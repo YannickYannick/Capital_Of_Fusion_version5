@@ -7,8 +7,8 @@
 ## 1. Base URL & authentification
 
 - **Base URL (dev) :** `http://localhost:8000` ou `http://127.0.0.1:8000`
-- **Phase 1 :** tous les endpoints listés sont en **lecture seule** ; pas d’authentification requise.
 - **CORS :** origines autorisées pour le front Next.js : `http://localhost:3000`, `http://127.0.0.1:3000`
+- **Auth :** Token DRF. `POST /api/auth/login/` renvoie `{ "token": "..." }` ; les endpoints protégés utilisent l’en-tête `Authorization: Token <key>`.
 
 ---
 
@@ -64,7 +64,11 @@
 
 **Exemple :** `GET /api/courses/?level=beginner&style=bachata`
 
-**Exemple de réponse :**
+| Méthode | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/courses/<slug>/` | Détail d’un cours actif par slug. 404 si inactif ou inexistant. |
+
+**Exemple de réponse (liste) :**
 ```json
 [
   {
@@ -102,7 +106,11 @@
 
 **Exemple :** `GET /api/events/?upcoming=1&type=FESTIVAL`
 
-**Exemple de réponse :**
+| Méthode | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/events/<slug>/` | Détail d’un événement par slug. |
+
+**Exemple de réponse (liste) :**
 ```json
 [
   {
@@ -123,10 +131,32 @@
 
 ---
 
+### 2.4 Organisation (Explore 3D)
+
+| Méthode | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/organization/nodes/` | Liste des noeuds visibles en 3D (`is_visible_3d=True`), avec paramètres 3D et `node_events`. |
+| GET | `/api/organization/nodes/<slug>/` | Détail d’un noeud par slug (pour overlay). |
+
+---
+
+### 2.5 Auth
+
+| Méthode | URL | Description |
+|--------|-----|-------------|
+| POST | `/api/auth/login/` | Body : `{ "username", "password" }`. Réponse : `{ "token": "..." }`. |
+| POST | `/api/auth/logout/` | Déconnexion (supprime le token). Header : `Authorization: Token <key>`. |
+| GET | `/api/auth/me/` | Utilisateur courant. Header : `Authorization: Token <key>`. |
+
+---
+
 ## 3. Codes de statut & erreurs
 
 - **200 OK** : requête réussie, corps = liste ou objet JSON.
-- **404** : ressource non trouvée (non utilisé en Phase 1 pour ces endpoints liste).
+- **204 No Content** : logout réussi.
+- **400** : paramètres manquants ou invalides (ex. login sans username/password).
+- **401** : non autorisé (identifiants incorrects ou token manquant/invalide).
+- **404** : ressource non trouvée (slug inexistant).
 - **500** : erreur serveur ; format d’erreur DRF par défaut.
 
 ---

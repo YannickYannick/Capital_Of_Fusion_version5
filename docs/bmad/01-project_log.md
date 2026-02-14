@@ -38,6 +38,12 @@
 | [2025-02-10] Completed Task | Landing + Navbar | Navbar avec scroll, MobileNav hamburger, landing gradient + CTA, NEXT_PUBLIC_YOUTUBE_VIDEO_ID. |
 | [2025-02-10] Starting Task | Backend Django Phase 1 | Objectif : projet config, apps core/users/organization/courses/events, modèles MCD Phase 1, API menu/courses/events (lecture seule), fixtures, doc. |
 | [2025-02-10] Completed Task | Backend Django Phase 1 | Projet Django dans `backend/` (config, settings base/local/production), apps core, users, organization, courses, events ; modèles BaseModel, DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem, User, OrganizationNode, OrganizationRole, UserOrganizationRole, NodeEvent, Course, Schedule, Enrollment, Event, EventPass, Registration ; API GET /api/menu/items/, /api/courses/, /api/events/ avec filtres ; commande `load_initial_data` ; tech_specs, api_docs, project_log et .gitignore mis à jour. |
+| [2025-02-10] Starting Task | Prochaines étapes (Navbar dynamique, Cours, Événements, Explore 3D, Auth) | Objectif : implémenter les 5 étapes front + API (détail par slug, organization/nodes, auth token). |
+| [2025-02-10] Completed Task | Navbar dynamique | Front : GET /api/menu/items/, NEXT_PUBLIC_API_URL, Navbar et MobileNav pilotés par l’API ; fallback liens statiques si API indisponible. |
+| [2025-02-10] Completed Task | Pages Cours | Backend : GET /api/courses/<slug>/ ; front : /cours (liste, filtres style/niveau), /cours/[slug] (détail). |
+| [2025-02-10] Completed Task | Pages Événements | Backend : GET /api/events/<slug>/ ; front : /evenements (liste, filtres type/upcoming), /evenements/[slug] (détail). |
+| [2025-02-10] Completed Task | Explore 3D | Backend : GET /api/organization/nodes/ et nodes/<slug>/ ; front : scène Three.js (planètes = noeuds), overlay détail (PlanetOverlay + NodeEvents), fallback vue liste. |
+| [2025-02-10] Completed Task | Auth base | Backend : TokenAuthentication, POST /api/auth/login/, logout, GET /api/auth/me/ ; front : page /login, stockage token (localStorage), Déconnexion dans Navbar/MobileNav. api_docs mis à jour. |
 
 ---
 
