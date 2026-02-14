@@ -12,7 +12,7 @@
 |---------|--------|------|
 | **Front-end** | Next.js 15 (App Router) + Tailwind CSS + Three.js | SSR pour SEO, mobile-first ; Three.js pour Explore 3D. |
 | **Back-end / API** | Django + Django REST Framework (DRF) | API REST, auth (rôles participant/artiste/admin). |
-| **Base de données** | PostgreSQL | Données relationnelles (users, cours, événements, organisations). |
+| **Base de données** | SQLite (Phase 1) → PostgreSQL (Phase 2+) | Phase 1 : `backend/db.sqlite3` ; migration PostgreSQL prévue. |
 | **Hébergement** | À préciser | V4 : Vercel (front), Railway/Render (back), cPanel. À valider pour V5. |
 | **CI/CD** | À définir | Déploiement par phases (étapes V5). |
 
@@ -59,6 +59,7 @@ backend/apps/: core, users, organization, courses, events, shop
 ```
 
 - **Phase 1 (MVP) :** focus `(site)`, `(app)` pour Cours/Événements/Explore, `(auth)` ; apps core, users, organization, courses, events.
+- **Lancer le backend (Phase 1) :** depuis la racine du monorepo, `cd backend` puis `python manage.py runserver` (settings par défaut : `config.settings.local`). Voir `backend/README.md` pour venv et `load_initial_data`.
 - **Phase 2+ :** shop, formations, trainings, artistes, etc. (voir MCD V4).
 
 ---
@@ -118,7 +119,7 @@ Le MCD détaillé (Core, Users, Organization, Courses, Events, Shop, Formations,
 | Choix | Détail |
 |-------|--------|
 | **Source** | YouTube uniquement (embed IFrame API). ID configurable via `NEXT_PUBLIC_YOUTUBE_VIDEO_ID`. |
-| **Son** | Activé par défaut. Bouton permet de couper/rétablir le son. *Note : certains navigateurs bloquent l’autoplay avec son sans interaction utilisateur.* |
+| **Son** | Désactivé au démarrage (muet) pour garantir l’autoplay. Bouton « Activer le son » pour démutiser. *Les navigateurs n’autorisent l’autoplay qu’avec vidéo muette.* |
 | **Qualité** | Sélectionnable par l’utilisateur : 360p, 480p, 720p, 1080p (boutons sur la landing). Par défaut 720p. |
 | **Redimensionnement** | Comportement « cover » : le lecteur (1920×1080) est mis à l’échelle pour toujours couvrir la fenêtre ; `scale = max(largeur/1920, hauteur/1080)` ; recalcul au resize. |
 | **Composant** | `frontend/src/components/shared/YouTubeVideoBackground.tsx`. |

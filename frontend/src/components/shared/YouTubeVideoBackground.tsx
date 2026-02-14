@@ -32,7 +32,7 @@ const QUALITY_OPTIONS = [
 export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [quality, setQuality] = useState<string>("hd720");
   const [apiReady, setApiReady] = useState(false);
   const [scale, setScale] = useState(1);
@@ -82,7 +82,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
       height: 1080,
       playerVars: {
         autoplay: 1,
-        mute: 0, // Son par défaut ; certains navigateurs bloquent l'autoplay avec son
+        mute: 1, // Obligatoire pour l'autoplay (navigateurs bloquent le son sans interaction)
         loop: 1,
         playlist: videoId,
         controls: 0,

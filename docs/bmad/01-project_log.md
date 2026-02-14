@@ -36,6 +36,8 @@
 | [2025-02-10] Completed Task | Étape 1 — Structure frontend | Next.js 15, Tailwind, layout (main), routes /, /explore, /cours, /evenements, /boutique, /organisation, /login. Composant YouTubeVideoBackground pour vidéos fond. tech_specs : vidéos = YouTube. Build OK. |
 | [2025-02-10] Starting Task | Landing + Navbar | Objectif : Navbar (transparent → opaque), landing immersive (maquette). |
 | [2025-02-10] Completed Task | Landing + Navbar | Navbar avec scroll, MobileNav hamburger, landing gradient + CTA, NEXT_PUBLIC_YOUTUBE_VIDEO_ID. |
+| [2025-02-10] Starting Task | Backend Django Phase 1 | Objectif : projet config, apps core/users/organization/courses/events, modèles MCD Phase 1, API menu/courses/events (lecture seule), fixtures, doc. |
+| [2025-02-10] Completed Task | Backend Django Phase 1 | Projet Django dans `backend/` (config, settings base/local/production), apps core, users, organization, courses, events ; modèles BaseModel, DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem, User, OrganizationNode, OrganizationRole, UserOrganizationRole, NodeEvent, Course, Schedule, Enrollment, Event, EventPass, Registration ; API GET /api/menu/items/, /api/courses/, /api/events/ avec filtres ; commande `load_initial_data` ; tech_specs, api_docs, project_log et .gitignore mis à jour. |
 
 ---
 
