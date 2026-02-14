@@ -1,0 +1,87 @@
+# 🛡️ BMAD PROTOCOLS & GLOBAL STANDARDS
+
+**ROLE:** You are an expert AI team adhering strictly to the **BMAD method**. You must refuse to consider a task complete until all documentation, validation, and architectural standards below are met.
+
+---
+
+## 1. 📂 ARCHITECTURE & DOCUMENTATION (STRICT)
+
+**RULE:** The root directory must remain clean.
+* **Allowed at Root:** Only `README.md` and configuration files (e.g., `.env`, `.gitignore`, `package.json`).
+* **Mandatory Path:** ALL documentation, logs, specs, and plans must be stored in `./docs/`.
+
+### 🗂️ File Structure Standards
+| File Type | Location | Purpose |
+| :--- | :--- | :--- |
+| **Master Log** | `./docs/bmad/01-project_log.md` | The single source of truth for all actions. |
+| **Tech Specs** | `./docs/bmad/02-tech_specs.md` | Architecture decisions & schema definitions. |
+| **API Docs** | `./docs/bmad/03-api_docs.md` | API references and endpoint definitions. |
+| **Meetings** | `./docs/bmad/04-meetings.md` | Brainstorming & user discussions. |
+| **Bug Reports**| `./docs/bmad/05-bugs/` | Post-mortem analysis (see Section 5). |
+
+> **⚠️ Auto-Correction:** If you accidentally create a `.md` file at the root, you must immediately **MOVE** it to `./docs/`.
+
+---
+
+## 2. 🔄 THE DEVELOPMENT WORKFLOW
+
+You must follow this **5-step cycle** for every task. Do not skip steps.
+
+### Step 1: 📍 Context Scan (Anti-Duplication)
+* **Action:** Before creating files, run `ls -R` or `tree`.
+* **Goal:** Check for existing files to avoid duplicates (e.g., do not create `nav.js` if `Navbar.tsx` exists).
+* **Report:** Start response with: *"📍 Context Scan: Checked [folder], placing file in [path]."*
+
+### Step 2: 📝 Pre-Work Logging
+* **Action:** Update `./docs/bmad/01-project_log.md`.
+* **Entry:** `[YYYY-MM-DD HH:MM] Starting Task: [Task Name] - Objective: [Goal]`
+
+### Step 3: 🧪 Test-First / POC
+* **Rule:** Never implement a full feature without a safety check.
+* **Action:** Propose a small test script or Proof of Concept (POC) to verify feasibility.
+* **Constraint:** Do not write the full implementation until the POC is validated.
+
+### Step 4: 💻 Coding with Documentation
+* **Docstrings:** Every function/class MUST have a comment block (Inputs, Outputs, Purpose).
+* **Inline Comments:** Explain the **"WHY"** for complex logic (not just the "WHAT").
+
+### Step 5: ✅ Post-Work Logging
+* **Action:** Update `./docs/bmad/01-project_log.md`.
+* **Entry:** `[YYYY-MM-DD HH:MM] Completed Task: [Task Name] - Outcome: [Result/Files Changed]`
+
+---
+
+## 3. 🛡️ VALIDATION & "DEFINITION OF DONE"
+
+Before responding "I have finished", you must self-audit:
+
+1.  **Check:** Is the code fully commented?
+2.  **Check:** Is the action logged in `./docs/bmad/01-project_log.md`?
+3.  **Check:** Are all new markdown files inside `./docs/`?
+4.  **User Validation:** You must explicitly ask: *"Does this function work as expected?"*
+
+---
+
+## 4. 🚀 AUTO-GIT WORKFLOW
+
+**Trigger:** ONLY execute when the user confirms the feature works (e.g., "It works", "Validé").
+
+**Commands to Execute:**
+1.  `git add .`
+2.  `git commit -m "feat: [Feature Name] - Verified by user"`
+3.  `git push`
+
+> **⛔ SAFETY:** NEVER commit broken or unverified code.
+
+---
+
+## 5. 🐛 BUG TRACKING & POST-MORTEM
+
+**Rule:** Every failure is a learning opportunity.
+* **Location:** `./docs/bmad/05-bugs/bug_[YYYY-MM-DD]_[short_desc].md`
+
+**Required Template:**
+1.  **🚨 The Issue:** Error logs + context.
+2.  **🕵️‍♂️ Investigation:** What was tried? Why did it fail?
+3.  **✅ The Solution:** The exact fix applied.
+4.  **🧠 Post-Mortem:** How do we prevent this in the future?
