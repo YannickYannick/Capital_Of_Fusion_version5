@@ -12,11 +12,11 @@ Créer la structure des dossiers frontend Next.js selon [01-arborescence.md](../
 
 ## Tâches
 
-1. [ ] Créer `frontend/src/app/(main)/` avec `page.tsx` (landing)
-2. [ ] Créer `frontend/src/app/layout.tsx` et `globals.css`
-3. [ ] Créer les dossiers : `components/ui/`, `components/shared/`, `components/features/`, `hooks/`, `lib/`, `contexts/`, `store/`, `types/`
-4. [ ] Créer les routes squelettes : `(main)/explore/`, `(main)/cours/`, `(main)/evenements/`, `(main)/boutique/`, `(main)/organisation/`, `(main)/login/` (page.tsx minimal)
-5. [ ] Vérifier que Next.js démarre et affiche la landing
+1. [x] Créer `frontend/src/app/(main)/` avec `page.tsx` (landing)
+2. [x] Créer `frontend/src/app/layout.tsx` et `globals.css`
+3. [x] Créer les dossiers : `components/ui/`, `components/shared/`, `components/features/`, `hooks/`, `lib/`, `contexts/`, `store/`, `types/`
+4. [x] Créer les routes squelettes : `(main)/explore/`, `(main)/cours/`, `(main)/evenements/`, `(main)/boutique/`, `(main)/organisation/`, `(main)/login/` (page.tsx minimal)
+5. [x] Vérifier que Next.js démarre et affiche la landing
 
 ## Livrables
 

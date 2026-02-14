@@ -6,7 +6,7 @@ Liste des étapes de refactorisation, dans l'ordre recommandé.
 
 | # | Étape | Fichier | Statut |
 |---|--------|---------|--------|
-| 1 | Structure dossiers frontend | 01-structure_frontend.md | À faire |
+| 1 | Structure dossiers frontend | 01-structure_frontend.md | Fait |
 | 2 | … | … | … |
 
 _Ajouter une ligne par étape et créer le fichier détaillé dans `etapes/`._

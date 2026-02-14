@@ -31,7 +31,7 @@
 
 | Module | Rôle | Pages / fonctionnalités associées |
 |--------|------|-----------------------------------|
-| **Landing** | Présentation école (Capital of Fusion) | Page d'accueil immersive ; vidéo fond, CTA vers Explore et Cours. |
+| **Landing** | Présentation école (Capital of Fusion) | Page d'accueil immersive ; vidéo fond via **YouTube** (embeds), CTA vers Explore et Cours. |
 | **Explore 3D** | Navigation « planétaire » (OrganizationNode) | Scène Three.js, overlay détail (PlanetOverlay), NodeEvent ; fallback liste/arbre (mobile, a11y). |
 | **Cours** | Catalogue et vente de cours | `/cours/`, filtres (style, niveau, prof), recherche, détail. |
 | **Événements** | Agenda et mise en avant d'événements | `/evenements/`, calendrier, lieux, passes, types (festival, soirée). |

@@ -31,6 +31,11 @@
 | [2025-02-10] Completed Task | Copie hybride refactorisation_v4 | Tous les fichiers validés copiés/adaptés. Réf. `docs/refactorisation_v4/sources_refacto.md`. |
 | [2025-02-10] Completed Task | Réorganisation docs | Titres homogènes (01–05), numérotation structure/etapes, sources_refacto → refactorisation_v4, docs/README.md créé, liens mis à jour. |
 | [2025-02-10] Completed Task | Réorganisation BMAD | Fichiers BMAD numérotés (01–10) et regroupés dans `docs/bmad/`. |
+| [2025-02-10] Git | Repo initialisé, commit : feat: reorganisation docs BMAD. Remote non configuré (push à faire après `git remote add`). |
+| [2025-02-10] Starting Task | Étape 1 — Structure frontend | Objectif : créer monorepo frontend/, structure Next.js 15 (main), routes squelettes. |
+| [2025-02-10] Completed Task | Étape 1 — Structure frontend | Next.js 15, Tailwind, layout (main), routes /, /explore, /cours, /evenements, /boutique, /organisation, /login. Composant YouTubeVideoBackground pour vidéos fond. tech_specs : vidéos = YouTube. Build OK. |
+| [2025-02-10] Starting Task | Landing + Navbar | Objectif : Navbar (transparent → opaque), landing immersive (maquette). |
+| [2025-02-10] Completed Task | Landing + Navbar | Navbar avec scroll, MobileNav hamburger, landing gradient + CTA, NEXT_PUBLIC_YOUTUBE_VIDEO_ID. |
 
 ---
 
