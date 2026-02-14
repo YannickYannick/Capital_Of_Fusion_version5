@@ -1,8 +1,11 @@
 import { YouTubeVideoBackground } from "@/components/shared/YouTubeVideoBackground";
 import Link from "next/link";
 
+// Remplace par ton ID YouTube dans .env.local (NEXT_PUBLIC_YOUTUBE_VIDEO_ID)
+// Ex: https://youtube.com/watch?v=abc123 → abc123
+// Vidéo de démo par défaut. Remplace via .env.local (NEXT_PUBLIC_YOUTUBE_VIDEO_ID)
 const YOUTUBE_VIDEO_ID =
-  process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "VIDEO_ID";
+  process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
 
 /**
  * Landing — page d'accueil immersive.

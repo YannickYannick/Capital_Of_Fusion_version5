@@ -113,6 +113,16 @@ Le MCD détaillé (Core, Users, Organization, Courses, Events, Shop, Formations,
 - Navbar : transparente → `bg-black/80 backdrop-blur-md` au scroll.
 - Police : Inter (Tailwind).
 
+### Vidéo de fond — Landing
+
+| Choix | Détail |
+|-------|--------|
+| **Source** | YouTube uniquement (embed IFrame API). ID configurable via `NEXT_PUBLIC_YOUTUBE_VIDEO_ID`. |
+| **Son** | Activé par défaut. Bouton permet de couper/rétablir le son. *Note : certains navigateurs bloquent l’autoplay avec son sans interaction utilisateur.* |
+| **Qualité** | Sélectionnable par l’utilisateur : 360p, 480p, 720p, 1080p (boutons sur la landing). Par défaut 720p. |
+| **Redimensionnement** | Comportement « cover » : le lecteur (1920×1080) est mis à l’échelle pour toujours couvrir la fenêtre ; `scale = max(largeur/1920, hauteur/1080)` ; recalcul au resize. |
+| **Composant** | `frontend/src/components/shared/YouTubeVideoBackground.tsx`. |
+
 ---
 
 *Dernière mise à jour : 2025-02-10*
