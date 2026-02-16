@@ -1,0 +1,15 @@
+# Railway (Nixpacks) : forcer l'installation des dépendances Python dans le venv utilisé au runtime.
+# Sans ce fichier, le build peut ne pas installer requirements.txt quand Root Directory = backend.
+
+[phases.setup]
+nixPkgs = ["python312", "pip"]
+
+[phases.install]
+cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
+
+[phases.build]
+cmds = []
+
+[start]
+# Railway injecte PORT au runtime ; la commande est exécutée dans un shell, $PORT est donc développé.
+cmd = "gunicorn config.wsgi --bind 0.0.0.0:$PORT"

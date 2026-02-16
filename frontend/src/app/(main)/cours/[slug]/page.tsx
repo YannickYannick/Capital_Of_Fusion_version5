@@ -1,9 +1,31 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getCourseBySlug, getApiBaseUrl } from "@/lib/api";
 import { notFound } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+/** SEO : titre et description dynamiques selon le cours */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const course = await getCourseBySlug(slug);
+    const description =
+      course.description?.slice(0, 160) ||
+      `${course.name} — ${course.style_name}, ${course.level_name}. Capital of Fusion.`;
+    return {
+      title: course.name,
+      description,
+      openGraph: {
+        title: course.name,
+        description,
+      },
+    };
+  } catch {
+    return { title: "Cours" };
+  }
 }
 
 /**

@@ -57,10 +57,10 @@ export function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Navigation principale">
         <Link
           href="/"
-          className="text-lg font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent hover:opacity-90 transition"
+          className="text-lg font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
         >
           [CF] Capital of Fusion
         </Link>
@@ -68,8 +68,8 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-6">
           {links.map(({ href, label, children }) =>
             children.length > 0 ? (
-              <div key={href + label} className="relative group">
-                <span className="text-white/90 hover:text-white text-sm font-medium transition cursor-default py-2">
+              <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
+                <span className="text-white/90 hover:text-white text-sm font-medium transition cursor-default py-2 block">
                   {label}
                 </span>
                 <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -78,7 +78,7 @@ export function Navbar() {
                       <Link
                         key={child.id}
                         href={child.url || "#"}
-                        className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5"
+                        className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
                       >
                         {child.name}
                       </Link>
@@ -90,7 +90,7 @@ export function Navbar() {
               <Link
                 key={href + label}
                 href={href}
-                className="text-white/90 hover:text-white text-sm font-medium transition"
+                className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
               >
                 {label}
               </Link>
@@ -104,7 +104,7 @@ export function Navbar() {
                 setHasToken(false);
                 router.refresh();
               }}
-              className="p-2 text-white/90 hover:text-white transition text-sm"
+              className="p-2 text-white/90 hover:text-white transition text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
               aria-label="Déconnexion"
             >
               Déconnexion
@@ -112,7 +112,7 @@ export function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="p-2 text-white/90 hover:text-white transition"
+              className="p-2 text-white/90 hover:text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded inline-block"
               aria-label="Connexion"
             >
               <svg

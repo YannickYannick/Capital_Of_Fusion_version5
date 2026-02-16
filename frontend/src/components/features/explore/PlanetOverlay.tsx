@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { OrganizationNodeApi } from "@/types/organization";
 
 interface PlanetOverlayProps {
@@ -20,26 +21,45 @@ function formatDateTime(s: string): string {
 
 /**
  * Overlay détail d'un noeud (planète) : nom, description, NodeEvents.
+ * Accessibilité : dialog modal, fermeture Escape, focus sur le bouton fermer à l'ouverture.
  */
 export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!node) return;
+    closeButtonRef.current?.focus();
+  }, [node]);
+
+  useEffect(() => {
+    if (!node) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [node, onClose]);
+
   if (!node) return null;
 
   return (
     <div
       className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-black/95 backdrop-blur-md border-l border-white/10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300"
       role="dialog"
+      aria-modal="true"
       aria-label={`Détail : ${node.name}`}
     >
       <div className="p-6">
         <div className="flex justify-between items-start">
           <h2 className="text-xl font-bold text-white">{node.name}</h2>
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-white"
-            aria-label="Fermer"
+            className="p-2 text-white/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
+            aria-label="Fermer le détail"
           >
-            <span className="text-2xl leading-none">×</span>
+            <span className="text-2xl leading-none" aria-hidden="true">×</span>
           </button>
         </div>
         {node.short_description && (
@@ -80,9 +100,10 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
                       href={ev.external_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-purple-300 hover:underline mt-1 inline-block"
+                      className="text-xs text-purple-300 hover:underline mt-1 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 rounded"
+                      aria-label={`Lien vers l’événement : ${ev.title}`}
                     >
-                      Lien
+                      Voir l’événement
                     </a>
                   )}
                 </li>

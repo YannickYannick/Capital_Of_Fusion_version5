@@ -44,6 +44,15 @@
 | [2025-02-10] Completed Task | Pages Événements | Backend : GET /api/events/<slug>/ ; front : /evenements (liste, filtres type/upcoming), /evenements/[slug] (détail). |
 | [2025-02-10] Completed Task | Explore 3D | Backend : GET /api/organization/nodes/ et nodes/<slug>/ ; front : scène Three.js (planètes = noeuds), overlay détail (PlanetOverlay + NodeEvents), fallback vue liste. |
 | [2025-02-10] Completed Task | Auth base | Backend : TokenAuthentication, POST /api/auth/login/, logout, GET /api/auth/me/ ; front : page /login, stockage token (localStorage), Déconnexion dans Navbar/MobileNav. api_docs mis à jour. |
+| [2025-02-10] Starting Task | Données démo | Objectif : créer des données démo (noeuds, cours, événements, NodeEvents) et documenter. |
+| [2025-02-10] Completed Task | Données démo | Commande `load_demo_data` : 3 noeuds (Capital of Fusion, Paris, Lyon), 3 NodeEvents, 3 cours + horaires, 3 événements + passes. Doc : `docs/explication/donnees_demo.md`, `backend/README.md` (section Données démo). |
+| [2025-02-10] Starting Task | SEO | Objectif : metadata par page, Open Graph, robots.txt, sitemap, guide explicatif. |
+| [2025-02-10] Completed Task | SEO | Layout racine : metadataBase, title template, openGraph, twitter, robots. Layouts (cours, evenements, explore, login) + landing : metadata. generateMetadata sur /cours/[slug] et /evenements/[slug]. robots.ts (disallow /login, sitemap), sitemap.ts (pages + cours + events). NEXT_PUBLIC_SITE_URL dans .env.example. Doc : `docs/explication/seo-guide.md`. |
+| [2025-02-10] Completed Task | Mise à jour étapes Phase 1 | `docs/bmad/10-etapes_v5.md` : index des étapes 1–10 marquées « Fait », section « Suite après Phase 1 » (accessibilité, déploiement, Phase 2). |
+| [2025-02-10] Starting Task | Accessibilité | Objectif : contrastes (focus visible), clavier (Escape, focus), ARIA, fallback Explore 3D. |
+| [2025-02-10] Completed Task | Accessibilité | Navbar : aria-label nav, focus-visible ring sur liens/boutons, aria-haspopup/aria-label sur groupes dropdown. MobileNav : aria-expanded, aria-controls, aria-label dynamique (Ouvrir/Fermer menu), focus ring, aria-label Déconnexion/Connexion. Explore : groupe toggle aria-label, aria-pressed sur boutons Vue 3D/liste, sr-only hint « Vue liste pour clavier/TA », liste avec aria-label et aria-label sur boutons noeuds, vue 3D avec aria-hidden + sr-only fallback. PlanetOverlay : aria-modal, fermeture Escape, focus sur bouton fermer à l’ouverture, aria-label liens événements. Pas de piège de focus complet (à renforcer plus tard si besoin). |
+| [2025-02-10] Starting Task | Préparation déploiement | Objectif : backend prêt prod (gunicorn, CORS, Procfile) + guide pas à pas. |
+| [2025-02-10] Completed Task | Préparation déploiement | Backend : gunicorn + psycopg dans requirements.txt ; Procfile (gunicorn bind $PORT) ; production.py : CORS_ALLOWED_ORIGINS depuis env. Doc : `docs/explication/deploiement.md` (étapes Vercel + Railway/Render, variables, migrations, CORS, checklist). Lien depuis `hebergement.md`. |
 
 ---
 

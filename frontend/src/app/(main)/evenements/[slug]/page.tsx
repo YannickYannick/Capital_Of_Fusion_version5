@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getEventBySlug, getApiBaseUrl } from "@/lib/api";
 import { notFound } from "next/navigation";
@@ -13,6 +14,27 @@ function formatDate(dateStr: string): string {
     month: "long",
     year: "numeric",
   });
+}
+
+/** SEO : titre et description dynamiques selon l'événement */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const event = await getEventBySlug(slug);
+    const description =
+      event.description?.slice(0, 160) ||
+      `${event.name} — ${event.type}, ${event.location_name || ""}. Capital of Fusion.`;
+    return {
+      title: event.name,
+      description,
+      openGraph: {
+        title: event.name,
+        description,
+      },
+    };
+  } catch {
+    return { title: "Événement" };
+  }
 }
 
 /**

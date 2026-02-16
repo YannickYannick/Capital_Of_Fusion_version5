@@ -1,13 +1,13 @@
 # Déploiement — Site Bachata V5
 
-**Objectif :** déployer le frontend (Next.js) sur Vercel et le backend (Django + PostgreSQL) sur Railway ou Render, puis connecter les deux.
+**Objectif :** déployer le frontend (Next.js) sur Vercel et le backend (Django + PostgreSQL) sur **Railway** (recommandé) ou **Render**, puis connecter les deux. Un seul hébergeur backend suffit.
 
 ---
 
 ## Prérequis
 
 - Un **compte GitHub** avec le repo du projet poussé.
-- Comptes **Vercel**, **Railway** et/ou **Render** (gratuits pour commencer).
+- **Vercel** (frontend) + **Railway** ou **Render** (backend, au choix).
 
 ---
 
@@ -18,7 +18,7 @@
 
 ---
 
-## Étape 1 — Backend (Railway ou Render)
+## Étape 1 — Backend (Railway recommandé, ou Render)
 
 ### 1.1 Créer le projet
 
@@ -34,9 +34,8 @@
 
 - **Root / répertoire de travail :** `backend` (pas la racine du repo).
 - **Commande de démarrage :**
-  - Railway : détecte souvent le `Procfile` dans `backend/`. Sinon : `python -m gunicorn config.wsgi --bind 0.0.0.0:$PORT`
-  - Render : dans "Build Command" mettre `pip install -r requirements.txt`, dans "Start Command" : `python -m gunicorn config.wsgi --bind 0.0.0.0:$PORT`
-  - *Important :* utiliser `python -m gunicorn` (et non `gunicorn` seul) pour éviter l’erreur « gunicorn: command not found » sur certains environnements (Railway/Nixpacks, etc.).
+  - **Railway** : le repo contient `backend/nixpacks.toml` qui force l’installation des dépendances et définit la commande de start. Si tu overrides dans le dashboard, utilise **Start Command** : `gunicorn config.wsgi --bind 0.0.0.0:$PORT` (et ne supprime pas `gunicorn` de `requirements.txt`).
+  - **Render** : Build Command `pip install -r requirements.txt`, Start Command : `gunicorn config.wsgi --bind 0.0.0.0:$PORT`.
 - **Variables d’environnement** à définir :
 
 | Variable | Description | Exemple |
@@ -131,6 +130,25 @@ Une fois l’URL Vercel connue (ex: `https://ton-app.vercel.app`) :
 - **CORS bloqué :** vérifier que `CORS_ALLOWED_ORIGINS` contient exactement l’URL du front (schéma + domaine + port si présent).
 - **Données vides :** vérifier que les migrations ont été faites et, si tu utilises les données démo, que `load_demo_data` a été exécuté.
 - **Front ne charge pas l’API :** vérifier `NEXT_PUBLIC_API_URL` (sans slash final en général) et que le backend répond en GET sur `/api/menu/items/` par exemple.
+
+### Dépannage Railway : « No module named gunicorn » / « gunicorn: command not found »
+
+Cela signifie que les dépendances ne sont pas installées dans l’environnement utilisé au démarrage (build incomplet ou venv non utilisé).
+
+1. **Fichiers à avoir dans `backend/` (et à committer/pousser) :**
+   - **`requirements.txt`** — doit contenir la ligne `gunicorn` (et `psycopg[binary]` pour PostgreSQL).
+   - **`nixpacks.toml`** — force l’installation des deps et la commande de start (présent dans le repo).
+   - **`runtime.txt`** — optionnel, fixe la version Python (ex. `python-3.12`).
+
+2. **Dans le dashboard Railway :**
+   - **Settings** du service → **Root Directory** = `backend`.
+   - **Start Command** : soit laisser Railway utiliser le Procfile / nixpacks.toml (recommandé), soit définir : `gunicorn config.wsgi --bind 0.0.0.0:$PORT` (module Django = `config.wsgi`).
+
+3. **Vérifier que Railway installe les dépendances :**
+   - **Deployments** → dernier déploiement → **Build Logs** : une phase doit exécuter `pip install -r requirements.txt`.
+   - Faire **Clear build cache** puis **Redeploy** pour un build propre.
+
+4. **Si ça échoue encore :** dans Railway, **Build Command** = `pip install -r requirements.txt`, **Start Command** = `gunicorn config.wsgi --bind 0.0.0.0:$PORT`, puis redéployer. Vérifier que **Root Directory** = `backend`.
 
 ---
 

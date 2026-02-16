@@ -21,6 +21,18 @@ Index de la documentation du projet (méthodologie BMAD).
 
 ---
 
+## 📖 Explications (`explication/`)
+
+Guides pour comprendre et utiliser des fonctionnalités du projet.
+
+| Fichier | Contenu |
+|---------|---------|
+| [seo-guide.md](explication/seo-guide.md) | SEO : title, description, Open Graph, robots, sitemap (étapes et où c’est dans le code) |
+| [donnees_demo.md](explication/donnees_demo.md) | Données démo : commandes `load_initial_data` / `load_demo_data`, contenu créé |
+| [hebergement.md](explication/hebergement.md) | Hébergement cible : Vercel (front) + Railway ou Render (back), pour ~100 users/jour |
+
+---
+
 ## 📂 Refactorisation V4 (copie locale)
 
 Source : `C:\...\Projet - site bachata V4\refactorisation_V5_Structuré\`

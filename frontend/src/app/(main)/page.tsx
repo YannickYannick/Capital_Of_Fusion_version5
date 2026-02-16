@@ -1,22 +1,23 @@
 import { YouTubeVideoBackground } from "@/components/shared/YouTubeVideoBackground";
 import Link from "next/link";
 
-// Remplace par ton ID YouTube dans .env.local (NEXT_PUBLIC_YOUTUBE_VIDEO_ID)
-// Ex: https://youtube.com/watch?v=abc123 → abc123
-// Vidéo de démo par défaut. Remplace via .env.local (NEXT_PUBLIC_YOUTUBE_VIDEO_ID)
 const YOUTUBE_VIDEO_ID =
   process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
 
+export const metadata = {
+  title: "Accueil",
+  description:
+    "Capital of Fusion — École nationale de danse. Bachata, salsa, kizomba. Découvrez nos cours, événements et l'expérience Explore 3D.",
+};
+
 /**
  * Landing — page d'accueil immersive.
- * Vidéo fond : YouTube (NEXT_PUBLIC_YOUTUBE_VIDEO_ID ou VIDEO_ID à remplacer).
  */
 export default function LandingPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
       <YouTubeVideoBackground videoId={YOUTUBE_VIDEO_ID} />
 
-      {/* Gradient overlay (from maquette) */}
       <div
         className="absolute inset-0 bg-gradient-to-b from-[#0a0e27] via-[#0a0e27]/60 to-transparent pointer-events-none"
         aria-hidden
@@ -38,19 +39,19 @@ export default function LandingPage() {
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/explore"
-            className="px-8 py-4 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-semibold transition shadow-lg shadow-purple-500/25"
+            className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition"
           >
-            ▶ Commencer l&apos;Expérience
+            Commencer l&apos;Expérience
           </Link>
           <Link
             href="/cours"
-            className="px-8 py-4 rounded-lg border-2 border-white/30 hover:bg-white/10 text-white font-semibold transition"
+            className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition"
           >
-            Voir les Cours →
+            Voir les Cours
           </Link>
         </div>
 
-        <p className="mt-12 text-sm text-white/60">
+        <p className="mt-8 text-sm text-white/50">
           Paris, France • École Nationale de Danse
         </p>
       </section>

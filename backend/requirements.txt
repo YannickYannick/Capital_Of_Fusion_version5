@@ -3,3 +3,5 @@ djangorestframework
 django-cors-headers
 django-environ
 Pillow
+gunicorn
+psycopg[binary]

@@ -32,9 +32,12 @@ export function MobileNav({
   return (
     <div className="md:hidden">
       <button
+        type="button"
         onClick={() => setOpen(!open)}
-        className="p-2 text-white/90 hover:text-white"
-        aria-label="Menu"
+        className="p-2 text-white/90 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
+        aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+        aria-expanded={open}
+        aria-controls="mobile-menu"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +64,7 @@ export function MobileNav({
         </svg>
       </button>
       {open && (
-        <div className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
+        <div id="mobile-menu" role="navigation" aria-label="Menu mobile" className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
           {items.map(({ href, label, children }) => (
             <div key={href + label}>
               {children.length > 0 ? (
@@ -71,7 +74,9 @@ export function MobileNav({
                     onClick={() =>
                       setExpandedSlug((s) => (s === label ? null : label))
                     }
-                    className="w-full px-6 py-2 text-left text-white/90 hover:text-white hover:bg-white/5 flex items-center justify-between"
+                    className="w-full px-6 py-2 text-left text-white/90 hover:text-white hover:bg-white/5 flex items-center justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
+                    aria-expanded={expandedSlug === label}
+                    aria-controls={`mobile-submenu-${label.replace(/\s+/g, "-")}`}
                   >
                     {label}
                     <span
@@ -83,13 +88,13 @@ export function MobileNav({
                     </span>
                   </button>
                   {expandedSlug === label && (
-                    <div className="pl-6 pb-2 flex flex-col gap-1">
+                    <div id={`mobile-submenu-${label.replace(/\s+/g, "-")}`} className="pl-6 pb-2 flex flex-col gap-1" role="group" aria-label={`Sous-menu ${label}`}>
                       {children.map((child) => (
                         <Link
                           key={child.id}
                           href={child.url || "#"}
                           onClick={() => setOpen(false)}
-                          className="py-1.5 text-sm text-white/80 hover:text-white"
+                          className="py-1.5 text-sm text-white/80 hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
                         >
                           {child.name}
                         </Link>
@@ -101,7 +106,7 @@ export function MobileNav({
                 <Link
                   href={href}
                   onClick={() => setOpen(false)}
-                  className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5"
+                  className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
                 >
                   {label}
                 </Link>
@@ -115,7 +120,8 @@ export function MobileNav({
                 onLogout();
                 setOpen(false);
               }}
-              className="w-full text-left px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2"
+              className="w-full text-left px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
+              aria-label="Déconnexion"
             >
               Déconnexion
             </button>
@@ -123,7 +129,8 @@ export function MobileNav({
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2"
+              className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
+              aria-label="Connexion"
             >
               Connexion
             </Link>
