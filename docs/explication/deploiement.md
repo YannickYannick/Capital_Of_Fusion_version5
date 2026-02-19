@@ -34,7 +34,7 @@
 
 - **Root / répertoire de travail :** `backend` (pas la racine du repo).
 - **Commande de démarrage :**
-  - **Railway** : le repo contient `backend/nixpacks.toml` qui force l’installation des dépendances et définit la commande de start. Si tu overrides dans le dashboard, utilise **Start Command** : `gunicorn config.wsgi --bind 0.0.0.0:$PORT` (et ne supprime pas `gunicorn` de `requirements.txt`).
+  - **Railway** : le repo contient `backend/Procfile` qui définit la commande de start (collectstatic, migrate, gunicorn). Si tu overrides dans le dashboard, utilise **Start Command** : `python manage.py collectstatic --noinput && python manage.py migrate --noinput && exec gunicorn config.wsgi --bind 0.0.0.0:$PORT` (et ne supprime pas `gunicorn` de `requirements.txt`).
   - **Render** : Build Command `pip install -r requirements.txt`, Start Command : `gunicorn config.wsgi --bind 0.0.0.0:$PORT`.
 - **Variables d’environnement** à définir :
 
@@ -48,20 +48,21 @@
 | `DB_PASSWORD` | Mot de passe PostgreSQL | (fourni) |
 | `DB_HOST` | Hôte PostgreSQL | (fourni) |
 | `DB_PORT` | Port (souvent 5432) | `5432` |
-| `CORS_ALLOWED_ORIGINS` | URL(s) du frontend (Vercel) | `https://votre-app.vercel.app` (à adapter après déploiement front) |
+| `CORS_ALLOWED_ORIGINS` | Optionnel. URL(s) du front (domaine perso) | Les **\*.vercel.app** sont autorisés automatiquement (regex). À renseigner seulement pour un domaine perso (ex: `https://capitaloffusion.fr`). |
 
 **Test sans PostgreSQL (SQLite) :** si tu ne définis **aucune** variable `DB_NAME` ni `DB_HOST`, Django en production utilisera SQLite (fichier dans le conteneur). Pratique pour vérifier que l’app répond ; les données sont **perdues à chaque redéploiement**. Pense à lancer `python manage.py migrate` et éventuellement `load_demo_data` (shell Railway ou release command).
 
 Sur **Railway**, si une variable `DATABASE_URL` est fournie, il faut soit la parser, soit utiliser les variables séparées. Beaucoup de projets utilisent `dj-database-url` ; ici on utilise `DB_*` pour rester simple. Si Railway n’expose que `DATABASE_URL`, il faudra l’ajouter dans les settings (ou remplir manuellement `DB_HOST`, `DB_USER`, etc. à partir de l’URL).
 
-### 1.4 Migrations et données initiales (automatique à distance)
+### 1.4 Migrations et statiques (automatique à distance)
 
-Le script **`backend/scripts/start.sh`** est exécuté à chaque démarrage du conteneur (Railway, Render, etc.) :
+La **commande de démarrage** (Procfile) exécute à chaque déploiement :
 
-1. **`python manage.py migrate`** — toujours exécuté avant de lancer Gunicorn.
-2. **`python manage.py load_demo_data`** — uniquement si la variable **`RUN_LOAD_DEMO_DATA=1`** est définie (utile au premier déploiement avec SQLite, ou pour réinjecter des données démo). Tu peux la retirer après coup.
+1. **`python manage.py collectstatic --noinput`** — collecte les fichiers statiques (admin, etc.).
+2. **`python manage.py migrate --noinput`** — applique les migrations.
+3. **Gunicorn** — lance l’app.
 
-Aucune action manuelle ni SSH nécessaire : tout se fait à distance à chaque déploiement. Pour charger les données démo une fois, ajoute la variable **`RUN_LOAD_DEMO_DATA`** = **`1`** dans Railway (ou Render), redéploie, puis retire-la si tu ne veux pas relancer le chargement à chaque start.
+Pour charger les **données démo** une fois : `railway run python manage.py load_demo_data` (ou via SSH dans le conteneur).
 
 ### 1.5 Noter l’URL du backend
 
@@ -88,7 +89,7 @@ Dans Vercel : Project → Settings → Environment Variables. Ajouter :
 
 | Variable | Valeur (exemple) |
 |----------|------------------|
-| `NEXT_PUBLIC_API_URL` | URL du backend (étape 1.5), ex: `https://ton-backend.railway.app` |
+| `NEXT_PUBLIC_API_URL` | **Obligatoire.** URL du backend (étape 1.5), ex: `https://capitaloffusionversion5-production.up.railway.app` (sans slash final). Sans elle, le front appelle la mauvaise origine et « Failed to fetch » apparaît. |
 | `NEXT_PUBLIC_SITE_URL` | URL du site front (Vercel ou domaine perso), ex: `https://ton-app.vercel.app` |
 | `NEXT_PUBLIC_YOUTUBE_VIDEO_ID` | ID de la vidéo YouTube (fond landing), ex: `Dqg0oKlXpTE` |
 
@@ -96,28 +97,24 @@ Pour l’ID YouTube : si l’URL est `https://www.youtube.com/watch?v=Dqg0oKlXpT
 
 ### 2.4 Redéploiement
 
-Après avoir sauvegardé les variables, lancer un redeploy (Deployments → … → Redeploy) pour que le build utilise bien `NEXT_PUBLIC_API_URL` et les autres.
+Après avoir sauvegardé les variables, **lancer un redeploy** (Deployments → … → Redeploy). Les variables `NEXT_PUBLIC_*` sont prises en compte **au build** : sans nouveau déploiement, l’ancienne valeur (ou l’absence de valeur) reste utilisée.
 
 ---
 
-## Étape 3 — Revenir au backend (CORS)
+## Étape 3 — CORS (backend)
 
-Une fois l’URL Vercel connue (ex: `https://ton-app.vercel.app`) :
-
-- Dans les variables d’environnement du **backend** (Railway/Render), mettre à jour :
-  - `CORS_ALLOWED_ORIGINS` = `https://ton-app.vercel.app`  
-  (plusieurs origines possibles en les séparant par des virgules, sans espaces inutiles).
-- Redéployer le backend si besoin.
+- **Vercel (\*.vercel.app) :** toutes les origines du type `https://xxx.vercel.app` (preview et prod) sont **automatiquement autorisées** par le backend (regex en prod). Aucune variable à définir pour les déploiements Vercel.
+- **Domaine perso :** si tu utilises un domaine personnalisé (ex: `https://capitaloffusion.fr`), ajouter dans les variables du backend : `CORS_ALLOWED_ORIGINS` = `https://capitaloffusion.fr` (plusieurs origines en les séparant par des virgules). Puis redéployer le backend.
 
 ---
 
 ## Checklist rapide
 
 - [ ] Repo sur GitHub à jour
-- [ ] Backend : Root = `backend`, build/start = gunicorn, variables (DJANGO_*, DB_*, ALLOWED_HOSTS, CORS_ALLOWED_ORIGINS)
+- [ ] Backend : Root = `backend`, build/start = gunicorn, variables (DJANGO_*, DB_*, ALLOWED_HOSTS ; CORS_ALLOWED_ORIGINS optionnel, \*.vercel.app autorisé par défaut)
 - [ ] Backend : `migrate` (+ optionnel `load_demo_data`)
 - [ ] Frontend : Root = `frontend`, variables NEXT_PUBLIC_*
-- [ ] CORS = URL du frontend Vercel
+- [ ] CORS = automatique pour \*.vercel.app ; ajouter domaine perso dans CORS_ALLOWED_ORIGINS si besoin
 - [ ] Test : ouvrir le site Vercel, vérifier que les pages (cours, événements, explore) chargent les données depuis l’API
 
 ---
@@ -125,7 +122,7 @@ Une fois l’URL Vercel connue (ex: `https://ton-app.vercel.app`) :
 ## En cas de problème
 
 - **502 / 503 backend :** vérifier que la commande de démarrage est bien gunicorn et que `PORT` est utilisé (Railway/Render injectent `PORT`). Si erreur « gunicorn: command not found », utiliser `python -m gunicorn` au lieu de `gunicorn`.
-- **CORS bloqué :** vérifier que `CORS_ALLOWED_ORIGINS` contient exactement l’URL du front (schéma + domaine + port si présent).
+- **CORS bloqué :** les URLs \*.vercel.app sont autorisées par défaut. Si tu utilises un domaine perso, ajouter son URL dans `CORS_ALLOWED_ORIGINS` (exactement : schéma + domaine, sans slash final).
 - **Données vides :** vérifier que les migrations ont été faites et, si tu utilises les données démo, que `load_demo_data` a été exécuté.
 - **Front ne charge pas l’API :** vérifier `NEXT_PUBLIC_API_URL` (sans slash final en général) et que le backend répond en GET sur `/api/menu/items/` par exemple.
 
@@ -135,12 +132,12 @@ Cela signifie que les dépendances ne sont pas installées dans l’environnemen
 
 1. **Fichiers à avoir dans `backend/` (et à committer/pousser) :**
    - **`requirements.txt`** — doit contenir la ligne `gunicorn` (et `psycopg[binary]` pour PostgreSQL).
-   - **`nixpacks.toml`** — force l’installation des deps et la commande de start (présent dans le repo).
+   - **`Procfile`** — définit la commande de start (présent dans `backend/`).
    - **`runtime.txt`** — optionnel, fixe la version Python (ex. `python-3.12`).
 
 2. **Dans le dashboard Railway :**
    - **Settings** du service → **Root Directory** = `backend`.
-   - **Start Command** : soit laisser Railway utiliser le Procfile / nixpacks.toml (recommandé), soit définir : `gunicorn config.wsgi --bind 0.0.0.0:$PORT` (module Django = `config.wsgi`).
+   - **Start Command** : soit laisser Railway utiliser le Procfile (recommandé), soit définir la même commande que dans le Procfile (collectstatic, migrate, gunicorn).
 
 3. **Vérifier que Railway installe les dépendances :**
    - **Deployments** → dernier déploiement → **Build Logs** : une phase doit exécuter `pip install -r requirements.txt`.

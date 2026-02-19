@@ -18,6 +18,8 @@ ALLOWED_HOSTS = [
 # CORS : origines autorisées (URL du front Vercel). Ex: https://mon-site.vercel.app,https://capitaloffusion.fr
 _cors = os.environ.get("CORS_ALLOWED_ORIGINS", "")
 CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors.split(",") if o.strip()]
+# Autorise tout sous-domaine Vercel (preview + prod) pour éviter de mettre à jour CORS à chaque déploiement.
+CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://[\w-]+\.vercel\.app$"]
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF : origines de confiance pour les formulaires POST (admin, login, etc.). Format: https://domaine (sans slash final).

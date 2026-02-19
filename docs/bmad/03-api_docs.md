@@ -7,8 +7,28 @@
 ## 1. Base URL & authentification
 
 - **Base URL (dev) :** `http://localhost:8000` ou `http://127.0.0.1:8000`
-- **CORS :** origines autorisées pour le front Next.js : `http://localhost:3000`, `http://127.0.0.1:3000`
+- **Base URL (prod Railway) :** `https://capitaloffusionversion5-production.up.railway.app`
+- **Préfixe API :** `/api/` — tous les endpoints ci-dessous sont sous `{Base URL}/api/`.
+- **CORS :** origines autorisées pour le front Next.js : `http://localhost:3000`, `http://127.0.0.1:3000` (dev) ; en prod : `CORS_ALLOWED_ORIGINS` (ex. URL Vercel).
 - **Auth :** Token DRF. `POST /api/auth/login/` renvoie `{ "token": "..." }` ; les endpoints protégés utilisent l’en-tête `Authorization: Token <key>`.
+
+### Liste complète des endpoints (prod)
+
+| Méthode | URL complète (prod) |
+|--------|----------------------|
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/health/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/menu/items/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/courses/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/courses/<slug>/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/events/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/events/<slug>/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/organization/nodes/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/organization/nodes/<slug>/` |
+| POST | `https://capitaloffusionversion5-production.up.railway.app/api/auth/login/` |
+| POST | `https://capitaloffusionversion5-production.up.railway.app/api/auth/logout/` |
+| GET | `https://capitaloffusionversion5-production.up.railway.app/api/auth/me/` |
+
+**Hors API (Django admin) :** `https://capitaloffusionversion5-production.up.railway.app/admin/`
 
 ---
 

@@ -53,7 +53,9 @@
 | [2025-02-10] Completed Task | Accessibilité | Navbar : aria-label nav, focus-visible ring sur liens/boutons, aria-haspopup/aria-label sur groupes dropdown. MobileNav : aria-expanded, aria-controls, aria-label dynamique (Ouvrir/Fermer menu), focus ring, aria-label Déconnexion/Connexion. Explore : groupe toggle aria-label, aria-pressed sur boutons Vue 3D/liste, sr-only hint « Vue liste pour clavier/TA », liste avec aria-label et aria-label sur boutons noeuds, vue 3D avec aria-hidden + sr-only fallback. PlanetOverlay : aria-modal, fermeture Escape, focus sur bouton fermer à l’ouverture, aria-label liens événements. Pas de piège de focus complet (à renforcer plus tard si besoin). |
 | [2025-02-10] Starting Task | Préparation déploiement | Objectif : backend prêt prod (gunicorn, CORS, Procfile) + guide pas à pas. |
 | [2025-02-10] Completed Task | Préparation déploiement | Backend : gunicorn + psycopg dans requirements.txt ; Procfile (gunicorn bind $PORT) ; production.py : CORS_ALLOWED_ORIGINS depuis env. Doc : `docs/explication/deploiement.md` (étapes Vercel + Railway/Render, variables, migrations, CORS, checklist). Lien depuis `hebergement.md`. |
+| [2026-02-10] Starting Task | CORS Vercel → Railway | Objectif : corriger blocage CORS (front Vercel appelant API Railway) — « No Access-Control-Allow-Origin header ». |
+| [2026-02-10] Completed Task | CORS Vercel → Railway | production.py : ajout CORS_ALLOWED_ORIGIN_REGEXES pour autoriser tout \*.vercel.app (preview + prod). Doc déploiement : étape 3 et tableau variables mises à jour (CORS optionnel pour Vercel). project_log mis à jour. |
 
 ---
 
-*Dernière mise à jour : 2025-02-10*
+*Dernière mise à jour : 2026-02-10*

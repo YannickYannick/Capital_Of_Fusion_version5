@@ -30,9 +30,9 @@
 2. **Statiques admin** —  
    - **whitenoise** ajouté dans `requirements.txt` et en middleware (juste après `SecurityMiddleware`).  
    - **STATIC_ROOT** défini en production (`staticfiles/`).  
-   - **Procfile** et **nixpacks** : `python manage.py collectstatic --noinput` exécuté au démarrage avant `migrate` et Gunicorn.
+   - **Procfile** : `python manage.py collectstatic --noinput` exécuté au démarrage avant `migrate` et Gunicorn.
 
-Fichiers modifiés : `config/settings/production.py`, `config/settings/base.py`, `requirements.txt`, `Procfile`, `nixpacks.toml`.
+Fichiers modifiés : `config/settings/production.py`, `config/settings/base.py`, `requirements.txt`, `Procfile`.
 
 ---
 

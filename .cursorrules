@@ -81,7 +81,22 @@ Before responding "I have finished", you must self-audit:
 * **Location:** `./docs/bugs/<branch_name>/bug_[YYYY-MM-DD]_[short_desc].md`
 * **Règle BMAD :** Chaque bug (et la doc de résolution associée) est placé dans un **sous-dossier au nom de la branche** où le correctif a été fait. Ex. : branche `debug` → `./docs/bugs/debug/`.
 
-**Required Template:**
+### Workflow bug (du démarrage à la résolution)
+
+1. **Au démarrage d’un bug**
+   * Créer une branche dédiée (ex. `debug`, `fix/nom-du-bug`).
+   * Pousser tout l’état courant sur cette branche (`git add .` → `git commit` → `git push origin <branch>`).
+   * Documenter le bug dans `./docs/bugs/<branch_name>/` (fiche(s) avec le template ci-dessous, nom de la branche indiqué dans chaque fiche).
+
+2. **Pendant la résolution**
+   * Documenter au fil de l’eau dans le même sous-dossier (investigation, pistes, éventuelles fiches supplémentaires).
+
+3. **À la résolution**
+   * Documenter la résolution (section Solution + Post-mortem dans la fiche bug, ou fiche dédiée dans `./docs/bugs/<branch_name>/`).
+   * Supprimer les fichiers inutiles (scripts de debug, fichiers temporaires, instrumentation de debug).
+   * Revenir sur `main` : merger la branche dans `main` (ou `git checkout main` puis merge), puis pousser `main`. Supprimer la branche de travail si elle n’est plus nécessaire.
+
+**Required Template (fiche bug) :**
 1.  **🚨 The Issue:** Error logs + context.
 2.  **🕵️‍♂️ Investigation:** What was tried? Why did it fail?
 3.  **✅ The Solution:** The exact fix applied.

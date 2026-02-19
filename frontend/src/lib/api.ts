@@ -10,7 +10,8 @@ import type { OrganizationNodeApi } from "@/types/organization";
 
 /**
  * Retourne l'URL de base de l'API (sans slash final).
- * En dev : http://localhost:8000 si NEXT_PUBLIC_API_URL non défini.
+ * En prod (Vercel) : NEXT_PUBLIC_API_URL doit être défini (ex. URL Railway).
+ * En dev : http://localhost:8000 si non défini.
  */
 export function getApiBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_URL;
