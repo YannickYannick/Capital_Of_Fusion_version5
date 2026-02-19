@@ -5,3 +5,4 @@ django-environ
 Pillow
 gunicorn
 psycopg[binary]
+whitenoise

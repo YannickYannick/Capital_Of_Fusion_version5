@@ -12,4 +12,4 @@ cmds = []
 
 [start]
 # Migrations puis Gunicorn (inline = pas de souci CRLF). load_demo_data : une fois via railway run ou SSH.
-cmd = "python manage.py migrate --noinput && exec gunicorn config.wsgi --bind 0.0.0.0:$PORT"
+cmd = "python manage.py collectstatic --noinput && python manage.py migrate --noinput && exec gunicorn config.wsgi --bind 0.0.0.0:$PORT"

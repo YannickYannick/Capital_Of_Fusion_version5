@@ -17,7 +17,7 @@
 | **Tech Specs** | `./docs/bmad/02-tech_specs.md` | Architecture decisions & schema definitions. |
 | **API Docs** | `./docs/bmad/03-api_docs.md` | API references and endpoint definitions. |
 | **Meetings** | `./docs/bmad/04-meetings.md` | Brainstorming & user discussions. |
-| **Bug Reports**| `./docs/bmad/05-bugs/` | Post-mortem analysis (see Section 5). |
+| **Bug Reports**| `./docs/bugs/<branch_name>/` | Post-mortem par branche (voir Section 5). |
 
 > **⚠️ Auto-Correction:** If you accidentally create a `.md` file at the root, you must immediately **MOVE** it to `./docs/`.
 
@@ -78,7 +78,8 @@ Before responding "I have finished", you must self-audit:
 ## 5. 🐛 BUG TRACKING & POST-MORTEM
 
 **Rule:** Every failure is a learning opportunity.
-* **Location:** `./docs/bmad/05-bugs/bug_[YYYY-MM-DD]_[short_desc].md`
+* **Location:** `./docs/bugs/<branch_name>/bug_[YYYY-MM-DD]_[short_desc].md`
+* **Règle BMAD :** Chaque bug (et la doc de résolution associée) est placé dans un **sous-dossier au nom de la branche** où le correctif a été fait. Ex. : branche `debug` → `./docs/bugs/debug/`.
 
 **Required Template:**
 1.  **🚨 The Issue:** Error logs + context.

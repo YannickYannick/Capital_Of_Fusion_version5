@@ -20,6 +20,16 @@ _cors = os.environ.get("CORS_ALLOWED_ORIGINS", "")
 CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors.split(",") if o.strip()]
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF : origines de confiance pour les formulaires POST (admin, login, etc.). Format: https://domaine (sans slash final).
+_csrf_origins = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    "https://capitaloffusionversion5-production.up.railway.app,http://capitaloffusionversion5-production.up.railway.app",
+)
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()]
+
+# Fichiers statiques (admin, etc.) : WhiteNoise les sert en prod après collectstatic.
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Base de données : PostgreSQL si DB_NAME (ou DB_HOST) est défini, sinon SQLite pour test (données éphémères sur PaaS).
 if os.environ.get("DB_NAME") or os.environ.get("DB_HOST"):
     DATABASES = {
