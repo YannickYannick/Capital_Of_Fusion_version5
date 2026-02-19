@@ -11,5 +11,5 @@ cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
 cmds = []
 
 [start]
-# Migrations + optionnel load_demo_data (RUN_LOAD_DEMO_DATA=1) puis Gunicorn. Tout à distance à chaque déploiement.
-cmd = "sh scripts/start.sh"
+# Migrations puis Gunicorn (inline = pas de souci CRLF). load_demo_data : une fois via railway run ou SSH.
+cmd = "python manage.py migrate --noinput && exec gunicorn config.wsgi --bind 0.0.0.0:$PORT"

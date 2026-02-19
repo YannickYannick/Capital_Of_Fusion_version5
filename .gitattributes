@@ -1,0 +1,2 @@
+# Scripts shell : toujours LF pour exécution sur Linux (Railway, etc.)
+*.sh text eol=lf
