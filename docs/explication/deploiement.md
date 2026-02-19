@@ -50,6 +50,8 @@
 | `DB_PORT` | Port (souvent 5432) | `5432` |
 | `CORS_ALLOWED_ORIGINS` | URL(s) du frontend (Vercel) | `https://votre-app.vercel.app` (à adapter après déploiement front) |
 
+**Test sans PostgreSQL (SQLite) :** si tu ne définis **aucune** variable `DB_NAME` ni `DB_HOST`, Django en production utilisera SQLite (fichier dans le conteneur). Pratique pour vérifier que l’app répond ; les données sont **perdues à chaque redéploiement**. Pense à lancer `python manage.py migrate` et éventuellement `load_demo_data` (shell Railway ou release command).
+
 Sur **Railway**, si une variable `DATABASE_URL` est fournie, il faut soit la parser, soit utiliser les variables séparées. Beaucoup de projets utilisent `dj-database-url` ; ici on utilise `DB_*` pour rester simple. Si Railway n’expose que `DATABASE_URL`, il faudra l’ajouter dans les settings (ou remplir manuellement `DB_HOST`, `DB_USER`, etc. à partir de l’URL).
 
 ### 1.4 Migrations et données initiales
