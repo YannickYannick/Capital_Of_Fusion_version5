@@ -64,6 +64,59 @@ La **commande de démarrage** (Procfile) exécute à chaque déploiement :
 
 Pour charger les **données démo** une fois : `railway run python manage.py load_demo_data` (ou via SSH dans le conteneur).
 
+### 1.4.1 Créer un superuser sur Railway
+
+Pour accéder à l’admin Django (`/admin/`) en production, il faut créer un superuser.
+
+**Prérequis :** [Railway CLI](https://docs.railway.app/develop/cli) installé et connecté au projet (`railway link` depuis la racine du repo, ou depuis `backend`).
+
+**Méthode 1 — Interactive (recommandée)**  
+Depuis ton PC, dans un terminal (dossier `backend` ou racine) :
+
+```bash
+railway run python manage.py createsuperuser
+```
+
+Railway exécute la commande dans l’environnement du projet (base Railway). Tu entres ensuite le nom d’utilisateur, l’email et le mot de passe dans le terminal.
+
+**Méthode 2 — Non interactive (variables d’environnement)**  
+Utile pour automatiser ou si le terminal n’est pas interactif.
+
+1. Dans Railway → ton service backend → **Variables** → ajouter :
+   - `DJANGO_SUPERUSER_USERNAME` — nom de connexion admin
+   - `DJANGO_SUPERUSER_EMAIL` — email du superuser
+   - `DJANGO_SUPERUSER_PASSWORD` — mot de passe (fort, à ne pas partager)
+
+2. Exécuter une seule fois (en local, avec Railway CLI lié au bon projet) :
+
+```bash
+railway run python manage.py createsuperuser --noinput
+```
+
+3. **Sécurité :** après création du superuser, tu peux supprimer ces trois variables dans Railway pour éviter qu’un redéploiement ne tente de recréer l’utilisateur (Django échoue si l’utilisateur existe déjà ; en les retirant, tu évites de laisser des secrets inutiles).
+
+**Méthode 3 — SSH dans le conteneur**  
+Si `railway run` ne fonctionne pas (projet non lié ou environnement distant), ouvre une session SSH dans le service Railway puis lance `createsuperuser` à l’intérieur du conteneur.
+
+1. Récupère les IDs dans Railway : **Project** → **Settings** (ou clic droit sur le service) pour l’ID projet ; **Environnement** et **Service** ont chacun un ID (visibles dans l’URL ou les paramètres).
+
+2. Depuis ton PC (Railway CLI installé et connecté) :
+
+```bash
+railway ssh --project=<PROJECT_ID> --environment=<ENVIRONMENT_ID> --service=<SERVICE_ID>
+```
+
+3. Une fois connecté au conteneur, exécute :
+
+```bash
+python manage.py createsuperuser
+```
+
+4. Saisis le nom d’utilisateur, l’email et le mot de passe, puis quitte avec `exit`.
+
+*Exemple (remplacer par tes propres IDs) :*  
+`railway ssh --project=a32a6714-e6db-4f25-b94d-68b4f8dfbea2 --environment=fd7f19c6-3f95-4366-95b7-6a712e29c877 --service=f2c11d59-3ed4-4b78-823d-9296ea7a9936`
+
 ### 1.5 Noter l’URL du backend
 
 Exemple : `https://ton-projet.railway.app` ou `https://ton-service.onrender.com`.  
@@ -149,4 +202,4 @@ Cela signifie que les dépendances ne sont pas installées dans l’environnemen
 
 ---
 
-*Dernière mise à jour : 2025-02-10*
+*Dernière mise à jour : 2025-02-09*
