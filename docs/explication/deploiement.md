@@ -122,7 +122,9 @@ Après avoir sauvegardé les variables, **lancer un redeploy** (Deployments → 
 ## En cas de problème
 
 - **502 / 503 backend :** vérifier que la commande de démarrage est bien gunicorn et que `PORT` est utilisé (Railway/Render injectent `PORT`). Si erreur « gunicorn: command not found », utiliser `python -m gunicorn` au lieu de `gunicorn`.
-- **CORS bloqué :** les URLs \*.vercel.app sont autorisées par défaut. Si tu utilises un domaine perso, ajouter son URL dans `CORS_ALLOWED_ORIGINS` (exactement : schéma + domaine, sans slash final).
+- **CORS bloqué :** les URLs \*.vercel.app sont autorisées par le code (regex en prod). Si l’erreur continue :
+  1. **Railway doit déployer le code à jour.** Si le correctif CORS est sur une branche (ex. `fix/vercel-api-connection`), soit merger cette branche dans `main` et pousser (Railway déploie alors depuis `main`), soit dans Railway → Settings du service → **Branch** = ta branche, puis **Redeploy**.
+  2. Si tu utilises un domaine perso (hors Vercel), ajouter son URL dans `CORS_ALLOWED_ORIGINS` (schéma + domaine, sans slash final).
 - **Données vides :** vérifier que les migrations ont été faites et, si tu utilises les données démo, que `load_demo_data` a été exécuté.
 - **Front ne charge pas l’API :** vérifier `NEXT_PUBLIC_API_URL` (sans slash final en général) et que le backend répond en GET sur `/api/menu/items/` par exemple.
 
