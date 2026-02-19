@@ -54,18 +54,14 @@
 
 Sur **Railway**, si une variable `DATABASE_URL` est fournie, il faut soit la parser, soit utiliser les variables séparées. Beaucoup de projets utilisent `dj-database-url` ; ici on utilise `DB_*` pour rester simple. Si Railway n’expose que `DATABASE_URL`, il faudra l’ajouter dans les settings (ou remplir manuellement `DB_HOST`, `DB_USER`, etc. à partir de l’URL).
 
-### 1.4 Migrations et données initiales
+### 1.4 Migrations et données initiales (automatique à distance)
 
-Après le premier déploiement, lancer les migrations (et éventuellement les données démo) :
+Le script **`backend/scripts/start.sh`** est exécuté à chaque démarrage du conteneur (Railway, Render, etc.) :
 
-- **Railway** : dans le projet → onglet "Variables" / "Settings" → parfois une console "Run Command" ou CLI :  
-  `railway run python manage.py migrate`  
-  puis optionnel : `railway run python manage.py load_demo_data`
-- **Render** : Dashboard → ton Web Service → Shell (ou "Run Command" selon l’offre) :  
-  `python manage.py migrate`  
-  puis optionnel : `python manage.py load_demo_data`
+1. **`python manage.py migrate`** — toujours exécuté avant de lancer Gunicorn.
+2. **`python manage.py load_demo_data`** — uniquement si la variable **`RUN_LOAD_DEMO_DATA=1`** est définie (utile au premier déploiement avec SQLite, ou pour réinjecter des données démo). Tu peux la retirer après coup.
 
-Si aucune console n’est disponible, tu peux exécuter ces commandes en local en pointant temporairement `DJANGO_SETTINGS_MODULE=config.settings.production` et les variables `DB_*` de prod (à ne faire que depuis un environnement de confiance).
+Aucune action manuelle ni SSH nécessaire : tout se fait à distance à chaque déploiement. Pour charger les données démo une fois, ajoute la variable **`RUN_LOAD_DEMO_DATA`** = **`1`** dans Railway (ou Render), redéploie, puis retire-la si tu ne veux pas relancer le chargement à chaque start.
 
 ### 1.5 Noter l’URL du backend
 

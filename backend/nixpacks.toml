@@ -11,5 +11,5 @@ cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
 cmds = []
 
 [start]
-# Railway injecte PORT au runtime ; la commande est exécutée dans un shell, $PORT est donc développé.
-cmd = "gunicorn config.wsgi --bind 0.0.0.0:$PORT"
+# Migrations + optionnel load_demo_data (RUN_LOAD_DEMO_DATA=1) puis Gunicorn. Tout à distance à chaque déploiement.
+cmd = "sh scripts/start.sh"
