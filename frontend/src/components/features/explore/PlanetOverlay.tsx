@@ -44,14 +44,14 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
 
   return (
     <div
-      className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-black/95 backdrop-blur-md border-l border-white/10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300"
+      className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-[#0a0e27]/80 backdrop-blur-xl border-l border-white/10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300"
       role="dialog"
       aria-modal="true"
       aria-label={`Détail : ${node.name}`}
     >
-      <div className="p-6">
-        <div className="flex justify-between items-start">
-          <h2 className="text-xl font-bold text-white">{node.name}</h2>
+      <div className="p-8">
+        <div className="flex justify-between items-start mb-6">
+          <h2 className="text-2xl font-bold text-white tracking-tight">{node.name}</h2>
           <button
             ref={closeButtonRef}
             type="button"
@@ -63,28 +63,36 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
           </button>
         </div>
         {node.short_description && (
-          <p className="mt-2 text-white/80 text-sm">{node.short_description}</p>
+          <p className="text-purple-300/90 font-medium text-sm mb-4">{node.short_description}</p>
         )}
         {node.description && (
           <p className="mt-2 text-white/70 text-sm whitespace-pre-wrap">
             {node.description}
           </p>
         )}
-        {node.cta_url && (
+        <div className="mt-6 flex flex-wrap gap-3">
+          {node.cta_url && (
+            <a
+              href={node.cta_url}
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold transition shadow-lg shadow-purple-500/20"
+            >
+              {node.cta_text || "En savoir plus"}
+            </a>
+          )}
           <a
-            href={node.cta_url}
-            className="mt-4 inline-block px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition"
+            href={`/cours?organization=${node.id}`}
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition backdrop-blur-sm border border-white/5"
           >
-            {node.cta_text || "En savoir plus"}
+            Voir les cours
           </a>
-        )}
+        </div>
 
         {node.node_events.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-sm font-semibold text-white/90 uppercase tracking-wide">
-              Événements
+          <div className="mt-10">
+            <h3 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
+              Prochains Événements
             </h3>
-            <ul className="mt-2 space-y-3">
+            <ul className="space-y-3">
               {node.node_events.map((ev) => (
                 <li
                   key={ev.id}

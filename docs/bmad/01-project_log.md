@@ -57,7 +57,15 @@
 | [2026-02-10] Completed Task | CORS Vercel → Railway | production.py : ajout CORS_ALLOWED_ORIGIN_REGEXES pour autoriser tout \*.vercel.app (preview + prod). Doc déploiement : étape 3 et tableau variables mises à jour (CORS optionnel pour Vercel). project_log mis à jour. |
 | [2025-02-09] Completed Task | Doc superuser Railway + Méthode SSH | `docs/explication/deploiement.md` : ajout méthode 3 « SSH dans le conteneur » pour créer un superuser Django sur Railway (`railway ssh --project/--environment/--service`, puis `python manage.py createsuperuser` dans le conteneur), avec exemple de commande. Unification : seul Master Log conservé (`docs/bmad/01-project_log.md`), suppression de `docs/project_log.md`. |
 | [2025-02-09] Validation | Checklist déploiement + Tests prod | Checklist rapide dans `deploiement.md` cochée (repo, backend, frontend, CORS, tests, superuser). Création `docs/RECAP_TEMPORAIRE_actions_et_phases.md` : récap actions depuis le début + checklist validée + phases futures (Phase 2 : Boutique, Formations ; optionnel domaine perso). Prêt pour suite produit. |
+| [2025-02-09] Starting Task | Interface 3D Explore (feat/explore-3d) | Objectif : appliquer le CDC — soleil central (noeud ROOT), orbites visibles, hover (highlight + tooltip), clic → overlay. |
+| [2025-02-09] Completed Task | Interface 3D Explore | ExploreScene : séparation rootNode (type ROOT) = Sun central avec emissive ; orbitNodes = planètes en orbite. Orbites dessinées (Line drei). Hover : scale + emissive + tooltip Html (nom). Lumière renforcée (3 pointLights). Build OK. |
+| [2026-02-10] Starting Task | Connexion Google (OAuth) | Objectif : lier compte utilisateur à Gmail via « Se connecter avec Google ». |
+| [2026-02-10] Completed Task | Connexion Google (OAuth) | Backend : `POST /api/auth/google/` (vérif id_token avec google-auth), get_or_create User par email, même token API. Frontend : @react-oauth/google, bouton sur /login si NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID. Doc : `docs/explication/auth-google-avantages-inconvenients.md`, api_docs, .env.example. |
+| [2025-02-09] Completed Task | Explore 3D — options et zoom | Panneau d’options (Orbites on/off, Figer planètes). Premier clic planète/soleil = zoom caméra (CameraAnimator + lerp) ; boutons « Détails » (overlay) et « Vue d’ensemble ». Build OK. |
+| [2026-02-21 15:47] Starting Task | Explore 3D — Finalisation (Phase 3.1) | Objectif : Améliorer le rendu visuel, l'UX du panneau/légendes, les performances (LOD) et le vrai contenu de la vue 3D. |
+| [2026-02-21 16:21] Bug Fix | CORS Ports frontend | Ajout des ports 3001, 3002 et 3003 dans `CORS_ALLOWED_ORIGINS` (`backend/config/settings/base.py`) pour résoudre le blocage au lancement de Next.js sur ces ports alternatifs. |
+| [2026-02-21 16:22] Completed Task | Explore 3D — Finalisation (Phase 3.1) | Rendu des planètes affiné (matériaux standard avec rugosité, lumières revues), composant d'UI passés en Glassmorphism (panneau d'options, tooltip). Overlay connecté aux requêtes contextuelles `/cours?organization=ID`. Verification visuelle effectuée. |
 
 ---
 
-*Dernière mise à jour : 2025-02-09*
+*Dernière mise à jour : 2026-02-10*
