@@ -9,7 +9,7 @@ from apps.organization.views import (
     OrganizationNodeListAPIView,
     OrganizationNodeDetailAPIView,
 )
-from apps.users.views import LoginAPIView, LogoutAPIView, MeAPIView
+from apps.users.views import LoginAPIView, GoogleLoginAPIView, LogoutAPIView, MeAPIView
 
 urlpatterns = [
     path("health/", health_check),
@@ -21,6 +21,7 @@ urlpatterns = [
     path("organization/nodes/", OrganizationNodeListAPIView.as_view()),
     path("organization/nodes/<slug:slug>/", OrganizationNodeDetailAPIView.as_view()),
     path("auth/login/", LoginAPIView.as_view()),
+    path("auth/google/", GoogleLoginAPIView.as_view()),
     path("auth/logout/", LogoutAPIView.as_view()),
     path("auth/me/", MeAPIView.as_view()),
 ]

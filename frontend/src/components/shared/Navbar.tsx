@@ -37,25 +37,24 @@ export function Navbar() {
 
   const links = menuError || !menuItems?.length
     ? [
-        { href: "/", label: "Accueil", children: [] as MenuItemApi[] },
-        { href: "/explore", label: "Explore", children: [] as MenuItemApi[] },
-        { href: "/cours", label: "Cours", children: [] as MenuItemApi[] },
-        { href: "/evenements", label: "Événements", children: [] as MenuItemApi[] },
-        { href: "/boutique", label: "Boutique", children: [] as MenuItemApi[] },
-      ]
+      { href: "/", label: "Accueil", children: [] as MenuItemApi[] },
+      { href: "/explore", label: "Explore", children: [] as MenuItemApi[] },
+      { href: "/cours", label: "Cours", children: [] as MenuItemApi[] },
+      { href: "/evenements", label: "Événements", children: [] as MenuItemApi[] },
+      { href: "/boutique", label: "Boutique", children: [] as MenuItemApi[] },
+    ]
     : menuItems.map((item) => ({
-        href: item.url || "/",
-        label: item.name,
-        children: item.children ?? [],
-      }));
+      href: item.url || "/",
+      label: item.name,
+      children: item.children ?? [],
+    }));
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
           ? "bg-black/80 backdrop-blur-md border-b border-white/10"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Navigation principale">
         <Link
@@ -65,7 +64,7 @@ export function Navbar() {
           [CF] Capital of Fusion
         </Link>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden xl:flex items-center gap-4 lg:gap-6 flex-1 justify-end overflow-x-auto no-scrollbar pl-4">
           {links.map(({ href, label, children }) =>
             children.length > 0 ? (
               <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
@@ -133,7 +132,7 @@ export function Navbar() {
           )}
         </div>
 
-        <div className="md:hidden">
+        <div className="xl:hidden">
           <MobileNav
             items={links}
             hasToken={hasToken}

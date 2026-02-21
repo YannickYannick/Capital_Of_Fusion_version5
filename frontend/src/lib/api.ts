@@ -166,6 +166,24 @@ export async function login(
 }
 
 /**
+ * Connexion avec Google. POST /api/auth/google/
+ * id_token = JWT renvoyé par le bouton Google (GoogleOAuthProvider).
+ */
+export async function loginWithGoogle(idToken: string): Promise<LoginResponse> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/auth/google/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id_token: idToken }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Google login error: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
  * Déconnexion. POST /api/auth/logout/ (avec token).
  */
 export async function logout(): Promise<void> {

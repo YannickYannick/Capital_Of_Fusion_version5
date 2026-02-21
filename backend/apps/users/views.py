@@ -1,12 +1,15 @@
 """
-Vues API Users — auth (login/logout) et utilisateur courant.
+Vues API Users — auth (login/logout, Google OAuth) et utilisateur courant.
 """
+import os
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 from .models import User
 
@@ -33,6 +36,69 @@ class LoginAPIView(APIView):
                 {"error": "Identifiants incorrects"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
+
+
+class GoogleLoginAPIView(APIView):
+    """
+    POST /api/auth/google/
+    Body: { "id_token": "<Google JWT id_token>" } -> { "token": "<api token>" }.
+    Vérifie le id_token auprès de Google, crée ou récupère le User par email, retourne le token API (même format que login).
+    Variable d'env : GOOGLE_OAUTH_CLIENT_ID (Client ID Web de la console Google).
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        id_token_raw = request.data.get("id_token")
+        if not id_token_raw:
+            return Response(
+                {"error": "id_token requis"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        client_id = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+        if not client_id:
+            return Response(
+                {"error": "Connexion Google non configurée"},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                id_token_raw, google_requests.Request(), client_id
+            )
+        except ValueError:
+            return Response(
+                {"error": "Token Google invalide ou expiré"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        email = idinfo.get("email")
+        if not email or not idinfo.get("email_verified", True):
+            return Response(
+                {"error": "Email Google non disponible"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        first_name = idinfo.get("given_name") or ""
+        last_name = idinfo.get("family_name") or ""
+        user = User.objects.filter(email=email).first()
+        if not user:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            user.set_unusable_password()
+            user.save()
+        else:
+            updated = []
+            if first_name and not user.first_name:
+                user.first_name = first_name
+                updated.append("first_name")
+            if last_name and not user.last_name:
+                user.last_name = last_name
+                updated.append("last_name")
+            if updated:
+                user.save(update_fields=updated)
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key})
 

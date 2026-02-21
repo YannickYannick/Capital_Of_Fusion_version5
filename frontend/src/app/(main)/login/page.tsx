@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { login, setStoredToken } from "@/lib/api";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { login, loginWithGoogle, setStoredToken } from "@/lib/api";
+
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID ?? "";
 
 /**
- * Page Login — formulaire username/password, stockage du token, redirection.
+ * Page Login — formulaire username/password + option « Se connecter avec Google ».
+ * Stocke le token (identique pour les deux flux) et redirige vers l'accueil.
  */
 export default function LoginPage() {
   const router = useRouter();
@@ -14,6 +18,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleSuccess = useCallback(
+    async (idToken: string) => {
+      setError(null);
+      setLoading(true);
+      try {
+        const { token } = await loginWithGoogle(idToken);
+        setStoredToken(token);
+        router.push("/");
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Connexion Google échouée");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router]
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,6 +101,29 @@ export default function LoginPage() {
             {loading ? "Connexion…" : "Se connecter"}
           </button>
         </form>
+
+        {googleClientId && (
+          <>
+            <p className="mt-6 text-center text-sm text-white/60">ou</p>
+            <div className="mt-4 flex justify-center">
+              <GoogleOAuthProvider clientId={googleClientId}>
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    const token = credentialResponse.credential;
+                    if (token) handleGoogleSuccess(token);
+                  }}
+                  onError={() =>
+                    setError("Connexion Google annulée ou indisponible")
+                  }
+                  theme="filled_black"
+                  size="large"
+                  text="continue_with"
+                  useOneTap={false}
+                />
+              </GoogleOAuthProvider>
+            </div>
+          </>
+        )}
 
         <p className="mt-6 text-center text-sm text-white/60">
           <Link href="/" className="text-purple-300 hover:underline">

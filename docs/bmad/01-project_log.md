@@ -65,6 +65,8 @@
 | [2026-02-21 15:47] Starting Task | Explore 3D — Finalisation (Phase 3.1) | Objectif : Améliorer le rendu visuel, l'UX du panneau/légendes, les performances (LOD) et le vrai contenu de la vue 3D. |
 | [2026-02-21 16:21] Bug Fix | CORS Ports frontend | Ajout des ports 3001, 3002 et 3003 dans `CORS_ALLOWED_ORIGINS` (`backend/config/settings/base.py`) pour résoudre le blocage au lancement de Next.js sur ces ports alternatifs. |
 | [2026-02-21 16:22] Completed Task | Explore 3D — Finalisation (Phase 3.1) | Rendu des planètes affiné (matériaux standard avec rugosité, lumières revues), composant d'UI passés en Glassmorphism (panneau d'options, tooltip). Overlay connecté aux requêtes contextuelles `/cours?organization=ID`. Verification visuelle effectuée. |
+| [2026-02-21 16:34] Starting Task | Phase 2 — Squelettes Routing & Menus | Objectif : Implémenter toute la structure de routes V5 telle que décrite dans `04-maquettes_ui_jour.md`. |
+| [2026-02-21 16:38] Completed Task | Phase 2 — Squelettes Routing & Menus | Backend : Mise à jour du script `load_initial_data` pour peupler récursivement +14 entrées et leurs sous-menus. Frontend : Script python utilisé pour générer 32 pages squelettes (Formations, Théorie, Artistes, Shop, etc.) dans `app/(main)`, adaptation de `Navbar.tsx` en `xl` pour les grands menus. Commits validés. |
 
 ---
 

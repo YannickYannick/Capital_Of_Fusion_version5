@@ -25,6 +25,7 @@
 | GET | `https://capitaloffusionversion5-production.up.railway.app/api/organization/nodes/` |
 | GET | `https://capitaloffusionversion5-production.up.railway.app/api/organization/nodes/<slug>/` |
 | POST | `https://capitaloffusionversion5-production.up.railway.app/api/auth/login/` |
+| POST | `https://capitaloffusionversion5-production.up.railway.app/api/auth/google/` |
 | POST | `https://capitaloffusionversion5-production.up.railway.app/api/auth/logout/` |
 | GET | `https://capitaloffusionversion5-production.up.railway.app/api/auth/me/` |
 
@@ -165,6 +166,7 @@
 | Méthode | URL | Description |
 |--------|-----|-------------|
 | POST | `/api/auth/login/` | Body : `{ "username", "password" }`. Réponse : `{ "token": "..." }`. |
+| POST | `/api/auth/google/` | Body : `{ "id_token": "<JWT Google>" }`. Vérifie le token, crée ou récupère le User par email, réponse : `{ "token": "..." }`. Variable d'env backend : `GOOGLE_OAUTH_CLIENT_ID`. |
 | POST | `/api/auth/logout/` | Déconnexion (supprime le token). Header : `Authorization: Token <key>`. |
 | GET | `/api/auth/me/` | Utilisateur courant. Header : `Authorization: Token <key>`. |
 
