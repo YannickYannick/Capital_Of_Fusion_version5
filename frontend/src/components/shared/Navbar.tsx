@@ -128,7 +128,7 @@ export function Navbar() {
           [CF] Capital of Fusion
         </Link>
 
-        <div className="hidden xl:flex items-center gap-4 lg:gap-6 flex-1 justify-end overflow-x-auto no-scrollbar pl-4">
+        <div className="hidden xl:flex items-center gap-2 lg:gap-4 flex-1 justify-end pl-2 flex-wrap lg:flex-nowrap">
           {links.map(({ href, label, children }) =>
             children.length > 0 ? (
               <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
