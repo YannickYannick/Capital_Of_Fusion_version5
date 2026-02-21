@@ -66,9 +66,10 @@ Toutes ces pages partagent le layout `(main)` : vidéo de fond persistante (Afte
 ├────────────────────────────────────────────────────────────────┤
 │  SCÈNE 3D (full viewport, fond transparent pour voir la vidéo)  │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Soleil central (Capital of Fusion / BachataVibe)         │  │
-│  │  Planètes en orbite (Cours, Événements, Boutique, etc.)   │  │
-│  │  Données : API /organization/nodes/                       │  │
+│  │  Soleil central = noeud racine (ex. Capital of Fusion)    │  │
+│  │  Planètes en orbite = noeuds d'organisation (OrganizationNode),  │  │
+│  │  ex. BachataVibe Paris, BachataVibe Lyon (pas Cours/Événements/Boutique)  │  │
+│  │  Données : API /organization/nodes/                        │  │
 │  │  Contrôles : OrbitControls (rotation, zoom)               │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                  │
@@ -88,7 +89,7 @@ Toutes ces pages partagent le layout `(main)` : vidéo de fond persistante (Afte
 └────────────────────────────────────────────────────────────────┘
 ```
 
-- Données 3D : **OrganizationNode** (name, slug, orbites, type planète, couleurs, etc.).
+- Données 3D : **OrganizationNode** (noeuds d'organisation : pôles, partenaires, etc.) — name, slug, orbites, type planète, couleurs, etc. Les planètes ne sont pas les sections menu (Cours, Événements, Boutique) mais les noeuds d'organisation.
 - Premier clic : zoom sur la planète ; second clic / bouton « Détails » : ouverture de l'overlay avec détail du noeud (cover_image, short_description, content, cta, node_events).
 - Fallback : prévoir un affichage liste/arbre pour mobile et accessibilité (réf. [05-maquettes_ui.md](05-maquettes_ui.md)).
 

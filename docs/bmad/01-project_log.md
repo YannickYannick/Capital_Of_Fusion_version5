@@ -55,7 +55,9 @@
 | [2025-02-10] Completed Task | Préparation déploiement | Backend : gunicorn + psycopg dans requirements.txt ; Procfile (gunicorn bind $PORT) ; production.py : CORS_ALLOWED_ORIGINS depuis env. Doc : `docs/explication/deploiement.md` (étapes Vercel + Railway/Render, variables, migrations, CORS, checklist). Lien depuis `hebergement.md`. |
 | [2026-02-10] Starting Task | CORS Vercel → Railway | Objectif : corriger blocage CORS (front Vercel appelant API Railway) — « No Access-Control-Allow-Origin header ». |
 | [2026-02-10] Completed Task | CORS Vercel → Railway | production.py : ajout CORS_ALLOWED_ORIGIN_REGEXES pour autoriser tout \*.vercel.app (preview + prod). Doc déploiement : étape 3 et tableau variables mises à jour (CORS optionnel pour Vercel). project_log mis à jour. |
+| [2025-02-09] Completed Task | Doc superuser Railway + Méthode SSH | `docs/explication/deploiement.md` : ajout méthode 3 « SSH dans le conteneur » pour créer un superuser Django sur Railway (`railway ssh --project/--environment/--service`, puis `python manage.py createsuperuser` dans le conteneur), avec exemple de commande. Unification : seul Master Log conservé (`docs/bmad/01-project_log.md`), suppression de `docs/project_log.md`. |
+| [2025-02-09] Validation | Checklist déploiement + Tests prod | Checklist rapide dans `deploiement.md` cochée (repo, backend, frontend, CORS, tests, superuser). Création `docs/RECAP_TEMPORAIRE_actions_et_phases.md` : récap actions depuis le début + checklist validée + phases futures (Phase 2 : Boutique, Formations ; optionnel domaine perso). Prêt pour suite produit. |
 
 ---
 
-*Dernière mise à jour : 2026-02-10*
+*Dernière mise à jour : 2025-02-09*

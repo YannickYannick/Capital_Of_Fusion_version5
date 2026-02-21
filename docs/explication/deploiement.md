@@ -163,12 +163,13 @@ Après avoir sauvegardé les variables, **lancer un redeploy** (Deployments → 
 
 ## Checklist rapide
 
-- [ ] Repo sur GitHub à jour
-- [ ] Backend : Root = `backend`, build/start = gunicorn, variables (DJANGO_*, DB_*, ALLOWED_HOSTS ; CORS_ALLOWED_ORIGINS optionnel, \*.vercel.app autorisé par défaut)
-- [ ] Backend : `migrate` (+ optionnel `load_demo_data`)
-- [ ] Frontend : Root = `frontend`, variables NEXT_PUBLIC_*
-- [ ] CORS = automatique pour \*.vercel.app ; ajouter domaine perso dans CORS_ALLOWED_ORIGINS si besoin
-- [ ] Test : ouvrir le site Vercel, vérifier que les pages (cours, événements, explore) chargent les données depuis l’API
+- [x] Repo sur GitHub à jour
+- [x] Backend : Root = `backend`, build/start = gunicorn, variables (DJANGO_*, DB_*, ALLOWED_HOSTS ; CORS_ALLOWED_ORIGINS optionnel, \*.vercel.app autorisé par défaut)
+- [x] Backend : `migrate` (+ optionnel `load_demo_data`)
+- [x] Frontend : Root = `frontend`, variables NEXT_PUBLIC_*
+- [x] CORS = automatique pour \*.vercel.app ; ajouter domaine perso dans CORS_ALLOWED_ORIGINS si besoin
+- [x] Test : ouvrir le site Vercel, vérifier que les pages (cours, événements, explore) chargent les données depuis l’API
+- [x] Superuser admin créé sur Railway (accès `/admin/` en prod)
 
 ---
 

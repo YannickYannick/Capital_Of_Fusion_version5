@@ -159,6 +159,8 @@ Comportement:
 
 ### 3. Visualisation Planétaire 3D
 
+Les **planètes** représentent des **noeuds d'organisation (OrganizationNode)** (pôles, partenaires, ex. BachataVibe Paris, Kompa Vibe), pas les sections du site (Cours, Événements, Boutique).
+
 **Technologies** : Three.js + React Three Fiber
 
 ```tsx
