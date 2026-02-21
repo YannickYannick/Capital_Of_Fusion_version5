@@ -9,12 +9,7 @@ import { PlanetOverlay } from "@/components/features/explore/PlanetOverlay";
 import { OptionsPanel } from "@/components/features/explore/OptionsPanel";
 import { GlobalPlanetConfigPanel } from "@/components/features/explore/GlobalPlanetConfigPanel";
 import { DebugPanel } from "@/components/features/explore/DebugPanel";
-import { ExploreVideos } from "@/components/features/explore/ExploreVideos";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Vidéo principale (accueil) + vidéo cyclique (aftermovie)
-const VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
-const VIDEO_CYCLE = "yaGM4tF42Jk";
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
 const ExploreScene = dynamic(
@@ -75,8 +70,7 @@ function ExplorePageInner() {
   return (
     // Wrapper fullscreen — le canvas 3D est transparent, les vidéos sont en -z-10 dessous
     <div className="fixed inset-0 z-10">
-      {/* Deux vidéos arrière-plan : principale + cyclique (gèrent leur propre fixed -z-10) */}
-      <ExploreVideos videoIdMain={VIDEO_MAIN} videoIdCycle={VIDEO_CYCLE} />
+      {/* La vidéo est gérée globalement dans layout.tsx (GlobalVideoBackground) */}
 
       {/* Chargement */}
       {loading && (
