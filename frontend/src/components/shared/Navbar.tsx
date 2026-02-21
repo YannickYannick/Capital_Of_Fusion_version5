@@ -37,7 +37,6 @@ export function Navbar() {
 
   const links = menuError || !menuItems?.length
     ? [
-      { href: "/", label: "Accueil", children: [] as MenuItemApi[] },
       {
         href: "/cours", label: "Cours", children: [
           { id: "c1", name: "Liste & Planning", url: "/cours/planning/" },
@@ -123,9 +122,9 @@ export function Navbar() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Navigation principale">
         <Link
           href="/"
-          className="text-lg font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
+          className="text-xl md:text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 hover:scale-105 transition transform origin-left whitespace-nowrap flex-shrink-0"
         >
-          [CF] Capital of Fusion
+          Capital of Fusion
         </Link>
 
         <div className="hidden xl:flex items-center gap-2 lg:gap-4 flex-1 justify-end pl-2 flex-wrap lg:flex-nowrap">
