@@ -38,6 +38,7 @@ export interface PlanetsOptionsState {
     videoTransition: number;
     isTransitioningToExplore: boolean;
     showVideoOverlay: boolean;
+    showEntryTrajectory: boolean;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -84,6 +85,7 @@ const DEFAULTS: PlanetsOptionsState = {
     videoTransition: 1500,
     isTransitioningToExplore: false,
     showVideoOverlay: true,
+    showEntryTrajectory: false,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -109,6 +111,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     videoCycleHidden: "video_cycleHidden",
     videoTransition: "video_transitionDuration",
     showVideoOverlay: "video_showOverlay",
+    showEntryTrajectory: "planets_showEntryTrajectory",
 };
 
 function lsGet<T>(key: string, fallback: T): T {
@@ -151,6 +154,7 @@ function loadFromLS(): PlanetsOptionsState {
         videoCycleHidden: lsGet(LS_KEYS.videoCycleHidden!, DEFAULTS.videoCycleHidden),
         videoTransition: lsGet(LS_KEYS.videoTransition!, DEFAULTS.videoTransition),
         showVideoOverlay: lsGet(LS_KEYS.showVideoOverlay!, DEFAULTS.showVideoOverlay),
+        showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
         isTransitioningToExplore: false,
     };
 }

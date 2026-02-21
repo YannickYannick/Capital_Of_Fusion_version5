@@ -299,6 +299,7 @@ interface PlanetProps {
   onHover: (v: boolean) => void;
   isHovered: boolean;
   isSelected: boolean;
+  showEntryTrajectory: boolean;
 }
 
 function Planet({
@@ -325,6 +326,7 @@ function Planet({
   onHover,
   isHovered,
   isSelected,
+  showEntryTrajectory,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);
@@ -373,27 +375,37 @@ function Planet({
     }
 
     if (!s.hasEnteredOrbit) {
-      // Phase 1 : animation d'entrée en ligne droite vers X=0
+      // Phase 1 : animation d'entrée en ligne droite depuis entryStart vers l'orbite
       const startZ = entryStartZ ?? orbitRadius;
-      const targetPhase = node.orbit_phase ?? (index * 0.7);
-      const targetPos = getOrbitPosition(targetPhase, orbitRadius, orbitShape, orbitRoundness);
 
       const speed = entrySpeed * dt;
-      const currentX = groupRef.current.position.x;
-      const newX = currentX + speed;
+      const currentPos = groupRef.current.position.clone();
+      const newX = currentPos.x + speed;
 
       if (newX >= 0) {
-        // Entrée en orbite
+        // Trouver le point le plus proche sur l'orbite par rapport à la position actuelle
+        let bestPhase = node.orbit_phase ?? (index * 0.7);
+        let bestDist = Infinity;
+        const STEPS = 64;
+        for (let k = 0; k < STEPS; k++) {
+          const testPhase = (k / STEPS) * Math.PI * 2;
+          const testPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness);
+          const dist = testPos.distanceTo(new THREE.Vector3(currentPos.x, 0, currentPos.z));
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestPhase = testPhase;
+          }
+        }
+        // Entrer en orbite sans téléportation
         s.hasEnteredOrbit = true;
-        // Calculer le phaseOffset pour continuité
-        s.phaseOffset = targetPhase;
-        s.phase = targetPhase;
-        groupRef.current.position.copy(targetPos);
+        s.phaseOffset = bestPhase;
+        s.phase = bestPhase;
+        groupRef.current.position.copy(getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness));
       } else {
-        // Interpoler Y et Z vers la destination
-        const progress = Math.max(0, 1 - (-newX / -entryStartX));
-        const currentY = entryStartY + (targetPos.y - entryStartY) * progress;
-        const currentZ = startZ + (targetPos.z - startZ) * progress;
+        // Interpoler Y et Z vers le centre de l'orbite (Y=0, Z=0)
+        const progress = Math.max(0, 1 - (-newX / Math.max(0.001, -entryStartX)));
+        const currentY = entryStartY * (1 - progress);
+        const currentZ = startZ + (0 - startZ) * progress;
         groupRef.current.position.set(newX, currentY, currentZ);
       }
       return;
@@ -455,14 +467,29 @@ function Planet({
   const visualSource = node.visual_source || "preset";
   const planetType = node.planet_type || "glass";
 
+  const entryPoint: [number, number, number] = [entryStartX, entryStartY, entryStartZ ?? orbitRadius];
+
   return (
     <group
       ref={groupRef}
-      position={[entryStartX, entryStartY, entryStartZ ?? orbitRadius]}
+      position={entryPoint}
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; onHover(true); }}
       onPointerOut={() => { document.body.style.cursor = "default"; onHover(false); }}
     >
+      {/* Trajectoire d'arrivée (de entryStart vers l'orbite) */}
+      {showEntryTrajectory && !stateRef.current.hasEnteredOrbit && (
+        <Line
+          points={[entryPoint, [0, 0, 0]]}
+          color="#a855f7"
+          opacity={0.25}
+          transparent
+          lineWidth={1}
+          dashed
+          dashSize={0.5}
+          gapSize={0.3}
+        />
+      )}
       {visualSource === "glb" && node.model_3d ? (
         <GlbPlanet url={node.model_3d} scale={displayScale} />
       ) : visualSource === "gif" && node.planet_texture ? (
@@ -758,6 +785,7 @@ interface SceneContentProps {
   entrySpeed: number;
   controlsRef: React.RefObject<{ target: THREE.Vector3; update: () => void } | null>;
   selectedNodePos: THREE.Vector3 | null;
+  showEntryTrajectory: boolean;
 }
 
 function SceneContent({
@@ -784,6 +812,7 @@ function SceneContent({
   entrySpeed,
   controlsRef,
   selectedNodePos,
+  showEntryTrajectory,
 }: SceneContentProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
@@ -874,6 +903,7 @@ function SceneContent({
             onHover={(v) => setHoveredId(v ? node.id : null)}
             isHovered={hoveredId === node.id}
             isSelected={selectedId === node.id}
+            showEntryTrajectory={showEntryTrajectory}
           />
         );
       })}
@@ -1020,6 +1050,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode }: ExploreScen
         entrySpeed={opts.entrySpeed}
         controlsRef={controlsRef}
         selectedNodePos={selectedNodePos}
+        showEntryTrajectory={opts.showEntryTrajectory}
       />
     </Canvas>
   );

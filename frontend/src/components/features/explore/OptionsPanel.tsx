@@ -58,8 +58,8 @@ function ToggleBtn({
             type="button"
             onClick={onClick}
             className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all border ${active
-                    ? "bg-purple-600/30 border-purple-500/50 text-white"
-                    : "bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10"
+                ? "bg-purple-600/30 border-purple-500/50 text-white"
+                : "bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10"
                 }`}
         >
             {icon && <span className="mr-1.5">{icon}</span>}
@@ -183,8 +183,8 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                 <button
                                     type="button"
                                     className={`flex-1 py-1.5 rounded-lg text-xs border transition ${!opts.globalShapeOverride
-                                            ? "bg-purple-600/30 border-purple-500/50 text-white"
-                                            : "bg-white/5 border-white/10 text-white/60"
+                                        ? "bg-purple-600/30 border-purple-500/50 text-white"
+                                        : "bg-white/5 border-white/10 text-white/60"
                                         }`}
                                     onClick={() => opts.set("globalShapeOverride", false)}
                                 >
@@ -193,8 +193,8 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                 <button
                                     type="button"
                                     className={`flex-1 py-1.5 rounded-lg text-xs border transition ${opts.globalShapeOverride
-                                            ? "bg-purple-600/30 border-purple-500/50 text-white"
-                                            : "bg-white/5 border-white/10 text-white/60"
+                                        ? "bg-purple-600/30 border-purple-500/50 text-white"
+                                        : "bg-white/5 border-white/10 text-white/60"
                                         }`}
                                     onClick={() => opts.set("globalShapeOverride", true)}
                                 >
@@ -209,8 +209,8 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                                 key={s}
                                                 type="button"
                                                 className={`flex-1 py-1.5 rounded-lg text-xs border transition ${opts.orbitShape === s
-                                                        ? "bg-purple-600/30 border-purple-500/50 text-white"
-                                                        : "bg-white/5 border-white/10 text-white/60"
+                                                    ? "bg-purple-600/30 border-purple-500/50 text-white"
+                                                    : "bg-white/5 border-white/10 text-white/60"
                                                     }`}
                                                 onClick={() => opts.set("orbitShape", s)}
                                             >
@@ -270,6 +270,12 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
 
                         {/* Animation d'entrée */}
                         <Section title="Animation d'Entrée">
+                            <ToggleBtn
+                                label={opts.showEntryTrajectory ? "Masquer trajectoires arrivée" : "Afficher trajectoires arrivée"}
+                                icon="🞣"
+                                active={opts.showEntryTrajectory}
+                                onClick={() => opts.set("showEntryTrajectory", !opts.showEntryTrajectory)}
+                            />
                             <Slider
                                 label="Position X départ"
                                 value={opts.entryStartX}
@@ -334,7 +340,7 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                             <Slider
                                 label="Durée visible (s)"
                                 value={opts.videoCycleVisible}
-                                min={1}
+                                min={0}
                                 max={30}
                                 step={1}
                                 onChange={(v) => opts.set("videoCycleVisible", v)}
@@ -342,7 +348,7 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                             <Slider
                                 label="Durée cachée (s)"
                                 value={opts.videoCycleHidden}
-                                min={1}
+                                min={0}
                                 max={30}
                                 step={1}
                                 onChange={(v) => opts.set("videoCycleHidden", v)}
@@ -350,7 +356,7 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                             <Slider
                                 label="Transition (s)"
                                 value={opts.videoTransition / 1000}
-                                min={0.5}
+                                min={0}
                                 max={3}
                                 step={0.1}
                                 onChange={(v) => opts.set("videoTransition", v * 1000)}
