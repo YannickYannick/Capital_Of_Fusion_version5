@@ -1,129 +1,194 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useState, useCallback, useEffect } from "react";
 import { getOrganizationNodes } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
-import { ExploreScene } from "@/components/features/explore/ExploreScene";
+import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { PlanetOverlay } from "@/components/features/explore/PlanetOverlay";
+import { OptionsPanel } from "@/components/features/explore/OptionsPanel";
+import { GlobalPlanetConfigPanel } from "@/components/features/explore/GlobalPlanetConfigPanel";
+import { DebugPanel } from "@/components/features/explore/DebugPanel";
+import { ExploreVideos } from "@/components/features/explore/ExploreVideos";
+import { motion, AnimatePresence } from "framer-motion";
 
-/**
- * Explore — scène 3D (noeuds = planètes) + fallback liste/arbre.
- * Données : GET /api/organization/nodes/
- * Clic planète ou entrée liste → overlay détail (NodeEvents).
- */
-export default function ExplorePage() {
+// Vidéo principale (accueil) + vidéo cyclique (aftermovie)
+const VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
+const VIDEO_CYCLE = "yaGM4tF42Jk";
+
+// Chargement dynamique de ExploreScene (Three.js) sans SSR
+const ExploreScene = dynamic(
+  () =>
+    import("@/components/features/explore/ExploreScene").then(
+      (mod) => ({ default: mod.ExploreScene })
+    ),
+  { ssr: false }
+);
+
+// ─────────────────────────────────────────────────────────
+//  Inner page (inside Provider)
+// ─────────────────────────────────────────────────────────
+
+function ExplorePageInner() {
+  const opts = usePlanetsOptions();
   const [nodes, setNodes] = useState<OrganizationNodeApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedNode, setSelectedNode] = useState<OrganizationNodeApi | null>(
-    null
-  );
-  const [viewMode, setViewMode] = useState<"3d" | "list">("3d");
+  const [selectedNode, setSelectedNode] = useState<OrganizationNodeApi | null>(null);
+  const [overlayNode, setOverlayNode] = useState<OrganizationNodeApi | null>(null);
+  const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
+
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
   useEffect(() => {
     getOrganizationNodes()
       .then(setNodes)
-      .catch((e) => setError(e instanceof Error ? e.message : "Erreur"))
+      .catch((e) => setError(e instanceof Error ? e.message : "Erreur chargement"))
       .finally(() => setLoading(false));
   }, []);
 
   const visibleNodes = nodes.filter((n) => n.is_visible_3d);
 
+  const handleSelectNode = useCallback((node: OrganizationNodeApi | null) => {
+    setSelectedNode(node);
+  }, []);
+
+  const handleOpenOverlay = useCallback((node: OrganizationNodeApi) => {
+    setOverlayNode(node);
+  }, []);
+
+  const handleCloseOverlay = useCallback(() => {
+    setOverlayNode(null);
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setSelectedNode(null);
+    opts.triggerReset();
+    opts.set("freezePlanets", false);
+  }, [opts]);
+
+  const handleSaved = useCallback(() => {
+    // Après sauvegarde, rejouer l'intro pour mettre à jour la scène
+    opts.triggerRestart();
+  }, [opts]);
+
   return (
-    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-white">Explore</h1>
-        <p className="mt-2 text-white/70">
-          Découvrez les pôles et acteurs — vue 3D ou liste.
-        </p>
+    // Wrapper fullscreen — le canvas 3D est transparent, les vidéos sont en -z-10 dessous
+    <div className="fixed inset-0 z-10">
+      {/* Deux vidéos arrière-plan : principale + cyclique (gèrent leur propre fixed -z-10) */}
+      <ExploreVideos videoIdMain={VIDEO_MAIN} videoIdCycle={VIDEO_CYCLE} />
 
-        <div className="mt-4 flex gap-2" role="group" aria-label="Choisir le mode d’affichage">
-          <button
-            type="button"
-            onClick={() => setViewMode("3d")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] ${
-              viewMode === "3d"
-                ? "bg-purple-600 text-white"
-                : "bg-white/10 text-white/80 hover:bg-white/15"
-            }`}
-            aria-pressed={viewMode === "3d"}
-          >
-            Vue 3D
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("list")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] ${
-              viewMode === "list"
-                ? "bg-purple-600 text-white"
-                : "bg-white/10 text-white/80 hover:bg-white/15"
-            }`}
-            aria-pressed={viewMode === "list"}
-            aria-describedby="list-view-a11y-hint"
-          >
-            Vue liste
-          </button>
+      {/* Chargement */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="w-10 h-10 rounded-full border-2 border-purple-500/40 border-t-purple-500 animate-spin" />
         </div>
-        <p id="list-view-a11y-hint" className="sr-only">
-          La vue liste permet d’accéder à tous les pôles au clavier et aux technologies d’assistance.
-        </p>
+      )}
 
-        {error && (
-          <p className="mt-4 text-red-400" role="alert">
-            {error}
-          </p>
-        )}
+      {/* Erreur */}
+      {error && (
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-xl bg-red-900/60 border border-red-500/30 text-red-300 text-sm">
+          {error}
+        </div>
+      )}
 
-        {loading ? (
-          <p className="mt-8 text-white/60">Chargement…</p>
-        ) : visibleNodes.length === 0 ? (
-          <p className="mt-8 text-white/60">
-            Aucun noeud à afficher pour le moment.
-          </p>
-        ) : (
-          <>
-            {viewMode === "3d" && (
-              <div className="mt-6" aria-hidden="true">
-                <ExploreScene
-                  nodes={visibleNodes}
-                  onSelectNode={setSelectedNode}
-                />
-                <p className="sr-only">
-                  Vue 3D : utilisation à la souris. Pour une navigation au clavier, utilisez l’onglet « Vue liste ».
-                </p>
-              </div>
-            )}
-            {viewMode === "list" && (
-              <ul className="mt-6 space-y-2" role="list" aria-label="Liste des pôles et acteurs">
-                {visibleNodes.map((node) => (
-                  <li key={node.id}>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedNode(node)}
-                      className="w-full text-left px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27]"
-                      aria-label={`Voir le détail : ${node.name}`}
-                    >
-                      <span className="font-medium text-white">{node.name}</span>
-                      {node.short_description && (
-                        <p className="text-sm text-white/60 mt-0.5">
-                          {node.short_description}
-                        </p>
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </div>
-
-      {selectedNode && (
-        <PlanetOverlay
-          node={selectedNode}
-          onClose={() => setSelectedNode(null)}
+      {/* Canvas 3D */}
+      {!loading && !error && visibleNodes.length > 0 && (
+        <ExploreScene
+          nodes={visibleNodes}
+          onOpenOverlay={handleOpenOverlay}
+          onSelectNode={handleSelectNode}
         />
       )}
+
+      {/* Barre d'action planète sélectionnée (centre, z-30) */}
+      <AnimatePresence>
+        {selectedNode && !overlayNode && (
+          <motion.div
+            key="action-bar"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center gap-3 min-w-[260px]"
+          >
+            <p className="text-white/40 text-xs uppercase tracking-widest font-semibold">Sélectionné</p>
+            <p className="text-white text-3xl font-bold text-center">{selectedNode.name}</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => handleOpenOverlay(selectedNode)}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/20 flex items-center gap-2"
+              >
+                ↗ Détails
+              </button>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-medium transition border border-white/10 flex items-center gap-2"
+              >
+                ← Retour
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Panneau Options (droite, z-20) */}
+      <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} />
+
+      {/* Panneau Config Planètes (slide-in droite, z-50) */}
+      <GlobalPlanetConfigPanel
+        nodes={nodes}
+        isOpen={planetConfigOpen}
+        onClose={() => setPlanetConfigOpen(false)}
+        onSaved={handleSaved}
+        apiBaseUrl={apiBaseUrl}
+      />
+
+      {/* Debug Panel (gauche, z-20) */}
+      {opts.showDebugInfo && (
+        <DebugPanel controlsRef={controlsRef} cameraRef={cameraRef} />
+      )}
+
+      {/* Hint Navigation (bas-gauche, z-20) */}
+      <div className="fixed bottom-8 left-8 z-20 text-white/30 text-xs leading-relaxed select-none pointer-events-none">
+        <p>• Clic gauche + glisser : Rotation</p>
+        <p>• Clic droit + glisser : Panoramique</p>
+        <p>• Molette : Zoom</p>
+        <p>• Clic planète : Figer + Zoomer</p>
+        <p>• Double-clic : Réinitialiser</p>
+      </div>
+
+      {/* Overlay détails planète (z-50) */}
+      <PlanetOverlay node={overlayNode} onClose={handleCloseOverlay} />
+
+      {/* Accessible fallback liste (screen readers) */}
+      <ul className="sr-only" aria-label="Liste des planètes">
+        {visibleNodes.map((node) => (
+          <li key={node.id}>
+            <button type="button" onClick={() => handleOpenOverlay(node)}>
+              {node.name}: {node.short_description}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+//  Page principale (wrappée dans le Provider)
+// ─────────────────────────────────────────────────────────
+
+/**
+ * Page /explore — Canvas 3D fullscreen avec planètes, physique et overlays.
+ * Le fond vidéo est géré par le layout parent (z-0).
+ */
+export default function ExplorePage() {
+  return (
+    <PlanetsOptionsProvider>
+      <ExplorePageInner />
+    </PlanetsOptionsProvider>
   );
 }
