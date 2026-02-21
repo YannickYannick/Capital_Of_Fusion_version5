@@ -38,16 +38,74 @@ export function Navbar() {
   const links = menuError || !menuItems?.length
     ? [
       { href: "/", label: "Accueil", children: [] as MenuItemApi[] },
-      { href: "/cours", label: "Cours", children: [] as MenuItemApi[] },
-      { href: "/formations", label: "Formations", children: [] as MenuItemApi[] },
-      { href: "/trainings", label: "Trainings", children: [] as MenuItemApi[] },
-      { href: "/artistes", label: "Artistes", children: [] as MenuItemApi[] },
-      { href: "/theorie", label: "Théorie", children: [] as MenuItemApi[] },
-      { href: "/care", label: "Care", children: [] as MenuItemApi[] },
-      { href: "/shop", label: "Shop", children: [] as MenuItemApi[] },
-      { href: "/projets", label: "Projets", children: [] as MenuItemApi[] },
-      { href: "/organisation", label: "Organisation", children: [] as MenuItemApi[] },
-      { href: "http://localhost:8000/admin/", label: "DB", children: [] as MenuItemApi[] },
+      {
+        href: "/cours", label: "Cours", children: [
+          { id: "c1", name: "Liste & Planning", url: "/cours/planning/" },
+          { id: "c2", name: "Filtres (Ville, Niveau)", url: "/cours/filtres/" },
+          { id: "c3", name: "Détails des programmes", url: "/cours/programmes/" },
+          { id: "c4", name: "Inscription", url: "/cours/inscription/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/formations", label: "Formations", children: [
+          { id: "f1", name: "Contenu éducatif en ligne", url: "/formations/contenu/" },
+          { id: "f2", name: "Catégories", url: "/formations/categories/" },
+          { id: "f3", name: "Vidéothèque", url: "/formations/videotheque/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/trainings", label: "Trainings", children: [
+          { id: "t1", name: "Sessions libres", url: "/trainings/sessions/" },
+          { id: "t2", name: "Organisation adhérents", url: "/trainings/adherents/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/artistes", label: "Artistes", children: [
+          { id: "a1", name: "Annuaire", url: "/artistes/annuaire/" },
+          { id: "a2", name: "Profils & Bios", url: "/artistes/profils/" },
+          { id: "a3", name: "Booking", url: "/artistes/booking/" },
+          { id: "a4", name: "Avis & Notes", url: "/artistes/avis/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/theorie", label: "Théorie", children: [
+          { id: "th1", name: "Cours théoriques", url: "/theorie/cours/" },
+          { id: "th2", name: "Quiz de connaissances", url: "/theorie/quiz/" },
+          { id: "th3", name: "Suivi de progression", url: "/theorie/progression/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/care", label: "Care", children: [
+          { id: "ca1", name: "Soins & Récupération", url: "/care/soins/" },
+          { id: "ca2", name: "Nos Praticiens", url: "/care/praticiens/" },
+          { id: "ca3", name: "Réservation", url: "/care/reservation/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/shop", label: "Shop", children: [
+          { id: "s1", name: "Pulls & Sweats", url: "/shop/pulls/" },
+          { id: "s2", name: "T-shirts", url: "/shop/tshirts/" },
+          { id: "s3", name: "Chaussures", url: "/shop/chaussures/" },
+          { id: "s4", name: "Vins & Spiritueux", url: "/shop/vins/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/projets", label: "Projets", children: [
+          { id: "p1", name: "Programme d'incubation", url: "/projets/incubation/" },
+          { id: "p2", name: "Autres initiatives", url: "/projets/initiatives/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "/organisation", label: "Organisation", children: [
+          { id: "o1", name: "Structure", url: "/organisation/structure/" },
+          { id: "o2", name: "Pôles", url: "/organisation/poles/" },
+        ] as MenuItemApi[]
+      },
+      {
+        href: "http://localhost:8000/admin/", label: "DB", children: [
+          { id: "db1", name: "Accès au schéma de la base de données", url: "http://localhost:8000/admin/" },
+        ] as MenuItemApi[]
+      },
     ]
     : menuItems.map((item) => ({
       href: item.url || "/",
