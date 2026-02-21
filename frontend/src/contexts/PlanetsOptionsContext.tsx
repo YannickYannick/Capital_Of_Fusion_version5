@@ -36,6 +36,8 @@ export interface PlanetsOptionsState {
     videoCycleVisible: number;
     videoCycleHidden: number;
     videoTransition: number;
+    isTransitioningToExplore: boolean;
+    showVideoOverlay: boolean;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -80,9 +82,11 @@ const DEFAULTS: PlanetsOptionsState = {
     videoCycleVisible: 10,
     videoCycleHidden: 10,
     videoTransition: 1500,
+    isTransitioningToExplore: false,
+    showVideoOverlay: true,
 };
 
-const LS_KEYS: Record<keyof PlanetsOptionsState, string> = {
+const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     showOrbits: "planets_showOrbits",
     freezePlanets: "planets_freezePlanets",
     showDebugInfo: "planets_showDebugInfo",
@@ -104,6 +108,7 @@ const LS_KEYS: Record<keyof PlanetsOptionsState, string> = {
     videoCycleVisible: "video_cycleVisible",
     videoCycleHidden: "video_cycleHidden",
     videoTransition: "video_transitionDuration",
+    showVideoOverlay: "video_showOverlay",
 };
 
 function lsGet<T>(key: string, fallback: T): T {
@@ -142,9 +147,11 @@ function loadFromLS(): PlanetsOptionsState {
         entrySpeed: lsGet(LS_KEYS.entrySpeed, DEFAULTS.entrySpeed),
         grayscaleVideo: lsGet(LS_KEYS.grayscaleVideo, DEFAULTS.grayscaleVideo),
         enableVideoCycle: lsGet(LS_KEYS.enableVideoCycle, DEFAULTS.enableVideoCycle),
-        videoCycleVisible: lsGet(LS_KEYS.videoCycleVisible, DEFAULTS.videoCycleVisible),
-        videoCycleHidden: lsGet(LS_KEYS.videoCycleHidden, DEFAULTS.videoCycleHidden),
-        videoTransition: lsGet(LS_KEYS.videoTransition, DEFAULTS.videoTransition),
+        videoCycleVisible: lsGet(LS_KEYS.videoCycleVisible!, DEFAULTS.videoCycleVisible),
+        videoCycleHidden: lsGet(LS_KEYS.videoCycleHidden!, DEFAULTS.videoCycleHidden),
+        videoTransition: lsGet(LS_KEYS.videoTransition!, DEFAULTS.videoTransition),
+        showVideoOverlay: lsGet(LS_KEYS.showVideoOverlay!, DEFAULTS.showVideoOverlay),
+        isTransitioningToExplore: false,
     };
 }
 
@@ -169,7 +176,10 @@ export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
         <K extends keyof PlanetsOptionsState>(key: K, value: PlanetsOptionsState[K]) => {
             setState((prev) => {
                 const next = { ...prev, [key]: value };
-                lsSet(LS_KEYS[key], value);
+                if (key !== "isTransitioningToExplore") {
+                    const lsKey = LS_KEYS[key];
+                    if (lsKey) lsSet(lsKey, value);
+                }
                 return next;
             });
         },

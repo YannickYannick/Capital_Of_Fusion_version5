@@ -2,23 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { YouTubeVideoBackground } from "@/components/shared/YouTubeVideoBackground";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-
-const YOUTUBE_VIDEO_ID =
-    process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
-// La vidéo qu'on trouvera sur la page Explore
-const EXPLORE_VIDEO_CYCLE = "yaGM4tF42Jk";
+import { motion } from "framer-motion";
+import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 
 export default function LandingPageClient() {
     const router = useRouter();
+    const opts = usePlanetsOptions();
     const [isTransitioning, setIsTransitioning] = useState(false);
 
     const handleStartPushed = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         setIsTransitioning(true);
-        // Délai pour laisser le temps au framer-motion fade-in (1.5s)
+        // Déclenche le cycle fondu dans la GlobalVideoBackground (gérée dans layout.tsx)
+        opts.set("isTransitioningToExplore", true);
+
+        // Délai pour laisser le temps au fondu vidéo paramétré dans GlobalVideoBackground (1.5s)
         setTimeout(() => {
             router.push("/explore");
         }, 1500);
@@ -26,12 +25,16 @@ export default function LandingPageClient() {
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
-            <YouTubeVideoBackground videoId={YOUTUBE_VIDEO_ID} />
+            {/* Le fond vidéo principal est maintenant géré globalement dans layout.tsx (GlobalVideoBackground) */}
 
-            <div
-                className="absolute inset-0 bg-gradient-to-b from-[#0a0e27] via-[#0a0e27]/60 to-transparent pointer-events-none"
-                aria-hidden
-            />
+            {/* Le voile dégradé de la page d'accueil - peut être toggle par l'overlay global si on le souhaite, 
+                mais on le garde local à la homepage pour l'instant sauf si opts le masque */}
+            {opts.showVideoOverlay && (
+                <div
+                    className="absolute inset-0 bg-gradient-to-b from-[#0a0e27] via-[#0a0e27]/60 to-transparent pointer-events-none"
+                    aria-hidden
+                />
+            )}
 
             <section className="relative z-10 max-w-3xl mx-auto text-center">
                 <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
@@ -75,21 +78,6 @@ export default function LandingPageClient() {
                 </p>
             </section>
 
-            {/* Transition: Faire apparaitre la vidéo d'explore en fondu quand on clique */}
-            <AnimatePresence>
-                {isTransitioning && (
-                    <motion.div
-                        key="video-transition"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                        className="fixed inset-0 z-50 pointer-events-none"
-                    >
-                        <div className="absolute inset-0 bg-black/30 z-10" />
-                        <YouTubeVideoBackground videoId={EXPLORE_VIDEO_CYCLE} />
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

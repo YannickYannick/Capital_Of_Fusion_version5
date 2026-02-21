@@ -51,20 +51,29 @@ const QUALITY_OPTIONS = [
     { value: "hd1080", label: "1080p" },
 ] as const;
 
+import { usePathname } from "next/navigation";
+
+// Vidéos par défaut si non fournies (celles de la page d'accueil et d'explore)
+const DEFAULT_VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
+const DEFAULT_VIDEO_CYCLE = "yaGM4tF42Jk";
+
 /**
- * Fond vidéo double pour la page Explore :
- * - Vidéo principale (permanente, en dessous)  — videoIdMain
- * - Vidéo cyclique  (fondue, au-dessus)         — videoIdCycle
- * Cycle contrôlé par PlanetsOptionsContext (videoCycleVisible, videoCycleHidden, videoTransition, enableVideoCycle).
- * Grayscale contrôlé par opts.grayscaleVideo.
+ * Fond vidéo global pour tout le layout (main).
+ * Reste monté en permanence pour éviter le rechargement des iframes.
+ * - Sur `/` : vidéo principale seule
+ * - En transition : vidéo cyclique fondue par-dessus la principale
+ * - Sur `/explore` : vidéo cyclique gérée par les intervalles opts
  */
-export function ExploreVideos({
-    videoIdMain,
-    videoIdCycle,
+export function GlobalVideoBackground({
+    videoIdMain = DEFAULT_VIDEO_MAIN,
+    videoIdCycle = DEFAULT_VIDEO_CYCLE,
 }: {
-    videoIdMain: string;
-    videoIdCycle: string;
+    videoIdMain?: string;
+    videoIdCycle?: string;
 }) {
+    const pathname = usePathname();
+    const isHome = pathname === "/";
+    const isExplore = pathname === "/explore";
     const opts = usePlanetsOptions();
     const [apiReady, setApiReady] = useState(false);
     const [cycleOpacity, setCycleOpacity] = useState(0);
@@ -93,8 +102,21 @@ export function ExploreVideos({
         return () => { window.onYouTubeIframeAPIReady = undefined; };
     }, []);
 
-    // Cycle vidéo
+    // Gestion du cycle vidéo et transitions
     useEffect(() => {
+        // En transition, on force la vidéo cyclique à s'afficher en fondu
+        if (opts.isTransitioningToExplore) {
+            setCycleOpacity(1);
+            return;
+        }
+
+        // Si on n'est pas sur Explore ni en transition, pas de vidéo cyclique
+        if (!isExplore) {
+            setCycleOpacity(0);
+            return;
+        }
+
+        // Sur explore : si cycle désactivé, reste toujours affichée
         if (!opts.enableVideoCycle) {
             setCycleOpacity(1);
             return;
@@ -103,7 +125,6 @@ export function ExploreVideos({
         let timer: ReturnType<typeof setTimeout>;
         const visibleMs = opts.videoCycleVisible * 1000;
         const hiddenMs = opts.videoCycleHidden * 1000;
-        const transMs = opts.videoTransition;
 
         function showCycle() {
             setCycleOpacity(1);
@@ -116,7 +137,11 @@ export function ExploreVideos({
 
         showCycle();
         return () => clearTimeout(timer);
-    }, [opts.enableVideoCycle, opts.videoCycleVisible, opts.videoCycleHidden, opts.videoTransition]);
+    }, [opts.enableVideoCycle, opts.videoCycleVisible, opts.videoCycleHidden, isExplore, opts.isTransitioningToExplore]);
+
+    // Visibilité globale des vidéos
+    const isVisibleGlobally = isHome || isExplore || opts.isTransitioningToExplore;
+    if (!isVisibleGlobally) return null; // Sur les autres pages (cours...), on cache l'iframe
 
     const grayscale = opts.grayscaleVideo ? "grayscale(100%)" : "none";
     const transitionMs = opts.videoTransition;
@@ -148,7 +173,7 @@ export function ExploreVideos({
                     className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
                     style={{ transform: playerTransform }}
                 />
-                <div className="absolute inset-0 bg-black/30" />
+                {opts.showVideoOverlay && <div className="absolute inset-0 bg-black/30 pointer-events-none" />}
             </div>
 
             {/* Vidéo cyclique — fondue par-dessus */}
@@ -184,8 +209,16 @@ export function ExploreVideos({
                 </div>
                 <button
                     type="button"
+                    onClick={() => opts.set("showVideoOverlay", !opts.showVideoOverlay)}
+                    className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2"
+                    title="Activer/Désactiver le voile sombre sur la vidéo"
+                >
+                    {opts.showVideoOverlay ? "👁️‍🗨️ Masquer voile" : "👁️ Afficher voile"}
+                </button>
+                <button
+                    type="button"
                     onClick={handleMute}
-                    className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm"
+                    className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2"
                 >
                     {muted ? "🔇 Activer le son" : "🔊 Son activé"}
                 </button>
