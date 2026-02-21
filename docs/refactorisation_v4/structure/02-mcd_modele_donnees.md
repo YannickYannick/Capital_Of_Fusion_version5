@@ -268,10 +268,10 @@ erDiagram
 La navbar est pilotée par **MenuItem** (API `GET /api/menu/items/`). Pour rester cohérent avec les maquettes :
 
 - **Ordre des entrées de premier niveau** (champ `order` à renseigner en base) :  
-  1. Accueil (url `/`, pas d'enfants), 2. Boutique, 3. Événements, 4. Explore, 5. Cours, 6. Formations, 7. Trainings, 8. Artistes, 9. Théorie, 10. Care, 11. Shop, 12. Projets, 13. Organisation.
-- **Sous-menus** : chaque entrée (sauf Accueil) peut avoir 0..N **children** (MenuItem avec `parent_id` = cet item). Exemples : Boutique → Pulls & Sweats, T-shirts, Chaussures, Vins & Spiritueux ; Cours → Liste & Planning, Filtres, Détails des programmes, Inscription ; Organisation → Structure, Pôles.
-- **URLs** : `url` doit correspondre aux routes du site (ex. `/boutique/`, `/evenements/`, `/explore/`, `/cours/`, `/organisation/structure/`). Les sous-pages (ex. `/boutique/pulls/`) sont des MenuItem enfants avec leur propre `url`.
-- **Référence détaillée** : liste complète des parents et sous-menus dans [04-maquettes_ui_jour.md](04-maquettes_ui_jour.md) section 5 (ordre et tableau des dropdowns). Le script `populate_menu.py` doit produire des MenuItem dont l'ordre et la hiérarchie respectent cette structure.
+  1. Cours, 2. Formations, 3. Trainings, 4. Artistes, 5. Théorie, 6. Care, 7. Shop, 8. Projets, 9. Organisation, 10. DB (+ Accueil, Événements, Explore pour l'MVP existant).
+- **Sous-menus** : chaque entrée (sauf Accueil) peut avoir 0..N **children** (MenuItem avec `parent_id` = cet item). Exemples : Formations → Contenu éducatif en ligne, Catégories, Vidéothèque ; Trainings → Sessions libres, Organisation adhérents.
+- **URLs** : `url` doit correspondre aux routes du site (ex. `/formations/`, `/trainings/`, `/artistes/`, `/theorie/`, `/organisation/structure/`). Les sous-pages (ex. `/formations/contenu/`) sont des MenuItem enfants avec leur propre `url`.
+- **Référence détaillée** : liste complète des parents et sous-menus dictée par les correctifs itératifs. Le script `load_initial_data.py` reflète fidèlement cette nouvelle hiérarchie.
 
 ### Correspondance Menu → Modèles (données par section)
 

@@ -69,24 +69,31 @@ export function MobileNav({
             <div key={href + label}>
               {children.length > 0 ? (
                 <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setExpandedSlug((s) => (s === label ? null : label))
-                    }
-                    className="w-full px-6 py-2 text-left text-white/90 hover:text-white hover:bg-white/5 flex items-center justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
-                    aria-expanded={expandedSlug === label}
-                    aria-controls={`mobile-submenu-${label.replace(/\s+/g, "-")}`}
-                  >
-                    {label}
-                    <span
-                      className={`text-xs transition ${
-                        expandedSlug === label ? "rotate-180" : ""
-                      }`}
+                  <div className="flex items-center w-full px-6 text-white/90 hover:bg-white/5">
+                    <Link
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      className="flex-1 py-3 text-left hover:text-white focus:outline-none focus-visible:underline"
                     >
-                      ▾
-                    </span>
-                  </button>
+                      {label}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setExpandedSlug((s) => (s === label ? null : label));
+                      }}
+                      className="p-3 -mr-3 text-white/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded"
+                      aria-expanded={expandedSlug === label}
+                      aria-controls={`mobile-submenu-${label.replace(/\s+/g, "-")}`}
+                      aria-label={`Déplier le sous-menu ${label}`}
+                    >
+                      <span className={`text-xs transition inline-block ${expandedSlug === label ? "rotate-180" : ""}`}>
+                        ▾
+                      </span>
+                    </button>
+                  </div>
                   {expandedSlug === label && (
                     <div id={`mobile-submenu-${label.replace(/\s+/g, "-")}`} className="pl-6 pb-2 flex flex-col gap-1" role="group" aria-label={`Sous-menu ${label}`}>
                       {children.map((child) => (
