@@ -499,6 +499,7 @@ interface PlanetProps {
   isHovered: boolean;
   isSelected: boolean;
   showEntryTrajectory: boolean;
+  speedMultiplierRef: React.MutableRefObject<number>;
 }
 
 function Planet({
@@ -537,6 +538,7 @@ function Planet({
   isHovered,
   isSelected,
   showEntryTrajectory,
+  speedMultiplierRef,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);       // temps (ms) après délai
@@ -697,7 +699,7 @@ function Planet({
           currentAngularSpeed = startAngular + (nominalAngularSpeed - startAngular) * easedT;
         }
       }
-      s.phase += currentAngularSpeed * dt;
+      s.phase += currentAngularSpeed * speedMultiplierRef.current * dt;
     }
 
     // Position nominale sur l'orbite (déterministe, forme respectée)
@@ -874,6 +876,7 @@ function Sun({
   isHovered,
   onHover,
   globalPlanetScale,
+  speedMultiplierRef,
 }: {
   node: OrganizationNodeApi;
   frozen: boolean;
@@ -882,6 +885,7 @@ function Sun({
   isHovered: boolean;
   globalPlanetScale: number;
   onHover: (v: boolean) => void;
+  speedMultiplierRef: React.MutableRefObject<number>;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = hexToColor(node.planet_color || "#fbbf24");
@@ -889,7 +893,7 @@ function Sun({
 
   useFrame((_, delta) => {
     if (!meshRef.current || frozen) return;
-    meshRef.current.rotation.y += delta * 0.15;
+    meshRef.current.rotation.y += delta * 0.15 * speedMultiplierRef.current;
   });
 
   const displayScale = isHovered || isSelected ? scale * 1.1 : scale;
@@ -1155,6 +1159,24 @@ function SceneContent({
     return () => canvas.removeEventListener("mousemove", handleMove);
   }, [camera, gl]);
 
+  // Vitesse globale (ralentit au survol des orbites et s'arrête si planète pointée)
+  const speedMultiplierRef = useRef(1);
+  useFrame((state, delta) => {
+    let maxR = 0;
+    if (orbitNodes.length > 0) {
+      maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing).r;
+    }
+    const dist = mousePosRef.current.length();
+    const inOrbitZone = dist <= maxR + 5 && dist >= 0.1;
+
+    // Si une planète est pointée -> multiplier = 0.1 (divisé par 10)
+    // Si zone d'orbite survolée -> multiplier = 0.33 (divisé par 3)
+    // Sinon -> multiplier = 1.0
+    const targetMultiplier = hoveredId !== null ? 0.1 : (inOrbitZone ? 0.333 : 1.0);
+    const lerpSpeed = hoveredId !== null ? 10 : 2;
+    speedMultiplierRef.current = THREE.MathUtils.lerp(speedMultiplierRef.current, targetMultiplier, delta * lerpSpeed);
+  });
+
   const selectedNode = orbitNodes.find(n => n.id === selectedId) ?? (rootNode?.id === selectedId ? rootNode : null);
   const selectedScale = selectedNode?.planet_scale ?? 0.6;
 
@@ -1188,6 +1210,7 @@ function SceneContent({
           isSelected={selectedId === rootNode.id}
           isHovered={hoveredId === rootNode.id}
           onHover={(v) => setHoveredId(v ? rootNode.id : null)}
+          speedMultiplierRef={speedMultiplierRef}
         />
       )}
 
@@ -1234,6 +1257,7 @@ function SceneContent({
             isHovered={hoveredId === node.id}
             isSelected={selectedId === node.id}
             showEntryTrajectory={showEntryTrajectory}
+            speedMultiplierRef={speedMultiplierRef}
           />
         );
       })}
