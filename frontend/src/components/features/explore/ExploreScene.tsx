@@ -1163,26 +1163,77 @@ function SceneContent({
       const ndcY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
-      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-      const pt = new THREE.Vector3();
-      raycaster.ray.intersectPlane(plane, pt);
-      mousePosRef.current.copy(pt);
+
+      // Enregistrer le raycaster directement, car on veut évaluer 
+      // la distance aux planètes en 3D volumétrique
+      mousePosRef.current.copy(raycaster.ray.direction);
+      // On stocke origin dans le x,y,z d'un attribut custom ou on garde juste le NDc pour refaire le raycast côté frame
     };
     canvas.addEventListener("mousemove", handleMove);
     return () => canvas.removeEventListener("mousemove", handleMove);
   }, [camera, gl]);
 
+  const pointerNDC = useRef(new THREE.Vector2());
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const handleMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      pointerNDC.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointerNDC.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    };
+    canvas.addEventListener("mousemove", handleMove);
+    return () => canvas.removeEventListener("mousemove", handleMove);
+  }, [gl]);
+
   // Vitesse globale (ralentit au survol des orbites et s'arrête si planète pointée)
   const speedMultiplierRef = useRef(1);
+  const raycasterRef = useRef(new THREE.Raycaster());
+
   useFrame((state, delta) => {
+    // Reconstruire le rayon depuis le dernier NDC pointé
+    raycasterRef.current.setFromCamera(pointerNDC.current, state.camera);
+    const ray = raycasterRef.current.ray;
+
+    let inOrbitZone = false;
+
+    // Déterminer la distance max (rayon + marge)
     let maxR = 0;
     if (orbitNodes.length > 0) {
       maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude).r;
     }
-    const dist = mousePosRef.current.length();
-    const inOrbitZone = dist <= maxR + 5 && dist >= 0.1;
 
-    // Si une planète est pointée -> multiplier = 0.1 (divisé par 10)
+    // Le centre du système est à [0,0,0]. 
+    // On trouve approximativement la distance la plus courte entre le rayon (écran) et l'origine (système central)
+    const distanceToOrigin = ray.distanceToPoint(new THREE.Vector3(0, 0, 0));
+
+    // Si le pointeur vise à l'intérieur du disque global d'orbites
+    if (distanceToOrigin <= maxR + 5 && distanceToOrigin >= 0.1) {
+      // On vérifie que la hauteur du rayon (Y) lorsqu'il "croise" l'orbite 
+      // est à l'intérieur de l'amplitude verticale maximale des planètes
+
+      // Calcul de l'amplitude max Y
+      let maxY = 5; // valeur par défaut minimale
+      if (verticalMode === "homogeneous") {
+        const step = verticalHomogeneousStep / Math.max(1, Math.floor(orbitNodes.length / 2));
+        maxY = (step * Math.floor(orbitNodes.length / 2) + verticalHomogeneousBase);
+      } else if (verticalMode === "jupiter") {
+        maxY = verticalJupiterAmplitude;
+      } else if (verticalMode === "manual") {
+        maxY = Math.max(...orbitNodes.map(n => Math.abs(n.orbit_position_y || 0)), 5);
+      }
+
+      // Le point le plus proche entre le rayon et l'axe (0,y,0)
+      // Pour simplifier, on trouve le point du rayon le plus près de l'origine
+      const pointCible = new THREE.Vector3();
+      ray.closestPointToPoint(new THREE.Vector3(0, 0, 0), pointCible);
+
+      // On se donne une large marge verticale tolérée (hauteur des orbites + 30 visuellement)
+      if (Math.abs(pointCible.y) <= maxY + 15) {
+        inOrbitZone = true;
+      }
+    }
+
+    // Si une planète est pointée -> multiplier = hoverPlanetSpeedRatio
     // Si zone d'orbite survolée -> multiplier = hoverOrbitSpeedRatio
     // Sinon -> multiplier = 1.0
     const targetMultiplier = hoveredId !== null ? hoverPlanetSpeedRatio : (inOrbitZone ? hoverOrbitSpeedRatio : 1.0);
