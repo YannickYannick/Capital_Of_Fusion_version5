@@ -51,6 +51,7 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
             "planet_scale",
             "rotation_speed",
             "orbit_phase",
+            "orbit_position_y",
             "orbit_shape",
             "orbit_roundness",
             "entry_start_x",

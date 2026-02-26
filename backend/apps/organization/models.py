@@ -129,6 +129,10 @@ class OrganizationNode(BaseModel):
         default=0.0,
         help_text="Position initiale sur l'orbite (en radians)"
     )
+    orbit_position_y = models.FloatField(
+        default=0.0,
+        help_text="Position verticale (Y) manuelle de l'orbite (entre -50 et +50)"
+    )
     
     ORBIT_SHAPES = (
         ('circle', 'Circulaire'),

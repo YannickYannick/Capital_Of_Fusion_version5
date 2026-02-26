@@ -22,6 +22,7 @@ export interface PlanetsOptionsState {
     showDebugInfo: boolean;
     fishEye: number;
     orbitSpacing: number;
+    globalPlanetScale: number;
     globalShapeOverride: boolean;
     orbitShape: "circle" | "squircle";
     orbitRoundness: number;
@@ -55,6 +56,9 @@ export interface PlanetsOptionsState {
     isTransitioningToExplore: boolean;
     showVideoOverlay: boolean;
     showEntryTrajectory: boolean;
+    // ── Nouveaux Modes ──
+    verticalMode: "manual" | "homogeneous" | "jupiter";
+    autoDistributeOrbits: boolean;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -83,6 +87,7 @@ const DEFAULTS: PlanetsOptionsState = {
     showDebugInfo: false,
     fishEye: 50,
     orbitSpacing: 1.0,
+    globalPlanetScale: 1.0,
     globalShapeOverride: false,
     orbitShape: "circle",
     orbitRoundness: 0.6,
@@ -121,6 +126,8 @@ const DEFAULTS: PlanetsOptionsState = {
     isTransitioningToExplore: false,
     showVideoOverlay: true,
     showEntryTrajectory: false,
+    verticalMode: "manual",
+    autoDistributeOrbits: false,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -129,6 +136,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     showDebugInfo: "planets_showDebugInfo",
     fishEye: "planets_fishEye",
     orbitSpacing: "planets_orbitSpacing",
+    globalPlanetScale: "planets_globalPlanetScale",
     globalShapeOverride: "planets_globalShapeOverride",
     orbitShape: "planets_orbitShape",
     orbitRoundness: "planets_orbitRoundness",
@@ -157,6 +165,8 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     videoTransition: "video_transitionDuration",
     showVideoOverlay: "video_showOverlay",
     showEntryTrajectory: "planets_showEntryTrajectory",
+    verticalMode: "planets_verticalMode",
+    autoDistributeOrbits: "planets_autoDistributeOrbits",
 };
 
 function lsGet<T>(key: string, fallback: T): T {
@@ -177,21 +187,22 @@ function lsSet(key: string, value: unknown) {
 
 function loadFromLS(): PlanetsOptionsState {
     return {
-        showOrbits: lsGet(LS_KEYS.showOrbits, DEFAULTS.showOrbits),
-        freezePlanets: lsGet(LS_KEYS.freezePlanets, DEFAULTS.freezePlanets),
-        showDebugInfo: lsGet(LS_KEYS.showDebugInfo, DEFAULTS.showDebugInfo),
-        fishEye: lsGet(LS_KEYS.fishEye, DEFAULTS.fishEye),
-        orbitSpacing: lsGet(LS_KEYS.orbitSpacing, DEFAULTS.orbitSpacing),
-        globalShapeOverride: lsGet(LS_KEYS.globalShapeOverride, DEFAULTS.globalShapeOverride),
-        orbitShape: lsGet(LS_KEYS.orbitShape, DEFAULTS.orbitShape),
-        orbitRoundness: lsGet(LS_KEYS.orbitRoundness, DEFAULTS.orbitRoundness),
-        mouseForce: lsGet(LS_KEYS.mouseForce, DEFAULTS.mouseForce),
-        collisionForce: lsGet(LS_KEYS.collisionForce, DEFAULTS.collisionForce),
-        damping: lsGet(LS_KEYS.damping, DEFAULTS.damping),
-        returnForce: lsGet(LS_KEYS.returnForce, DEFAULTS.returnForce),
-        entryStartX: lsGet(LS_KEYS.entryStartX, DEFAULTS.entryStartX),
-        entryStartY: lsGet(LS_KEYS.entryStartY, DEFAULTS.entryStartY),
-        entryStartZ: lsGet(LS_KEYS.entryStartZ, DEFAULTS.entryStartZ),
+        showOrbits: lsGet(LS_KEYS.showOrbits!, DEFAULTS.showOrbits),
+        freezePlanets: lsGet(LS_KEYS.freezePlanets!, DEFAULTS.freezePlanets),
+        showDebugInfo: lsGet(LS_KEYS.showDebugInfo!, DEFAULTS.showDebugInfo),
+        fishEye: lsGet(LS_KEYS.fishEye!, DEFAULTS.fishEye),
+        orbitSpacing: lsGet(LS_KEYS.orbitSpacing!, DEFAULTS.orbitSpacing),
+        globalPlanetScale: lsGet(LS_KEYS.globalPlanetScale!, DEFAULTS.globalPlanetScale),
+        globalShapeOverride: lsGet(LS_KEYS.globalShapeOverride!, DEFAULTS.globalShapeOverride),
+        orbitShape: lsGet(LS_KEYS.orbitShape!, DEFAULTS.orbitShape),
+        orbitRoundness: lsGet(LS_KEYS.orbitRoundness!, DEFAULTS.orbitRoundness),
+        mouseForce: lsGet(LS_KEYS.mouseForce!, DEFAULTS.mouseForce),
+        collisionForce: lsGet(LS_KEYS.collisionForce!, DEFAULTS.collisionForce),
+        damping: lsGet(LS_KEYS.damping!, DEFAULTS.damping),
+        returnForce: lsGet(LS_KEYS.returnForce!, DEFAULTS.returnForce),
+        entryStartX: lsGet(LS_KEYS.entryStartX!, DEFAULTS.entryStartX),
+        entryStartY: lsGet(LS_KEYS.entryStartY!, DEFAULTS.entryStartY),
+        entryStartZ: lsGet(LS_KEYS.entryStartZ!, DEFAULTS.entryStartZ),
         entrySpeedStart: lsGet(LS_KEYS.entrySpeedStart!, DEFAULTS.entrySpeedStart),
         entrySpeedEnd: lsGet(LS_KEYS.entrySpeedEnd!, DEFAULTS.entrySpeedEnd),
         entryEasing: lsGet(LS_KEYS.entryEasing!, DEFAULTS.entryEasing),
@@ -203,13 +214,15 @@ function loadFromLS(): PlanetsOptionsState {
         orbitEasing: lsGet(LS_KEYS.orbitEasing!, DEFAULTS.orbitEasing),
         orbitalRampDuration: lsGet(LS_KEYS.orbitalRampDuration!, DEFAULTS.orbitalRampDuration),
         globalOrbitSpeed: lsGet(LS_KEYS.globalOrbitSpeed!, DEFAULTS.globalOrbitSpeed),
-        grayscaleVideo: lsGet(LS_KEYS.grayscaleVideo, DEFAULTS.grayscaleVideo),
-        enableVideoCycle: lsGet(LS_KEYS.enableVideoCycle, DEFAULTS.enableVideoCycle),
+        grayscaleVideo: lsGet(LS_KEYS.grayscaleVideo!, DEFAULTS.grayscaleVideo),
+        enableVideoCycle: lsGet(LS_KEYS.enableVideoCycle!, DEFAULTS.enableVideoCycle),
         videoCycleVisible: lsGet(LS_KEYS.videoCycleVisible!, DEFAULTS.videoCycleVisible),
         videoCycleHidden: lsGet(LS_KEYS.videoCycleHidden!, DEFAULTS.videoCycleHidden),
         videoTransition: lsGet(LS_KEYS.videoTransition!, DEFAULTS.videoTransition),
         showVideoOverlay: lsGet(LS_KEYS.showVideoOverlay!, DEFAULTS.showVideoOverlay),
         showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
+        verticalMode: lsGet(LS_KEYS.verticalMode!, DEFAULTS.verticalMode),
+        autoDistributeOrbits: lsGet(LS_KEYS.autoDistributeOrbits!, DEFAULTS.autoDistributeOrbits),
         isTransitioningToExplore: false,
     };
 }

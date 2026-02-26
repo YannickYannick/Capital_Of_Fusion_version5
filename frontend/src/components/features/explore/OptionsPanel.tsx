@@ -171,6 +171,14 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                         {/* Caméra */}
                         <Section title="Caméra & Espace">
                             <Slider
+                                label="Échelle Planètes"
+                                value={opts.globalPlanetScale}
+                                min={0.1}
+                                max={5.0}
+                                step={0.1}
+                                onChange={(v) => opts.set("globalPlanetScale", v)}
+                            />
+                            <Slider
                                 label="Fish Eye (FOV)"
                                 value={opts.fishEye}
                                 min={30}
@@ -186,6 +194,34 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                 step={0.1}
                                 onChange={(v) => opts.set("orbitSpacing", v)}
                             />
+                        </Section>
+
+                        {/* Répartition Spatiale */}
+                        <Section title="Répartition Spatiale">
+                            <ToggleBtn
+                                label={opts.autoDistributeOrbits ? "Désactiver Auto-Orbite" : "Répartir Auto Orbites"}
+                                icon="🔄"
+                                active={opts.autoDistributeOrbits}
+                                onClick={() => opts.set("autoDistributeOrbits", !opts.autoDistributeOrbits)}
+                            />
+                            <div>
+                                <p className="text-xs text-white/60 mb-1.5 mt-2">Mode Vertical (Y)</p>
+                                <div className="grid grid-cols-3 gap-1">
+                                    {(["manual", "homogeneous", "jupiter"] as const).map((m) => (
+                                        <button
+                                            key={m}
+                                            type="button"
+                                            className={`py-1.5 rounded-lg text-xs border transition ${opts.verticalMode === m
+                                                ? "bg-purple-600/30 border-purple-500/50 text-white"
+                                                : "bg-white/5 border-white/10 text-white/60 hover:text-white/80"
+                                                }`}
+                                            onClick={() => opts.set("verticalMode", m)}
+                                        >
+                                            {m === "manual" ? "Manuel" : m === "homogeneous" ? "Lissé" : "Jupiter"}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </Section>
 
                         {/* Orbites */}

@@ -87,3 +87,7 @@ Pour garantir le fonctionnement de l'interface d'Exploration 3D comme sur la V4,
   * Ajout des directives `MEDIA_URL` et `MEDIA_ROOT` au `settings.py` (associé au support statique dans `urls.py`) pour que Django délivre localement les fichiers modèles.
   * Passage du contexte de requête HTTP (`context={'request': request}`) dans le serializer de `OrganizationNode` pour transformer les URLs relatives des GLB en URLs absolues (ex: `http://localhost:8000/media/...`).
   * Importation du dossier `media` depuis la V4 vers la V5 pour récupérer tous les fichiers GLB existants.
+* **Fonctions de Répartition et de Dimension** :
+  * Ajout d'une option de **Répartition Automatique des Orbites** pour recalculer les distances au soleil harmonieusement (sans toucher la base de données).
+  * Ajout d'une gestion complète de **Dimension Verticale** (`orbit_position_y` en base) avec plusieurs modes (Manuel, Homogène, Jupiter) permettant d'éclater l'affichage sur la hauteur de façon réaliste.
+  * Création d'un coefficient global (`Échelle Planètes`) pour réduire ou agrandir l'ensemble des planètes d'un coup.

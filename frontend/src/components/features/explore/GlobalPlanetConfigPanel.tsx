@@ -10,6 +10,7 @@ interface LocalNodeChanges {
     planet_scale?: number;
     orbit_shape?: string;
     orbit_roundness?: number;
+    orbit_position_y?: number;
     is_visible_3d?: boolean;
 }
 
@@ -37,6 +38,7 @@ function NodeRow({
     const planetScale = changes.planet_scale ?? node.planet_scale ?? 0.6;
     const orbitShape = changes.orbit_shape ?? node.orbit_shape ?? "circle";
     const orbitRoundness = changes.orbit_roundness ?? node.orbit_roundness ?? 0.6;
+    const orbitPositionY = changes.orbit_position_y ?? node.orbit_position_y ?? 0;
 
     const hasChanges = Object.keys(changes).length > 0;
 
@@ -85,6 +87,15 @@ function NodeRow({
                                 step={0.5}
                                 onChange={(v) => onChangeField("orbit_radius", v)}
                             />
+                            {/* Hauteur (Y) */}
+                            <SliderRow
+                                label="Hauteur de l'orbite (Y)"
+                                value={orbitPositionY}
+                                min={-50}
+                                max={50}
+                                step={1}
+                                onChange={(v) => onChangeField("orbit_position_y", v)}
+                            />
                             {/* Vitesse orbitale */}
                             <SliderRow
                                 label="Vitesse orbitale"
@@ -112,8 +123,8 @@ function NodeRow({
                                             key={s}
                                             type="button"
                                             className={`flex-1 py-1.5 rounded-lg text-xs border transition ${orbitShape === s
-                                                    ? "bg-purple-600/40 border-purple-500/60 text-white"
-                                                    : "bg-white/5 border-white/10 text-white/50"
+                                                ? "bg-purple-600/40 border-purple-500/60 text-white"
+                                                : "bg-white/5 border-white/10 text-white/50"
                                                 }`}
                                             onClick={() => onChangeField("orbit_shape", s)}
                                         >
@@ -293,14 +304,14 @@ export function GlobalPlanetConfigPanel({
                                 onClick={handleSaveAll}
                                 disabled={changeCount === 0 || saveStatus === "saving"}
                                 className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${saveStatus === "success"
-                                        ? "bg-green-600 text-white"
-                                        : saveStatus === "error"
-                                            ? "bg-red-600 text-white"
-                                            : saveStatus === "saving"
-                                                ? "bg-purple-600/50 text-white/50 cursor-wait"
-                                                : changeCount === 0
-                                                    ? "bg-white/10 text-white/30 cursor-not-allowed"
-                                                    : "bg-purple-600 hover:bg-purple-500 text-white"
+                                    ? "bg-green-600 text-white"
+                                    : saveStatus === "error"
+                                        ? "bg-red-600 text-white"
+                                        : saveStatus === "saving"
+                                            ? "bg-purple-600/50 text-white/50 cursor-wait"
+                                            : changeCount === 0
+                                                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                                                : "bg-purple-600 hover:bg-purple-500 text-white"
                                     }`}
                             >
                                 {saveStatus === "saving"

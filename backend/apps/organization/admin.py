@@ -39,7 +39,7 @@ class OrganizationNodeAdmin(admin.ModelAdmin):
                 'planet_color', 
                 'planet_scale',
                 ('orbit_radius', 'orbit_speed', 'orbit_phase'),
-                ('orbit_shape', 'orbit_roundness'),
+                ('orbit_position_y', 'orbit_shape', 'orbit_roundness'),
                 'rotation_speed',
             ],
             'classes': ['collapse'],

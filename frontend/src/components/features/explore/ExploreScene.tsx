@@ -50,17 +50,44 @@ function getOrbitPosition(
   phase: number,
   radius: number,
   shape: "circle" | "squircle",
-  roundness: number
+  roundness: number,
+  orbitY: number = 0
 ): THREE.Vector3 {
   if (shape === "squircle") {
     const [x, z] = getSquirclePosition(phase / (Math.PI * 2), radius, roundness);
-    return new THREE.Vector3(x, 0, z);
+    return new THREE.Vector3(x, orbitY, z);
   }
   return new THREE.Vector3(
     Math.cos(phase) * radius,
-    0,
+    orbitY,
     Math.sin(phase) * radius
   );
+}
+
+export function getDynamicOrbitParams(
+  node: OrganizationNodeApi,
+  i: number,
+  total: number,
+  autoDistribute: boolean,
+  verticalMode: "manual" | "homogeneous" | "jupiter",
+  orbitSpacing: number
+): { r: number; y: number } {
+  const r0 = autoDistribute ? 3 + i * 2.5 : (node.orbit_radius ?? 3 + i * 1.5);
+  const r = r0 * orbitSpacing;
+
+  let y = 0;
+  if (verticalMode === "manual") {
+    y = node.orbit_position_y || 0;
+  } else if (verticalMode === "homogeneous") {
+    const sign = i % 2 === 0 ? 1 : -1;
+    const step = 20 / Math.max(1, Math.floor(total / 2));
+    y = sign * (step * Math.floor(i / 2) + 5);
+  } else if (verticalMode === "jupiter") {
+    const amplitude = 30 * (1 - i / Math.max(1, total));
+    const sign = i % 2 === 0 ? 1 : -1;
+    y = sign * amplitude;
+  }
+  return { r, y };
 }
 
 // ─────────────────────────────────────────────────────────
@@ -228,10 +255,12 @@ function OrbitRing({
   radius,
   shape,
   roundness,
+  orbitY = 0,
 }: {
   radius: number;
   shape: "circle" | "squircle";
   roundness: number;
+  orbitY?: number;
 }) {
   const points = useMemo<[number, number, number][]>(() => {
     const pts: [number, number, number][] = [];
@@ -241,13 +270,13 @@ function OrbitRing({
       const phase = t * Math.PI * 2;
       if (shape === "squircle") {
         const [x, z] = getSquirclePosition(t, radius, roundness);
-        pts.push([x, 0, z]);
+        pts.push([x, orbitY, z]);
       } else {
-        pts.push([Math.cos(phase) * radius, 0, Math.sin(phase) * radius]);
+        pts.push([Math.cos(phase) * radius, orbitY, Math.sin(phase) * radius]);
       }
     }
     return pts;
-  }, [radius, shape, roundness]);
+  }, [radius, shape, roundness, orbitY]);
 
   return (
     <Line points={points} color="#ffffff" opacity={0.1} transparent lineWidth={1} />
@@ -434,8 +463,10 @@ interface PlanetProps {
   node: OrganizationNodeApi;
   index: number;
   orbitRadius: number;
+  orbitY: number;
   orbitShape: "circle" | "squircle";
   orbitRoundness: number;
+  globalPlanetScale: number;
   frozen: boolean;
   entryStartX: number;
   entryStartY: number;
@@ -474,8 +505,10 @@ function Planet({
   node,
   index,
   orbitRadius,
+  orbitY,
   orbitShape,
   orbitRoundness,
+  globalPlanetScale,
   frozen,
   entryStartX,
   entryStartY,
@@ -536,7 +569,7 @@ function Planet({
     entryFinalSpeed.current = 0;
   }, [restartKey, node.orbit_phase, index]);
 
-  const scale = node.planet_scale ?? 0.6;
+  const scale = (node.planet_scale ?? 0.6) * globalPlanetScale;
   const color = hexToColor(node.planet_color || "#a855f7");
 
   const { targetOrbitPos, targetOrbitPhase, fanStartPos } = useMemo(() => {
@@ -552,7 +585,7 @@ function Planet({
       const STEPS = 128;
       for (let k = 0; k < STEPS; k++) {
         const testPhase = (k / STEPS) * Math.PI * 2;
-        const tPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness);
+        const tPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness, orbitY);
         const dist = tPos.distanceTo(startVec);
         if (dist < bestDist) {
           bestDist = dist;
@@ -560,7 +593,7 @@ function Planet({
         }
       }
     }
-    const finalPos = getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness);
+    const finalPos = getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness, orbitY);
 
     // Calcul du point de départ en mode fan :
     // On part dans la direction opposée à la tangente de l'orbite au point d'arrivée
@@ -577,7 +610,7 @@ function Planet({
       targetOrbitPhase: bestPhase,
       fanStartPos: fanStart,
     };
-  }, [entryTrajectory, entryStartX, entryStartY, entryStartZ, orbitRadius, orbitShape, orbitRoundness, index, fanDistance]);
+  }, [entryTrajectory, entryStartX, entryStartY, entryStartZ, orbitRadius, orbitY, orbitShape, orbitRoundness, index, fanDistance]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
@@ -668,7 +701,7 @@ function Planet({
     }
 
     // Position nominale sur l'orbite (déterministe, forme respectée)
-    const nominalPos = getOrbitPosition(s.phase, orbitRadius, orbitShape, orbitRoundness);
+    const nominalPos = getOrbitPosition(s.phase, orbitRadius, orbitShape, orbitRoundness, orbitY);
 
     // Force souris (répulsion) — perturbation temporaire via vélocité
     if (mouseForce > 0) {
@@ -840,17 +873,19 @@ function Sun({
   isSelected,
   isHovered,
   onHover,
+  globalPlanetScale,
 }: {
   node: OrganizationNodeApi;
   frozen: boolean;
   onClick: () => void;
   isSelected: boolean;
   isHovered: boolean;
+  globalPlanetScale: number;
   onHover: (v: boolean) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = hexToColor(node.planet_color || "#fbbf24");
-  const scale = Math.max(node.planet_scale ?? 1.2, 1);
+  const scale = Math.max(node.planet_scale ?? 1.2, 1) * globalPlanetScale;
 
   useFrame((_, delta) => {
     if (!meshRef.current || frozen) return;
@@ -1054,6 +1089,9 @@ interface SceneContentProps {
   controlsRef: React.RefObject<{ target: THREE.Vector3; update: () => void } | null>;
   selectedNodePos: THREE.Vector3 | null;
   showEntryTrajectory: boolean;
+  verticalMode: "manual" | "homogeneous" | "jupiter";
+  autoDistributeOrbits: boolean;
+  globalPlanetScale: number;
 }
 
 function SceneContent({
@@ -1090,6 +1128,9 @@ function SceneContent({
   controlsRef,
   selectedNodePos,
   showEntryTrajectory,
+  verticalMode,
+  autoDistributeOrbits,
+  globalPlanetScale,
 }: SceneContentProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
@@ -1128,12 +1169,12 @@ function SceneContent({
 
       {/* Orbites */}
       {showOrbits &&
-        orbitNodes.map((node) => {
-          const r = (node.orbit_radius ?? 5) * orbitSpacing;
+        orbitNodes.map((node, i) => {
+          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing);
           const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
           const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
           return (
-            <OrbitRing key={`orbit-${node.id}`} radius={r} shape={shape} roundness={roundness} />
+            <OrbitRing key={`orbit-${node.id}`} radius={r} shape={shape} roundness={roundness} orbitY={y} />
           );
         })}
 
@@ -1142,6 +1183,7 @@ function SceneContent({
         <Sun
           node={rootNode}
           frozen={frozen}
+          globalPlanetScale={globalPlanetScale}
           onClick={() => onPlanetClick(rootNode)}
           isSelected={selectedId === rootNode.id}
           isHovered={hoveredId === rootNode.id}
@@ -1151,7 +1193,7 @@ function SceneContent({
 
       {/* Planètes */}
       {orbitNodes.map((node, i) => {
-        const r = (node.orbit_radius ?? 3 + i * 1.5) * orbitSpacing;
+        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing);
         const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
         const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
         return (
@@ -1160,8 +1202,10 @@ function SceneContent({
             node={node}
             index={i}
             orbitRadius={r}
+            orbitY={y}
             orbitShape={shape}
             orbitRoundness={roundness}
+            globalPlanetScale={globalPlanetScale}
             frozen={frozen}
             entryStartX={entryStartX}
             entryStartY={entryStartY}
@@ -1275,9 +1319,9 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         setSelectedNodePos(new THREE.Vector3(0, 0, 0));
       } else {
         const i = orbitNodes.findIndex((n) => n.id === node.id);
-        const r = (node.orbit_radius ?? 3 + i * 1.5) * opts.orbitSpacing;
+        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode, opts.orbitSpacing);
         const phase = node.orbit_phase ?? (i * 0.7);
-        setSelectedNodePos(getOrbitPosition(phase, r, opts.orbitShape, opts.orbitRoundness));
+        setSelectedNodePos(getOrbitPosition(phase, r, opts.orbitShape, opts.orbitRoundness, y));
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1350,6 +1394,9 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         controlsRef={controlsRef}
         selectedNodePos={selectedNodePos}
         showEntryTrajectory={opts.showEntryTrajectory}
+        verticalMode={opts.verticalMode}
+        autoDistributeOrbits={opts.autoDistributeOrbits}
+        globalPlanetScale={opts.globalPlanetScale}
       />
     </Canvas>
   );

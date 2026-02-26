@@ -35,6 +35,7 @@ export interface OrganizationNodeApi {
   planet_scale: number | null;
   rotation_speed: number | null;
   orbit_phase: number | null;
+  orbit_position_y: number;
   orbit_shape: string;
   orbit_roundness: number | null;
   entry_start_x: number | null;
