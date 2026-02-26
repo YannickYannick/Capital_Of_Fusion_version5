@@ -19,7 +19,7 @@ class OrganizationNodeListAPIView(APIView):
         qs = OrganizationNode.objects.filter(
             is_visible_3d=True
         ).prefetch_related("node_events").order_by("created_at")
-        serializer = OrganizationNodeSerializer(qs, many=True)
+        serializer = OrganizationNodeSerializer(qs, many=True, context={'request': request})
         return Response(serializer.data)
 
 
@@ -34,5 +34,5 @@ class OrganizationNodeDetailAPIView(APIView):
             OrganizationNode.objects.prefetch_related("node_events"),
             slug=slug,
         )
-        serializer = OrganizationNodeSerializer(node)
+        serializer = OrganizationNodeSerializer(node, context={'request': request})
         return Response(serializer.data)

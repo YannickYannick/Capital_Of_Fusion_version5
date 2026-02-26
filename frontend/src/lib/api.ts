@@ -104,7 +104,7 @@ export async function getEventBySlug(slug: string): Promise<EventApi> {
  */
 export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/organization/nodes/`);
+  const res = await fetch(`${base}/api/organization/nodes/`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization nodes API error: ${res.status}`);
   return res.json();
 }

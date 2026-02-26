@@ -13,6 +13,9 @@ declare global {
 interface YTPlayer {
     mute: () => void;
     unMute: () => void;
+    isMuted: () => boolean;
+    setPlaybackQuality: (quality: string) => void;
+    getAvailableQualityLevels: () => string[];
     destroy: () => void;
 }
 
@@ -55,7 +58,7 @@ import { usePathname } from "next/navigation";
 
 // Vidéos par défaut si non fournies (celles de la page d'accueil et d'explore)
 const DEFAULT_VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
-const DEFAULT_VIDEO_CYCLE = "yaGM4tF42Jk";
+const DEFAULT_VIDEO_CYCLE = process.env.NEXT_PUBLIC_YOUTUBE_CYCLE_VIDEO_ID || "eZhq_RMYRKQ";
 
 /**
  * Fond vidéo global pour tout le layout (main).

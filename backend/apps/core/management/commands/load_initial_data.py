@@ -33,7 +33,6 @@ class Command(BaseCommand):
 
         self.stdout.write("Création des MenuItem...")
         menu_data = [
-            {"name": "Accueil", "slug": "accueil", "url": "/", "order": 1, "children": []},
             {"name": "Événements", "slug": "evenements", "url": "/evenements/", "order": 2, "children": [
                 {"name": "Liste & Événements", "slug": "evenements-liste", "url": "/evenements/", "order": 1},
                 {"name": "Festivals", "slug": "evenements-festivals", "url": "/evenements/festivals/", "order": 2},

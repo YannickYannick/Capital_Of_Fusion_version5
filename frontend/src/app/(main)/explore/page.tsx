@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { getOrganizationNodes } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
@@ -26,6 +26,8 @@ const ExploreScene = dynamic(
 
 function ExplorePageInner() {
   const opts = usePlanetsOptions();
+  const controlsRef = useRef<any>(null);
+  const cameraRef = useRef<any>(null);
   const [nodes, setNodes] = useState<OrganizationNodeApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +94,8 @@ function ExplorePageInner() {
           nodes={visibleNodes}
           onOpenOverlay={handleOpenOverlay}
           onSelectNode={handleSelectNode}
+          controlsRef={controlsRef}
+          cameraRef={cameraRef}
         />
       )}
 

@@ -64,6 +64,163 @@ function getOrbitPosition(
 }
 
 // ─────────────────────────────────────────────────────────
+//  Fonctions de trajectoire d'entrée
+// ─────────────────────────────────────────────────────────
+
+/**
+ * Calcule la tangente unitaire à l'orbite en un point donné (phase).
+ * Pour un cercle : tangente = (-sin(phase), 0, cos(phase))
+ * Pour une squircle : dérivée numérique.
+ */
+function getOrbitTangent(
+  phase: number,
+  radius: number,
+  shape: "circle" | "squircle",
+  roundness: number
+): THREE.Vector3 {
+  if (shape === "circle") {
+    return new THREE.Vector3(-Math.sin(phase), 0, Math.cos(phase)).normalize();
+  }
+  // Dérivée numérique pour la squircle
+  const eps = 0.001;
+  const p1 = getOrbitPosition(phase - eps, radius, shape, roundness);
+  const p2 = getOrbitPosition(phase + eps, radius, shape, roundness);
+  return p2.clone().sub(p1).normalize();
+}
+
+export type EntryTrajectory = "linear" | "arc" | "ellipse" | "scurve" | "spiral" | "corkscrew" | "wave" | "fan";
+export type EasingType = "linear" | "easeIn" | "easeOut" | "easeInOut";
+
+/**
+ * Applique une courbe d'easing sur t ∈ [0..1].
+ */
+function applyEasing(t: number, easing: EasingType): number {
+  const c = Math.max(0, Math.min(1, t));
+  if (easing === "linear") return c;
+  if (easing === "easeIn") return c * c * c;
+  if (easing === "easeOut") return 1 - Math.pow(1 - c, 3);
+  // easeInOut
+  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
+}
+
+/**
+ * Retourne la position selon la trajectoire d'entrée.
+ * @param t      Avancement normalisé [0..1] (0=départ, 1=cible)
+ * @param start  Position de départ
+ * @param end    Position d'arrivée (sur l'orbite)
+ * @param index  Index de la planète (pour varier les trajectoires)
+ */
+function getEntryPosition(
+  t: number,
+  start: THREE.Vector3,
+  end: THREE.Vector3,
+  trajectory: EntryTrajectory,
+  index: number
+): THREE.Vector3 {
+  // En mode "fan", le point de départ est déjà calé sur la tangente dans Planet ;
+  // la trajectoire elle-même est un simple lerp linéaire.
+  if (trajectory === "fan") {
+    return start.clone().lerp(end, t);
+  }
+
+  if (trajectory === "linear") {
+    return start.clone().lerp(end, t);
+  }
+
+  if (trajectory === "arc") {
+    // Courbe bézier quadratique — point de contrôle perpendiculaire
+    const mid = start.clone().lerp(end, 0.5);
+    const perp = new THREE.Vector3(-(end.z - start.z), 0, end.x - start.x).normalize();
+    const sign = index % 2 === 0 ? 1 : -1;
+    const curveStrength = start.distanceTo(end) * 0.4;
+    const ctrl = mid.clone().addScaledVector(perp, sign * curveStrength);
+    // Bézier quadratique : (1-t)²·P0 + 2(1-t)t·P1 + t²·P2
+    const it = 1 - t;
+    return new THREE.Vector3(
+      it * it * start.x + 2 * it * t * ctrl.x + t * t * end.x,
+      it * it * start.y + 2 * it * t * ctrl.y + t * t * end.y,
+      it * it * start.z + 2 * it * t * ctrl.z + t * t * end.z,
+    );
+  }
+
+  if (trajectory === "ellipse") {
+    // Demi-ellipse : montée verticale en arc de cercle (θ de π à 0)
+    const dist = start.distanceTo(end);
+    const height = dist * 0.5; // hauteur max du sommet de l'ellipse
+    const angle = Math.PI * (1 - t); // commence à angle=π (top), finit à 0
+    // interpolation horizontale linéaire + offset vertical elliptique
+    const base = start.clone().lerp(end, t);
+    base.y += Math.sin(angle) * height;
+    return base;
+  }
+
+  if (trajectory === "scurve") {
+    // Courbe en S : bezier cubique avec 2 points de contrôle opposés
+    const dist = start.distanceTo(end);
+    const perp = new THREE.Vector3(-(end.z - start.z), 0, end.x - start.x).normalize();
+    const sign = index % 2 === 0 ? 1 : -1;
+    const strength = dist * 0.45;
+    // P0=start, P1=ctrl1 (1/3), P2=ctrl2 (2/3), P3=end
+    const ctrl1 = start.clone().lerp(end, 0.33).addScaledVector(perp, sign * strength);
+    const ctrl2 = start.clone().lerp(end, 0.67).addScaledVector(perp, -sign * strength);
+    // Bézier cubique
+    const it = 1 - t;
+    return new THREE.Vector3(
+      it * it * it * start.x + 3 * it * it * t * ctrl1.x + 3 * it * t * t * ctrl2.x + t * t * t * end.x,
+      it * it * it * start.y + 3 * it * it * t * ctrl1.y + 3 * it * t * t * ctrl2.y + t * t * t * end.y,
+      it * it * it * start.z + 3 * it * it * t * ctrl1.z + 3 * it * t * t * ctrl2.z + t * t * t * end.z,
+    );
+  }
+
+  if (trajectory === "wave") {
+    // Vague : oscillation latérale horizontale qui s'amortit à l'arrivée
+    const base = start.clone().lerp(end, t);
+    const dist = start.distanceTo(end);
+    const freq = 2.5;
+    const amplitude = dist * 0.2 * (1 - t); // amorti vers 0
+    const dir = end.clone().sub(start).normalize();
+    const perp = new THREE.Vector3(-dir.z, 0, dir.x);
+    const sign = index % 2 === 0 ? 1 : -1;
+    base.addScaledVector(perp, Math.sin(t * freq * Math.PI * 2) * amplitude * sign);
+    return base;
+  }
+
+  if (trajectory === "spiral") {
+    // Spirale : la planète tourne autour de l'axe Y en avançant vers la cible
+    const base = start.clone().lerp(end, t);
+    const dist = start.distanceTo(end);
+    // Nombre de tours diminue vers la fin pour s'aligner proprement
+    const turns = 1.5 * (1 - t);
+    const phase = turns * Math.PI * 2;
+    const radius = dist * 0.3 * (1 - t);
+    // Vecteur perpendiculaire dans le plan XZ
+    const dir = end.clone().sub(start).normalize();
+    const perp = new THREE.Vector3(-dir.z, 0, dir.x);
+    const up = new THREE.Vector3(0, 1, 0);
+    base.addScaledVector(perp, Math.cos(phase) * radius);
+    base.addScaledVector(up, Math.sin(phase) * radius * 0.5);
+    return base;
+  }
+
+  if (trajectory === "corkscrew") {
+    // Tire-bouchon : oscillation hélicoïdale Y qui s'amortit en arrivant
+    const base = start.clone().lerp(end, t);
+    const dist = start.distanceTo(end);
+    const freq = 3; // nombre de spires
+    const amplitude = dist * 0.25 * (1 - t); // s'amortit vers 0
+    const phase = t * freq * Math.PI * 2;
+    const dir = end.clone().sub(start).normalize();
+    const perp = new THREE.Vector3(-dir.z, 0, dir.x);
+    const up = new THREE.Vector3(0, 1, 0);
+    base.addScaledVector(perp, Math.cos(phase) * amplitude);
+    base.addScaledVector(up, Math.sin(phase) * amplitude);
+    return base;
+  }
+
+  return start.clone().lerp(end, t);
+}
+
+// ─────────────────────────────────────────────────────────
 //  Orbit ring
 // ─────────────────────────────────────────────────────────
 
@@ -104,8 +261,8 @@ function OrbitRing({
 function WirePlanet({ scale, color }: { scale: number; color: THREE.Color }) {
   return (
     <mesh scale={scale}>
-      <icosahedronGeometry args={[1, 1]} />
-      <meshBasicMaterial color={color} wireframe transparent opacity={0.6} />
+      <sphereGeometry args={[1, 16, 16]} />
+      <meshBasicMaterial color={color} wireframe transparent opacity={0.8} />
     </mesh>
   );
 }
@@ -268,11 +425,9 @@ function GlbPlanet({
 // ─────────────────────────────────────────────────────────
 
 interface PlanetState {
-  phase: number;        // phase orbitale courante
-  entryProgress: number; // 0 = pas démarré, 1+ = terminé et en orbite
-  vel: THREE.Vector3;    // vitesse physique
+  phase: number;           // phase orbitale courante
+  vel: THREE.Vector3;      // vitesse physique
   hasEnteredOrbit: boolean;
-  phaseOffset: number;   // décalage calculé au moment de l'entrée en orbite
 }
 
 interface PlanetProps {
@@ -285,8 +440,21 @@ interface PlanetProps {
   entryStartX: number;
   entryStartY: number;
   entryStartZ: number | null;
-  entrySpeed: number;
-  entryDelay: number; // ms
+  // ── Cinématique Entrée ──
+  entrySpeedStart: number;
+  entrySpeedEnd: number;
+  entryEasing: EasingType;
+  entryDuration: number;       // 0 = automatique (basé sur la distance)
+  entryTrajectory: EntryTrajectory;
+  /** Distance de départ pour le mode éventail (fan), en unités-monde */
+  fanDistance: number;
+  // ── Cinématique Orbite ──
+  orbitSpeedStart: number;
+  orbitSpeedTarget: number;
+  orbitEasing: EasingType;
+  orbitalRampDuration: number;
+  // misc
+  entryDelay: number;          // ms
   restartKey: number;
   mousePos: MutableRefObject<THREE.Vector3>;
   mouseForce: number;
@@ -312,7 +480,16 @@ function Planet({
   entryStartX,
   entryStartY,
   entryStartZ,
-  entrySpeed,
+  entrySpeedStart,
+  entrySpeedEnd,
+  entryEasing,
+  entryDuration,
+  entryTrajectory,
+  fanDistance,
+  orbitSpeedStart,
+  orbitSpeedTarget,
+  orbitEasing,
+  orbitalRampDuration,
   entryDelay,
   restartKey,
   mousePos,
@@ -329,32 +506,78 @@ function Planet({
   showEntryTrajectory,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const startTime = useRef<number | null>(null);
+  const startTime = useRef<number | null>(null);       // temps (ms) après délai
+  const entryElapsed = useRef<number>(0);               // temps écoulé depuis début de l'entrée (s)
   const stateRef = useRef<PlanetState>({
     phase: node.orbit_phase ?? (index * 0.7),
-    entryProgress: 0,
     vel: new THREE.Vector3(),
     hasEnteredOrbit: false,
-    phaseOffset: 0,
   });
+  const orbitEntryTime = useRef<number | null>(null);
+  const entryFinalSpeed = useRef<number>(0);            // vitesse linéaire réelle à l'arrivée
+  const totalEntryDistance = useRef<number>(0);
+  const entryStartPos = useRef<THREE.Vector3 | null>(null);
   const hasDelayPassed = useRef(false);
+  const entryTParam = useRef<number>(0);               // paramètre t [0..1] pour les trajectoires
 
   // Réinitialiser l'animation d'entrée au restart
   useEffect(() => {
     stateRef.current = {
       phase: node.orbit_phase ?? (index * 0.7),
-      entryProgress: 0,
       vel: new THREE.Vector3(),
       hasEnteredOrbit: false,
-      phaseOffset: 0,
     };
     startTime.current = null;
+    orbitEntryTime.current = null;
     hasDelayPassed.current = false;
+    entryStartPos.current = null;
+    entryElapsed.current = 0;
+    entryTParam.current = 0;
+    entryFinalSpeed.current = 0;
   }, [restartKey, node.orbit_phase, index]);
 
   const scale = node.planet_scale ?? 0.6;
   const color = hexToColor(node.planet_color || "#a855f7");
-  const orbitSpeed = node.orbit_speed ?? 0.1;
+
+  const { targetOrbitPos, targetOrbitPhase, fanStartPos } = useMemo(() => {
+    // ── Mode éventail : phase déterminée par index (répartition uniforme sur l'orbite)
+    let bestPhase: number;
+    if (entryTrajectory === "fan") {
+      // On répartit les planètes uniformément sur l'orbite en mode fan
+      bestPhase = (index / Math.max(1, 8)) * Math.PI * 2; // 8 positions max sur un tour
+    } else {
+      const startVec = new THREE.Vector3(entryStartX, entryStartY, entryStartZ ?? orbitRadius);
+      bestPhase = 0;
+      let bestDist = Infinity;
+      const STEPS = 128;
+      for (let k = 0; k < STEPS; k++) {
+        const testPhase = (k / STEPS) * Math.PI * 2;
+        const tPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness);
+        const dist = tPos.distanceTo(startVec);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestPhase = testPhase;
+        }
+      }
+    }
+    const finalPos = getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness);
+
+    // Calcul du point de départ en mode fan :
+    // On part dans la direction opposée à la tangente de l'orbite au point d'arrivée
+    let fanStart: THREE.Vector3 | null = null;
+    if (entryTrajectory === "fan") {
+      const tangent = getOrbitTangent(bestPhase, orbitRadius, orbitShape, orbitRoundness);
+      // Départ = point d'arrivée - distance * tangente (on arrive « depuis » la direction tangente)
+      fanStart = finalPos.clone().addScaledVector(tangent, -fanDistance);
+      fanStart.y = entryStartY; // on garde le Y configuré
+    }
+
+    return {
+      targetOrbitPos: finalPos,
+      targetOrbitPhase: bestPhase,
+      fanStartPos: fanStart,
+    };
+  }, [entryTrajectory, entryStartX, entryStartY, entryStartZ, orbitRadius, orbitShape, orbitRoundness, index, fanDistance]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
@@ -365,6 +588,11 @@ function Planet({
     if (!hasDelayPassed.current) {
       if (startTime.current === null) {
         startTime.current = state.clock.elapsedTime * 1000;
+        // En mode fan, le point de départ est calé sur la tangente
+        entryStartPos.current = fanStartPos
+          ? fanStartPos.clone()
+          : new THREE.Vector3(entryStartX, entryStartY, entryStartZ ?? orbitRadius);
+        totalEntryDistance.current = entryStartPos.current.distanceTo(targetOrbitPos);
       }
       const elapsed = state.clock.elapsedTime * 1000 - startTime.current;
       if (elapsed < entryDelay) {
@@ -375,58 +603,77 @@ function Planet({
     }
 
     if (!s.hasEnteredOrbit) {
-      // Phase 1 : animation d'entrée en ligne droite depuis entryStart vers l'orbite
-      const startZ = entryStartZ ?? orbitRadius;
+      // ── Phase 1 : animation d'entrée ──
+      entryElapsed.current += dt;
+      const start = entryStartPos.current ?? new THREE.Vector3(entryStartX, entryStartY, entryStartZ ?? orbitRadius);
 
-      const speed = entrySpeed * dt;
-      const currentPos = groupRef.current.position.clone();
-      const newX = currentPos.x + speed;
-
-      if (newX >= 0) {
-        // Trouver le point le plus proche sur l'orbite par rapport à la position actuelle
-        let bestPhase = node.orbit_phase ?? (index * 0.7);
-        let bestDist = Infinity;
-        const STEPS = 64;
-        for (let k = 0; k < STEPS; k++) {
-          const testPhase = (k / STEPS) * Math.PI * 2;
-          const testPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness);
-          const dist = testPos.distanceTo(new THREE.Vector3(currentPos.x, 0, currentPos.z));
-          if (dist < bestDist) {
-            bestDist = dist;
-            bestPhase = testPhase;
-          }
-        }
-        // Entrer en orbite sans téléportation
-        s.hasEnteredOrbit = true;
-        s.phaseOffset = bestPhase;
-        s.phase = bestPhase;
-        groupRef.current.position.copy(getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness));
+      // Paramètre t normalisé [0..1] selon la durée ou la distance
+      let tNorm: number;
+      if (entryDuration > 0) {
+        // Durée fixée manuellement
+        tNorm = Math.min(entryElapsed.current / entryDuration, 1);
       } else {
-        // Interpoler Y et Z vers le centre de l'orbite (Y=0, Z=0)
-        const progress = Math.max(0, 1 - (-newX / Math.max(0.001, -entryStartX)));
-        const currentY = entryStartY * (1 - progress);
-        const currentZ = startZ + (0 - startZ) * progress;
-        groupRef.current.position.set(newX, currentY, currentZ);
+        // Durée automatique : vitesse interpolée * distance
+        // On avance t en utilisant la vitesse instantanée courante
+        const easedT = applyEasing(entryTParam.current, entryEasing);
+        const currentSpeed = entrySpeedStart + (entrySpeedEnd - entrySpeedStart) * easedT;
+        const distTotal = totalEntryDistance.current;
+        const step = currentSpeed * dt;
+        if (distTotal > 0) {
+          entryTParam.current = Math.min(entryTParam.current + step / distTotal, 1);
+        } else {
+          entryTParam.current = 1;
+        }
+        tNorm = entryTParam.current;
+      }
+
+      // Position via la courbe d'easing sur t
+      const tEased = entryDuration > 0 ? applyEasing(tNorm, entryEasing) : tNorm;
+      const newPos = getEntryPosition(tEased, start, targetOrbitPos, entryTrajectory, index);
+      groupRef.current.position.copy(newPos);
+
+      // Vitesse en fin d'entrée (pour raccord orbital)
+      const lastEased = applyEasing(Math.max(0, tNorm - 0.01), entryEasing);
+      entryFinalSpeed.current = entrySpeedStart + (entrySpeedEnd - entrySpeedStart) * lastEased;
+
+      if (tNorm >= 1) {
+        s.hasEnteredOrbit = true;
+        s.phase = targetOrbitPhase;
+        orbitEntryTime.current = state.clock.elapsedTime;
+        groupRef.current.position.copy(targetOrbitPos);
       }
       return;
     }
 
-    // Phase 2 : orbite + physique
+    // ── Phase 2 : orbite + physique ──
+    // Conversion u/s → rad/s : ω = v / r
+    const toAngular = orbitRadius > 0 ? 1 / orbitRadius : 1;
+    const nominalAngularSpeed = orbitSpeedTarget * toAngular;
+
     if (!frozen) {
-      s.phase += orbitSpeed * dt;
+      let currentAngularSpeed = nominalAngularSpeed;
+      if (orbitalRampDuration > 0 && orbitEntryTime.current !== null) {
+        const timeSinceOrbit = state.clock.elapsedTime - orbitEntryTime.current;
+        if (timeSinceOrbit < orbitalRampDuration) {
+          const rawT = timeSinceOrbit / orbitalRampDuration;
+          const easedT = applyEasing(rawT, orbitEasing);
+          // Vitesse angulaire de départ (u/s → rad/s)
+          const startAngular = orbitSpeedStart > 0
+            ? orbitSpeedStart * toAngular
+            : (orbitRadius > 0 ? entryFinalSpeed.current / orbitRadius : nominalAngularSpeed);
+          currentAngularSpeed = startAngular + (nominalAngularSpeed - startAngular) * easedT;
+        }
+      }
+      s.phase += currentAngularSpeed * dt;
     }
 
+    // Position nominale sur l'orbite (déterministe, forme respectée)
     const nominalPos = getOrbitPosition(s.phase, orbitRadius, orbitShape, orbitRoundness);
-    const currentPos = groupRef.current.position.clone();
 
-    // Force de retour (spring)
-    const springForce = nominalPos.clone().sub(currentPos).multiplyScalar(returnForce);
-    s.vel.add(springForce);
-
-    // Force souris (répulsion)
+    // Force souris (répulsion) — perturbation temporaire via vélocité
     if (mouseForce > 0) {
       const MOUSE_RADIUS = 5;
-      const toMouse = currentPos.clone().sub(mousePos.current);
+      const toMouse = nominalPos.clone().sub(mousePos.current);
       toMouse.y = 0;
       const dist = toMouse.length();
       if (dist < MOUSE_RADIUS && dist > 0.01) {
@@ -437,6 +684,7 @@ function Planet({
 
     // Force collision inter-planètes
     if (collisionForce > 0) {
+      const currentPos = groupRef.current.position.clone();
       allPlanetPositions.current.forEach((otherPos, otherId) => {
         if (otherId === node.id) return;
         const diff = currentPos.clone().sub(otherPos);
@@ -450,11 +698,13 @@ function Planet({
       });
     }
 
-    // Amortissement
+    // Amortissement de la vélocité de perturbation
     s.vel.multiplyScalar(damping);
 
-    // Appliquer la vitesse
-    const newPos = currentPos.add(s.vel);
+    // Position finale = orbite nominale + perturbation amortie
+    // La perturbation s'amortit naturellement vers 0, donc la planète
+    // revient toujours sur l'orbite sans springForce explicite
+    const newPos = nominalPos.clone().add(s.vel);
     groupRef.current.position.copy(newPos);
 
     // Mettre à jour le registre des positions
@@ -467,7 +717,13 @@ function Planet({
   const visualSource = node.visual_source || "preset";
   const planetType = node.planet_type || "glass";
 
-  const entryPoint: [number, number, number] = [entryStartX, entryStartY, entryStartZ ?? orbitRadius];
+  // En mode fan, la position initiale du groupe est sur le point de départ tangentiel
+  const entryPoint: [number, number, number] = fanStartPos
+    ? [fanStartPos.x, fanStartPos.y, fanStartPos.z]
+    : [entryStartX, entryStartY, entryStartZ ?? orbitRadius];
+  const targetOrbitPosArray = useMemo(() => {
+    return [targetOrbitPos.x, targetOrbitPos.y, targetOrbitPos.z] as [number, number, number];
+  }, [targetOrbitPos]);
 
   return (
     <group
@@ -480,7 +736,7 @@ function Planet({
       {/* Trajectoire d'arrivée (de entryStart vers l'orbite) */}
       {showEntryTrajectory && !stateRef.current.hasEnteredOrbit && (
         <Line
-          points={[entryPoint, [0, 0, 0]]}
+          points={[entryPoint, targetOrbitPosArray]}
           color="#a855f7"
           opacity={0.25}
           transparent
@@ -782,7 +1038,19 @@ interface SceneContentProps {
   entryStartX: number;
   entryStartY: number;
   entryStartZ: number | null;
-  entrySpeed: number;
+  // ── Cinématique Entrée ──
+  entrySpeedStart: number;
+  entrySpeedEnd: number;
+  entryEasing: EasingType;
+  entryDuration: number;
+  entryTrajectory: EntryTrajectory;
+  /** Distance de départ pour le mode éventail (fan) */
+  fanDistance: number;
+  // ── Cinématique Orbite ──
+  orbitSpeedStart: number;
+  orbitSpeedTarget: number;
+  orbitEasing: EasingType;
+  orbitalRampDuration: number;
   controlsRef: React.RefObject<{ target: THREE.Vector3; update: () => void } | null>;
   selectedNodePos: THREE.Vector3 | null;
   showEntryTrajectory: boolean;
@@ -809,7 +1077,16 @@ function SceneContent({
   entryStartX,
   entryStartY,
   entryStartZ,
-  entrySpeed,
+  entrySpeedStart,
+  entrySpeedEnd,
+  entryEasing,
+  entryDuration,
+  entryTrajectory,
+  fanDistance,
+  orbitSpeedStart,
+  orbitSpeedTarget,
+  orbitEasing,
+  orbitalRampDuration,
   controlsRef,
   selectedNodePos,
   showEntryTrajectory,
@@ -889,7 +1166,16 @@ function SceneContent({
             entryStartX={entryStartX}
             entryStartY={entryStartY}
             entryStartZ={entryStartZ}
-            entrySpeed={entrySpeed}
+            entrySpeedStart={entrySpeedStart}
+            entrySpeedEnd={entrySpeedEnd}
+            entryEasing={entryEasing}
+            entryDuration={entryDuration}
+            entryTrajectory={entryTrajectory}
+            fanDistance={fanDistance}
+            orbitSpeedStart={orbitSpeedStart}
+            orbitSpeedTarget={orbitSpeedTarget}
+            orbitEasing={orbitEasing}
+            orbitalRampDuration={orbitalRampDuration}
             entryDelay={i * 200}
             restartKey={restartKey}
             mousePos={mousePosRef}
@@ -944,6 +1230,8 @@ interface ExploreSceneProps {
   onOpenOverlay: (node: OrganizationNodeApi) => void;
   /** Appelé quand une planète est sélectionnée (1er clic) */
   onSelectNode: (node: OrganizationNodeApi | null) => void;
+  controlsRef?: React.MutableRefObject<any>;
+  cameraRef?: React.MutableRefObject<any>;
 }
 
 /**
@@ -951,12 +1239,13 @@ interface ExploreSceneProps {
  * animation Fan Effect, physique interactive, contrôles caméra GSAP.
  * S'appuie sur PlanetsOptionsContext pour tous les paramètres.
  */
-export function ExploreScene({ nodes, onOpenOverlay, onSelectNode }: ExploreSceneProps) {
+export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: externalControlsRef, cameraRef }: ExploreSceneProps) {
   const opts = usePlanetsOptions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedIdRef = useRef<string | null>(null); // toujours synchrone, pas de stale closure
   const [selectedNodePos, setSelectedNodePos] = useState<THREE.Vector3 | null>(null);
-  const controlsRef = useRef<{ target: THREE.Vector3; update: () => void } | null>(null);
+  const localControlsRef = useRef<{ target: THREE.Vector3; update: () => void } | null>(null);
+  const controlsRef = externalControlsRef || localControlsRef;
 
   // Synchroniser la ref avec l'état
   useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
@@ -1010,7 +1299,8 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode }: ExploreScen
       camera={{ position: [0, 6.84, 18.79], fov: opts.fishEye }}
       gl={{ alpha: true, antialias: true }}
       shadows
-      onCreated={({ gl }) => {
+      onCreated={({ gl, camera }) => {
+        if (cameraRef) cameraRef.current = camera;
         gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.5;
@@ -1021,7 +1311,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode }: ExploreScen
       }}
       // Clic dans le vide → reset
       onClick={(e) => {
-        if (e.object === undefined && selectedId) {
+        if ((e as any).object === undefined && selectedId) {
           handleReset();
         }
       }}
@@ -1047,7 +1337,16 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode }: ExploreScen
         entryStartX={opts.entryStartX}
         entryStartY={opts.entryStartY}
         entryStartZ={opts.entryStartZ}
-        entrySpeed={opts.entrySpeed}
+        entryTrajectory={opts.entryTrajectory as EntryTrajectory}
+        fanDistance={opts.fanDistance ?? 30}
+        entrySpeedStart={opts.entrySpeedStart}
+        entrySpeedEnd={opts.entrySpeedEnd}
+        entryEasing={opts.entryEasing}
+        entryDuration={opts.entryDuration}
+        orbitSpeedStart={opts.orbitSpeedStart}
+        orbitSpeedTarget={opts.orbitSpeedTarget}
+        orbitEasing={opts.orbitEasing}
+        orbitalRampDuration={opts.orbitalRampDuration}
         controlsRef={controlsRef}
         selectedNodePos={selectedNodePos}
         showEntryTrajectory={opts.showEntryTrajectory}

@@ -14,6 +14,8 @@ import {
 //  Types
 // ─────────────────────────────────────────────────────────
 
+export type EasingType = "linear" | "easeIn" | "easeOut" | "easeInOut";
+
 export interface PlanetsOptionsState {
     showOrbits: boolean;
     freezePlanets: boolean;
@@ -30,7 +32,21 @@ export interface PlanetsOptionsState {
     entryStartX: number;
     entryStartY: number;
     entryStartZ: number | null;
-    entrySpeed: number;
+    // ── Cinématique Entrée ──
+    entrySpeedStart: number;   // vitesse initiale (unités/s)
+    entrySpeedEnd: number;     // vitesse cible à l'arrivée sur l'orbite
+    entryEasing: EasingType;   // courbe de rampe entre start et end
+    entryDuration: number;     // durée totale de la phase d'entrée (s, 0 = automatique)
+    entryTrajectory: "linear" | "arc" | "ellipse" | "scurve" | "spiral" | "corkscrew" | "wave" | "fan";
+    /** Distance de départ en mode éventail (fan), en unités-monde */
+    fanDistance: number;
+    // ── Cinématique Orbite ──
+    orbitSpeedStart: number;   // vitesse angulaire initiale (rad/s) au raccord
+    orbitSpeedTarget: number;  // vitesse angulaire nominale cible
+    orbitEasing: EasingType;   // courbe de rampe orbitale
+    orbitalRampDuration: number; // durée de la rampe orbitale (s, 0 = instantané)
+    /** @deprecated utiliser orbitSpeedTarget */
+    globalOrbitSpeed: number;
     grayscaleVideo: boolean;
     enableVideoCycle: boolean;
     videoCycleVisible: number;
@@ -77,7 +93,26 @@ const DEFAULTS: PlanetsOptionsState = {
     entryStartX: -60,
     entryStartY: 0,
     entryStartZ: null,
-    entrySpeed: 30,
+    // ── Cinématique Entrée ──
+    // Vitesses en unités-monde/seconde [0–10 u/s].
+    // entrySpeedStart = vitesse au moment du départ (point hors-écran)
+    // entrySpeedEnd   = vitesse visée à l'arrivée sur l'orbite (raccord)
+    entrySpeedStart: 2,
+    entrySpeedEnd: 8,
+    entryEasing: "easeOut",
+    entryDuration: 0,
+    entryTrajectory: "linear",
+    fanDistance: 30,
+    // ── Cinématique Orbite ──
+    // Vitesses en unités-monde/seconde [0–10 u/s].
+    // Converties en rad/s via ω = v/r dans le moteur (ExploreScene).
+    // orbitSpeedStart = vitesse ang. initiale (0 = calc. auto depuis fin entrée)
+    // orbitSpeedTarget = vitesse ang. nominale atteinte après la rampe
+    orbitSpeedStart: 0,
+    orbitSpeedTarget: 0.5,
+    orbitEasing: "easeOut",
+    orbitalRampDuration: 10,
+    globalOrbitSpeed: 0.5,
     grayscaleVideo: true,
     enableVideoCycle: true,
     videoCycleVisible: 10,
@@ -104,7 +139,17 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     entryStartX: "planets_entryStartX",
     entryStartY: "planets_entryStartY",
     entryStartZ: "planets_entryStartZ",
-    entrySpeed: "planets_entrySpeed",
+    entrySpeedStart: "planets_entrySpeedStart",
+    entrySpeedEnd: "planets_entrySpeedEnd",
+    entryEasing: "planets_entryEasing",
+    entryDuration: "planets_entryDuration",
+    entryTrajectory: "planets_entryTrajectory",
+    fanDistance: "planets_fanDistance",
+    orbitSpeedStart: "planets_orbitSpeedStart",
+    orbitSpeedTarget: "planets_orbitSpeedTarget",
+    orbitEasing: "planets_orbitEasing",
+    orbitalRampDuration: "planets_orbitalRampDuration",
+    globalOrbitSpeed: "planets_globalOrbitSpeed",
     grayscaleVideo: "planets_grayscaleVideo",
     enableVideoCycle: "planets_enableVideoCycle",
     videoCycleVisible: "video_cycleVisible",
@@ -147,7 +192,17 @@ function loadFromLS(): PlanetsOptionsState {
         entryStartX: lsGet(LS_KEYS.entryStartX, DEFAULTS.entryStartX),
         entryStartY: lsGet(LS_KEYS.entryStartY, DEFAULTS.entryStartY),
         entryStartZ: lsGet(LS_KEYS.entryStartZ, DEFAULTS.entryStartZ),
-        entrySpeed: lsGet(LS_KEYS.entrySpeed, DEFAULTS.entrySpeed),
+        entrySpeedStart: lsGet(LS_KEYS.entrySpeedStart!, DEFAULTS.entrySpeedStart),
+        entrySpeedEnd: lsGet(LS_KEYS.entrySpeedEnd!, DEFAULTS.entrySpeedEnd),
+        entryEasing: lsGet(LS_KEYS.entryEasing!, DEFAULTS.entryEasing),
+        entryDuration: lsGet(LS_KEYS.entryDuration!, DEFAULTS.entryDuration),
+        entryTrajectory: lsGet(LS_KEYS.entryTrajectory!, DEFAULTS.entryTrajectory),
+        fanDistance: lsGet(LS_KEYS.fanDistance!, DEFAULTS.fanDistance),
+        orbitSpeedStart: lsGet(LS_KEYS.orbitSpeedStart!, DEFAULTS.orbitSpeedStart),
+        orbitSpeedTarget: lsGet(LS_KEYS.orbitSpeedTarget!, DEFAULTS.orbitSpeedTarget),
+        orbitEasing: lsGet(LS_KEYS.orbitEasing!, DEFAULTS.orbitEasing),
+        orbitalRampDuration: lsGet(LS_KEYS.orbitalRampDuration!, DEFAULTS.orbitalRampDuration),
+        globalOrbitSpeed: lsGet(LS_KEYS.globalOrbitSpeed!, DEFAULTS.globalOrbitSpeed),
         grayscaleVideo: lsGet(LS_KEYS.grayscaleVideo, DEFAULTS.grayscaleVideo),
         enableVideoCycle: lsGet(LS_KEYS.enableVideoCycle, DEFAULTS.enableVideoCycle),
         videoCycleVisible: lsGet(LS_KEYS.videoCycleVisible!, DEFAULTS.videoCycleVisible),

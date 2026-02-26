@@ -25,9 +25,20 @@ function Slider({
 }) {
     return (
         <div className="flex flex-col gap-1">
-            <div className="flex justify-between text-xs text-white/60">
-                <span>{label}</span>
-                <span className="font-mono text-white/80">{value.toFixed(step < 1 ? 2 : 1)}</span>
+            <div className="flex items-center justify-between text-xs text-white/60 gap-2">
+                <span className="flex-1 min-w-0 truncate">{label}</span>
+                <input
+                    type="number"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={value}
+                    onChange={(e) => {
+                        const v = parseFloat(e.target.value);
+                        if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v)));
+                    }}
+                    className="w-16 px-1.5 py-0.5 rounded bg-white/10 border border-white/20 text-white/90 font-mono text-xs text-right focus:outline-none focus:border-purple-500/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
             </div>
             <input
                 type="range"
@@ -232,6 +243,102 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                             )}
                         </Section>
 
+                        {/* ─── Phase Entrée ─── */}
+                        <Section title="⬇ Phase d'Entrée — Cinématique">
+                            <Slider
+                                label="Vitesse début entrée (u/s)"
+                                value={opts.entrySpeedStart}
+                                min={0}
+                                max={10}
+                                step={0.1}
+                                onChange={(v) => opts.set("entrySpeedStart", v)}
+                            />
+                            <Slider
+                                label="Vitesse fin entrée (u/s)"
+                                value={opts.entrySpeedEnd}
+                                min={0}
+                                max={10}
+                                step={0.1}
+                                onChange={(v) => opts.set("entrySpeedEnd", v)}
+                            />
+                            <div>
+                                <p className="text-xs text-white/60 mb-1.5">Type de rampe</p>
+                                <div className="grid grid-cols-2 gap-1">
+                                    {(["linear", "easeIn", "easeOut", "easeInOut"] as const).map((e) => (
+                                        <button
+                                            key={e}
+                                            type="button"
+                                            className={`py-1.5 rounded-lg text-xs border transition ${opts.entryEasing === e
+                                                ? "bg-indigo-600/40 border-indigo-500/40 text-white"
+                                                : "bg-white/5 border-white/10 text-white/60 hover:text-white/80"
+                                                }`}
+                                            onClick={() => opts.set("entryEasing", e)}
+                                        >
+                                            {e === "linear" ? "Linéaire" : e === "easeIn" ? "Accél." : e === "easeOut" ? "Décél." : "S (In/Out)"}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <Slider
+                                label="Durée entrée (s, 0=auto)"
+                                value={opts.entryDuration}
+                                min={0}
+                                max={30}
+                                step={0.5}
+                                onChange={(v) => opts.set("entryDuration", v)}
+                            />
+                        </Section>
+
+                        {/* ─── Phase Orbite ─── */}
+                        <Section title="🪐 Phase Orbitale — Cinématique">
+                            <Slider
+                                label="Vitesse départ orbite (u/s)"
+                                value={opts.orbitSpeedStart}
+                                min={0}
+                                max={10}
+                                step={0.1}
+                                onChange={(v) => opts.set("orbitSpeedStart", v)}
+                            />
+                            <Slider
+                                label="Vitesse cible orbite (u/s)"
+                                value={opts.orbitSpeedTarget}
+                                min={0}
+                                max={10}
+                                step={0.1}
+                                onChange={(v) => {
+                                    opts.set("orbitSpeedTarget", v);
+                                    opts.set("globalOrbitSpeed", v);
+                                }}
+                            />
+                            <div>
+                                <p className="text-xs text-white/60 mb-1.5">Type de rampe orbitale</p>
+                                <div className="grid grid-cols-2 gap-1">
+                                    {(["linear", "easeIn", "easeOut", "easeInOut"] as const).map((e) => (
+                                        <button
+                                            key={e}
+                                            type="button"
+                                            className={`py-1.5 rounded-lg text-xs border transition ${opts.orbitEasing === e
+                                                ? "bg-violet-600/40 border-violet-500/40 text-white"
+                                                : "bg-white/5 border-white/10 text-white/60 hover:text-white/80"
+                                                }`}
+                                            onClick={() => opts.set("orbitEasing", e)}
+                                        >
+                                            {e === "linear" ? "Linéaire" : e === "easeIn" ? "Accél." : e === "easeOut" ? "Décél." : "S (In/Out)"}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <Slider
+                                label="Durée rampe orbitale (s)"
+                                value={opts.orbitalRampDuration}
+                                min={0}
+                                max={30}
+                                step={1}
+                                onChange={(v) => opts.set("orbitalRampDuration", v)}
+                            />
+                        </Section>
+
+
                         {/* Physique */}
                         <Section title="Physique">
                             <Slider
@@ -276,6 +383,45 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                 active={opts.showEntryTrajectory}
                                 onClick={() => opts.set("showEntryTrajectory", !opts.showEntryTrajectory)}
                             />
+                            {/* Sélecteur de trajectoire */}
+                            <div>
+                                <p className="text-xs text-white/60 mb-1.5">Trajectoire d'arrivée</p>
+                                <div className="grid grid-cols-2 gap-1">
+                                    {([
+                                        ["linear", "→ Droite"],
+                                        ["arc", "⌒ Arc"],
+                                        ["ellipse", "⊙ Ellipse"],
+                                        ["scurve", "∿ Courbe S"],
+                                        ["wave", "〰 Vague"],
+                                        ["spiral", "🌀 Spirale"],
+                                        ["corkscrew", "⍁ Tire-bouchon"],
+                                        ["fan", "🎇 Éventail"],
+                                    ] as const).map(([val, lbl]) => (
+                                        <button
+                                            key={val}
+                                            type="button"
+                                            className={`py-1.5 rounded-lg text-xs border transition text-left px-2 ${opts.entryTrajectory === val
+                                                ? "bg-indigo-600/40 border-indigo-500/40 text-white"
+                                                : "bg-white/5 border-white/10 text-white/60 hover:text-white/80"
+                                                }`}
+                                            onClick={() => opts.set("entryTrajectory", val)}
+                                        >
+                                            {lbl}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Slider distance éventail — affiché uniquement en mode fan */}
+                            {opts.entryTrajectory === "fan" && (
+                                <Slider
+                                    label="Distance éventail (u)"
+                                    value={opts.fanDistance}
+                                    min={5}
+                                    max={80}
+                                    step={1}
+                                    onChange={(v) => opts.set("fanDistance", v)}
+                                />
+                            )}
                             <Slider
                                 label="Position X départ"
                                 value={opts.entryStartX}
@@ -318,14 +464,7 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                     />
                                 )}
                             </div>
-                            <Slider
-                                label="Vitesse d'entrée"
-                                value={opts.entrySpeed}
-                                min={10}
-                                max={50}
-                                step={1}
-                                onChange={(v) => opts.set("entrySpeed", v)}
-                            />
+
                             <button
                                 type="button"
                                 onClick={opts.triggerRestart}
