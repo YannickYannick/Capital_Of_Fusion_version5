@@ -815,7 +815,7 @@ function Planet({
       )}
 
       {/* Label */}
-      <LabelSprite text={node.name} offsetY={displayScale + 1.2} visible={isHovered || isSelected} />
+      <LabelSprite text={node.name} offsetY={displayScale + 1.2} />
     </group>
   );
 }
@@ -827,11 +827,9 @@ function Planet({
 function LabelSprite({
   text,
   offsetY,
-  visible,
 }: {
   text: string;
   offsetY: number;
-  visible: boolean;
 }) {
   const spriteRef = useRef<THREE.Sprite>(null);
   const texture = useMemo(() => {
@@ -857,8 +855,6 @@ function LabelSprite({
     const s = Math.max(0.5, dist * 0.12);
     spriteRef.current.scale.set(s * 1.8, s * 0.45, 1);
   });
-
-  if (!visible) return null;
 
   return (
     <sprite ref={spriteRef} position={[0, offsetY, 0]}>
@@ -923,7 +919,7 @@ function Sun({
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial color={color} transparent opacity={0.06} />
       </mesh>
-      <LabelSprite text={node.name} offsetY={displayScale + 1.5} visible={isHovered || isSelected} />
+      <LabelSprite text={node.name} offsetY={displayScale + 1.5} />
     </group>
   );
 }
