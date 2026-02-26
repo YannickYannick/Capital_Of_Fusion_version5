@@ -1096,6 +1096,10 @@ interface SceneContentProps {
   verticalMode: "manual" | "homogeneous" | "jupiter";
   autoDistributeOrbits: boolean;
   globalPlanetScale: number;
+  hoverOrbitSpeedRatio: number;
+  hoverPlanetSpeedRatio: number;
+  hoverOrbitTransitionSpeed: number;
+  hoverPlanetTransitionSpeed: number;
 }
 
 function SceneContent({
@@ -1135,6 +1139,10 @@ function SceneContent({
   verticalMode,
   autoDistributeOrbits,
   globalPlanetScale,
+  hoverOrbitSpeedRatio,
+  hoverPlanetSpeedRatio,
+  hoverOrbitTransitionSpeed,
+  hoverPlanetTransitionSpeed,
 }: SceneContentProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
@@ -1170,10 +1178,10 @@ function SceneContent({
     const inOrbitZone = dist <= maxR + 5 && dist >= 0.1;
 
     // Si une planète est pointée -> multiplier = 0.1 (divisé par 10)
-    // Si zone d'orbite survolée -> multiplier = 0.33 (divisé par 3)
+    // Si zone d'orbite survolée -> multiplier = hoverOrbitSpeedRatio
     // Sinon -> multiplier = 1.0
-    const targetMultiplier = hoveredId !== null ? 0.1 : (inOrbitZone ? 0.333 : 1.0);
-    const lerpSpeed = hoveredId !== null ? 10 : 2;
+    const targetMultiplier = hoveredId !== null ? hoverPlanetSpeedRatio : (inOrbitZone ? hoverOrbitSpeedRatio : 1.0);
+    const lerpSpeed = hoveredId !== null ? hoverPlanetTransitionSpeed : hoverOrbitTransitionSpeed;
     speedMultiplierRef.current = THREE.MathUtils.lerp(speedMultiplierRef.current, targetMultiplier, delta * lerpSpeed);
   });
 
@@ -1421,6 +1429,10 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         verticalMode={opts.verticalMode}
         autoDistributeOrbits={opts.autoDistributeOrbits}
         globalPlanetScale={opts.globalPlanetScale}
+        hoverOrbitSpeedRatio={opts.hoverOrbitSpeedRatio}
+        hoverPlanetSpeedRatio={opts.hoverPlanetSpeedRatio}
+        hoverOrbitTransitionSpeed={opts.hoverOrbitTransitionSpeed}
+        hoverPlanetTransitionSpeed={opts.hoverPlanetTransitionSpeed}
       />
     </Canvas>
   );

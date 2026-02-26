@@ -59,6 +59,11 @@ export interface PlanetsOptionsState {
     // ── Nouveaux Modes ──
     verticalMode: "manual" | "homogeneous" | "jupiter";
     autoDistributeOrbits: boolean;
+    // ── Vitesse de survol (Hover) ──
+    hoverOrbitSpeedRatio: number;
+    hoverPlanetSpeedRatio: number;
+    hoverOrbitTransitionSpeed: number;
+    hoverPlanetTransitionSpeed: number;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -128,6 +133,10 @@ const DEFAULTS: PlanetsOptionsState = {
     showEntryTrajectory: false,
     verticalMode: "manual",
     autoDistributeOrbits: false,
+    hoverOrbitSpeedRatio: 0.333,
+    hoverPlanetSpeedRatio: 0.1,
+    hoverOrbitTransitionSpeed: 2,
+    hoverPlanetTransitionSpeed: 10,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -167,6 +176,10 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     showEntryTrajectory: "planets_showEntryTrajectory",
     verticalMode: "planets_verticalMode",
     autoDistributeOrbits: "planets_autoDistributeOrbits",
+    hoverOrbitSpeedRatio: "planets_hoverOrbitSpeedRatio",
+    hoverPlanetSpeedRatio: "planets_hoverPlanetSpeedRatio",
+    hoverOrbitTransitionSpeed: "planets_hoverOrbitTransitionSpeed",
+    hoverPlanetTransitionSpeed: "planets_hoverPlanetTransitionSpeed",
 };
 
 function lsGet<T>(key: string, fallback: T): T {
@@ -223,6 +236,10 @@ function loadFromLS(): PlanetsOptionsState {
         showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
         verticalMode: lsGet(LS_KEYS.verticalMode!, DEFAULTS.verticalMode),
         autoDistributeOrbits: lsGet(LS_KEYS.autoDistributeOrbits!, DEFAULTS.autoDistributeOrbits),
+        hoverOrbitSpeedRatio: lsGet(LS_KEYS.hoverOrbitSpeedRatio!, DEFAULTS.hoverOrbitSpeedRatio),
+        hoverPlanetSpeedRatio: lsGet(LS_KEYS.hoverPlanetSpeedRatio!, DEFAULTS.hoverPlanetSpeedRatio),
+        hoverOrbitTransitionSpeed: lsGet(LS_KEYS.hoverOrbitTransitionSpeed!, DEFAULTS.hoverOrbitTransitionSpeed),
+        hoverPlanetTransitionSpeed: lsGet(LS_KEYS.hoverPlanetTransitionSpeed!, DEFAULTS.hoverPlanetTransitionSpeed),
         isTransitioningToExplore: false,
     };
 }

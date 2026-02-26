@@ -224,6 +224,42 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                             </div>
                         </Section>
 
+                        {/* Vitesse de Survol */}
+                        <Section title="Vitesse de Survol (Hover)">
+                            <Slider
+                                label="Multiplicateur Zone Orbite"
+                                value={opts.hoverOrbitSpeedRatio}
+                                min={0.0}
+                                max={1.0}
+                                step={0.01}
+                                onChange={(v) => opts.set("hoverOrbitSpeedRatio", v)}
+                            />
+                            <Slider
+                                label="Multiplicateur Planète"
+                                value={opts.hoverPlanetSpeedRatio}
+                                min={0.0}
+                                max={1.0}
+                                step={0.01}
+                                onChange={(v) => opts.set("hoverPlanetSpeedRatio", v)}
+                            />
+                            <Slider
+                                label="Vitesse Transition Orbite"
+                                value={opts.hoverOrbitTransitionSpeed}
+                                min={0.5}
+                                max={10.0}
+                                step={0.5}
+                                onChange={(v) => opts.set("hoverOrbitTransitionSpeed", v)}
+                            />
+                            <Slider
+                                label="Vitesse Transition Planète"
+                                value={opts.hoverPlanetTransitionSpeed}
+                                min={1.0}
+                                max={20.0}
+                                step={1.0}
+                                onChange={(v) => opts.set("hoverPlanetTransitionSpeed", v)}
+                            />
+                        </Section>
+
                         {/* Orbites */}
                         <Section title="Forme des Orbites">
                             <div className="flex gap-2">
