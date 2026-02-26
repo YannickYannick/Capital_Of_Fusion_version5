@@ -221,6 +221,40 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                         </button>
                                     ))}
                                 </div>
+
+                                {opts.verticalMode === "homogeneous" && (
+                                    <div className="mt-3 space-y-2">
+                                        <Slider
+                                            label="Base (Homogène)"
+                                            value={opts.verticalHomogeneousBase}
+                                            min={0}
+                                            max={20}
+                                            step={1}
+                                            onChange={(v) => opts.set("verticalHomogeneousBase", v)}
+                                        />
+                                        <Slider
+                                            label="Étape (Homogène)"
+                                            value={opts.verticalHomogeneousStep}
+                                            min={5}
+                                            max={50}
+                                            step={1}
+                                            onChange={(v) => opts.set("verticalHomogeneousStep", v)}
+                                        />
+                                    </div>
+                                )}
+
+                                {opts.verticalMode === "jupiter" && (
+                                    <div className="mt-3">
+                                        <Slider
+                                            label="Amplitude (Jupiter)"
+                                            value={opts.verticalJupiterAmplitude}
+                                            min={10}
+                                            max={100}
+                                            step={1}
+                                            onChange={(v) => opts.set("verticalJupiterAmplitude", v)}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </Section>
 

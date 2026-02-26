@@ -59,6 +59,9 @@ export interface PlanetsOptionsState {
     // ── Nouveaux Modes ──
     verticalMode: "manual" | "homogeneous" | "jupiter";
     autoDistributeOrbits: boolean;
+    verticalHomogeneousBase: number;
+    verticalHomogeneousStep: number;
+    verticalJupiterAmplitude: number;
     // ── Vitesse de survol (Hover) ──
     hoverOrbitSpeedRatio: number;
     hoverPlanetSpeedRatio: number;
@@ -133,6 +136,9 @@ const DEFAULTS: PlanetsOptionsState = {
     showEntryTrajectory: false,
     verticalMode: "manual",
     autoDistributeOrbits: false,
+    verticalHomogeneousBase: 5.0,
+    verticalHomogeneousStep: 20.0,
+    verticalJupiterAmplitude: 30.0,
     hoverOrbitSpeedRatio: 0.333,
     hoverPlanetSpeedRatio: 0.1,
     hoverOrbitTransitionSpeed: 2,
@@ -176,6 +182,9 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     showEntryTrajectory: "planets_showEntryTrajectory",
     verticalMode: "planets_verticalMode",
     autoDistributeOrbits: "planets_autoDistributeOrbits",
+    verticalHomogeneousBase: "planets_verticalHomogeneousBase",
+    verticalHomogeneousStep: "planets_verticalHomogeneousStep",
+    verticalJupiterAmplitude: "planets_verticalJupiterAmplitude",
     hoverOrbitSpeedRatio: "planets_hoverOrbitSpeedRatio",
     hoverPlanetSpeedRatio: "planets_hoverPlanetSpeedRatio",
     hoverOrbitTransitionSpeed: "planets_hoverOrbitTransitionSpeed",
@@ -236,6 +245,9 @@ function loadFromLS(): PlanetsOptionsState {
         showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
         verticalMode: lsGet(LS_KEYS.verticalMode!, DEFAULTS.verticalMode),
         autoDistributeOrbits: lsGet(LS_KEYS.autoDistributeOrbits!, DEFAULTS.autoDistributeOrbits),
+        verticalHomogeneousBase: lsGet(LS_KEYS.verticalHomogeneousBase!, DEFAULTS.verticalHomogeneousBase),
+        verticalHomogeneousStep: lsGet(LS_KEYS.verticalHomogeneousStep!, DEFAULTS.verticalHomogeneousStep),
+        verticalJupiterAmplitude: lsGet(LS_KEYS.verticalJupiterAmplitude!, DEFAULTS.verticalJupiterAmplitude),
         hoverOrbitSpeedRatio: lsGet(LS_KEYS.hoverOrbitSpeedRatio!, DEFAULTS.hoverOrbitSpeedRatio),
         hoverPlanetSpeedRatio: lsGet(LS_KEYS.hoverPlanetSpeedRatio!, DEFAULTS.hoverPlanetSpeedRatio),
         hoverOrbitTransitionSpeed: lsGet(LS_KEYS.hoverOrbitTransitionSpeed!, DEFAULTS.hoverOrbitTransitionSpeed),

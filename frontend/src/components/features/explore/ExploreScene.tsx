@@ -70,7 +70,10 @@ export function getDynamicOrbitParams(
   total: number,
   autoDistribute: boolean,
   verticalMode: "manual" | "homogeneous" | "jupiter",
-  orbitSpacing: number
+  orbitSpacing: number,
+  verticalHomogeneousBase: number = 5,
+  verticalHomogeneousStep: number = 20,
+  verticalJupiterAmplitude: number = 30
 ): { r: number; y: number } {
   const r0 = autoDistribute ? 3 + i * 2.5 : (node.orbit_radius ?? 3 + i * 1.5);
   const r = r0 * orbitSpacing;
@@ -80,10 +83,10 @@ export function getDynamicOrbitParams(
     y = node.orbit_position_y || 0;
   } else if (verticalMode === "homogeneous") {
     const sign = i % 2 === 0 ? 1 : -1;
-    const step = 20 / Math.max(1, Math.floor(total / 2));
-    y = sign * (step * Math.floor(i / 2) + 5);
+    const step = verticalHomogeneousStep / Math.max(1, Math.floor(total / 2));
+    y = sign * (step * Math.floor(i / 2) + verticalHomogeneousBase);
   } else if (verticalMode === "jupiter") {
-    const amplitude = 30 * (1 - i / Math.max(1, total));
+    const amplitude = verticalJupiterAmplitude * (1 - i / Math.max(1, total));
     const sign = i % 2 === 0 ? 1 : -1;
     y = sign * amplitude;
   }
@@ -1100,6 +1103,9 @@ interface SceneContentProps {
   hoverPlanetSpeedRatio: number;
   hoverOrbitTransitionSpeed: number;
   hoverPlanetTransitionSpeed: number;
+  verticalHomogeneousBase: number;
+  verticalHomogeneousStep: number;
+  verticalJupiterAmplitude: number;
 }
 
 function SceneContent({
@@ -1143,6 +1149,9 @@ function SceneContent({
   hoverPlanetSpeedRatio,
   hoverOrbitTransitionSpeed,
   hoverPlanetTransitionSpeed,
+  verticalHomogeneousBase,
+  verticalHomogeneousStep,
+  verticalJupiterAmplitude,
 }: SceneContentProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
@@ -1172,7 +1181,7 @@ function SceneContent({
   useFrame((state, delta) => {
     let maxR = 0;
     if (orbitNodes.length > 0) {
-      maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing).r;
+      maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude).r;
     }
     const dist = mousePosRef.current.length();
     const inOrbitZone = dist <= maxR + 5 && dist >= 0.1;
@@ -1200,7 +1209,7 @@ function SceneContent({
       {/* Orbites */}
       {showOrbits &&
         orbitNodes.map((node, i) => {
-          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing);
+          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude);
           const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
           const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
           return (
@@ -1224,7 +1233,7 @@ function SceneContent({
 
       {/* Planètes */}
       {orbitNodes.map((node, i) => {
-        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing);
+        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude);
         const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
         const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
         return (
@@ -1433,6 +1442,9 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         hoverPlanetSpeedRatio={opts.hoverPlanetSpeedRatio}
         hoverOrbitTransitionSpeed={opts.hoverOrbitTransitionSpeed}
         hoverPlanetTransitionSpeed={opts.hoverPlanetTransitionSpeed}
+        verticalHomogeneousBase={opts.verticalHomogeneousBase}
+        verticalHomogeneousStep={opts.verticalHomogeneousStep}
+        verticalJupiterAmplitude={opts.verticalJupiterAmplitude}
       />
     </Canvas>
   );
