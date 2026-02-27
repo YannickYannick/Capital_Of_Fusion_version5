@@ -1111,6 +1111,7 @@ interface SceneContentProps {
   verticalHomogeneousBase: number;
   verticalHomogeneousStep: number;
   verticalJupiterAmplitude: number;
+  allPositions?: React.MutableRefObject<Map<string, THREE.Vector3>>;
 }
 
 function SceneContent({
@@ -1157,11 +1158,13 @@ function SceneContent({
   verticalHomogeneousBase,
   verticalHomogeneousStep,
   verticalJupiterAmplitude,
+  allPositions: externalAllPositions,
 }: SceneContentProps) {
   const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
-  const allPositions = useRef<Map<string, THREE.Vector3>>(new Map());
+  const localAllPositions = useRef<Map<string, THREE.Vector3>>(new Map());
+  const allPositions = externalAllPositions || localAllPositions;
 
   // Track mouse position in 3D (plan Y=0)
   const { camera, gl } = useThree();
@@ -1396,6 +1399,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
   const [selectedNodePos, setSelectedNodePos] = useState<THREE.Vector3 | null>(null);
   const localControlsRef = useRef<{ target: THREE.Vector3; update: () => void } | null>(null);
   const controlsRef = externalControlsRef || localControlsRef;
+  const allPositions = useRef<Map<string, THREE.Vector3>>(new Map());
 
   // Synchroniser la ref avec l'état
   useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
@@ -1424,10 +1428,15 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
       if (node.type === "ROOT") {
         setSelectedNodePos(new THREE.Vector3(0, 0, 0));
       } else {
-        const i = orbitNodes.findIndex((n) => n.id === node.id);
-        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode, opts.orbitSpacing);
-        const phase = node.orbit_phase ?? (i * 0.7);
-        setSelectedNodePos(getOrbitPosition(phase, r, opts.orbitShape, opts.orbitRoundness, y));
+        const currentPos = allPositions.current.get(node.id);
+        if (currentPos) {
+          setSelectedNodePos(currentPos.clone());
+        } else {
+          const i = orbitNodes.findIndex((n) => n.id === node.id);
+          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode, opts.orbitSpacing);
+          const phase = node.orbit_phase ?? (i * 0.7);
+          setSelectedNodePos(getOrbitPosition(phase, r, opts.globalShapeOverride ? opts.orbitShape : ((node.orbit_shape as any) || "circle"), opts.globalShapeOverride ? opts.orbitRoundness : (node.orbit_roundness ?? 0.6), y));
+        }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1510,6 +1519,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         verticalHomogeneousBase={opts.verticalHomogeneousBase}
         verticalHomogeneousStep={opts.verticalHomogeneousStep}
         verticalJupiterAmplitude={opts.verticalJupiterAmplitude}
+        allPositions={allPositions}
       />
     </Canvas>
   );
