@@ -1030,14 +1030,23 @@ function CameraController({
 
   // Zoom sur planète sélectionnée
   useEffect(() => {
-    if (!selectedNodePos) return;
+    console.log("CameraController useEffect check:", {
+      hasSelectedNodePos: !!selectedNodePos,
+      selectedNodePosTarget: selectedNodePos,
+      hasControlsRef: !!controlsRef,
+      controlsRefCurrent: controlsRef?.current
+    });
+    if (!selectedNodePos || !controlsRef.current) return;
     if (prevSelectedPos.current?.equals(selectedNodePos)) return;
     prevSelectedPos.current = selectedNodePos.clone();
 
     const offset = 8 + (selectedNodeScale * 2);
+    // Quand on sélectionne une planète, on l'approche
+    // Le zoom va se placer juste devant la planète.
     const targetX = selectedNodePos.x;
     const targetY = selectedNodePos.y;
     const targetZ = selectedNodePos.z;
+    console.log("CameraController received targetPos:", { x: targetX, y: targetY, z: targetZ });
 
     isAnimating.current = true;
     gsap.to(camera.position, {
@@ -1426,16 +1435,20 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
 
       // Calculer la position pour la caméra
       if (node.type === "ROOT") {
+        console.log("Zooming to ROOT");
         setSelectedNodePos(new THREE.Vector3(0, 0, 0));
       } else {
         const currentPos = allPositions.current.get(node.id);
         if (currentPos) {
+          console.log(`Zooming to planet LIVE POS: ${node.name}`, currentPos);
           setSelectedNodePos(currentPos.clone());
         } else {
           const i = orbitNodes.findIndex((n) => n.id === node.id);
           const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode, opts.orbitSpacing);
           const phase = node.orbit_phase ?? (i * 0.7);
-          setSelectedNodePos(getOrbitPosition(phase, r, opts.globalShapeOverride ? opts.orbitShape : ((node.orbit_shape as any) || "circle"), opts.globalShapeOverride ? opts.orbitRoundness : (node.orbit_roundness ?? 0.6), y));
+          const fbPos = getOrbitPosition(phase, r, opts.globalShapeOverride ? opts.orbitShape : ((node.orbit_shape as any) || "circle"), opts.globalShapeOverride ? opts.orbitRoundness : (node.orbit_roundness ?? 0.6), y);
+          console.log(`Zooming to planet FALLBACK POS: ${node.name}`, fbPos);
+          setSelectedNodePos(fbPos);
         }
       }
     },
@@ -1444,6 +1457,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
   );
 
   const handleReset = useCallback(() => {
+    console.log("handleReset triggered, resetting camera to origin");
     setSelectedId(null);
     setSelectedNodePos(null);
     opts.set("freezePlanets", false);
@@ -1469,10 +1483,8 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         gl.setClearColor(0x000000, 0);
       }}
       // Clic dans le vide → reset
-      onClick={(e) => {
-        if ((e as any).object === undefined && selectedId) {
-          handleReset();
-        }
+      onPointerMissed={() => {
+        if (selectedId) handleReset();
       }}
     >
       <SceneContent
