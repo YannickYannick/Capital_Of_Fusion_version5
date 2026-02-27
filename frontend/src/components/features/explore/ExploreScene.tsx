@@ -13,6 +13,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Line } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import gsap from "gsap";
+import { useRouter } from "next/navigation";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 
@@ -498,6 +499,7 @@ interface PlanetProps {
   allPlanetPositions: MutableRefObject<Map<string, THREE.Vector3>>;
   onPositionUpdate?: (id: string, pos: THREE.Vector3) => void;
   onClick: () => void;
+  onDoubleClick?: () => void;
   onHover: (v: boolean) => void;
   isHovered: boolean;
   isSelected: boolean;
@@ -537,6 +539,7 @@ function Planet({
   allPlanetPositions,
   onPositionUpdate,
   onClick,
+  onDoubleClick,
   onHover,
   isHovered,
   isSelected,
@@ -768,6 +771,7 @@ function Planet({
       ref={groupRef}
       position={entryPoint}
       onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick?.(); }}
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; onHover(true); }}
       onPointerOut={() => { document.body.style.cursor = "default"; onHover(false); }}
     >
@@ -867,25 +871,29 @@ function LabelSprite({
 //  Soleil central (nœud ROOT)
 // ─────────────────────────────────────────────────────────
 
-function Sun({
-  node,
-  frozen,
-  onClick,
-  isSelected,
-  isHovered,
-  onHover,
-  globalPlanetScale,
-  speedMultiplierRef,
-}: {
+interface SunProps {
   node: OrganizationNodeApi;
   frozen: boolean;
   onClick: () => void;
+  onDoubleClick?: () => void;
   isSelected: boolean;
   isHovered: boolean;
   globalPlanetScale: number;
   onHover: (v: boolean) => void;
   speedMultiplierRef: React.MutableRefObject<number>;
-}) {
+}
+
+function Sun({
+  node,
+  frozen,
+  onClick,
+  onDoubleClick,
+  isSelected,
+  isHovered,
+  onHover,
+  globalPlanetScale,
+  speedMultiplierRef,
+}: SunProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = hexToColor(node.planet_color || "#fbbf24");
   const scale = Math.max(node.planet_scale ?? 1.2, 1) * globalPlanetScale;
@@ -901,6 +909,7 @@ function Sun({
     <group
       position={[0, 0, 0]}
       onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick?.(); }}
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; onHover(true); }}
       onPointerOut={() => { document.body.style.cursor = "default"; onHover(false); }}
     >
@@ -1149,6 +1158,7 @@ function SceneContent({
   verticalHomogeneousStep,
   verticalJupiterAmplitude,
 }: SceneContentProps) {
+  const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
   const allPositions = useRef<Map<string, THREE.Vector3>>(new Map());
@@ -1271,6 +1281,10 @@ function SceneContent({
           frozen={frozen}
           globalPlanetScale={globalPlanetScale}
           onClick={() => onPlanetClick(rootNode)}
+          onDoubleClick={() => {
+            if (rootNode.cta_url) router.push(rootNode.cta_url);
+            else router.push(`/${rootNode.slug}`);
+          }}
           isSelected={selectedId === rootNode.id}
           isHovered={hoveredId === rootNode.id}
           onHover={(v) => setHoveredId(v ? rootNode.id : null)}
@@ -1317,6 +1331,10 @@ function SceneContent({
             allPlanetPositions={allPositions}
             onPositionUpdate={(id, pos) => allPositions.current.set(id, pos)}
             onClick={() => onPlanetClick(node)}
+            onDoubleClick={() => {
+              if (node.cta_url) router.push(node.cta_url);
+              else router.push(`/${node.slug}`);
+            }}
             onHover={(v) => setHoveredId(v ? node.id : null)}
             isHovered={hoveredId === node.id}
             isSelected={selectedId === node.id}

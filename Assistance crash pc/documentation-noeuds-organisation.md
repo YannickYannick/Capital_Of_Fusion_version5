@@ -91,3 +91,6 @@ Pour garantir le fonctionnement de l'interface d'Exploration 3D comme sur la V4,
   * Ajout d'une option de **Répartition Automatique des Orbites** pour recalculer les distances au soleil harmonieusement (sans toucher la base de données).
   * Ajout d'une gestion complète de **Dimension Verticale** (`orbit_position_y` en base) avec plusieurs modes (Manuel, Homogène, Jupiter) permettant d'éclater l'affichage sur la hauteur de façon réaliste.
   * Création d'un coefficient global (`Échelle Planètes`) pour réduire ou agrandir l'ensemble des planètes d'un coup.
+* **Nouvelles intéractions de survol et de clic** :
+  * Réduction globale de la vitesse de la scène via configuration (Options) avec **calcul par Raycasting 3D** si le pointeur survole le volume vertical des orbites.
+  * **Double-clic vs Simple clic** : Contrairement à la V4 où il n'y avait qu'une seule action (ouvrir le panneau latéral sans ajuster la caméra), la V5 distingue le simple clic (zoom en douceur et centrage de la caméra sur la planète visée) et le double-clic (redirection native vers la section de la planète, en exploitant éventuellement son URL via `cta_url` ou son `slug`).
