@@ -8,7 +8,12 @@ export const metadata = {
 };
 
 export default async function ArtistesPage() {
-  const artists = await getArtists();
+  let artists: Awaited<ReturnType<typeof getArtists>> = [];
+  try {
+    artists = await getArtists();
+  } catch (err) {
+    console.error("Erreur prerender artistes:", err);
+  }
   const baseUrl = getApiBaseUrl();
 
   return (
