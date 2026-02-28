@@ -52,8 +52,24 @@ function getOrbitPosition(
   radius: number,
   shape: "circle" | "squircle",
   roundness: number,
-  orbitY: number = 0
+  orbitY: number = 0,
+  verticalMode: string = "manual",
+  verticalSphereRadius: number = 30,
+  index: number = 0,
+  totalNodes: number = 1
 ): THREE.Vector3 {
+  if (verticalMode === "sphere") {
+    // Répartition homogène via Sphère de Fibonacci
+    const phi = Math.acos(1 - 2 * (index + 0.5) / Math.max(1, totalNodes));
+    const theta = Math.PI * (1 + Math.sqrt(5)) * index;
+    // La phase globale permet de faire tourner toute la sphère autour de l'axe Y
+    return new THREE.Vector3(
+      verticalSphereRadius * Math.sin(phi) * Math.cos(theta + phase),
+      verticalSphereRadius * Math.cos(phi),
+      verticalSphereRadius * Math.sin(phi) * Math.sin(theta + phase)
+    );
+  }
+
   if (shape === "squircle") {
     const [x, z] = getSquirclePosition(phase / (Math.PI * 2), radius, roundness);
     return new THREE.Vector3(x, orbitY, z);
@@ -70,11 +86,12 @@ export function getDynamicOrbitParams(
   i: number,
   total: number,
   autoDistribute: boolean,
-  verticalMode: "manual" | "homogeneous" | "jupiter",
+  verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere",
   orbitSpacing: number,
   verticalHomogeneousBase: number = 5,
   verticalHomogeneousStep: number = 20,
-  verticalJupiterAmplitude: number = 30
+  verticalJupiterAmplitude: number = 30,
+  verticalSphereRadius: number = 30
 ): { r: number; y: number } {
   const r0 = autoDistribute ? 3 + i * 2.5 : (node.orbit_radius ?? 3 + i * 1.5);
   const r = r0 * orbitSpacing;
@@ -90,6 +107,9 @@ export function getDynamicOrbitParams(
     const amplitude = verticalJupiterAmplitude * (1 - i / Math.max(1, total));
     const sign = i % 2 === 0 ? 1 : -1;
     y = sign * amplitude;
+  } else if (verticalMode === "sphere") {
+    // La hauteur individuelle d'orbite n'est plus utilisée, c'est géré globalement
+    y = 0;
   }
   return { r, y };
 }
@@ -107,15 +127,20 @@ function getOrbitTangent(
   phase: number,
   radius: number,
   shape: "circle" | "squircle",
-  roundness: number
+  roundness: number,
+  orbitY: number = 0,
+  verticalMode: string = "manual",
+  verticalSphereRadius: number = 30,
+  index: number = 0,
+  totalNodes: number = 1
 ): THREE.Vector3 {
-  if (shape === "circle") {
+  if (shape === "circle" && verticalMode !== "sphere") {
     return new THREE.Vector3(-Math.sin(phase), 0, Math.cos(phase)).normalize();
   }
-  // Dérivée numérique pour la squircle
+  // Dérivée numérique pour la squircle et la sphère
   const eps = 0.001;
-  const p1 = getOrbitPosition(phase - eps, radius, shape, roundness);
-  const p2 = getOrbitPosition(phase + eps, radius, shape, roundness);
+  const p1 = getOrbitPosition(phase - eps, radius, shape, roundness, orbitY, verticalMode, verticalSphereRadius, index, totalNodes);
+  const p2 = getOrbitPosition(phase + eps, radius, shape, roundness, orbitY, verticalMode, verticalSphereRadius, index, totalNodes);
   return p2.clone().sub(p1).normalize();
 }
 
@@ -505,6 +530,9 @@ interface PlanetProps {
   isSelected: boolean;
   showEntryTrajectory: boolean;
   speedMultiplierRef: React.MutableRefObject<number>;
+  verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
+  verticalSphereRadius: number;
+  totalNodes: number;
 }
 
 function Planet({
@@ -545,6 +573,9 @@ function Planet({
   isSelected,
   showEntryTrajectory,
   speedMultiplierRef,
+  verticalMode,
+  verticalSphereRadius,
+  totalNodes,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);       // temps (ms) après délai
@@ -593,7 +624,7 @@ function Planet({
       const STEPS = 128;
       for (let k = 0; k < STEPS; k++) {
         const testPhase = (k / STEPS) * Math.PI * 2;
-        const tPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness, orbitY);
+        const tPos = getOrbitPosition(testPhase, orbitRadius, orbitShape, orbitRoundness, orbitY, verticalMode, verticalSphereRadius, index, totalNodes);
         const dist = tPos.distanceTo(startVec);
         if (dist < bestDist) {
           bestDist = dist;
@@ -601,13 +632,13 @@ function Planet({
         }
       }
     }
-    const finalPos = getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness, orbitY);
+    const finalPos = getOrbitPosition(bestPhase, orbitRadius, orbitShape, orbitRoundness, orbitY, verticalMode, verticalSphereRadius, index, totalNodes);
 
     // Calcul du point de départ en mode fan :
     // On part dans la direction opposée à la tangente de l'orbite au point d'arrivée
     let fanStart: THREE.Vector3 | null = null;
     if (entryTrajectory === "fan") {
-      const tangent = getOrbitTangent(bestPhase, orbitRadius, orbitShape, orbitRoundness);
+      const tangent = getOrbitTangent(bestPhase, orbitRadius, orbitShape, orbitRoundness, orbitY, verticalMode, verticalSphereRadius, index, totalNodes);
       // Départ = point d'arrivée - distance * tangente (on arrive « depuis » la direction tangente)
       fanStart = finalPos.clone().addScaledVector(tangent, -fanDistance);
       fanStart.y = entryStartY; // on garde le Y configuré
@@ -637,7 +668,11 @@ function Planet({
       }
       const elapsed = state.clock.elapsedTime * 1000 - startTime.current;
       if (elapsed < entryDelay) {
-        groupRef.current.position.set(entryStartX, entryStartY, entryStartZ ?? orbitRadius);
+        if (entryStartPos.current) {
+          groupRef.current.position.copy(entryStartPos.current);
+        } else {
+          groupRef.current.position.set(entryStartX, entryStartY, entryStartZ ?? orbitRadius);
+        }
         return;
       }
       hasDelayPassed.current = true;
@@ -682,8 +717,9 @@ function Planet({
         s.phase = targetOrbitPhase;
         orbitEntryTime.current = state.clock.elapsedTime;
         groupRef.current.position.copy(targetOrbitPos);
+      } else {
+        return; // On attend la frame suivante pour continuer l'approche
       }
-      return;
     }
 
     // ── Phase 2 : orbite + physique ──
@@ -709,7 +745,7 @@ function Planet({
     }
 
     // Position nominale sur l'orbite (déterministe, forme respectée)
-    const nominalPos = getOrbitPosition(s.phase, orbitRadius, orbitShape, orbitRoundness, orbitY);
+    const nominalPos = getOrbitPosition(s.phase, orbitRadius, orbitShape, orbitRoundness, orbitY, verticalMode, verticalSphereRadius, index, totalNodes);
 
     // Force souris (répulsion) — perturbation temporaire via vélocité
     if (mouseForce > 0) {
@@ -944,6 +980,8 @@ interface CameraControllerProps {
   fov: number;
   controlsRef: React.RefObject<{ target: THREE.Vector3; update: () => void } | null>;
   onCameraMove?: (pos: THREE.Vector3, target: THREE.Vector3) => void;
+  autoResetCamera?: boolean;
+  autoResetDelay?: number;
 }
 
 function CameraController({
@@ -953,6 +991,8 @@ function CameraController({
   fov,
   controlsRef,
   onCameraMove,
+  autoResetCamera,
+  autoResetDelay,
 }: CameraControllerProps) {
   const { camera } = useThree();
   const isAnimating = useRef(false);
@@ -1001,11 +1041,8 @@ function CameraController({
     }
   });
 
-  // Reset caméra
-  useEffect(() => {
-    if (prevResetKey.current === resetKey) return;
-    prevResetKey.current = resetKey;
-
+  // Reset caméra (déclenché par resetKey manuel ou autoReset)
+  const executeReset = useCallback(() => {
     const refX = parseFloat(localStorage.getItem("camera_ref_x") ?? "0");
     const refY = parseFloat(localStorage.getItem("camera_ref_y") ?? "6.84");
     const refZ = parseFloat(localStorage.getItem("camera_ref_z") ?? "18.79");
@@ -1020,13 +1057,28 @@ function CameraController({
       ease: "power2.inOut",
       onUpdate: () => {
         if (controlsRef.current) {
-          gsap.to(controlsRef.current.target, { x: refTX, y: refTY, z: refTZ, duration: 1.5, ease: "power2.inOut" });
+          gsap.to(controlsRef.current.target, { x: refTX, y: refTY, z: refTZ, duration: 1.5, ease: "power2.inOut", overwrite: "auto" });
           controlsRef.current.update();
         }
       },
       onComplete: () => { isAnimating.current = false; },
+      overwrite: "auto"
     });
-  }, [resetKey, camera, controlsRef]);
+  }, [camera, controlsRef]);
+
+  // Détection du resetKey (bouton de l'interface)
+  useEffect(() => {
+    if (prevResetKey.current === resetKey) return;
+    prevResetKey.current = resetKey;
+    executeReset();
+  }, [resetKey, executeReset]);
+
+  // Fonction globale attachée sur window pour permettre l'appel manuel depuis OrbitControls onEnd
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__exploreCameraReset = executeReset;
+    }
+  }, [executeReset]);
 
   // Zoom sur planète sélectionnée
   useEffect(() => {
@@ -1110,7 +1162,7 @@ interface SceneContentProps {
   controlsRef: React.RefObject<{ target: THREE.Vector3; update: () => void } | null>;
   selectedNodePos: THREE.Vector3 | null;
   showEntryTrajectory: boolean;
-  verticalMode: "manual" | "homogeneous" | "jupiter";
+  verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
   autoDistributeOrbits: boolean;
   globalPlanetScale: number;
   hoverOrbitSpeedRatio: number;
@@ -1120,6 +1172,7 @@ interface SceneContentProps {
   verticalHomogeneousBase: number;
   verticalHomogeneousStep: number;
   verticalJupiterAmplitude: number;
+  verticalSphereRadius: number;
   allPositions?: React.MutableRefObject<Map<string, THREE.Vector3>>;
 }
 
@@ -1167,9 +1220,11 @@ function SceneContent({
   verticalHomogeneousBase,
   verticalHomogeneousStep,
   verticalJupiterAmplitude,
+  verticalSphereRadius,
   allPositions: externalAllPositions,
 }: SceneContentProps) {
   const router = useRouter();
+  const opts = usePlanetsOptions();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const mousePosRef = useRef(new THREE.Vector3());
   const localAllPositions = useRef<Map<string, THREE.Vector3>>(new Map());
@@ -1221,7 +1276,7 @@ function SceneContent({
     // Déterminer la distance max (rayon + marge)
     let maxR = 0;
     if (orbitNodes.length > 0) {
-      maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude).r;
+      maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius).r;
     }
 
     // Le centre du système est à [0,0,0]. 
@@ -1275,10 +1330,10 @@ function SceneContent({
       <pointLight position={[-10, -10, -10]} intensity={1.0} color="#7c3aed" />
       <pointLight position={[0, 5, 5]} intensity={1.0} color="#06b6d4" />
 
-      {/* Orbites */}
-      {showOrbits &&
+      {/* Orbites (masquées en mode Sphère car elles n'ont pas de sens physique 2D) */}
+      {showOrbits && verticalMode !== "sphere" &&
         orbitNodes.map((node, i) => {
-          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude);
+          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius);
           const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
           const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
           return (
@@ -1306,7 +1361,7 @@ function SceneContent({
 
       {/* Planètes */}
       {orbitNodes.map((node, i) => {
-        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude);
+        const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius);
         const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
         const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
         return (
@@ -1352,6 +1407,9 @@ function SceneContent({
             isSelected={selectedId === node.id}
             showEntryTrajectory={showEntryTrajectory}
             speedMultiplierRef={speedMultiplierRef}
+            verticalMode={verticalMode}
+            verticalSphereRadius={verticalSphereRadius}
+            totalNodes={orbitNodes.length}
           />
         );
       })}
@@ -1365,6 +1423,22 @@ function SceneContent({
         minDistance={5}
         maxDistance={60}
         maxPolarAngle={Math.PI / 1.5}
+        onStart={() => {
+          if ((window as any).__autoResetTimer) {
+            clearTimeout((window as any).__autoResetTimer);
+            (window as any).__autoResetTimer = null;
+          }
+        }}
+        onEnd={() => {
+          if (opts.autoResetCamera) {
+            if ((window as any).__autoResetTimer) clearTimeout((window as any).__autoResetTimer);
+            (window as any).__autoResetTimer = setTimeout(() => {
+              if ((window as any).__exploreCameraReset) {
+                (window as any).__exploreCameraReset();
+              }
+            }, (opts.autoResetDelay ?? 5) * 1000);
+          }
+        }}
       />
 
       <CameraController
@@ -1373,6 +1447,8 @@ function SceneContent({
         resetKey={resetKey}
         fov={fishEye}
         controlsRef={controlsRef}
+        autoResetCamera={opts.autoResetCamera}
+        autoResetDelay={opts.autoResetDelay}
       />
     </>
   );
@@ -1444,9 +1520,9 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
           setSelectedNodePos(currentPos.clone());
         } else {
           const i = orbitNodes.findIndex((n) => n.id === node.id);
-          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode, opts.orbitSpacing);
+          const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode as "manual" | "homogeneous" | "jupiter" | "sphere", opts.orbitSpacing, opts.verticalHomogeneousBase, opts.verticalHomogeneousStep, opts.verticalJupiterAmplitude, opts.verticalSphereRadius);
           const phase = node.orbit_phase ?? (i * 0.7);
-          const fbPos = getOrbitPosition(phase, r, opts.globalShapeOverride ? opts.orbitShape : ((node.orbit_shape as any) || "circle"), opts.globalShapeOverride ? opts.orbitRoundness : (node.orbit_roundness ?? 0.6), y);
+          const fbPos = getOrbitPosition(phase, r, opts.globalShapeOverride ? opts.orbitShape : ((node.orbit_shape as any) || "circle"), opts.globalShapeOverride ? opts.orbitRoundness : (node.orbit_roundness ?? 0.6), y, opts.verticalMode as any, opts.verticalSphereRadius, i, orbitNodes.length);
           console.log(`Zooming to planet FALLBACK POS: ${node.name}`, fbPos);
           setSelectedNodePos(fbPos);
         }
@@ -1521,7 +1597,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         controlsRef={controlsRef}
         selectedNodePos={selectedNodePos}
         showEntryTrajectory={opts.showEntryTrajectory}
-        verticalMode={opts.verticalMode}
+        verticalMode={opts.verticalMode as "manual" | "homogeneous" | "jupiter" | "sphere"}
         autoDistributeOrbits={opts.autoDistributeOrbits}
         globalPlanetScale={opts.globalPlanetScale}
         hoverOrbitSpeedRatio={opts.hoverOrbitSpeedRatio}
@@ -1531,6 +1607,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         verticalHomogeneousBase={opts.verticalHomogeneousBase}
         verticalHomogeneousStep={opts.verticalHomogeneousStep}
         verticalJupiterAmplitude={opts.verticalJupiterAmplitude}
+        verticalSphereRadius={opts.verticalSphereRadius}
         allPositions={allPositions}
       />
     </Canvas>

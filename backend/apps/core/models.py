@@ -90,7 +90,23 @@ class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=255, blank=True)
     hero_title = models.CharField(max_length=255, blank=True)
     hero_subtitle = models.TextField(blank=True)
-    hero_video_url = models.URLField(blank=True)
+    # Remplacé par les nouveaux champs avancés
+    # hero_video_url = models.URLField(blank=True)
+
+    # Paramètres de la vidéo principale
+    VIDEO_CHOICES = (
+        ('youtube', 'Vidéo YouTube'),
+        ('mp4', 'Fichier Local (MP4)'),
+    )
+    main_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube', verbose_name="Type Vidéo Principale")
+    main_video_youtube_id = models.CharField(max_length=50, blank=True, default="Dqg0oKlXpTE", verbose_name="ID YouTube Principale")
+    main_video_file = models.FileField(upload_to='videos/', blank=True, null=True, verbose_name="Fichier MP4 Principale")
+
+    # Paramètres de la vidéo cyclique
+    cycle_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube', verbose_name="Type Vidéo Cycle")
+    cycle_video_youtube_id = models.CharField(max_length=50, blank=True, default="eZhq_RMYRKQ", verbose_name="ID YouTube Cycle")
+    cycle_video_file = models.FileField(upload_to='videos/', blank=True, null=True, verbose_name="Fichier MP4 Cycle")
+
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

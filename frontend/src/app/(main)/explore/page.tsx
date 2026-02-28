@@ -5,16 +5,16 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { getOrganizationNodes } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
-import { PlanetOverlay } from "@/components/features/explore/PlanetOverlay";
-import { OptionsPanel } from "@/components/features/explore/OptionsPanel";
-import { GlobalPlanetConfigPanel } from "@/components/features/explore/GlobalPlanetConfigPanel";
-import { DebugPanel } from "@/components/features/explore/DebugPanel";
+import { PlanetOverlay } from "@/components/features/explore/components/PlanetOverlay";
+import { OptionsPanel } from "@/components/features/explore/components/OptionsPanel";
+import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
+import { DebugPanel } from "@/components/features/explore/components/DebugPanel";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
 const ExploreScene = dynamic(
   () =>
-    import("@/components/features/explore/ExploreScene").then(
+    import("@/components/features/explore/canvas/ExploreScene").then(
       (mod) => ({ default: mod.ExploreScene })
     ),
   { ssr: false }
@@ -133,7 +133,7 @@ function ExplorePageInner() {
       </AnimatePresence>
 
       {/* Panneau Options (droite, z-20) */}
-      <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} />
+      <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} nodes={nodes} />
 
       {/* Panneau Config Planètes (slide-in droite, z-50) */}
       <GlobalPlanetConfigPanel

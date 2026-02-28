@@ -5,8 +5,11 @@
 
 import type { MenuItemApi } from "@/types/menu";
 import type { CourseApi } from "@/types/course";
+import type { TheoryLessonApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
 import type { OrganizationNodeApi } from "@/types/organization";
+import type { ArtistApi } from "@/types/user";
+import type { SiteConfigurationApi } from "@/types/config";
 
 /**
  * Retourne l'URL de base de l'API (sans slash final).
@@ -28,8 +31,19 @@ export function getApiBaseUrl(): string {
  */
 export async function getMenuItems(): Promise<MenuItemApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/menu/items/`);
+  const res = await fetch(`${base}/api/menu/items/`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Menu API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Récupère la configuration globale du site (vidéos, titres).
+ * GET /api/config/
+ */
+export async function getSiteConfig(): Promise<SiteConfigurationApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/config/`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`Config API error: ${res.status}`);
   return res.json();
 }
 
@@ -195,4 +209,53 @@ export async function logout(): Promise<void> {
     headers: { Authorization: `Token ${token}` },
   });
   clearStoredToken();
+}
+
+/**
+ * Liste des artistes. GET /api/users/artists/
+ */
+export async function getArtists(): Promise<ArtistApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/users/artists/`);
+  if (!res.ok) throw new Error(`Artists API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'un artiste par username. GET /api/users/artists/<username>/
+ */
+export async function getArtistByUsername(username: string): Promise<ArtistApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/users/artists/${encodeURIComponent(username)}/`);
+  if (!res.ok) throw new Error(`Artist API error: ${res.status}`);
+  return res.json();
+}
+
+/** Query params pour la liste des leçons de théorie */
+export interface TheoryQuery {
+  category?: string;
+}
+
+/**
+ * Liste des leçons de théorie. GET /api/courses/theory/
+ */
+export async function getTheoryLessons(params?: TheoryQuery): Promise<TheoryLessonApi[]> {
+  const base = getApiBaseUrl();
+  const search = new URLSearchParams();
+  if (params?.category) search.set("category", params.category);
+  const qs = search.toString();
+  const url = qs ? `${base}/api/courses/theory/?${qs}` : `${base}/api/courses/theory/`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Theory API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'une leçon de théorie par slug. GET /api/courses/theory/<slug>/
+ */
+export async function getTheoryLessonBySlug(slug: string): Promise<TheoryLessonApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/courses/theory/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Theory lesson API error: ${res.status}`);
+  return res.json();
 }

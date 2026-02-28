@@ -12,6 +12,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 from .models import User
+from .serializers import ArtistSerializer
 
 
 class LoginAPIView(APIView):
@@ -137,3 +138,36 @@ class MeAPIView(APIView):
             "last_name": user.last_name or "",
             "is_vibe": getattr(user, "is_vibe", False),
         })
+
+class ArtistListAPIView(APIView):
+    """
+    GET /api/users/artists/
+    Liste publique des artistes (utilisateurs ayant des professions).
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        # On filtre les utilisateurs qui ont au moins une profession définie
+        artists = User.objects.filter(professions__isnull=False).distinct()
+        serializer = ArtistSerializer(artists, many=True, context={'request': request})
+        return Response(serializer.data)
+
+class ArtistDetailAPIView(APIView):
+    """
+    GET /api/users/artists/<username>/
+    Détail public d'un artiste.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        # Utilisation de filter().distinct().first() pour éviter MultipleObjectsReturned 
+        # si l'artiste a plusieurs professions (ex: Professeur + DJ)
+        artist = User.objects.filter(username=username, professions__isnull=False).distinct().first()
+        if artist:
+            serializer = ArtistSerializer(artist, context={'request': request})
+            return Response(serializer.data)
+        else:
+            return Response(
+                {"error": "Artiste non trouvé"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )

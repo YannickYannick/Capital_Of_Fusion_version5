@@ -5,8 +5,20 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import MenuItem
-from .serializers import MenuItemSerializer
+from .models import MenuItem, SiteConfiguration
+from .serializers import MenuItemSerializer, SiteConfigurationSerializer
+
+class SiteConfigurationAPIView(APIView):
+    """
+    GET /api/config/
+    Retourne la configuration singleton du site.
+    """
+    def get(self, request):
+        config = SiteConfiguration.objects.first()
+        if not config:
+            config = SiteConfiguration.objects.create()
+        serializer = SiteConfigurationSerializer(config, context={'request': request})
+        return Response(serializer.data)
 
 
 def health_check(request):

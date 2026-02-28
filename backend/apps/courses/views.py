@@ -1,12 +1,12 @@
 """
 Vues API Courses — liste des cours avec filtres ; détail par slug.
+Vues théorie — liste et détail des leçons de théorie.
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Course
-from .serializers import CourseSerializer
+from .models import Course, TheoryLesson
+from .serializers import CourseSerializer, TheoryLessonSerializer
 
 
 class CourseListAPIView(APIView):
@@ -48,4 +48,35 @@ class CourseDetailAPIView(APIView):
             is_active=True,
         )
         serializer = CourseSerializer(course)
+        return Response(serializer.data)
+
+
+class TheoryLessonListAPIView(APIView):
+    """
+    GET /api/courses/theory/
+    Liste des leçons de théorie actives. Query param optionnel : category.
+    """
+
+    def get(self, request):
+        qs = TheoryLesson.objects.filter(is_active=True).select_related("level")
+        category = request.query_params.get("category")
+        if category:
+            qs = qs.filter(category=category)
+        serializer = TheoryLessonSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class TheoryLessonDetailAPIView(APIView):
+    """
+    GET /api/courses/theory/<slug>/
+    Détail d'une leçon de théorie par slug.
+    """
+
+    def get(self, request, slug):
+        lesson = get_object_or_404(
+            TheoryLesson.objects.select_related("level"),
+            slug=slug,
+            is_active=True,
+        )
+        serializer = TheoryLessonSerializer(lesson)
         return Response(serializer.data)

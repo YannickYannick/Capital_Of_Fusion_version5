@@ -7,8 +7,12 @@
   --foreground: #ffffff;
 }
 
+html {
+  background: var(--background);
+}
+
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: transparent;
   font-family: var(--font-inter), sans-serif;
 }

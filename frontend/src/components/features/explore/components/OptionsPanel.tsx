@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import { getSiteConfig } from "@/lib/api";
+import type { OrganizationNodeApi } from "@/types/organization";
 
 interface OptionsPanelProps {
     onOpenPlanetConfig: () => void;
+    nodes?: OrganizationNodeApi[];
 }
 
 function Slider({
@@ -99,7 +102,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 /**
  * Panneau d'options fixe (droite, z-20) pour contrôler la scène 3D en temps réel.
  */
-export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
+export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelProps) {
     const [visible, setVisible] = useState(true);
     const opts = usePlanetsOptions();
 
@@ -206,8 +209,8 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                             />
                             <div>
                                 <p className="text-xs text-white/60 mb-1.5 mt-2">Mode Vertical (Y)</p>
-                                <div className="grid grid-cols-3 gap-1">
-                                    {(["manual", "homogeneous", "jupiter"] as const).map((m) => (
+                                <div className="grid grid-cols-4 gap-1">
+                                    {(["manual", "homogeneous", "jupiter", "sphere"] as const).map((m) => (
                                         <button
                                             key={m}
                                             type="button"
@@ -217,7 +220,7 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                                 }`}
                                             onClick={() => opts.set("verticalMode", m)}
                                         >
-                                            {m === "manual" ? "Manuel" : m === "homogeneous" ? "Lissé" : "Jupiter"}
+                                            {m === "manual" ? "Manuel" : m === "homogeneous" ? "Lissé" : m === "jupiter" ? "Jupiter" : "Sphère"}
                                         </button>
                                     ))}
                                 </div>
@@ -252,6 +255,19 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                             max={100}
                                             step={1}
                                             onChange={(v) => opts.set("verticalJupiterAmplitude", v)}
+                                        />
+                                    </div>
+                                )}
+
+                                {opts.verticalMode === "sphere" && (
+                                    <div className="mt-3">
+                                        <Slider
+                                            label="Rayon Sphère"
+                                            value={opts.verticalSphereRadius}
+                                            min={5}
+                                            max={100}
+                                            step={1}
+                                            onChange={(v) => opts.set("verticalSphereRadius", v)}
                                         />
                                     </div>
                                 )}
@@ -571,13 +587,93 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                                 )}
                             </div>
 
-                            <button
-                                type="button"
-                                onClick={opts.triggerRestart}
-                                className="w-full py-2 rounded-lg bg-indigo-600/40 border border-indigo-500/40 text-white text-xs font-medium hover:bg-indigo-600/60 transition"
-                            >
-                                🔄 Rejouer l'Intro
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={opts.triggerRestart}
+                                    className="flex-1 py-1.5 rounded-lg bg-indigo-600/40 border border-indigo-500/40 text-white text-xs font-medium hover:bg-indigo-600/60 transition"
+                                >
+                                    🔄 Rejouer l'Intro
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        // Extraction des clés de données uniquement (ignore les fonctions)
+                                        const exportData: any = {};
+                                        for (const key in opts) {
+                                            if (typeof (opts as any)[key] !== "function" && key !== "cameraRef" && key !== "restartKey" && key !== "resetKey") {
+                                                exportData[key] = (opts as any)[key];
+                                            }
+                                        }
+                                        navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
+                                        alert("Configuration copiée dans le presse-papier !");
+                                    }}
+                                    className="flex-1 py-1.5 rounded-lg bg-emerald-600/40 border border-emerald-500/40 text-white text-xs font-medium hover:bg-emerald-600/60 transition"
+                                >
+                                    📋 Copier
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        try {
+                                            const siteConfig = await getSiteConfig();
+                                            const optionsData: any = {};
+                                            for (const key in opts) {
+                                                if (typeof (opts as any)[key] !== "function" && key !== "cameraRef" && key !== "restartKey" && key !== "resetKey") {
+                                                    optionsData[key] = (opts as any)[key];
+                                                }
+                                            }
+
+                                            const cameraData = {
+                                                position: { x: opts.cameraRef.current?.x, y: opts.cameraRef.current?.y, z: opts.cameraRef.current?.z },
+                                                target: { x: opts.cameraRef.current?.tx, y: opts.cameraRef.current?.ty, z: opts.cameraRef.current?.tz }
+                                            };
+
+                                            const exportData = {
+                                                options: optionsData,
+                                                camera: cameraData,
+                                                video_config: siteConfig,
+                                                planets: nodes
+                                            };
+
+                                            await navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
+                                            alert("Configuration COMPLÈTE copiée dans le presse-papier !");
+                                        } catch (e) {
+                                            console.error("Erreur lors de l'export: ", e);
+                                            alert("Erreur lors de la copie.");
+                                        }
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg bg-emerald-700/60 border border-emerald-500/60 text-white text-xs font-bold hover:bg-emerald-600/80 transition"
+                                >
+                                    🌍 Tout Copier
+                                </button>
+                            </div>
+                        </Section>
+
+                        {/* Caméra */}
+                        <Section title="Caméra">
+                            <div className="flex items-center justify-between text-xs text-white/60 mb-2">
+                                <span>Retour auto après interaction</span>
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={!!opts.autoResetCamera}
+                                        onChange={(e) => opts.set("autoResetCamera", e.target.checked)}
+                                        className="w-4 h-4 accent-purple-500 rounded border-white/20 bg-black/40"
+                                    />
+                                    <span>Activer</span>
+                                </label>
+                            </div>
+                            {opts.autoResetCamera && (
+                                <Slider
+                                    label="Délai retour (s)"
+                                    value={opts.autoResetDelay}
+                                    min={1}
+                                    max={30}
+                                    step={1}
+                                    onChange={(v) => opts.set("autoResetDelay", v)}
+                                />
+                            )}
                         </Section>
 
                         {/* Vidéo */}
@@ -609,7 +705,7 @@ export function OptionsPanel({ onOpenPlanetConfig }: OptionsPanelProps) {
                         </Section>
                     </motion.aside>
                 )}
-            </AnimatePresence>
+            </AnimatePresence >
         </>
     );
 }

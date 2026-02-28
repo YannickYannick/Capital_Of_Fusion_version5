@@ -57,16 +57,20 @@ export interface PlanetsOptionsState {
     showVideoOverlay: boolean;
     showEntryTrajectory: boolean;
     // ── Nouveaux Modes ──
-    verticalMode: "manual" | "homogeneous" | "jupiter";
+    verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
     autoDistributeOrbits: boolean;
     verticalHomogeneousBase: number;
     verticalHomogeneousStep: number;
     verticalJupiterAmplitude: number;
+    verticalSphereRadius: number;
     // ── Vitesse de survol (Hover) ──
     hoverOrbitSpeedRatio: number;
     hoverPlanetSpeedRatio: number;
     hoverOrbitTransitionSpeed: number;
     hoverPlanetTransitionSpeed: number;
+    // ── Caméra ──
+    autoResetCamera: boolean;
+    autoResetDelay: number;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -126,23 +130,26 @@ const DEFAULTS: PlanetsOptionsState = {
     orbitEasing: "easeOut",
     orbitalRampDuration: 10,
     globalOrbitSpeed: 0.5,
-    grayscaleVideo: true,
+    grayscaleVideo: false,
     enableVideoCycle: true,
     videoCycleVisible: 10,
     videoCycleHidden: 10,
     videoTransition: 1500,
     isTransitioningToExplore: false,
-    showVideoOverlay: true,
+    showVideoOverlay: false,
     showEntryTrajectory: false,
     verticalMode: "manual",
     autoDistributeOrbits: false,
     verticalHomogeneousBase: 5.0,
     verticalHomogeneousStep: 20.0,
     verticalJupiterAmplitude: 30.0,
+    verticalSphereRadius: 30.0,
     hoverOrbitSpeedRatio: 0.333,
     hoverPlanetSpeedRatio: 0.1,
     hoverOrbitTransitionSpeed: 2,
     hoverPlanetTransitionSpeed: 10,
+    autoResetCamera: true,
+    autoResetDelay: 5,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -185,6 +192,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     verticalHomogeneousBase: "planets_verticalHomogeneousBase",
     verticalHomogeneousStep: "planets_verticalHomogeneousStep",
     verticalJupiterAmplitude: "planets_verticalJupiterAmplitude",
+    verticalSphereRadius: "planets_verticalSphereRadius",
     hoverOrbitSpeedRatio: "planets_hoverOrbitSpeedRatio",
     hoverPlanetSpeedRatio: "planets_hoverPlanetSpeedRatio",
     hoverOrbitTransitionSpeed: "planets_hoverOrbitTransitionSpeed",
@@ -248,11 +256,14 @@ function loadFromLS(): PlanetsOptionsState {
         verticalHomogeneousBase: lsGet(LS_KEYS.verticalHomogeneousBase!, DEFAULTS.verticalHomogeneousBase),
         verticalHomogeneousStep: lsGet(LS_KEYS.verticalHomogeneousStep!, DEFAULTS.verticalHomogeneousStep),
         verticalJupiterAmplitude: lsGet(LS_KEYS.verticalJupiterAmplitude!, DEFAULTS.verticalJupiterAmplitude),
+        verticalSphereRadius: lsGet(LS_KEYS.verticalSphereRadius!, DEFAULTS.verticalSphereRadius),
         hoverOrbitSpeedRatio: lsGet(LS_KEYS.hoverOrbitSpeedRatio!, DEFAULTS.hoverOrbitSpeedRatio),
         hoverPlanetSpeedRatio: lsGet(LS_KEYS.hoverPlanetSpeedRatio!, DEFAULTS.hoverPlanetSpeedRatio),
         hoverOrbitTransitionSpeed: lsGet(LS_KEYS.hoverOrbitTransitionSpeed!, DEFAULTS.hoverOrbitTransitionSpeed),
         hoverPlanetTransitionSpeed: lsGet(LS_KEYS.hoverPlanetTransitionSpeed!, DEFAULTS.hoverPlanetTransitionSpeed),
         isTransitioningToExplore: false,
+        autoResetCamera: DEFAULTS.autoResetCamera,
+        autoResetDelay: DEFAULTS.autoResetDelay,
     };
 }
 

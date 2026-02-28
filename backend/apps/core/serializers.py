@@ -2,7 +2,16 @@
 Serializers Core — MenuItem récursif (parent → children) pour l’API menu.
 """
 from rest_framework import serializers
-from .models import MenuItem
+from .models import MenuItem, SiteConfiguration
+
+class SiteConfigurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteConfiguration
+        fields = [
+            "site_name", "hero_title", "hero_subtitle",
+            "main_video_type", "main_video_youtube_id", "main_video_file",
+            "cycle_video_type", "cycle_video_youtube_id", "cycle_video_file",
+        ]
 
 
 class MenuItemSerializer(serializers.ModelSerializer):

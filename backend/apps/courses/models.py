@@ -95,3 +95,40 @@ class Enrollment(BaseModel):
 
     def __str__(self):
         return f"{self.user} → {self.course}"
+
+
+class TheoryLesson(BaseModel):
+    """
+    Leçon de théorie musicale / danse.
+    Catégories : rythme, technique, histoire, culture.
+    """
+
+    CATEGORY_CHOICES = [
+        ("rythme", "Rythme & Musique"),
+        ("technique", "Technique"),
+        ("histoire", "Histoire"),
+        ("culture", "Culture"),
+    ]
+
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="technique")
+    level = models.ForeignKey(
+        "core.Level",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="theory_lessons",
+    )
+    content = models.TextField(blank=True, help_text="Contenu en Markdown")
+    video_url = models.URLField(blank=True, help_text="URL YouTube embed (optionnel)")
+    duration_minutes = models.PositiveSmallIntegerField(default=5)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Leçon de théorie"
+        verbose_name_plural = "Leçons de théorie"
+        ordering = ["category", "level__order"]
+
+    def __str__(self):
+        return self.title

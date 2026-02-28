@@ -1,8 +1,8 @@
 """
-Serializers Courses — Course pour l’API catalogue.
+Serializers Courses — Course et TheoryLesson pour l'API catalogue.
 """
 from rest_framework import serializers
-from .models import Course
+from .models import Course, TheoryLesson
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -27,5 +27,29 @@ class CourseSerializer(serializers.ModelSerializer):
             "node_name",
             "is_active",
             "image",
+        )
+        read_only_fields = fields
+
+
+class TheoryLessonSerializer(serializers.ModelSerializer):
+    """TheoryLesson en lecture seule pour GET /api/courses/theory/."""
+
+    level_name = serializers.CharField(source="level.name", read_only=True)
+    category_display = serializers.CharField(source="get_category_display", read_only=True)
+
+    class Meta:
+        model = TheoryLesson
+        fields = (
+            "id",
+            "title",
+            "slug",
+            "category",
+            "category_display",
+            "level",
+            "level_name",
+            "content",
+            "video_url",
+            "duration_minutes",
+            "is_active",
         )
         read_only_fields = fields
