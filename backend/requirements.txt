@@ -7,3 +7,4 @@ gunicorn
 psycopg[binary]
 whitenoise
 google-auth>=2.0.0
+requests>=2.0.0
