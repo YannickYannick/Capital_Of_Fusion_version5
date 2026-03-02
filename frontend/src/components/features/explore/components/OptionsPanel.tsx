@@ -396,6 +396,14 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                         {/* ─── Phase Entrée ─── */}
                         <Section title="⬇ Phase d'Entrée — Cinématique">
                             <Slider
+                                label="Décalage (Stagger) (ms)"
+                                value={opts.entryStagger}
+                                min={0}
+                                max={1000}
+                                step={50}
+                                onChange={(v) => opts.set("entryStagger", v)}
+                            />
+                            <Slider
                                 label="Vitesse début entrée (u/s)"
                                 value={opts.entrySpeedStart}
                                 min={0}

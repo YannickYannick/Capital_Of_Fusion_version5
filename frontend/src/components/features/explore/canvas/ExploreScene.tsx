@@ -1392,7 +1392,7 @@ function SceneContent({
             orbitSpeedTarget={orbitSpeedTarget}
             orbitEasing={orbitEasing}
             orbitalRampDuration={orbitalRampDuration}
-            entryDelay={i * 200}
+            entryDelay={i * opts.entryStagger}
             restartKey={restartKey}
             mousePos={mousePosRef}
             mouseForce={mouseForce}

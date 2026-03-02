@@ -50,6 +50,7 @@ export interface PlanetsOptionsState {
     entryStartY: number;
     entryStartZ: number | null;
     // ── Cinématique Entrée ──
+    entryStagger: number;      // Décalage entre chaque planète (ms)
     entrySpeedStart: number;   // vitesse initiale (unités/s)
     entrySpeedEnd: number;     // vitesse cible à l'arrivée sur l'orbite
     entryEasing: EasingType;   // courbe de rampe entre start et end
@@ -138,6 +139,7 @@ const DEFAULTS: PlanetsOptionsState = {
     // Vitesses en unités-monde/seconde [0–10 u/s].
     // entrySpeedStart = vitesse au moment du départ (point hors-écran)
     // entrySpeedEnd   = vitesse visée à l'arrivée sur l'orbite (raccord)
+    entryStagger: 0,
     entrySpeedStart: 2,
     entrySpeedEnd: 8,
     entryEasing: "easeOut",
@@ -191,6 +193,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     collisionForce: "planets_collisionForce",
     damping: "planets_damping",
     returnForce: "planets_returnForce",
+    entryStagger: "planets_entryStagger",
     entryStartX: "planets_entryStartX",
     entryStartY: "planets_entryStartY",
     entryStartZ: "planets_entryStartZ",
@@ -256,6 +259,7 @@ function loadFromLS(): PlanetsOptionsState {
         collisionForce: lsGet(LS_KEYS.collisionForce!, DEFAULTS.collisionForce),
         damping: lsGet(LS_KEYS.damping!, DEFAULTS.damping),
         returnForce: lsGet(LS_KEYS.returnForce!, DEFAULTS.returnForce),
+        entryStagger: lsGet(LS_KEYS.entryStagger!, DEFAULTS.entryStagger),
         entryStartX: lsGet(LS_KEYS.entryStartX!, DEFAULTS.entryStartX),
         entryStartY: lsGet(LS_KEYS.entryStartY!, DEFAULTS.entryStartY),
         entryStartZ: lsGet(LS_KEYS.entryStartZ!, DEFAULTS.entryStartZ),
