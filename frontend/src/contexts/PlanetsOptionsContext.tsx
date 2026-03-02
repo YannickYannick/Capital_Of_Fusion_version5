@@ -174,7 +174,7 @@ const DEFAULTS: PlanetsOptionsState = {
     hoverPlanetSpeedRatio: 0.1,
     hoverOrbitTransitionSpeed: 2,
     hoverPlanetTransitionSpeed: 10,
-    autoResetCamera: true,
+    autoResetCamera: false,
     autoResetDelay: 5,
 };
 
