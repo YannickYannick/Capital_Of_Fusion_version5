@@ -185,12 +185,18 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                             lightData = parsed.lightConfig;
                                         }
 
-                                        if (lightData && typeof lightData.ambientIntensity === "number") {
+                                        // Try converting any potential strings inside lightData
+                                        if (lightData) {
+                                            const fixFloat = (val: any) => typeof val === "string" ? parseFloat(val) : val;
+                                            if (lightData.ambientIntensity !== undefined) lightData.ambientIntensity = fixFloat(lightData.ambientIntensity);
+                                        }
+
+                                        if (lightData && typeof lightData.ambientIntensity === "number" && !isNaN(lightData.ambientIntensity)) {
                                             opts.set("lightConfig", lightData);
                                             alert("Configuration des lumières appliquée avec succès !");
                                         } else {
                                             console.error("Format invalide. Contenu lu:", parsed);
-                                            alert("JSON invalide pour la configuration des lumières.");
+                                            alert("JSON invalide pour la configuration des lumières. Il doit contenir un 'ambientIntensity' valide.");
                                         }
                                     } catch (err) {
                                         console.error(err);
