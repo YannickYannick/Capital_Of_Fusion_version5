@@ -1082,12 +1082,6 @@ function CameraController({
 
   // Zoom sur planète sélectionnée
   useEffect(() => {
-    console.log("CameraController useEffect check:", {
-      hasSelectedNodePos: !!selectedNodePos,
-      selectedNodePosTarget: selectedNodePos,
-      hasControlsRef: !!controlsRef,
-      controlsRefCurrent: controlsRef?.current
-    });
     if (!selectedNodePos || !controlsRef.current) return;
     if (prevSelectedPos.current?.equals(selectedNodePos)) return;
     prevSelectedPos.current = selectedNodePos.clone();
@@ -1098,7 +1092,6 @@ function CameraController({
     const targetX = selectedNodePos.x;
     const targetY = selectedNodePos.y;
     const targetZ = selectedNodePos.z;
-    console.log("CameraController received targetPos:", { x: targetX, y: targetY, z: targetZ });
 
     isAnimating.current = true;
     gsap.to(camera.position, {
@@ -1515,19 +1508,16 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
 
       // Calculer la position pour la caméra
       if (node.type === "ROOT") {
-        console.log("Zooming to ROOT");
         setSelectedNodePos(new THREE.Vector3(0, 0, 0));
       } else {
         const currentPos = allPositions.current.get(node.id);
         if (currentPos) {
-          console.log(`Zooming to planet LIVE POS: ${node.name}`, currentPos);
           setSelectedNodePos(currentPos.clone());
         } else {
           const i = orbitNodes.findIndex((n) => n.id === node.id);
           const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, opts.autoDistributeOrbits, opts.verticalMode as "manual" | "homogeneous" | "jupiter" | "sphere", opts.orbitSpacing, opts.verticalHomogeneousBase, opts.verticalHomogeneousStep, opts.verticalJupiterAmplitude, opts.verticalSphereRadius);
           const phase = node.orbit_phase ?? (i * 0.7);
           const fbPos = getOrbitPosition(phase, r, opts.globalShapeOverride ? opts.orbitShape : ((node.orbit_shape as any) || "circle"), opts.globalShapeOverride ? opts.orbitRoundness : (node.orbit_roundness ?? 0.6), y, opts.verticalMode as any, opts.verticalSphereRadius, i, orbitNodes.length);
-          console.log(`Zooming to planet FALLBACK POS: ${node.name}`, fbPos);
           setSelectedNodePos(fbPos);
         }
       }
