@@ -1323,12 +1323,16 @@ function SceneContent({
 
   return (
     <>
-      {/* Éclairage V4 */}
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[10, 15, 10]} intensity={2.0} castShadow />
-      <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
-      <pointLight position={[-10, -10, -10]} intensity={1.0} color="#7c3aed" />
-      <pointLight position={[0, 5, 5]} intensity={1.0} color="#06b6d4" />
+      {/* Éclairage Dynamique V5 */}
+      {opts.lightConfig && (
+        <>
+          <ambientLight intensity={opts.lightConfig.ambientIntensity} />
+          <directionalLight position={opts.lightConfig.dirPosition} intensity={opts.lightConfig.dirIntensity} castShadow />
+          <pointLight position={opts.lightConfig.p1Position} intensity={opts.lightConfig.p1Intensity} color={opts.lightConfig.p1Color} />
+          <pointLight position={opts.lightConfig.p2Position} intensity={opts.lightConfig.p2Intensity} color={opts.lightConfig.p2Color} />
+          <pointLight position={opts.lightConfig.p3Position} intensity={opts.lightConfig.p3Intensity} color={opts.lightConfig.p3Color} />
+        </>
+      )}
 
       {/* Orbites (masquées en mode Sphère car elles n'ont pas de sens physique 2D) */}
       {showOrbits && verticalMode !== "sphere" &&

@@ -16,10 +16,26 @@ import {
 
 export type EasingType = "linear" | "easeIn" | "easeOut" | "easeInOut";
 
+export interface LightConfig {
+    ambientIntensity: number;
+    dirPosition: [number, number, number];
+    dirIntensity: number;
+    p1Position: [number, number, number];
+    p1Intensity: number;
+    p1Color: string;
+    p2Position: [number, number, number];
+    p2Intensity: number;
+    p2Color: string;
+    p3Position: [number, number, number];
+    p3Intensity: number;
+    p3Color: string;
+}
+
 export interface PlanetsOptionsState {
     showOrbits: boolean;
     freezePlanets: boolean;
     showDebugInfo: boolean;
+    lightConfig: LightConfig | null;
     fishEye: number;
     orbitSpacing: number;
     globalPlanetScale: number;
@@ -97,6 +113,14 @@ const DEFAULTS: PlanetsOptionsState = {
     showOrbits: true,
     freezePlanets: false,
     showDebugInfo: false,
+    lightConfig: {
+        ambientIntensity: 0.6,
+        dirPosition: [10, 15, 10],
+        dirIntensity: 2.0,
+        p1Position: [10, 10, 10], p1Intensity: 1.5, p1Color: "#ffffff",
+        p2Position: [-10, -10, -10], p2Intensity: 1.0, p2Color: "#7c3aed",
+        p3Position: [0, 5, 5], p3Intensity: 1.0, p3Color: "#06b6d4"
+    },
     fishEye: 50,
     orbitSpacing: 1.0,
     globalPlanetScale: 1.0,
@@ -156,6 +180,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     showOrbits: "planets_showOrbits",
     freezePlanets: "planets_freezePlanets",
     showDebugInfo: "planets_showDebugInfo",
+    lightConfig: "planets_lightConfig",
     fishEye: "planets_fishEye",
     orbitSpacing: "planets_orbitSpacing",
     globalPlanetScale: "planets_globalPlanetScale",
@@ -220,6 +245,7 @@ function loadFromLS(): PlanetsOptionsState {
         showOrbits: lsGet(LS_KEYS.showOrbits!, DEFAULTS.showOrbits),
         freezePlanets: lsGet(LS_KEYS.freezePlanets!, DEFAULTS.freezePlanets),
         showDebugInfo: lsGet(LS_KEYS.showDebugInfo!, DEFAULTS.showDebugInfo),
+        lightConfig: lsGet(LS_KEYS.lightConfig!, DEFAULTS.lightConfig),
         fishEye: lsGet(LS_KEYS.fishEye!, DEFAULTS.fishEye),
         orbitSpacing: lsGet(LS_KEYS.orbitSpacing!, DEFAULTS.orbitSpacing),
         globalPlanetScale: lsGet(LS_KEYS.globalPlanetScale!, DEFAULTS.globalPlanetScale),

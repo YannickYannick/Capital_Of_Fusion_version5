@@ -171,6 +171,34 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                             />
                         </div>
 
+                        {/* Lumières */}
+                        <Section title="Lumières & Éclairage">
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    try {
+                                        const text = await navigator.clipboard.readText();
+                                        const parsed = JSON.parse(text);
+                                        if (parsed && typeof parsed.ambientIntensity === "number") {
+                                            opts.set("lightConfig", parsed);
+                                            alert("Configuration des lumières appliquée avec succès !");
+                                        } else {
+                                            alert("JSON invalide pour la configuration des lumières.");
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert("Erreur lors de la lecture du presse-papier ou JSON invalide.");
+                                    }
+                                }}
+                                className="w-full px-3 py-2 rounded-lg bg-orange-600/30 border border-orange-500/40 text-white text-xs font-medium hover:bg-orange-600/50 transition mb-2"
+                            >
+                                💡 Coller Configuration JSON
+                            </button>
+                            <p className="text-[10px] text-white/40 leading-tight">
+                                Copiez un objet JSON contenant ambientIntensity, dirLight, etc. puis cliquez sur ce bouton pour l'appliquer.
+                            </p>
+                        </Section>
+
                         {/* Caméra */}
                         <Section title="Caméra & Espace">
                             <Slider
