@@ -1,12 +1,7 @@
 import { Navbar } from "@/components/shared/Navbar";
 import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
-import dynamic from "next/dynamic";
+import { VideoBackgroundClient } from "@/components/features/explore/canvas/VideoBackgroundClient";
 import { getSiteConfig } from "@/lib/api";
-
-const GlobalVideoBackground = dynamic(
-  () => import("@/components/features/explore/canvas/ExploreVideos").then((m) => m.GlobalVideoBackground),
-  { ssr: false }
-);
 
 /**
  * Layout (main) — partagé par toutes les pages publiques.
@@ -22,7 +17,7 @@ export default async function MainLayout({
   return (
     <PlanetsOptionsProvider>
       <Navbar />
-      <GlobalVideoBackground config={config} />
+      <VideoBackgroundClient config={config} />
       <main className="pt-16">{children}</main>
     </PlanetsOptionsProvider>
   );
