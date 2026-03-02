@@ -6,7 +6,7 @@
  * layout.tsx (Server Component) importe ce fichier directement.
  */
 import dynamic from "next/dynamic";
-import type { SiteConfigApi } from "@/types/core";
+import type { SiteConfigurationApi } from "@/types/config";
 
 const GlobalVideoBackground = dynamic(
     () =>
@@ -16,6 +16,6 @@ const GlobalVideoBackground = dynamic(
     { ssr: false }
 );
 
-export function VideoBackgroundClient({ config }: { config: SiteConfigApi | null }) {
+export function VideoBackgroundClient({ config }: { config: SiteConfigurationApi | null }) {
     return <GlobalVideoBackground config={config} />;
 }
