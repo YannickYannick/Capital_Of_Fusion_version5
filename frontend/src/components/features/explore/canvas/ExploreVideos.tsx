@@ -43,7 +43,9 @@ function useYTPlayer(videoId: string, ready: boolean, active: boolean) {
             width: 1920,
             height: 1080,
             playerVars: {
-                autoplay: 1, mute: 1, loop: 1, playlist: videoId, controls: 0, rel: 0, playsinline: 1, vq: 'hd1080'
+                autoplay: 1, mute: 1, loop: 1, playlist: videoId,
+                controls: 0, rel: 0, playsinline: 1, vq: 'hd1080',
+                origin: typeof window !== "undefined" ? window.location.origin : "",
             },
             events: {
                 onReady: (e: { target: YTPlayer }) => {
