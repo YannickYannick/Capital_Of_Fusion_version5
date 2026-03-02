@@ -178,11 +178,18 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                 onClick={async () => {
                                     try {
                                         const text = await navigator.clipboard.readText();
-                                        const parsed = JSON.parse(text);
-                                        if (parsed && typeof parsed.ambientIntensity === "number") {
-                                            opts.set("lightConfig", parsed);
+                                        let lightData = parsed;
+                                        if (parsed?.options?.lightConfig) {
+                                            lightData = parsed.options.lightConfig;
+                                        } else if (parsed?.lightConfig) {
+                                            lightData = parsed.lightConfig;
+                                        }
+
+                                        if (lightData && typeof lightData.ambientIntensity === "number") {
+                                            opts.set("lightConfig", lightData);
                                             alert("Configuration des lumières appliquée avec succès !");
                                         } else {
+                                            console.error("Format invalide. Contenu lu:", parsed);
                                             alert("JSON invalide pour la configuration des lumières.");
                                         }
                                     } catch (err) {
