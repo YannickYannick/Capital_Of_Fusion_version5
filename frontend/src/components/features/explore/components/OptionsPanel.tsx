@@ -177,7 +177,15 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                 type="button"
                                 onClick={async () => {
                                     try {
-                                        const text = await navigator.clipboard.readText();
+                                        let text = await navigator.clipboard.readText();
+                                        // Nettoyage au cas où l'utilisateur copie du texte avant/après le JSON
+                                        const startIndex = text.indexOf('{');
+                                        const endIndex = text.lastIndexOf('}');
+                                        if (startIndex >= 0 && endIndex >= startIndex) {
+                                            text = text.substring(startIndex, endIndex + 1);
+                                        }
+                                        const parsed = JSON.parse(text);
+
                                         let lightData = parsed;
                                         if (parsed?.options?.lightConfig) {
                                             lightData = parsed.options.lightConfig;
