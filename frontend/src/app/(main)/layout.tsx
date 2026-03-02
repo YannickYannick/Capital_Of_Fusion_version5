@@ -1,7 +1,12 @@
 import { Navbar } from "@/components/shared/Navbar";
 import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
-import { GlobalVideoBackground } from "@/components/features/explore/canvas/ExploreVideos";
+import dynamic from "next/dynamic";
 import { getSiteConfig } from "@/lib/api";
+
+const GlobalVideoBackground = dynamic(
+  () => import("@/components/features/explore/canvas/ExploreVideos").then((m) => m.GlobalVideoBackground),
+  { ssr: false }
+);
 
 /**
  * Layout (main) — partagé par toutes les pages publiques.
