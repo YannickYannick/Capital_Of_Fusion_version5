@@ -2,7 +2,7 @@
 Routes API — menu, courses, events (lecture seule Phase 1).
 """
 from django.urls import path
-from apps.core.views import MenuItemListAPIView, health_check, SiteConfigurationAPIView
+from apps.core.views import MenuItemListAPIView, health_check, SiteConfigurationAPIView, seed_database
 from apps.courses.views import CourseListAPIView, CourseDetailAPIView, TheoryLessonListAPIView, TheoryLessonDetailAPIView
 from apps.events.views import EventListAPIView, EventDetailAPIView
 from apps.organization.views import (
@@ -53,6 +53,7 @@ urlpatterns = [
     path("auth/me/", MeAPIView.as_view()),
     path("users/artists/", ArtistListAPIView.as_view()),
     path("users/artists/<str:username>/", ArtistDetailAPIView.as_view()),
+    path("seed/", seed_database),
 ]
 
 urlpatterns += router.urls

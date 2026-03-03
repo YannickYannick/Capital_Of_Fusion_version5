@@ -2,6 +2,7 @@
 Vues API Core — menu (items racine avec children récursifs), health check.
 """
 from django.http import JsonResponse
+from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -38,3 +39,36 @@ class MenuItemListAPIView(APIView):
         items = MenuItem.objects.filter(parent=None, is_active=True).order_by("order")
         serializer = MenuItemSerializer(items, many=True)
         return Response(serializer.data)
+
+
+def seed_database(request):
+    """
+    POST /api/seed/?key=SECRET_KEY
+    Endpoint sécurisé pour initialiser la base de données (noeuds + superuser).
+    """
+    import json
+    secret = request.GET.get("key", "")
+    expected = getattr(settings, 'SEED_SECRET_KEY', 'change-me-in-prod')
+    if secret != expected:
+        return JsonResponse({"error": "Unauthorized"}, status=403)
+
+    results = {}
+
+    # 1. Seed organization nodes
+    try:
+        from django.core.management import call_command
+        from io import StringIO
+        out = StringIO()
+        call_command('seed_nodes', stdout=out)
+        results['seed_nodes'] = out.getvalue().strip()
+    except Exception as e:
+        results['seed_nodes'] = f"Error: {str(e)}"
+
+    # 2. Create admin superuser
+    try:
+        call_command('create_admin', stdout=out)
+        results['create_admin'] = out.getvalue().strip()
+    except Exception as e:
+        results['create_admin'] = f"Error: {str(e)}"
+
+    return JsonResponse({"status": "done", "results": results})
