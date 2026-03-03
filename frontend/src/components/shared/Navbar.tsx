@@ -38,6 +38,9 @@ export function Navbar() {
   const links = menuError || !menuItems?.length
     ? [
       {
+        href: "/explore", label: "Explore 3D", children: [] as MenuItemApi[]
+      },
+      {
         href: "/cours", label: "Cours", children: [
           { id: "c1", name: "Liste & Planning", url: "/cours/planning/" },
           { id: "c2", name: "Filtres (Ville, Niveau)", url: "/cours/filtres/" },
