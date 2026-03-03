@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import type { PlanetsOptionsState } from "@/contexts/PlanetsOptionsContext";
 import { getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 
@@ -208,7 +209,7 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                                     }
                                                 } else {
                                                     // Traitement classique pour toutes les autres options
-                                                    opts.set(key as keyof typeof opts, value);
+                                                    opts.set(key as keyof PlanetsOptionsState, value as any);
                                                     appliedCount++;
                                                 }
                                             }
