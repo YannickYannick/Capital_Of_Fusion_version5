@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+﻿from django.core.management.base import BaseCommand
 from apps.organization.models import OrganizationNode
 
 NODES_DATA = [
@@ -7,11 +7,11 @@ NODES_DATA = [
         "name": "Capital of Fusion",
         "slug": "capital-of-fusion",
         "type": "ROOT",
-        "parent_id": null,
-        "description": "Capital of Fusion rassemble les pôles et les acteurs de la danse.",
-        "short_description": "École nationale de danse — Bachata, Salsa, Kizomba.",
+        "parent_id": None,
+        "description": "Capital of Fusion rassemble les pÃ´les et les acteurs de la danse.",
+        "short_description": "Ã‰cole nationale de danse â€” Bachata, Salsa, Kizomba.",
         "content": "",
-        "cta_text": "Découvrir",
+        "cta_text": "DÃ©couvrir",
         "cta_url": "/explore/",
         "visual_source": "preset",
         "planet_type": "wire",
@@ -24,7 +24,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "677e350e-f92b-44e1-b1bd-b65a19ed7113",
@@ -32,8 +32,8 @@ NODES_DATA = [
         "slug": "bachatavibe-paris",
         "type": "BRANCH",
         "parent_id": "c6221e82-7191-4e6f-a9e8-8c452aa3f230",
-        "description": "Cours réguliers et événements à Paris.",
-        "short_description": "Pôle Paris — cours et soirées.",
+        "description": "Cours rÃ©guliers et Ã©vÃ©nements Ã  Paris.",
+        "short_description": "PÃ´le Paris â€” cours et soirÃ©es.",
         "content": "",
         "cta_text": "Voir les cours",
         "cta_url": "/cours/",
@@ -48,7 +48,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 0.3,
-        "is_visible_3d": false
+        "is_visible_3d": False
     },
     {
         "id": "a50c40dd-4b3a-4b33-b3e2-00e729bad5a0",
@@ -57,7 +57,7 @@ NODES_DATA = [
         "type": "BRANCH",
         "parent_id": "c6221e82-7191-4e6f-a9e8-8c452aa3f230",
         "description": "",
-        "short_description": "Pôle Lyon.",
+        "short_description": "PÃ´le Lyon.",
         "content": "",
         "cta_text": "",
         "cta_url": "",
@@ -72,14 +72,14 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": false
+        "is_visible_3d": False
     },
     {
         "id": "da1d5c33-8b99-4f90-aac3-d5f27abcf9c2",
         "name": "CAPITAL OF FUSION FRANCE",
         "slug": "capital-of-fusion-france",
         "type": "ROOT",
-        "parent_id": null,
+        "parent_id": None,
         "description": "",
         "short_description": "",
         "content": "",
@@ -96,7 +96,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "1527367a-b025-4cf4-b653-0670dc7cd7e6",
@@ -120,7 +120,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": false
+        "is_visible_3d": False
     },
     {
         "id": "2493569c-9787-4ae5-9470-e9d42cdfebe8",
@@ -144,7 +144,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": false
+        "is_visible_3d": False
     },
     {
         "id": "0d74d40b-252d-4e51-914b-4c76ae73aef0",
@@ -152,9 +152,9 @@ NODES_DATA = [
         "slug": "bachata-vibe-experience",
         "type": "EVENT",
         "parent_id": "2493569c-9787-4ae5-9470-e9d42cdfebe8",
-        "description": "Fiche détaillée pour Bachata Vibe Experience",
+        "description": "Fiche dÃ©taillÃ©e pour Bachata Vibe Experience",
         "short_description": "Description courte de Bachata Vibe Experience",
-        "content": "Contenu détaillé de Bachata Vibe Experience",
+        "content": "Contenu dÃ©taillÃ© de Bachata Vibe Experience",
         "cta_text": "",
         "cta_url": "",
         "visual_source": "",
@@ -168,7 +168,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "d542c2c9-f2c2-4001-ae6e-aa44145884c6",
@@ -176,9 +176,9 @@ NODES_DATA = [
         "slug": "bachata-vibe-paris-hebdo",
         "type": "EVENT",
         "parent_id": "2493569c-9787-4ae5-9470-e9d42cdfebe8",
-        "description": "Fiche détaillée pour Bachata Vibe Paris Hebdo",
+        "description": "Fiche dÃ©taillÃ©e pour Bachata Vibe Paris Hebdo",
         "short_description": "Description courte de Bachata Vibe Paris Hebdo",
-        "content": "Contenu détaillé de Bachata Vibe Paris Hebdo",
+        "content": "Contenu dÃ©taillÃ© de Bachata Vibe Paris Hebdo",
         "cta_text": "",
         "cta_url": "",
         "visual_source": "",
@@ -192,7 +192,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "24e70569-d394-4686-a3db-99b5b5598899",
@@ -200,9 +200,9 @@ NODES_DATA = [
         "slug": "dominican-vibe",
         "type": "EVENT",
         "parent_id": "2493569c-9787-4ae5-9470-e9d42cdfebe8",
-        "description": "Fiche détaillée pour Dominican Vibe",
+        "description": "Fiche dÃ©taillÃ©e pour Dominican Vibe",
         "short_description": "Description courte de Dominican Vibe",
-        "content": "Contenu détaillé de Dominican Vibe",
+        "content": "Contenu dÃ©taillÃ© de Dominican Vibe",
         "cta_text": "",
         "cta_url": "",
         "visual_source": "",
@@ -216,7 +216,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "1d774525-2261-4065-b24a-797db640110d",
@@ -240,7 +240,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "86472f21-3ef0-4aa6-90ab-cbeb92ccd149",
@@ -264,7 +264,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "fb07ce25-03c1-4034-873f-dc07f1e66c71",
@@ -288,7 +288,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "904d79ff-0160-4266-b67b-bfea54962550",
@@ -312,7 +312,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "0e6a1a14-9a3a-4ce8-ba84-b223211c060e",
@@ -336,7 +336,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "1c9e7330-fe93-42ec-bf08-6c1bed4b017b",
@@ -344,9 +344,9 @@ NODES_DATA = [
         "slug": "bachata-vibe-lyon",
         "type": "EVENT",
         "parent_id": "2493569c-9787-4ae5-9470-e9d42cdfebe8",
-        "description": "Fiche détaillée pour Bachata Vibe Lyon",
+        "description": "Fiche dÃ©taillÃ©e pour Bachata Vibe Lyon",
         "short_description": "Description courte de Bachata Vibe Lyon",
-        "content": "Contenu détaillé de Bachata Vibe Lyon",
+        "content": "Contenu dÃ©taillÃ© de Bachata Vibe Lyon",
         "cta_text": "",
         "cta_url": "",
         "visual_source": "",
@@ -360,7 +360,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "77da718e-86fe-461d-b416-435188f57984",
@@ -384,7 +384,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": false
+        "is_visible_3d": False
     },
     {
         "id": "d59c9864-e7b5-4038-8e2e-cf5e297d0abf",
@@ -392,9 +392,9 @@ NODES_DATA = [
         "slug": "kompa-vibe-paris",
         "type": "EVENT",
         "parent_id": "77da718e-86fe-461d-b416-435188f57984",
-        "description": "Fiche détaillée pour Kompa Vibe Paris",
+        "description": "Fiche dÃ©taillÃ©e pour Kompa Vibe Paris",
         "short_description": "Description courte de Kompa Vibe Paris",
-        "content": "Contenu détaillé de Kompa Vibe Paris",
+        "content": "Contenu dÃ©taillÃ© de Kompa Vibe Paris",
         "cta_text": "",
         "cta_url": "",
         "visual_source": "preset",
@@ -408,7 +408,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     },
     {
         "id": "ef7ff1ad-5c20-4c59-ab1c-b9dcae2f9d2e",
@@ -432,7 +432,7 @@ NODES_DATA = [
         "orbit_shape": "circle",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": false
+        "is_visible_3d": False
     },
     {
         "id": "6fdcd72a-86a6-4959-bb02-f8c1e2b301cf",
@@ -440,9 +440,9 @@ NODES_DATA = [
         "slug": "amapiano-vibe-paris",
         "type": "EVENT",
         "parent_id": "ef7ff1ad-5c20-4c59-ab1c-b9dcae2f9d2e",
-        "description": "Fiche détaillée pour Amapiano Vibe Paris",
+        "description": "Fiche dÃ©taillÃ©e pour Amapiano Vibe Paris",
         "short_description": "Description courte de Amapiano Vibe Paris",
-        "content": "Contenu détaillé de Amapiano Vibe Paris",
+        "content": "Contenu dÃ©taillÃ© de Amapiano Vibe Paris",
         "cta_text": "",
         "cta_url": "",
         "visual_source": "",
@@ -456,7 +456,7 @@ NODES_DATA = [
         "orbit_shape": "",
         "orbit_roundness": 0.6,
         "rotation_speed": 1.0,
-        "is_visible_3d": true
+        "is_visible_3d": True
     }
 ]
 
@@ -489,3 +489,4 @@ class Command(BaseCommand):
                     pass
 
         self.stdout.write(self.style.SUCCESS(f"Done: {created} created, {updated} updated"))
+
