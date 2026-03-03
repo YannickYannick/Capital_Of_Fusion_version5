@@ -44,20 +44,28 @@ export default function EvenementsPage() {
   }, [type, upcoming]);
 
   return (
-    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white">Événements</h1>
-        <p className="mt-2 text-white/70">
-          Calendrier — filtrez par type ou affichez uniquement les à venir.
-        </p>
+    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Agenda</p>
+          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4">
+            Nos{" "}
+            <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+              Événements
+            </span>
+          </h1>
+          <p className="text-white/60 text-lg max-w-2xl mx-auto">
+            Festivals, soirées et stages intensifs. Ne manquez aucun rendez-vous de la communauté Bachata.
+          </p>
+        </div>
 
-        <div className="mt-6 flex flex-wrap gap-4 items-end">
-          <label className="flex flex-col gap-1 text-sm text-white/80">
+        <div className="mt-6 flex flex-wrap justify-center items-center gap-6 bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md max-w-2xl mx-auto mb-12">
+          <label className="flex flex-col gap-2 text-sm text-white/80 font-medium flex-1 min-w-[200px]">
             Type
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-purple-500"
+              className="bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
             >
               {TYPE_OPTIONS.map((o) => (
                 <option key={o.value || "all"} value={o.value}>
@@ -90,31 +98,33 @@ export default function EvenementsPage() {
             Aucun événement pour le moment.
           </p>
         ) : (
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 delay-200">
             {events.map((ev) => (
-              <li key={ev.id}>
+              <div key={ev.id} className="group h-full">
                 <Link
                   href={`/evenements/${ev.slug}`}
-                  className="block p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 transition"
+                  className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1"
                 >
-                  <span className="text-xs font-medium text-purple-300 uppercase tracking-wide">
-                    {ev.type}
-                  </span>
-                  <h2 className="mt-1 font-semibold text-white">{ev.name}</h2>
-                  <p className="mt-1 text-sm text-white/70">
-                    {formatDate(ev.start_date)}
-                    {ev.start_date !== ev.end_date &&
-                      ` → ${formatDate(ev.end_date)}`}
-                  </p>
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {ev.type}
+                    </span>
+                    <span className="text-xs font-semibold text-white/50 bg-black/30 px-2 py-1 rounded-md text-right">
+                      {formatDate(ev.start_date)}
+                    </span>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">{ev.name}</h2>
+
                   {ev.location_name && (
-                    <p className="mt-0.5 text-xs text-white/50">
-                      {ev.location_name}
+                    <p className="mt-auto pt-4 flex items-center gap-2 text-sm text-white/50 border-t border-white/5">
+                      <span>📍</span> {ev.location_name}
                     </p>
                   )}
                 </Link>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
