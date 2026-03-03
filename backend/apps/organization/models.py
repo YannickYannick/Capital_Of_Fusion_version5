@@ -240,3 +240,19 @@ class NodeEvent(BaseModel):
 
     def __str__(self):
         return self.title
+
+class TeamMember(BaseModel):
+    name = models.CharField(max_length=255, verbose_name="Nom complet")
+    role = models.CharField(max_length=255, verbose_name="Rôle / Fonction", help_text="Ex: Professeur, DJ, Vidéaste")
+    bio = models.TextField(blank=True, verbose_name="Biographie courte")
+    profile_image = models.ImageField(upload_to='organization/team/', blank=True, null=True, verbose_name="Photo de profil")
+    pole = models.CharField(max_length=100, blank=True, verbose_name="Pôle d'appartenance", help_text="Ex: Pôle Enseignement, Pôle Média")
+    is_active = models.BooleanField(default=True, verbose_name="Membre actif")
+
+    class Meta:
+        verbose_name = "Membre de l'équipe"
+        verbose_name_plural = "Membres de l'équipe"
+        ordering = ['role', 'name']
+
+    def __str__(self):
+        return f"{self.name} - {self.role}"

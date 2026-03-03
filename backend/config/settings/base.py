@@ -26,6 +26,10 @@ INSTALLED_APPS = [
     "apps.organization",
     "apps.courses",
     "apps.events",
+    "apps.shop",
+    "apps.care",
+    "apps.projects",
+    "apps.trainings",
 ]
 
 MIDDLEWARE = [

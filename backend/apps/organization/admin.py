@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import OrganizationNode, OrganizationRole, UserOrganizationRole, NodeEvent
+from .models import OrganizationNode, OrganizationRole, UserOrganizationRole, NodeEvent, TeamMember
 
 class NodeEventInline(admin.TabularInline):
     """Inline pour gérer les événements directement depuis le noeud."""
@@ -79,3 +79,9 @@ class UserOrganizationRoleAdmin(admin.ModelAdmin):
 class NodeEventAdmin(admin.ModelAdmin):
     list_display = ("title", "node", "start_datetime", "is_featured")
     list_filter = ("node", "is_featured")
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ('name', 'role', 'pole', 'is_active')
+    list_filter = ('is_active', 'pole')
+    search_fields = ('name', 'role', 'bio')

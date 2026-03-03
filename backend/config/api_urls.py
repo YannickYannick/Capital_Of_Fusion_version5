@@ -18,6 +18,23 @@ from apps.users.views import (
     ArtistDetailAPIView
 )
 
+from rest_framework.routers import DefaultRouter
+from apps.shop.views import ProductCategoryViewSet, ProductViewSet
+from apps.care.views import PractitionerViewSet, CareServiceViewSet
+from apps.projects.views import ProjectCategoryViewSet, ProjectViewSet
+from apps.trainings.views import SubscriptionPassViewSet, TrainingSessionViewSet
+
+router = DefaultRouter()
+router.register(r'shop/categories', ProductCategoryViewSet)
+router.register(r'shop/products', ProductViewSet)
+router.register(r'care/practitioners', PractitionerViewSet)
+router.register(r'care/services', CareServiceViewSet)
+router.register(r'projects/categories', ProjectCategoryViewSet)
+router.register(r'projects/projects', ProjectViewSet)
+router.register(r'trainings/passes', SubscriptionPassViewSet)
+router.register(r'trainings/sessions', TrainingSessionViewSet)
+
+
 urlpatterns = [
     path("health/", health_check),
     path("config/", SiteConfigurationAPIView.as_view()),
@@ -37,3 +54,5 @@ urlpatterns = [
     path("users/artists/", ArtistListAPIView.as_view()),
     path("users/artists/<str:username>/", ArtistDetailAPIView.as_view()),
 ]
+
+urlpatterns += router.urls
