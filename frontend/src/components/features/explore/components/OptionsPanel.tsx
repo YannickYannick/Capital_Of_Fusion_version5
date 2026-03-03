@@ -186,25 +186,39 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                         }
                                         const parsed = JSON.parse(text);
 
-                                        let lightData = parsed;
-                                        if (parsed?.options?.lightConfig) {
-                                            lightData = parsed.options.lightConfig;
-                                        } else if (parsed?.lightConfig) {
-                                            lightData = parsed.lightConfig;
+                                        let optionsPayload = parsed;
+                                        if (parsed?.options) {
+                                            optionsPayload = parsed.options;
                                         }
 
-                                        // Try converting any potential strings inside lightData
-                                        if (lightData) {
-                                            const fixFloat = (val: any) => typeof val === "string" ? parseFloat(val) : val;
-                                            if (lightData.ambientIntensity !== undefined) lightData.ambientIntensity = fixFloat(lightData.ambientIntensity);
+                                        let appliedCount = 0;
+                                        // On parcourt toutes les clés de l'objet collé
+                                        for (const [key, value] of Object.entries(optionsPayload)) {
+                                            // On vérifie que la clé existe dans opts et n'est pas une fonction
+                                            if (key in opts && typeof (opts as any)[key] !== "function" && key !== "cameraRef" && key !== "restartKey" && key !== "resetKey") {
+
+                                                // Traitement spécial pour lightConfig (pour assurer la conversion numérique si besoin)
+                                                if (key === "lightConfig" && value) {
+                                                    const lightData: any = value;
+                                                    const fixFloat = (val: any) => typeof val === "string" ? parseFloat(val) : val;
+                                                    if (lightData.ambientIntensity !== undefined) lightData.ambientIntensity = fixFloat(lightData.ambientIntensity);
+                                                    if (typeof lightData.ambientIntensity === "number" && !isNaN(lightData.ambientIntensity)) {
+                                                        opts.set("lightConfig", lightData);
+                                                        appliedCount++;
+                                                    }
+                                                } else {
+                                                    // Traitement classique pour toutes les autres options
+                                                    opts.set(key as keyof typeof opts, value);
+                                                    appliedCount++;
+                                                }
+                                            }
                                         }
 
-                                        if (lightData && typeof lightData.ambientIntensity === "number" && !isNaN(lightData.ambientIntensity)) {
-                                            opts.set("lightConfig", lightData);
-                                            alert("Configuration des lumières appliquée avec succès !");
+                                        if (appliedCount > 0) {
+                                            alert(`Configuration importée avec succès ! (${appliedCount} paramètres mis à jour)`);
                                         } else {
                                             console.error("Format invalide. Contenu lu:", parsed);
-                                            alert("JSON invalide pour la configuration des lumières. Il doit contenir un 'ambientIntensity' valide.");
+                                            alert("JSON valide mais aucun paramètre reconnu n'a été trouvé.");
                                         }
                                     } catch (err) {
                                         console.error(err);
@@ -213,10 +227,10 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                 }}
                                 className="w-full px-3 py-2 rounded-lg bg-orange-600/30 border border-orange-500/40 text-white text-xs font-medium hover:bg-orange-600/50 transition mb-2"
                             >
-                                💡 Coller Configuration JSON
+                                📥 Coller JSON (Global / Lumières)
                             </button>
                             <p className="text-[10px] text-white/40 leading-tight">
-                                Copiez un objet JSON contenant ambientIntensity, dirLight, etc. puis cliquez sur ce bouton pour l'appliquer.
+                                Copiez un objet JSON contenant n'importe quelles options (ou juste les lumières) puis cliquez sur ce bouton pour les appliquer.
                             </p>
                         </Section>
 
