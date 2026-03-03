@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
 
 interface PlanetOverlayProps {
@@ -157,23 +158,36 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
                       {node.short_description}
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-3 mt-2">
-                    {node.cta_url && (
+                  <div className="flex flex-wrap flex-col sm:flex-row gap-3 mt-4 w-full">
+                    {/* Primary Action: Routage principal vers la timeline/page */}
+                    {node.cta_url ? (
                       <a
                         href={node.cta_url}
-                        target="_blank"
+                        target={node.cta_url.startsWith("http") ? "_blank" : "_self"}
                         rel="noopener noreferrer"
-                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/20"
+                        className="flex-1 flex items-center justify-center text-center px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold transition-all hover:scale-[1.02] shadow-[0_0_20px_-5px_rgba(6,182,212,0.4)] border border-cyan-400/30"
                       >
-                        {node.cta_text || "En savoir plus"} ↗
+                        {node.cta_text || "Visiter le lien"} ↗
                       </a>
+                    ) : (
+                      <Link
+                        href={`/${node.slug}`}
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold transition-all hover:scale-[1.02] shadow-[0_0_20px_-5px_rgba(168,85,247,0.4)] border border-purple-400/30"
+                        onClick={onClose}
+                      >
+                        <span className="text-xl">🪐</span>
+                        <span>Explorer {node.name}</span>
+                      </Link>
                     )}
-                    <a
+
+                    {/* Secondary Action: Vue filtrée des cours (si pertinent) */}
+                    <Link
                       href={`/cours?organization=${node.id}`}
-                      className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-medium transition border border-white/10"
+                      className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition border border-white/10 text-center flex items-center justify-center"
+                      onClick={onClose}
                     >
-                      Voir les cours
-                    </a>
+                      Voir les cours liés
+                    </Link>
                   </div>
                 </div>
               </div>
