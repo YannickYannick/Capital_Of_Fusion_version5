@@ -8,6 +8,22 @@ Phase 1 : Django 5, DRF, SQLite, apps core / users / organization / courses / ev
 - Virtualenv recommandé : `python -m venv .venv` puis `.venv\Scripts\activate` (Windows) ou `source .venv/bin/activate` (Linux/Mac).
 - Installer les dépendances : `pip install -r requirements.txt`
 
+## Base de données (Supabase PostgreSQL)
+
+Le projet utilise PostgreSQL hébergé sur Supabase comme base de données principale (même en développement local).
+
+**Configuration du fichier `.env` :**
+Créez un fichier `.env` à la racine du dossier `backend/` avec le format suivant :
+
+```env
+# URL du Transaction Pooler IPv4 (Port 6543)
+DATABASE_URL=postgresql://[USER_POOLER]:[DB_PASSWORD]@[HOST_POOLER]:6543/postgres
+```
+
+⚠️ **Attention** : Les connexions directes classiques (port `5432` sur `db....supabase.co`) sont en cours de transition exclusive vers IPv6 chez Supabase, ce qui provoque des blocages complets (Timeout) sur la plupart des réseaux locaux classiques. Il est **impératif** d'utiliser l'URL du "Transaction Pooler" (trouvable dans l'onglet ORMs > Session mode sur le dashboard Supabase) qui garantit une résolution IPv4 (`aws-...pooler.supabase.com:6543`).
+
+*Note : Si la variable `DATABASE_URL` n'est pas définie ou est commentée, Django basculera automatiquement sur une base SQLite locale (`db.sqlite3`) pour le développement hors ligne rapide.*
+
 ## Lancer le serveur
 
 ```bash
