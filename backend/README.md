@@ -41,6 +41,8 @@ Par défaut : `http://127.0.0.1:8000/`. Admin : `http://127.0.0.1:8000/admin/`.
 Après les migrations, charger les données de référence (niveaux, styles, menu) :
 
 ```bash
+python manage.py makemigrations
+python manage.py migrate
 python manage.py load_initial_data
 ```
 
