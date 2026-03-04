@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { getProjectBySlug, getProjectCategories } from "@/lib/api";
 import { updateProject } from "@/lib/adminApi";
 import type { ProjectApi, ProjectCategoryApi } from "@/types/projects";
+import { STATUS_CONFIG } from "@/types/projects";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -14,27 +15,6 @@ import { AdminEditButton } from "@/components/admin/AdminEditButton";
 import { AdminModal, AdminField, adminInputClass, adminTextareaClass, adminSelectClass } from "@/components/admin/AdminModal";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const STATUS_CONFIG: Record<
-    ProjectApi["status"],
-    { label: string; color: string; dot: string }
-> = {
-    IN_PROGRESS: {
-        label: "En cours",
-        color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-        dot: "bg-emerald-400",
-    },
-    UPCOMING: {
-        label: "À venir",
-        color: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-        dot: "bg-purple-400",
-    },
-    COMPLETED: {
-        label: "Terminé",
-        color: "bg-white/10 text-white/50 border-white/10",
-        dot: "bg-white/40",
-    },
-};
 
 function formatDate(dateStr: string | null): string {
     if (!dateStr) return "";
@@ -45,6 +25,7 @@ function formatDate(dateStr: string | null): string {
         year: "numeric",
     });
 }
+
 
 function ProjectEditModal({
     project,

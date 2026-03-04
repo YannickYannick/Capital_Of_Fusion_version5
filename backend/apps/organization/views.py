@@ -1,18 +1,15 @@
 """
 Vues API Organization — liste des noeuds (Explore 3D) ; détail par slug.
-Vues admin — modifier les noeuds d'organisation (réservé is_superuser).
+Vues admin — modifier les noeuds d'organisation (réservé IsSuperUser).
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from apps.core.permissions import IsSuperUser
 from .models import OrganizationNode
 from .serializers import OrganizationNodeSerializer
 
-
-def _require_admin(user):
-    return user.is_authenticated and user.is_superuser
 
 
 class OrganizationNodeListAPIView(APIView):
@@ -54,11 +51,9 @@ class OrganizationNodeAdminDetailAPIView(APIView):
     Note : la création et suppression de noeuds se fait via l'admin Django
     car cela affecte la structure 3D.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperUser]
 
     def patch(self, request, slug):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         node = get_object_or_404(OrganizationNode, slug=slug)
         # Champs éditables depuis le frontend admin
         editable_fields = [

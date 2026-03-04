@@ -1,23 +1,19 @@
 """
 Vues API Courses — liste des cours avec filtres ; détail par slug.
 Vues théorie — liste et détail des leçons de théorie.
-Vues admin — créer, modifier, supprimer cours et leçons de théorie (réservé is_superuser).
+Vues admin — créer, modifier, supprimer cours et leçons (réservé IsSuperUser).
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from apps.core.permissions import IsSuperUser
 from .models import Course, TheoryLesson
 from .serializers import (
     CourseSerializer, CourseWriteSerializer,
     TheoryLessonSerializer, TheoryLessonWriteSerializer
 )
 
-
-def _require_admin(user):
-    """Retourne True si l'utilisateur est superuser."""
-    return user.is_authenticated and user.is_superuser
 
 
 class CourseListAPIView(APIView):
@@ -100,11 +96,9 @@ class CourseAdminAPIView(APIView):
     POST /api/admin/courses/
     Créer un cours. Réservé aux superusers.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperUser]
 
     def post(self, request):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         serializer = CourseWriteSerializer(data=request.data)
         if serializer.is_valid():
             course = serializer.save()
@@ -118,11 +112,9 @@ class CourseAdminDetailAPIView(APIView):
     DELETE /api/admin/courses/<slug>/ → supprimer un cours.
     Réservés aux superusers.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperUser]
 
     def patch(self, request, slug):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         course = get_object_or_404(Course, slug=slug)
         serializer = CourseWriteSerializer(course, data=request.data, partial=True)
         if serializer.is_valid():
@@ -131,8 +123,6 @@ class CourseAdminDetailAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, slug):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         course = get_object_or_404(Course, slug=slug)
         course.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -143,11 +133,9 @@ class TheoryLessonAdminAPIView(APIView):
     POST /api/admin/courses/theory/
     Créer une leçon de théorie. Réservé aux superusers.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperUser]
 
     def post(self, request):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         serializer = TheoryLessonWriteSerializer(data=request.data)
         if serializer.is_valid():
             lesson = serializer.save()
@@ -161,11 +149,9 @@ class TheoryLessonAdminDetailAPIView(APIView):
     DELETE /api/admin/courses/theory/<slug>/ → supprimer une leçon.
     Réservés aux superusers.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperUser]
 
     def patch(self, request, slug):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         lesson = get_object_or_404(TheoryLesson, slug=slug)
         serializer = TheoryLessonWriteSerializer(lesson, data=request.data, partial=True)
         if serializer.is_valid():
@@ -174,8 +160,6 @@ class TheoryLessonAdminDetailAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, slug):
-        if not _require_admin(request.user):
-            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
         lesson = get_object_or_404(TheoryLesson, slug=slug)
         lesson.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
