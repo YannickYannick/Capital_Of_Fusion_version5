@@ -1,6 +1,5 @@
 """
-Modèle User personnalisé — AbstractUser + champs optionnels,
-dance_level (FK Level), is_vibe, M-N DanceProfession.
+Modèle User personnalisé — AbstractUser + user_type/staff_role + champs danse.
 """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -8,10 +7,52 @@ from django.db import models
 
 class User(AbstractUser):
     """
-    Utilisateur : hérite AbstractUser + phone, bio, profile_picture,
-    dance_level (FK Level), is_vibe, professions (M-N DanceProfession).
+    3 types d'utilisateurs :
+    - ADMIN  : superutilisateur, peut tout valider.
+    - STAFF  : membre de l'équipe CoF, peut créer du contenu selon son rôle.
+    - MEMBER : utilisateur standard, s'inscrit aux événements.
     """
 
+    class UserType(models.TextChoices):
+        ADMIN = "ADMIN", "Administrateur"
+        STAFF = "STAFF", "Staff Capital of Fusion"
+        MEMBER = "MEMBER", "Membre"
+
+    class StaffRole(models.TextChoices):
+        TEACHER = "TEACHER", "Enseignant"
+        ORGANIZER = "ORGANIZER", "Organisateur"
+        ARTIST = "ARTIST", "Artiste"
+        CARE = "CARE", "Praticien / Care"
+        SHOP = "SHOP", "Boutique"
+        COMMUNICATIONS = "COMMUNICATIONS", "Communication"
+
+    # ─── Rôle & type ─────────────────────────────────────────────────────────
+    user_type = models.CharField(
+        max_length=10,
+        choices=UserType.choices,
+        default=UserType.MEMBER,
+        verbose_name="Type d'utilisateur",
+    )
+    staff_role = models.CharField(
+        max_length=20,
+        choices=StaffRole.choices,
+        blank=True,
+        verbose_name="Rôle (Staff uniquement)",
+    )
+
+    class AccountStatus(models.TextChoices):
+        PENDING = "PENDING", "En attente de validation"
+        APPROVED = "APPROVED", "Approuvé"
+        REJECTED = "REJECTED", "Refusé"
+
+    account_status = models.CharField(
+        max_length=10,
+        choices=AccountStatus.choices,
+        default=AccountStatus.APPROVED,
+        verbose_name="Statut du compte",
+    )
+
+    # ─── Profil danse ─────────────────────────────────────────────────────────
     phone = models.CharField(max_length=50, blank=True)
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
@@ -34,4 +75,30 @@ class User(AbstractUser):
         verbose_name_plural = "Utilisateurs"
 
     def __str__(self):
-        return self.username
+        return f"{self.username} ({self.get_user_type_display()})"
+
+    def save(self, *args, **kwargs):
+        """Synchronise is_staff / is_superuser avec user_type."""
+        if self.user_type == self.UserType.ADMIN:
+            self.is_superuser = True
+            self.is_staff = True
+        elif self.user_type == self.UserType.STAFF:
+            self.is_staff = True
+        else:
+            # MEMBER
+            if not self.pk:  # uniquement à la création
+                self.is_staff = False
+                self.is_superuser = False
+        super().save(*args, **kwargs)
+
+    @property
+    def is_admin(self) -> bool:
+        return self.user_type == self.UserType.ADMIN
+
+    @property
+    def is_cof_staff(self) -> bool:
+        return self.user_type == self.UserType.STAFF
+
+    @property
+    def is_member(self) -> bool:
+        return self.user_type == self.UserType.MEMBER

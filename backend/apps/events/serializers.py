@@ -28,3 +28,21 @@ class EventSerializer(serializers.ModelSerializer):
             "image",
         )
         read_only_fields = fields
+
+
+class EventWriteSerializer(serializers.ModelSerializer):
+    """Event en écriture pour les endpoints admin (POST/PUT/PATCH)."""
+
+    class Meta:
+        model = Event
+        fields = (
+            "name",
+            "slug",
+            "type",
+            "description",
+            "start_date",
+            "end_date",
+            "location_name",
+            "node",
+            "image",
+        )

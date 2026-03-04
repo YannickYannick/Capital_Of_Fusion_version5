@@ -54,4 +54,12 @@ Voir `docs/explication/donnees_demo.md` pour le détail.
 - `GET /api/courses/` — liste des cours actifs (filtres : `?style=`, `?level=`, `?node=`)
 - `GET /api/events/` — liste des événements (filtres : `?type=`, `?node=`, `?upcoming=1`)
 
-Voir `docs/bmad/03-api_docs.md` pour le détail.
+## API Administrateur (CRUD)
+
+Protégée par token (authentification) et `is_superuser`.
+- `POST`/`PATCH`/`DELETE` sur `/api/admin/events/`
+- `POST`/`PATCH`/`DELETE` sur `/api/admin/courses/` et `/api/admin/theory-lessons/`
+- `PATCH` sur `/api/admin/organization/nodes/`
+- Les projets gèrent aussi les permissions admin sur `/api/projects/projects/`
+
+Voir `docs/admin-content-management.md` pour le détail de l'architecture d'administration.

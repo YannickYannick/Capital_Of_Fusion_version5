@@ -1,12 +1,20 @@
 """
 Vues API Events — liste des événements avec filtres ; détail par slug.
+Vues admin — créer, modifier, supprimer (réservé is_superuser).
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from .models import Event
-from .serializers import EventSerializer
+from .serializers import EventSerializer, EventWriteSerializer
+
+
+def _require_admin(user):
+    """Retourne True si l'utilisateur est superuser, sinon lève 403."""
+    return user.is_authenticated and user.is_superuser
 
 
 class EventListAPIView(APIView):
@@ -49,3 +57,52 @@ class EventDetailAPIView(APIView):
         )
         serializer = EventSerializer(event)
         return Response(serializer.data)
+
+
+# ─── Admin views ──────────────────────────────────────────────────────────────
+
+class EventAdminAPIView(APIView):
+    """
+    POST /api/admin/events/
+    Créer un événement. Réservé aux superusers.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not _require_admin(request.user):
+            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
+        serializer = EventWriteSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save()
+            return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EventAdminDetailAPIView(APIView):
+    """
+    PATCH /api/admin/events/<slug>/  → modifier un événement.
+    DELETE /api/admin/events/<slug>/ → supprimer un événement.
+    Réservés aux superusers.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def _get_event(self, slug):
+        return get_object_or_404(Event, slug=slug)
+
+    def patch(self, request, slug):
+        if not _require_admin(request.user):
+            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
+        event = self._get_event(slug)
+        serializer = EventWriteSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            event = serializer.save()
+            return Response(EventSerializer(event).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, slug):
+        if not _require_admin(request.user):
+            return Response({"error": "Réservé aux administrateurs."}, status=status.HTTP_403_FORBIDDEN)
+        event = self._get_event(slug)
+        event.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+

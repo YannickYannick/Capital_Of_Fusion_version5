@@ -5,19 +5,30 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { login, loginWithGoogle, setStoredToken } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID ?? "";
 
 /**
- * Page Login — formulaire username/password + option « Se connecter avec Google ».
- * Stocke le token (identique pour les deux flux) et redirige vers l'accueil.
+ * Page Login — formulaire username/password + Google OAuth.
+ * Après connexion, redirige vers /dashboard.
  */
 export default function LoginPage() {
   const router = useRouter();
+  const { refresh } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const afterLogin = useCallback(
+    async (token: string) => {
+      setStoredToken(token);
+      await refresh(); // rehydrate AuthContext immédiatement
+      router.push("/dashboard");
+    },
+    [router, refresh]
+  );
 
   const handleGoogleSuccess = useCallback(
     async (idToken: string) => {
@@ -25,16 +36,14 @@ export default function LoginPage() {
       setLoading(true);
       try {
         const { token } = await loginWithGoogle(idToken);
-        setStoredToken(token);
-        router.push("/");
-        router.refresh();
+        await afterLogin(token);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Connexion Google échouée");
       } finally {
         setLoading(false);
       }
     },
-    [router]
+    [afterLogin]
   );
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,11 +52,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { token } = await login(username, password);
-      setStoredToken(token);
-      router.push("/");
-      router.refresh();
+      await afterLogin(token);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erreur de connexion");
+      setError(e instanceof Error ? e.message : "Identifiants incorrects");
     } finally {
       setLoading(false);
     }
@@ -56,47 +63,51 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold text-white text-center">
-          Connexion
-        </h1>
-        <p className="mt-2 text-white/70 text-center text-sm">
-          Accédez à votre espace Capital of Fusion.
-        </p>
+        {/* Logo / Titre */}
+        <div className="text-center mb-8">
+          <p className="text-purple-400 text-xs font-bold uppercase tracking-widest mb-2">
+            Capital of Fusion
+          </p>
+          <h1 className="text-3xl font-black text-white">Connexion</h1>
+          <p className="mt-2 text-white/50 text-sm">
+            Accédez à votre espace personnel.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <p className="text-red-400 text-sm" role="alert">
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm" role="alert">
               {error}
-            </p>
+            </div>
           )}
           <label className="block">
-            <span className="text-sm text-white/80">Identifiant</span>
+            <span className="text-sm text-white/70 font-medium">Identifiant</span>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
               autoComplete="username"
-              className="mt-1 w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="mt-1 w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white placeholder-white/30 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
               placeholder="Nom d'utilisateur"
             />
           </label>
           <label className="block">
-            <span className="text-sm text-white/80">Mot de passe</span>
+            <span className="text-sm text-white/70 font-medium">Mot de passe</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="mt-1 w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="mt-1 w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white placeholder-white/30 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
               placeholder="••••••••"
             />
           </label>
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold transition disabled:opacity-50 mt-2"
           >
             {loading ? "Connexion…" : "Se connecter"}
           </button>
@@ -104,7 +115,7 @@ export default function LoginPage() {
 
         {googleClientId && (
           <>
-            <p className="mt-6 text-center text-sm text-white/60">ou</p>
+            <p className="mt-6 text-center text-sm text-white/40">ou</p>
             <div className="mt-4 flex justify-center">
               <GoogleOAuthProvider clientId={googleClientId}>
                 <GoogleLogin
@@ -112,9 +123,7 @@ export default function LoginPage() {
                     const token = credentialResponse.credential;
                     if (token) handleGoogleSuccess(token);
                   }}
-                  onError={() =>
-                    setError("Connexion Google annulée ou indisponible")
-                  }
+                  onError={() => setError("Connexion Google annulée ou indisponible")}
                   theme="filled_black"
                   size="large"
                   text="continue_with"
@@ -125,11 +134,14 @@ export default function LoginPage() {
           </>
         )}
 
-        <p className="mt-6 text-center text-sm text-white/60">
-          <Link href="/" className="text-purple-300 hover:underline">
-            ← Retour à l&apos;accueil
+        <div className="mt-8 flex justify-between text-sm text-white/40">
+          <Link href="/" className="hover:text-white/70 transition">
+            ← Accueil
           </Link>
-        </p>
+          <Link href="/register" className="hover:text-purple-300 transition">
+            Créer un compte
+          </Link>
+        </div>
       </div>
     </div>
   );

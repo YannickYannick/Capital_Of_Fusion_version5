@@ -1,5 +1,5 @@
 """
-Vues API Users — auth (login/logout, Google OAuth) et utilisateur courant.
+Vues API Users — auth (login/logout, Google OAuth), utilisateur courant, et inscription.
 """
 import os
 from rest_framework import status
@@ -8,11 +8,12 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
+
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 from .models import User
-from .serializers import ArtistSerializer
+from .serializers import ArtistSerializer, RegisterSerializer
 
 
 class LoginAPIView(APIView):
@@ -36,6 +37,17 @@ class LoginAPIView(APIView):
             return Response(
                 {"error": "Identifiants incorrects"},
                 status=status.HTTP_401_UNAUTHORIZED,
+            )
+        # Bloquer les comptes en attente de validation
+        if getattr(user, "account_status", "APPROVED") == "PENDING":
+            return Response(
+                {"error": "Votre compte est en attente de validation par un administrateur."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if getattr(user, "account_status", "APPROVED") == "REJECTED":
+            return Response(
+                {"error": "Votre demande a été refusée. Contactez l'administration."},
+                status=status.HTTP_403_FORBIDDEN,
             )
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key})
@@ -123,7 +135,7 @@ class LogoutAPIView(APIView):
 class MeAPIView(APIView):
     """
     GET /api/auth/me/
-    Utilisateur courant (si authentifié).
+    Utilisateur courant avec rôle (ADMIN / STAFF / MEMBER).
     Header: Authorization: Token <key>
     """
     permission_classes = [IsAuthenticated]
@@ -137,6 +149,9 @@ class MeAPIView(APIView):
             "first_name": user.first_name or "",
             "last_name": user.last_name or "",
             "is_vibe": getattr(user, "is_vibe", False),
+            "user_type": getattr(user, "user_type", "MEMBER"),
+            "staff_role": getattr(user, "staff_role", "") or "",
+            "account_status": getattr(user, "account_status", "APPROVED"),
         })
 
 class ArtistListAPIView(APIView):
@@ -160,14 +175,103 @@ class ArtistDetailAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, username):
-        # Utilisation de filter().distinct().first() pour éviter MultipleObjectsReturned 
-        # si l'artiste a plusieurs professions (ex: Professeur + DJ)
         artist = User.objects.filter(username=username, professions__isnull=False).distinct().first()
         if artist:
             serializer = ArtistSerializer(artist, context={'request': request})
             return Response(serializer.data)
         else:
             return Response(
-                {"error": "Artiste non trouvé"}, 
+                {"error": "Artiste non trouvé"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+class RegisterAPIView(APIView):
+    """
+    POST /api/auth/register/
+    Création d'un compte Membre.
+    Body: { username, email, password, first_name?, last_name? }
+    Retourne un token d'auth directement après l'inscription.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = serializer.save()
+        is_pending = user.account_status == "PENDING"
+        # On ne retourne un token que si le compte est actif
+        token_key = None
+        if not is_pending:
+            token, _ = Token.objects.get_or_create(user=user)
+            token_key = token.key
+        return Response(
+            {
+                "token": token_key,
+                "account_status": user.account_status,
+                "user": {
+                    "id": str(user.pk),
+                    "username": user.username,
+                    "email": user.email,
+                    "user_type": user.user_type,
+                },
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class PendingStaffAPIView(APIView):
+    """
+    GET  /api/auth/pending-staff/  → liste des comptes Staff en attente (Admin only).
+    PATCH /api/auth/pending-staff/<id>/ → approuver ou refuser (Admin only).
+    Body PATCH: { "action": "approve" | "reject" }
+    """
+    permission_classes = [IsAuthenticated]
+
+    def _require_admin(self, user):
+        if not getattr(user, "is_superuser", False):
+            return Response(
+                {"error": "Réservé aux administrateurs."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return None
+
+    def get(self, request):
+        err = self._require_admin(request.user)
+        if err:
+            return err
+        pending = User.objects.filter(user_type="STAFF", account_status="PENDING")
+        data = [
+            {
+                "id": u.pk,
+                "username": u.username,
+                "email": u.email,
+                "first_name": u.first_name,
+                "last_name": u.last_name,
+                "staff_role": u.staff_role,
+                "date_joined": u.date_joined,
+            }
+            for u in pending
+        ]
+        return Response(data)
+
+    def patch(self, request, user_id):
+        err = self._require_admin(request.user)
+        if err:
+            return err
+        action = request.data.get("action")  # "approve" | "reject"
+        try:
+            user = User.objects.get(pk=user_id, user_type="STAFF")
+        except User.DoesNotExist:
+            return Response({"error": "Utilisateur introuvable."}, status=status.HTTP_404_NOT_FOUND)
+        if action == "approve":
+            user.account_status = "APPROVED"
+            user.is_active = True
+            user.save()
+            return Response({"status": "approved", "username": user.username})
+        elif action == "reject":
+            user.account_status = "REJECTED"
+            user.save()
+            return Response({"status": "rejected", "username": user.username})
+        return Response({"error": "action doit être 'approve' ou 'reject'."}, status=status.HTTP_400_BAD_REQUEST)

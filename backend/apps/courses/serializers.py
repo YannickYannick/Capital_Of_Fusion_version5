@@ -31,6 +31,24 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class CourseWriteSerializer(serializers.ModelSerializer):
+    """Course en écriture pour les endpoints admin (POST/PATCH)."""
+
+    class Meta:
+        model = Course
+        fields = (
+            "name",
+            "slug",
+            "description",
+            "style",
+            "level",
+            "node",
+            "is_active",
+            "image",
+            "teachers",
+        )
+
+
 class TheoryLessonSerializer(serializers.ModelSerializer):
     """TheoryLesson en lecture seule pour GET /api/courses/theory/."""
 
@@ -53,3 +71,20 @@ class TheoryLessonSerializer(serializers.ModelSerializer):
             "is_active",
         )
         read_only_fields = fields
+
+
+class TheoryLessonWriteSerializer(serializers.ModelSerializer):
+    """TheoryLesson en écriture pour les endpoints admin (POST/PATCH)."""
+
+    class Meta:
+        model = TheoryLesson
+        fields = (
+            "title",
+            "slug",
+            "category",
+            "level",
+            "content",
+            "video_url",
+            "duration_minutes",
+            "is_active",
+        )

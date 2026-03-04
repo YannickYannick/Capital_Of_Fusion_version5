@@ -59,10 +59,11 @@ def seed_database(request):
         from django.core.management import call_command
         from io import StringIO
         out = StringIO()
-        call_command('seed_nodes', stdout=out)
-        results['seed_nodes'] = out.getvalue().strip()
+        call_command('load_initial_data', stdout=out)
+        call_command('load_demo_data', stdout=out)
+        results['seed_data'] = out.getvalue().strip()
     except Exception as e:
-        results['seed_nodes'] = f"Error: {str(e)}"
+        results['seed_data'] = f"Error: {str(e)}"
 
     # 2. Create admin superuser
     try:

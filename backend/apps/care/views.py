@@ -1,11 +1,12 @@
 from rest_framework import viewsets
-from .models import Practitioner, CareService
-from .serializers import PractitionerSerializer, CareServiceSerializer
+from rest_framework.permissions import AllowAny
 
-class PractitionerViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Practitioner.objects.all()
-    serializer_class = PractitionerSerializer
 
-class CareServiceViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CareService.objects.all()
-    serializer_class = CareServiceSerializer
+class PractitionerViewSet(viewsets.GenericViewSet):
+    queryset = []
+    permission_classes = [AllowAny]
+
+
+class CareServiceViewSet(viewsets.GenericViewSet):
+    queryset = []
+    permission_classes = [AllowAny]
