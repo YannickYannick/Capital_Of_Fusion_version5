@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem
+from .models import DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem, ExplorePreset
 
 
 @admin.register(DanceStyle)
@@ -7,6 +7,7 @@ class DanceStyleAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "parent")
     prepopulated_fields = {"slug": ("name",)}
     list_filter = ("parent",)
+    search_fields = ("name",)
 
 
 @admin.register(Level)
@@ -22,22 +23,18 @@ class DanceProfessionAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
 
+@admin.register(ExplorePreset)
+class ExplorePresetAdmin(admin.ModelAdmin):
+    list_display = ("name", "global_planet_scale", "global_orbit_speed", "vertical_mode")
+
 @admin.register(SiteConfiguration)
 class SiteConfigurationAdmin(admin.ModelAdmin):
     list_display = ("site_name", "hero_title", "updated_at")
-    
     fieldsets = (
-        ("Informations Générales", {
-            "fields": ("site_name", "hero_title", "hero_subtitle")
-        }),
-        ("Vidéo Principale (Accueil)", {
-            "fields": ("main_video_type", "main_video_youtube_id", "main_video_file"),
-            "description": "Choisissez YouTube pour une vidéo hébergée ou MP4 pour une vidéo native en 1080p/4K."
-        }),
-        ("Vidéo Cyclique (Apparition aléatoire)", {
-            "fields": ("cycle_video_type", "cycle_video_youtube_id", "cycle_video_file"),
-            "description": "Vidéo secondaire qui apparaît de temps en temps par-dessus."
-        }),
+        ("Général", {"fields": ("site_name", "hero_title", "hero_subtitle")}),
+        ("Explore 3D", {"fields": ("active_explore_preset",)}),
+        ("Vidéo Accueil", {"fields": ("main_video_type", "main_video_youtube_id", "main_video_file")}),
+        ("Vidéo Cycle", {"fields": ("cycle_video_type", "cycle_video_youtube_id", "cycle_video_file")}),
     )
 
 

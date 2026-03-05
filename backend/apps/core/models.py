@@ -81,33 +81,80 @@ class DanceProfession(BaseModel):
         return self.name
 
 
-class SiteConfiguration(models.Model):
-    """
-    Configuration singleton du site (hero, nom, etc.).
-    Une seule instance (pk=1) utilisée pour les réglages globaux.
-    """
+class ExplorePreset(BaseModel):
+    name = models.CharField(max_length=255, default="Default Preset")
+    show_orbits = models.BooleanField(default=True)
+    freeze_planets = models.BooleanField(default=False)
+    show_debug_info = models.BooleanField(default=False)
+    fish_eye = models.FloatField(default=85)
+    light_config = models.JSONField(default=dict, blank=True)
+    orbit_spacing = models.FloatField(default=1)
+    global_planet_scale = models.FloatField(default=2.7)
+    global_shape_override = models.BooleanField(default=False)
+    orbit_shape = models.CharField(max_length=50, default="circle")
+    orbit_roundness = models.FloatField(default=0.6)
+    mouse_force = models.FloatField(default=0.5)
+    collision_force = models.FloatField(default=0.3)
+    damping = models.FloatField(default=0.92)
+    return_force = models.FloatField(default=0.08)
+    entry_stagger = models.FloatField(default=0)
+    entry_start_x = models.FloatField(default=-60)
+    entry_start_y = models.FloatField(default=0)
+    entry_start_z = models.FloatField(null=True, blank=True)
+    entry_speed_start = models.FloatField(default=2)
+    entry_speed_end = models.FloatField(default=8)
+    entry_easing = models.CharField(max_length=50, default="easeOut")
+    entry_duration = models.FloatField(default=3.5)
+    entry_trajectory = models.CharField(max_length=50, default="fan")
+    fan_distance = models.FloatField(default=30)
+    orbit_speed_start = models.FloatField(default=0)
+    orbit_speed_target = models.FloatField(default=0.5)
+    orbit_easing = models.CharField(max_length=50, default="easeOut")
+    orbital_ramp_duration = models.FloatField(default=0)
+    global_orbit_speed = models.FloatField(default=0.5)
+    grayscale_video = models.BooleanField(default=False)
+    enable_video_cycle = models.BooleanField(default=True)
+    video_cycle_visible = models.FloatField(default=10)
+    video_cycle_hidden = models.FloatField(default=10)
+    video_transition = models.IntegerField(default=1500)
+    show_video_overlay = models.BooleanField(default=False)
+    show_entry_trajectory = models.BooleanField(default=False)
+    vertical_mode = models.CharField(max_length=50, default="jupiter")
+    auto_distribute_orbits = models.BooleanField(default=True)
+    vertical_homogeneous_base = models.FloatField(default=5)
+    vertical_homogeneous_step = models.FloatField(default=20)
+    vertical_jupiter_amplitude = models.FloatField(default=30)
+    vertical_sphere_radius = models.FloatField(default=30)
+    hover_orbit_speed_ratio = models.FloatField(default=0.333)
+    hover_planet_speed_ratio = models.FloatField(default=0.1)
+    hover_orbit_transition_speed = models.FloatField(default=2)
+    hover_planet_transition_speed = models.FloatField(default=10)
+    is_transitioning_to_explore = models.BooleanField(default=False)
+    auto_reset_camera = models.BooleanField(default=False)
+    auto_reset_delay = models.FloatField(default=5)
 
+    class Meta:
+        verbose_name = "Preset Explore 3D"
+        verbose_name_plural = "Presets Explore 3D"
+    def __str__(self): return self.name
+
+class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=255, blank=True)
     hero_title = models.CharField(max_length=255, blank=True)
     hero_subtitle = models.TextField(blank=True)
-    # Remplacé par les nouveaux champs avancés
-    # hero_video_url = models.URLField(blank=True)
-
-    # Paramètres de la vidéo principale
-    VIDEO_CHOICES = (
-        ('youtube', 'Vidéo YouTube'),
-        ('mp4', 'Fichier Local (MP4)'),
-    )
-    main_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube', verbose_name="Type Vidéo Principale")
-    main_video_youtube_id = models.CharField(max_length=50, blank=True, default="Dqg0oKlXpTE", verbose_name="ID YouTube Principale")
-    main_video_file = models.FileField(upload_to='videos/', blank=True, null=True, verbose_name="Fichier MP4 Principale")
-
-    # Paramètres de la vidéo cyclique
-    cycle_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube', verbose_name="Type Vidéo Cycle")
-    cycle_video_youtube_id = models.CharField(max_length=50, blank=True, default="eZhq_RMYRKQ", verbose_name="ID YouTube Cycle")
-    cycle_video_file = models.FileField(upload_to='videos/', blank=True, null=True, verbose_name="Fichier MP4 Cycle")
-
+    active_explore_preset = models.ForeignKey(ExplorePreset, on_delete=models.SET_NULL, null=True, blank=True)
+    VIDEO_CHOICES = (('youtube', 'Vidéo YouTube'), ('mp4', 'Fichier Local (MP4)'))
+    main_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube')
+    main_video_youtube_id = models.CharField(max_length=50, blank=True, default="Dqg0oKlXpTE")
+    main_video_file = models.FileField(upload_to='videos/', blank=True, null=True)
+    cycle_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube')
+    cycle_video_youtube_id = models.CharField(max_length=50, blank=True, default="eZhq_RMYRKQ")
+    cycle_video_file = models.FileField(upload_to='videos/', blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = "Configuration du site"
