@@ -1,9 +1,8 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
-class IsSuperUser(BasePermission):
+class IsSuperUser(permissions.BasePermission):
     """
-    Allows access only to superusers.
+    Permission permettant l'accès uniquement aux superutilisateurs.
     """
-
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_superuser)

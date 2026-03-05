@@ -56,35 +56,17 @@ class Command(BaseCommand):
                 {"name": "Sessions libres", "slug": "trainings-sessions", "url": "/trainings/sessions/", "order": 1},
                 {"name": "Organisation adhérents", "slug": "trainings-adherents", "url": "/trainings/adherents/", "order": 2},
             ]},
-            {"name": "Artistes", "slug": "artistes", "url": "/artistes/", "order": 7, "children": [
-                {"name": "Annuaire", "slug": "artistes-annuaire", "url": "/artistes/annuaire/", "order": 1},
-                {"name": "Profils & Bios", "slug": "artistes-profils", "url": "/artistes/profils/", "order": 2},
-                {"name": "Booking", "slug": "artistes-booking", "url": "/artistes/booking/", "order": 3},
-                {"name": "Avis & Notes", "slug": "artistes-avis", "url": "/artistes/avis/", "order": 4},
-            ]},
-            {"name": "Théorie", "slug": "theorie", "url": "/theorie/", "order": 8, "children": [
-                {"name": "Cours théoriques", "slug": "theorie-cours", "url": "/theorie/cours/", "order": 1},
-                {"name": "Quiz de connaissances", "slug": "theorie-quiz", "url": "/theorie/quiz/", "order": 2},
-                {"name": "Suivi de progression", "slug": "theorie-progression", "url": "/theorie/progression/", "order": 3},
-            ]},
-            {"name": "Care", "slug": "care", "url": "/care/", "order": 9, "children": [
-                {"name": "Soins & Récupération", "slug": "care-soins", "url": "/care/soins/", "order": 1},
-                {"name": "Nos Praticiens", "slug": "care-praticiens", "url": "/care/praticiens/", "order": 2},
-                {"name": "Réservation", "slug": "care-reservation", "url": "/care/reservation/", "order": 3},
-            ]},
-            {"name": "Shop", "slug": "shop", "url": "/shop/", "order": 10, "children": [
-                {"name": "Pulls & Sweats", "slug": "shop-pulls", "url": "/shop/pulls/", "order": 1},
-                {"name": "T-shirts", "slug": "shop-tshirts", "url": "/shop/tshirts/", "order": 2},
-                {"name": "Chaussures", "slug": "shop-chaussures", "url": "/shop/chaussures/", "order": 3},
-                {"name": "Vins & Spiritueux", "slug": "shop-vins", "url": "/shop/vins/", "order": 4},
-            ]},
-            {"name": "Projets", "slug": "projets", "url": "/projets/", "order": 11, "children": [
-                {"name": "Programme d'incubation", "slug": "projets-incubation", "url": "/projets/incubation/", "order": 1},
-                {"name": "Autres initiatives", "slug": "projets-initiatives", "url": "/projets/initiatives/", "order": 2},
+            {"name": "Autre", "slug": "autre", "url": "#", "order": 11, "children": [
+                {"name": "Théorie", "slug": "theorie", "url": "/theorie/", "order": 1},
+                {"name": "Care", "slug": "care", "url": "/care/", "order": 2},
+                {"name": "Shop", "slug": "shop", "url": "/shop/", "order": 3},
+                {"name": "Projets", "slug": "projets", "url": "/projets/", "order": 4},
             ]},
             {"name": "Organisation", "slug": "organisation", "url": "/organisation/", "order": 12, "children": [
-                {"name": "Structure", "slug": "orga-structure", "url": "/organisation/structure/", "order": 1},
-                {"name": "Pôles", "slug": "orga-poles", "url": "/organisation/poles/", "order": 2},
+                {"name": "Nos artistes", "slug": "artistes-annuaire", "url": "/artistes/", "order": 1},
+                {"name": "notre structure", "slug": "orga-structure", "url": "/organisation/structure/", "order": 2},
+                {"name": "nos poles", "slug": "orga-poles", "url": "/organisation/poles/", "order": 3},
+                {"name": "Notre Staff", "slug": "orga-staff", "url": "/organisation/staff/", "order": 4},
             ]},
             {"name": "DB", "slug": "db", "url": "http://localhost:8000/admin/", "order": 13, "children": [
                 {"name": "Accès au schéma de la base de données", "slug": "db-access", "url": "http://localhost:8000/admin/", "order": 1},

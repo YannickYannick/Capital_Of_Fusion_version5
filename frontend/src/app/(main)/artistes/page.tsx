@@ -1,93 +1,82 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
 import { getArtists } from "@/lib/api";
+import { ArtistCard } from "@/components/features/artists/ArtistCard";
+import type { ArtistApi } from "@/types/user";
+import { motion } from "framer-motion";
 
-const CATEGORIES = [
-  {
-    key: "annuaire",
-    label: "Annuaire",
-    icon: "🎭",
-    description: "Découvrez tous nos professeurs, danseurs et DJs partenaires.",
-    href: "/artistes/annuaire",
-    gradient: "from-purple-600/30 to-fuchsia-700/20",
-    border: "border-purple-500/30",
-    glow: "hover:shadow-purple-500/20",
-    badge: "bg-purple-500/20 text-purple-300",
-  },
-  {
-    key: "profils",
-    label: "Profils & Bios",
-    icon: "👤",
-    description: "Parcourez les expériences, palmarès et styles de nos artistes.",
-    href: "/artistes/profils",
-    gradient: "from-blue-600/30 to-indigo-700/20",
-    border: "border-blue-500/30",
-    glow: "hover:shadow-blue-500/20",
-    badge: "bg-blue-500/20 text-blue-300",
-  },
-  {
-    key: "booking",
-    label: "Demandes de Booking",
-    icon: "📅",
-    description: "Invitez nos artistes pour vos propres événements et festivals.",
-    href: "/artistes/booking",
-    gradient: "from-emerald-600/30 to-green-700/20",
-    border: "border-emerald-500/30",
-    glow: "hover:shadow-emerald-500/20",
-    badge: "bg-emerald-500/20 text-emerald-300",
-  },
-  {
-    key: "avis",
-    label: "Avis & Notes",
-    icon: "⭐",
-    description: "Lisez les retours d'expérience de nos élèves et organisateurs.",
-    href: "/artistes/avis",
-    gradient: "from-amber-600/30 to-orange-700/20",
-    border: "border-amber-500/30",
-    glow: "hover:shadow-amber-500/20",
-    badge: "bg-amber-500/20 text-amber-300",
-  },
-];
+/**
+ * Page /artistes — Hub des artistes.
+ * Affiche la liste des professeurs, DJs et autres professionnels de la danse.
+ */
+export default function ArtistesPage() {
+    const [artists, setArtists] = useState<ArtistApi[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-export default async function ArtistesPage() {
-  let artistsCount = 0;
-  try {
-    const list = await getArtists();
-    artistsCount = list.length;
-  } catch { }
+    useEffect(() => {
+        getArtists()
+            .then(setArtists)
+            .catch((err) => setError("Impossible de charger les artistes."))
+            .finally(() => setLoading(false));
+    }, []);
 
-  return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Notre Écosystème</p>
-          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4">
-            Nos <span className="bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">Artistes</span>
-          </h1>
-          <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            Retrouvez les professeurs, danseurs talentueux et ambassadeurs qui font vibrer Capital of Fusion au quotidien.
-          </p>
+    return (
+        <div className="min-h-screen bg-black text-white py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <header className="mb-12 text-center">
+                    <motion.h1
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-4xl md:text-6xl font-black mb-4 tracking-tighter"
+                    >
+                        Nos Artistes
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-white/60 text-lg max-w-2xl mx-auto"
+                    >
+                        Découvrez les talents qui font vibrer la scène Bachata, Salsa et Kizomba.
+                        Professeurs de renommée, DJs passionnés et créatifs inspirants.
+                    </motion.p>
+                </header>
+
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                ) : error ? (
+                    <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
+                        <p className="text-red-400 mb-4">{error}</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full transition"
+                        >
+                            Réessayer
+                        </button>
+                    </div>
+                ) : artists.length === 0 ? (
+                    <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
+                        <p className="text-white/40 italic">Aucun artiste n'est disponible pour le moment.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        {artists.map((artist, idx) => (
+                            <motion.div
+                                key={artist.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.05 }}
+                            >
+                                <ArtistCard artist={artist} />
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
-        <div className="flex justify-center gap-6 mb-12">
-          <div className="bg-white/5 border border-white/10 rounded-2xl px-8 py-4 text-center backdrop-blur-md">
-            <p className="text-3xl font-black text-white">{artistsCount || "—"}</p>
-            <p className="text-white/50 text-xs mt-1">Artistes Référencés</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {CATEGORIES.map((cat) => (
-            <Link key={cat.key} href={cat.href} className={`group relative bg-gradient-to-br ${cat.gradient} border ${cat.border} rounded-3xl p-8 backdrop-blur-md hover:-translate-y-1 hover:shadow-2xl ${cat.glow} transition-all duration-300`}>
-              <div className="flex items-start gap-5">
-                <div className="text-5xl shrink-0 group-hover:scale-110 transition-transform duration-300">{cat.icon}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2"><h2 className="text-2xl font-bold text-white">{cat.label}</h2></div>
-                  <p className="text-white/60 text-sm leading-relaxed">{cat.description}</p>
-                  <div className="mt-4 flex items-center text-white/50 text-sm group-hover:text-white/80 transition-colors">Découvrir →</div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+    );
 }

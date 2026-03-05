@@ -101,3 +101,22 @@ Before responding "I have finished", you must self-audit:
 2.  **🕵️‍♂️ Investigation:** What was tried? Why did it fail?
 3.  **✅ The Solution:** The exact fix applied.
 4.  **🧠 Post-Mortem:** How do we prevent this in the future?
+
+---
+
+## 6. 📜 BONNES PRATIQUES & WORKSPACE (WINDOWS)
+
+**CRITICAL RULE:** Before executing any build or Git command, the agent must verify the context.
+
+* **Workspace Check:**
+  * For **Frontend** (Next.js): You MUST be in `./frontend/`.
+  * For **Backend** (Django): You MUST be in `./backend/`.
+  * **Action:** Use `ls` to confirm `package.json` (frontend) or `manage.py` (backend) before running scripts.
+
+* **Git Security (Anti-Lock):**
+  * **Small Commits:** Commit after every technical unit (e.g., 1 model, 1 view). Max 5-10 files per commit.
+  * **Safe Add:** Use `git add <file>` or `git add .` + `git status` to verify there are no accidental "deleted" markers before committing.
+  * **Lock Management:** If `index.lock` is detected, stop all processes and delete it manually via `cmd /c "del /F /Q .git\index.lock"`.
+
+* **Reference Documentation:**
+  * Consult `./docs/bonnes_pratiques/` before any major architectural or workflow change.

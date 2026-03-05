@@ -4,9 +4,9 @@ from .models import SubscriptionPass, TrainingSession
 class SubscriptionPassSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubscriptionPass
-        fields = ['id', 'name', 'description', 'price', 'validity_months', 'stripe_payment_url']
+        fields = '__all__'
 
 class TrainingSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainingSession
-        fields = ['id', 'theme', 'date', 'location', 'available_spots', 'is_active']
+        fields = '__all__'

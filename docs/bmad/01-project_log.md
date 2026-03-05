@@ -67,7 +67,10 @@
 | [2026-02-21 16:22] Completed Task | Explore 3D — Finalisation (Phase 3.1) | Rendu des planètes affiné (matériaux standard avec rugosité, lumières revues), composant d'UI passés en Glassmorphism (panneau d'options, tooltip). Overlay connecté aux requêtes contextuelles `/cours?organization=ID`. Verification visuelle effectuée. |
 | [2026-02-21 16:34] Starting Task | Phase 2 — Squelettes Routing & Menus | Objectif : Implémenter toute la structure de routes V5 telle que décrite dans `04-maquettes_ui_jour.md`. |
 | [2026-02-21 16:38] Completed Task | Phase 2 — Squelettes Routing & Menus | Backend : Mise à jour du script `load_initial_data` pour peupler récursivement +14 entrées et leurs sous-menus. Frontend : Script python utilisé pour générer 32 pages squelettes (Formations, Théorie, Artistes, Shop, etc.) dans `app/(main)`, adaptation de `Navbar.tsx` en `xl` pour les grands menus. Commits validés. |
+| [2026-03-05 21:00] Starting Task | Application Artistes & Config 3D | Intégration complète : backend (models, views), frontend (annuaire, profils) et système de presets 3D Explore. |
+| [2026-03-05 22:15] Incident Git | Verrou index.lock & Data Loss | Bug Git sur Windows entraînant la suppression temporaire de fichiers. Restauration manuelle effectuée par l'agent AI. |
+| [2026-03-05 22:30] Completed Task | Application Artistes & Config 3D | Succès du push forcé sur `main`. Preset 1 initialisé, artistes démo chargés, 3D fonctionnelle avec réglages Admin. |
+| [2026-03-05 22:50] Starting Task | Bonnes Pratiques & Workflow | Création `docs/bonnes_pratiques/`, rédaction post-mortem incident Git dans `docs/bugs/`, mise à jour `.cursorrules` (Section 6). |
+| [2026-03-05 23:05] Completed Task | Bonnes Pratiques & Workflow | Documentation structurée, règles BMAD mises à jour pour prévenir les verrous Git et erreurs de workspace sur Windows. |
 
----
-
-*Dernière mise à jour : 2026-02-10*
+*Dernière mise à jour : 2026-03-05*

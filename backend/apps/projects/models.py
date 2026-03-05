@@ -1,32 +1,21 @@
 from django.db import models
-from apps.core.models import BaseModel
+import uuid
 
-class ProjectCategory(BaseModel):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
+class ProjectCategory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.title
 
-class Project(BaseModel):
-    STATUS_CHOICES = [
-        ("IN_PROGRESS", "En cours"),
-        ("UPCOMING", "À venir"),
-        ("COMPLETED", "Terminé"),
-    ]
-
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique=True)
-    category = models.ForeignKey(ProjectCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="projects")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="IN_PROGRESS")
-    summary = models.TextField(blank=True)
-    content = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    cover_image = models.URLField(blank=True, max_length=500)
-
-    class Meta:
-        ordering = ['-start_date']
+class Project(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    category = models.ForeignKey(ProjectCategory, related_name='projects', on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    image = models.ImageField(upload_to='projects/', blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.title
