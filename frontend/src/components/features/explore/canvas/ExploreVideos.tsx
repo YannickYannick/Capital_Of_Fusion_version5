@@ -115,14 +115,30 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     useEffect(() => {
         if (mainType !== 'youtube' && cycleType !== 'youtube') return;
         if (typeof window === "undefined") return;
-        if (window.YT?.Player) { setApiReady(true); return; }
-        if (document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) return;
 
-        const tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-        window.onYouTubeIframeAPIReady = () => setApiReady(true);
-        return () => { window.onYouTubeIframeAPIReady = undefined; };
+        // Si l'API est déjà dispo
+        if (window.YT?.Player) {
+            setApiReady(true);
+            return;
+        }
+
+        // On vérifie régulièrement si YT API devient disponible (robuste au fast refresh et React Strict Mode)
+        const interval = setInterval(() => {
+            if (window.YT?.Player) {
+                setApiReady(true);
+                clearInterval(interval);
+            }
+        }, 100);
+
+        // Ajout du script seulement s'il n'existe pas
+        if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+            const tag = document.createElement("script");
+            tag.src = "https://www.youtube.com/iframe_api";
+            document.head.appendChild(tag);
+        }
+
+        // Nettoyage de l'intervalle si le composant est démonté
+        return () => clearInterval(interval);
     }, [mainType, cycleType]);
 
     // Visibilité du cycle
