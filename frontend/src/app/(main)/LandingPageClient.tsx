@@ -1,91 +1,83 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getSiteConfig } from "@/lib/api";
-import type { SiteConfigurationApi } from "@/types/config";
+import { motion } from "framer-motion";
+import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 
-/**
- * LandingPageClient — Version restaurée et améliorée.
- * Interface premium avec Hero immersif, CTA Explore 3D et navigation rapide.
- */
 export default function LandingPageClient() {
-    const [config, setConfig] = useState<SiteConfigurationApi | null>(null);
+    const router = useRouter();
+    const opts = usePlanetsOptions();
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
-    useEffect(() => {
-        getSiteConfig().then(setConfig).catch(() => null);
-    }, []);
+    const handleStartPushed = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        setIsTransitioning(true);
+        // Déclenche le cycle fondu dans la GlobalVideoBackground (gérée dans layout.tsx)
+        opts.set("isTransitioningToExplore", true);
 
-    const heroTitle = config?.hero_title || "Capital of Fusion";
-    const heroSubtitle = config?.hero_subtitle || "L'école nationale de danse. Explorez la Bachata, la Salsa et la Kizomba dans une expérience 3D unique.";
+        // Délai pour laisser le temps au fondu vidéo paramétré dans GlobalVideoBackground (1.5s)
+        setTimeout(() => {
+            router.push("/explore");
+        }, 1500);
+    };
 
     return (
-        <div className="relative min-h-[calc(100vh-64px)] flex flex-col items-center justify-center text-white px-4">
-            {/* Hero Section Content */}
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-center max-w-4xl z-10"
-            >
-                <motion.h1
-                    className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40"
-                    initial={{ scale: 0.95 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                >
-                    {heroTitle}
-                </motion.h1>
+        <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
+            {/* Le fond vidéo principal est maintenant géré globalement dans layout.tsx (GlobalVideoBackground) */}
 
-                <motion.p
-                    className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                >
-                    {heroSubtitle}
-                </motion.p>
+            {/* Le voile dégradé de la page d'accueil - peut être toggle par l'overlay global si on le souhaite, 
+                mais on le garde local à la homepage pour l'instant sauf si opts le masque */}
+            {opts.showVideoOverlay && (
+                <div
+                    className="absolute inset-0 bg-gradient-to-b from-[#0a0e27] via-[#0a0e27]/60 to-transparent pointer-events-none"
+                    aria-hidden
+                />
+            )}
 
-                <motion.div
-                    className="flex flex-col sm:flex-row items-center justify-center gap-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                    <Link
+            <section className="relative z-10 max-w-3xl mx-auto text-center">
+                <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
+                    Nouvelle Version Immersive
+                </p>
+                <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-200 bg-clip-text text-transparent">
+                    Capital of Fusion
+                </h1>
+                <p className="mt-6 text-lg sm:text-xl text-white/85 leading-relaxed">
+                    Découvrez l&apos;univers de la Bachata comme jamais.
+                    <br />
+                    Une expérience interactive en 3D au cœur de la danse.
+                </p>
+
+                <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a
                         href="/explore"
-                        className="group relative px-8 py-4 bg-white text-black font-bold rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95"
+                        onClick={handleStartPushed}
+                        className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition cursor-pointer relative overflow-hidden group"
                     >
-                        <span className="relative z-10">Lancer l'Expérience 3D</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity" />
-                    </Link>
-
+                        <span className="relative z-10">Commencer l&apos;Expérience</span>
+                        {isTransitioning && (
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: "100%" }}
+                                transition={{ duration: 1.5, ease: "linear" }}
+                                className="absolute inset-0 bg-purple-400/30 z-0"
+                            />
+                        )}
+                    </a>
                     <Link
                         href="/cours"
-                        className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white font-bold rounded-full transition-all hover:scale-105 active:scale-95"
+                        className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition"
                     >
                         Voir les Cours
                     </Link>
-                </motion.div>
-            </motion.div>
+                </div>
 
-            {/* Floating Elements / Decorative */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-1/4 -left-20 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "1s" }} />
-            </div>
+                <p className="mt-8 text-sm text-white/50">
+                    Paris, France • École Nationale de Danse
+                </p>
+            </section>
 
-            {/* Bottom Hint */}
-            <motion.div
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/30 flex flex-col items-center gap-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 1 }}
-            >
-                <span className="text-[10px] uppercase tracking-widest font-medium">Scroll pour en découvrir plus</span>
-                <div className="w-px h-12 bg-gradient-to-b from-white/20 to-transparent" />
-            </motion.div>
         </div>
     );
 }
