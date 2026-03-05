@@ -1,10 +1,18 @@
 from rest_framework import viewsets
-from rest_framework.response import Response
+from apps.core.permissions import IsSuperUser
+from .models import SubscriptionPass, TrainingSession
+from .serializers import SubscriptionPassSerializer, TrainingSessionSerializer
 
-class SubscriptionPassViewSet(viewsets.ViewSet):
-    def list(self, request):
-        return Response([])
+class BaseViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsSuperUser()]
+        return []
 
-class TrainingSessionViewSet(viewsets.ViewSet):
-    def list(self, request):
-        return Response([])
+class SubscriptionPassViewSet(BaseViewSet):
+    queryset = SubscriptionPass.objects.all()
+    serializer_class = SubscriptionPassSerializer
+
+class TrainingSessionViewSet(BaseViewSet):
+    queryset = TrainingSession.objects.all()
+    serializer_class = TrainingSessionSerializer

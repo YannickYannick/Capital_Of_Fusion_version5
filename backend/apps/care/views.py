@@ -1,10 +1,18 @@
 from rest_framework import viewsets
-from rest_framework.response import Response
+from apps.core.permissions import IsSuperUser
+from .models import Practitioner, CareService
+from .serializers import PractitionerSerializer, CareServiceSerializer
 
-class PractitionerViewSet(viewsets.ViewSet):
-    def list(self, request):
-        return Response([])
+class BaseViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsSuperUser()]
+        return []
 
-class CareServiceViewSet(viewsets.ViewSet):
-    def list(self, request):
-        return Response([])
+class PractitionerViewSet(BaseViewSet):
+    queryset = Practitioner.objects.all()
+    serializer_class = PractitionerSerializer
+
+class CareServiceViewSet(BaseViewSet):
+    queryset = CareService.objects.select_related('practitioner')
+    serializer_class = CareServiceSerializer
