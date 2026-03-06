@@ -1,5 +1,5 @@
 import { getArtists } from "@/lib/api";
-import { ArtistCard } from "@/components/features/artists/ArtistCard";
+import ArtistCard from "@/components/features/artists/ArtistCard";
 
 export default async function AnnuairePage() {
     let artists = [];

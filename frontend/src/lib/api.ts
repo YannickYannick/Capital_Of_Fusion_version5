@@ -239,6 +239,9 @@ export async function getArtistByUsername(username: string): Promise<ArtistApi> 
   return res.json();
 }
 
+/** Alias pour la compatibilité avec certaines pages */
+export const getArtistBySlug = getArtistByUsername;
+
 /** Query params pour la liste des leçons de théorie */
 export interface TheoryQuery {
   category?: string;
