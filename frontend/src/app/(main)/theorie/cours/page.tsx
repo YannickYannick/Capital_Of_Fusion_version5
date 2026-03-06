@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { getTheoryLessons } from "@/lib/api";
 import { createTheoryLesson, updateTheoryLesson, deleteTheoryLesson } from "@/lib/adminApi";
 import type { TheoryLessonApi } from "@/types/course";
@@ -152,12 +152,11 @@ function LessonCard({ lesson, onEdit }: { lesson: TheoryLessonApi, onEdit: () =>
   );
 }
 
-export default function TheorieCoursPage({
-  searchParams,
-}: {
-  searchParams?: { category?: string };
+export default function TheorieCoursPage(props: {
+  searchParams: Promise<{ category?: string }>;
 }) {
-  const category = searchParams?.category;
+  const searchParams = use(props.searchParams);
+  const category = searchParams.category;
   const [lessons, setLessons] = useState<TheoryLessonApi[]>([]);
   const [loading, setLoading] = useState(true);
 
