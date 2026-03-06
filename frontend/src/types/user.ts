@@ -24,5 +24,6 @@ export interface ArtistApi {
     profile_picture: string | null;
     professions: DanceProfessionApi[];
     dance_level: LevelPublicApi | null;
+    is_staff_member: boolean;
     is_vibe: boolean;
 }

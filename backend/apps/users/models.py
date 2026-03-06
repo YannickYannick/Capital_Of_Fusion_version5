@@ -64,6 +64,11 @@ class User(AbstractUser):
         related_name="users",
     )
     is_vibe = models.BooleanField(default=False)
+    is_staff_member = models.BooleanField(
+        default=False,
+        verbose_name="Membre du staff Capital of Fusion",
+        help_text="Cocher si cet artiste fait partie de l'équipe officielle CoF."
+    )
     professions = models.ManyToManyField(
         "core.DanceProfession",
         related_name="users",

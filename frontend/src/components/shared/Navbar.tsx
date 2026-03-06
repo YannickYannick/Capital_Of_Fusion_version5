@@ -38,15 +38,7 @@ export function Navbar() {
   const links = menuError || !menuItems?.length
     ? [
       {
-        href: "/explore", label: "Explore 3D", children: [] as MenuItemApi[]
-      },
-      {
-        href: "/cours", label: "Cours", children: [
-          { id: "c1", name: "Liste & Planning", url: "/cours/planning/" },
-          { id: "c2", name: "Filtres (Ville, Niveau)", url: "/cours/filtres/" },
-          { id: "c3", name: "Détails des programmes", url: "/cours/programmes/" },
-          { id: "c4", name: "Inscription", url: "/cours/inscription/" },
-        ] as MenuItemApi[]
+        href: "/cours", label: "Cours", children: [] as MenuItemApi[]
       },
       {
         href: "/formations", label: "Formations", children: [
@@ -56,45 +48,22 @@ export function Navbar() {
         ] as MenuItemApi[]
       },
       {
-        href: "/trainings", label: "Trainings", children: [
-          { id: "t1", name: "Sessions libres", url: "/trainings/sessions/" },
-          { id: "t2", name: "Organisation adhérents", url: "/trainings/adherents/" },
-        ] as MenuItemApi[]
+        href: "/trainings", label: "Trainings", children: [] as MenuItemApi[]
       },
       {
         href: "/artistes", label: "Artistes", children: [
-          { id: "a1", name: "Annuaire", url: "/artistes/annuaire/" },
-          { id: "a2", name: "Profils & Bios", url: "/artistes/profils/" },
-          { id: "a3", name: "Booking", url: "/artistes/booking/" },
-          { id: "a4", name: "Avis & Notes", url: "/artistes/avis/" },
+          { id: "a1", name: "Nos artistes", url: "/artistes/" },
         ] as MenuItemApi[]
       },
       {
-        href: "/theorie", label: "Théorie", children: [
-          { id: "th1", name: "Cours théoriques", url: "/theorie/cours/" },
-          { id: "th2", name: "Quiz de connaissances", url: "/theorie/quiz/" },
-          { id: "th3", name: "Suivi de progression", url: "/theorie/progression/" },
-        ] as MenuItemApi[]
+        href: "/shop", label: "Shop", children: [] as MenuItemApi[]
       },
       {
-        href: "/care", label: "Care", children: [
-          { id: "ca1", name: "Soins & Récupération", url: "/care/soins/" },
-          { id: "ca2", name: "Nos Praticiens", url: "/care/praticiens/" },
-          { id: "ca3", name: "Réservation", url: "/care/reservation/" },
-        ] as MenuItemApi[]
-      },
-      {
-        href: "/shop", label: "Shop", children: [
-          { id: "s1", name: "Pulls & Sweats", url: "/shop/pulls/" },
-          { id: "s2", name: "T-shirts", url: "/shop/tshirts/" },
-          { id: "s3", name: "Chaussures", url: "/shop/chaussures/" },
-          { id: "s4", name: "Vins & Spiritueux", url: "/shop/vins/" },
-        ] as MenuItemApi[]
-      },
-      {
-        href: "/projets", label: "Projets", children: [
-          { id: "p1", name: "Programme d'incubation", url: "/projets/incubation/" },
-          { id: "p2", name: "Autres initiatives", url: "/projets/initiatives/" },
+        href: "#", label: "Autre", children: [
+          { id: "th1", name: "Théorie", url: "/theorie/" },
+          { id: "ca1", name: "Care", url: "/care/" },
+          { id: "p1", name: "Projets", url: "/projets/" },
+          { id: "f1", name: "Fichiers", url: "/fichiers/" },
         ] as MenuItemApi[]
       },
       {

@@ -218,9 +218,13 @@ export async function logout(): Promise<void> {
 /**
  * Liste des artistes. GET /api/users/artists/
  */
-export async function getArtists(): Promise<ArtistApi[]> {
+export async function getArtists(staffOnly?: boolean): Promise<ArtistApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/users/artists/`);
+  let url = `${base}/api/users/artists/`;
+  if (staffOnly !== undefined) {
+    url += `?staff_only=${staffOnly}`;
+  }
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Artists API error: ${res.status}`);
   return res.json();
 }

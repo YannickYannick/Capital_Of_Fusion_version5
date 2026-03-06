@@ -1,92 +1,102 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
 import { getArtists } from "@/lib/api";
+import type { ArtistApi } from "@/types/user";
+import ArtistCard from "@/components/features/artists/ArtistCard";
+import { motion } from "framer-motion";
 
-const CATEGORIES = [
-  {
-    key: "annuaire",
-    label: "Annuaire",
-    icon: "🎭",
-    description: "Découvrez tous nos professeurs, danseurs et DJs partenaires.",
-    href: "/artistes/annuaire",
-    gradient: "from-purple-600/30 to-fuchsia-700/20",
-    border: "border-purple-500/30",
-    glow: "hover:shadow-purple-500/20",
-    badge: "bg-purple-500/20 text-purple-300",
-  },
-  {
-    key: "profils",
-    label: "Profils & Bios",
-    icon: "👤",
-    description: "Parcourez les expériences, palmarès et styles de nos artistes.",
-    href: "/artistes/profils",
-    gradient: "from-blue-600/30 to-indigo-700/20",
-    border: "border-blue-500/30",
-    glow: "hover:shadow-blue-500/20",
-    badge: "bg-blue-500/20 text-blue-300",
-  },
-  {
-    key: "booking",
-    label: "Demandes de Booking",
-    icon: "📅",
-    description: "Invitez nos artistes pour vos propres événements et festivals.",
-    href: "/artistes/booking",
-    gradient: "from-emerald-600/30 to-green-700/20",
-    border: "border-emerald-500/30",
-    glow: "hover:shadow-emerald-500/20",
-    badge: "bg-emerald-500/20 text-emerald-300",
-  },
-  {
-    key: "avis",
-    label: "Avis & Notes",
-    icon: "⭐",
-    description: "Lisez les retours d'expérience de nos élèves et organisateurs.",
-    href: "/artistes/avis",
-    gradient: "from-amber-600/30 to-orange-700/20",
-    border: "border-amber-500/30",
-    glow: "hover:shadow-amber-500/20",
-    badge: "bg-amber-500/20 text-amber-300",
-  },
-];
+export default function ArtistesPage() {
+  const [artists, setArtists] = useState<ArtistApi[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'staff' | 'others'>('all');
 
-export default async function ArtistesPage() {
-  let artistsCount = 0;
-  try {
-    const list = await getArtists();
-    artistsCount = list.length;
-  } catch { }
+  useEffect(() => {
+    setLoading(true);
+    let staffOnly: boolean | undefined = undefined;
+    if (filter === 'staff') staffOnly = true;
+    if (filter === 'others') staffOnly = false;
+
+    getArtists(staffOnly)
+      .then(setArtists)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [filter]);
+
+  if (loading && artists.length === 0) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Notre Écosystème</p>
-          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4">
-            Nos <span className="bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">Artistes</span>
-          </h1>
-          <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            Retrouvez les professeurs, danseurs talentueux et ambassadeurs qui font vibrer Capital of Fusion au quotidien.
-          </p>
+    <div className="min-h-screen bg-black text-white py-24 px-8 md:px-16">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <h1 className="text-6xl font-black tracking-tighter mb-4 italic">NOS <span className="text-purple-500">ARTISTES</span></h1>
+            <p className="text-xl text-white/60 max-w-xl font-light leading-relaxed">
+              Découvrez les talents qui font battre le cœur de Capital of Fusion.
+              Membres officiels et artistes partenaires.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex p-1 bg-white/[0.03] border border-white/10 rounded-2xl"
+          >
+            {[
+              { id: 'all', label: 'Tous' },
+              { id: 'staff', label: 'Team CoF' },
+              { id: 'others', label: 'Externe' }
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => setFilter(btn.id as any)}
+                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${filter === btn.id
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
+                    : 'text-white/40 hover:text-white'
+                  }`}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </motion.div>
         </div>
-        <div className="flex justify-center gap-6 mb-12">
-          <div className="bg-white/5 border border-white/10 rounded-2xl px-8 py-4 text-center backdrop-blur-md">
-            <p className="text-3xl font-black text-white">{artistsCount || "—"}</p>
-            <p className="text-white/50 text-xs mt-1">Artistes Référencés</p>
+
+        {error ? (
+          <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[2rem] text-red-500 text-center">
+            <p className="text-2xl font-black mb-2 uppercase italic tracking-tighter">Erreur de connexion</p>
+            <p className="text-sm font-light opacity-60">{error}</p>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {CATEGORIES.map((cat) => (
-            <Link key={cat.key} href={cat.href} className={`group relative bg-gradient-to-br ${cat.gradient} border ${cat.border} rounded-3xl p-8 backdrop-blur-md hover:-translate-y-1 hover:shadow-2xl ${cat.glow} transition-all duration-300`}>
-              <div className="flex items-start gap-5">
-                <div className="text-5xl shrink-0 group-hover:scale-110 transition-transform duration-300">{cat.icon}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2"><h2 className="text-2xl font-bold text-white">{cat.label}</h2></div>
-                  <p className="text-white/60 text-sm leading-relaxed">{cat.description}</p>
-                  <div className="mt-4 flex items-center text-white/50 text-sm group-hover:text-white/80 transition-colors">Découvrir →</div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {artists.map((artist, idx) => (
+              <motion.div
+                key={artist.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+              >
+                <ArtistCard artist={artist} />
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {!loading && artists.length === 0 && !error && (
+          <div className="text-center py-32 text-white/10 border-2 border-dashed border-white/5 rounded-[3rem]">
+            <p className="text-3xl font-black tracking-widest uppercase italic italic">VIDE</p>
+            <p className="text-xs mt-4 tracking-[0.3em] font-light">AUCUN ARTISTE NE CORRESPOND À CETTE CATÉGORIE</p>
+          </div>
+        )}
       </div>
     </div>
   );

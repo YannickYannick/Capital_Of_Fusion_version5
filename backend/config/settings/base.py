@@ -116,3 +116,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3003",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# Autoriser l'iframe pour le dashboard frontend
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+SILENCED_SYSTEM_CHECKS = ['security.W019'] # Optionnel si on veut éviter l'alerte sur SAMEORIGIN

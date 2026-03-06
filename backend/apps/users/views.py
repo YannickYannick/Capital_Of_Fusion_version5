@@ -164,6 +164,14 @@ class ArtistListAPIView(APIView):
     def get(self, request):
         # On filtre les utilisateurs qui ont au moins une profession définie
         artists = User.objects.filter(professions__isnull=False).distinct()
+        
+        # Filtre optionnel pour le staff CoF
+        staff_only = request.query_params.get('staff_only')
+        if staff_only == 'true':
+            artists = artists.filter(is_staff_member=True)
+        elif staff_only == 'false':
+            artists = artists.filter(is_staff_member=False)
+            
         serializer = ArtistSerializer(artists, many=True, context={'request': request})
         return Response(serializer.data)
 

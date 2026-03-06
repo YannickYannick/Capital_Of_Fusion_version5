@@ -20,7 +20,7 @@ class ArtistSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name', 
-            'bio', 'profile_picture', 'professions'
+            'bio', 'profile_picture', 'professions', 'is_staff_member'
         ]
 
 class RegisterSerializer(serializers.ModelSerializer):
