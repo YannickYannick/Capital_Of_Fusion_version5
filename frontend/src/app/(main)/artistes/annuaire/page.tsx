@@ -1,8 +1,9 @@
 import { getArtists } from "@/lib/api";
+import type { ArtistApi } from "@/types/user";
 import ArtistCard from "@/components/features/artists/ArtistCard";
 
 export default async function AnnuairePage() {
-    let artists = [];
+    let artists: ArtistApi[] = [];
     try { artists = await getArtists(); } catch (error) { console.error(error); }
 
     return (

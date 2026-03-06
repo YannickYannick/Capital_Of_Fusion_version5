@@ -142,8 +142,8 @@ export default function ProjetsPage() {
 
   const fetchData = () => {
     setLoading(true);
-    // On conserve le cache des catégories si on recharge juste la liste
-    const promises = [getProjects()];
+    // On spécifie explicitement le type pour accepter des promesses de types différents
+    const promises: Promise<any>[] = [getProjects()];
     if (categories.length === 0) promises.push(getProjectCategories());
 
     Promise.all(promises)

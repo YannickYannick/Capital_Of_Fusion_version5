@@ -101,7 +101,7 @@ function LessonModal({
 
         <div className="grid grid-cols-2 gap-4">
           <AdminField label="Catégorie" required>
-            <select value={category} onChange={e => setCategory(e.target.value)} className={adminSelectClass}>
+            <select value={category} onChange={e => setCategory(e.target.value as any)} className={adminSelectClass}>
               {CATEGORIES_LIST.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </AdminField>
