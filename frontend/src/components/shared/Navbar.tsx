@@ -33,49 +33,67 @@ export function Navbar() {
       .catch(() => setMenuError(true));
   }, []);
 
-  const links = menuError || !menuItems?.length
-    ? [
-      {
-        href: "/cours", label: "Cours", children: [] as MenuItemApi[]
-      },
-      {
-        href: "/formations", label: "Formations", children: [
-          { id: "f1", name: "Contenu éducatif en ligne", url: "/formations/contenu/" },
-          { id: "f2", name: "Catégories", url: "/formations/categories/" },
-          { id: "f3", name: "Vidéothèque", url: "/formations/videotheque/" },
-        ] as MenuItemApi[]
-      },
-      {
-        href: "/trainings", label: "Trainings", children: [] as MenuItemApi[]
-      },
-      {
-        href: "/artistes", label: "Artistes", children: [
-          { id: "a1", name: "Nos artistes", url: "/artistes/" },
-        ] as MenuItemApi[]
-      },
-      {
-        href: "/shop", label: "Shop", children: [] as MenuItemApi[]
-      },
-      {
-        href: "#", label: "Autre", children: [
-          { id: "th1", name: "Théorie", url: "/theorie/" },
-          { id: "ca1", name: "Care", url: "/care/" },
-          { id: "p1", name: "Projets", url: "/projets/" },
-          { id: "f1", name: "Fichiers", url: "/fichiers/" },
-        ] as MenuItemApi[]
-      },
-      {
-        href: "/organisation", label: "Organisation", children: [
-          { id: "o1", name: "Structure", url: "/organisation/structure/" },
-          { id: "o2", name: "Pôles", url: "/organisation/poles/" },
-        ] as MenuItemApi[]
-      },
-    ]
-    : menuItems.map((item) => ({
-      href: item.url || "/",
-      label: item.name,
-      children: item.children ?? [],
-    }));
+  // Entrée "Identité COF" toujours en premier (affichée même si l'API ne la renvoie pas encore)
+  const identiteCofEntry = {
+    href: "/identite-cof",
+    label: "Identité COF",
+    children: [
+      { id: "id-vision", name: "Notre vision", url: "/identite-cof/notre-vision", slug: "identite-vision", icon: "", order: 1, is_active: true, children: [] },
+      { id: "id-bulletins", name: "Bulletins", url: "/identite-cof/bulletins", slug: "identite-bulletins", icon: "", order: 2, is_active: true, children: [] },
+    ] as MenuItemApi[],
+  };
+
+  const fallbackLinks = [
+    identiteCofEntry,
+    { href: "/cours", label: "Cours", children: [] as MenuItemApi[] },
+    { href: "/formations", label: "Formations", children: [
+      { id: "f1", name: "Contenu éducatif en ligne", url: "/formations/contenu/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "f2", name: "Catégories", url: "/formations/categories/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "f3", name: "Vidéothèque", url: "/formations/videotheque/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[] },
+    { href: "/trainings", label: "Trainings", children: [] as MenuItemApi[] },
+    { href: "/artistes", label: "Artistes", children: [
+      { id: "a1", name: "Nos artistes", url: "/artistes/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[] },
+    { href: "/shop", label: "Shop", children: [] as MenuItemApi[] },
+    { href: "#", label: "Autre", children: [
+      { id: "th1", name: "Théorie", url: "/theorie/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "ca1", name: "Care", url: "/care/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "p1", name: "Projets", url: "/projets/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "f1", name: "Fichiers", url: "/fichiers/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[] },
+    { href: "/organisation", label: "Organisation", children: [
+      { id: "o1", name: "Structure", url: "/organisation/structure/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "o2", name: "Pôles", url: "/organisation/poles/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[] },
+  ];
+
+  const apiLinks =
+    menuItems?.length && !menuError
+      ? menuItems
+          .map((item) => ({
+            href: item.url || "/",
+            label: item.name,
+            children: item.children ?? [],
+          }))
+          // Ne pas afficher en racine "Identité COF" ni les sous-pages (Notre vision, Bulletins) — elles sont dans notre dropdown
+          .filter((item) => {
+            const h = (item.href || "").replace(/\/$/, "") || "/";
+            return (
+              item.label !== "Identité COF" &&
+              item.label !== "Notre vision" &&
+              item.label !== "Bulletins" &&
+              h !== "/identite-cof/notre-vision" &&
+              h !== "/identite-cof/bulletins"
+            );
+          })
+      : [];
+
+  // Toujours afficher "Identité COF" en premier avec son dropdown (Notre vision, Bulletins)
+  const links =
+    apiLinks.length > 0
+      ? [identiteCofEntry, ...apiLinks]
+      : fallbackLinks;
 
   const filteredLinks = user
     ? links.filter(link => link.label.toLowerCase() !== "login" && link.href !== "/login")
@@ -110,7 +128,7 @@ export function Navbar() {
                 <Link href={href} className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1">
                   {label}
                 </Link>
-                <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="bg-black/95 backdrop-blur-md border border-white/10 rounded-lg py-2 min-w-[180px] shadow-xl">
                     {children.map((child) => (
                       <Link

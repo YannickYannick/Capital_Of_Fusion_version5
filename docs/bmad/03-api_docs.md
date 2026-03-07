@@ -36,6 +36,17 @@
 | GET | `.../api/config/` |
 | GET / POST / PATCH / DELETE | `.../api/core/presets/` |
 
+**Identité COF (vision + bulletins) :**
+
+| Méthode | URL | Auth |
+|--------|-----|------|
+| GET | `.../api/config/` | — |
+| PATCH | `.../api/admin/config/` | Token (staff/superuser) |
+| GET | `.../api/identite/bulletins/` | — |
+| GET | `.../api/identite/bulletins/<slug>/` | — |
+| GET / POST | `.../api/admin/identite/bulletins/` | Token (staff/superuser) |
+| GET / PATCH | `.../api/admin/identite/bulletins/<slug>/` | Token (staff/superuser) |
+
 **Hors API (Django admin) :** `https://capitaloffusionversion5-production.up.railway.app/admin/`
 
 ---

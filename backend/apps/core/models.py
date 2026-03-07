@@ -165,6 +165,14 @@ class SiteConfiguration(models.Model):
     hero_btn_2_url = models.CharField(max_length=255, blank=True, default="/cours")
     hero_footer_text = models.CharField(max_length=255, blank=True, default="Paris, France • École Nationale de Danse")
 
+    # Identité COF — Notre vision (page markdown)
+    vision_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Notre vision (Markdown)",
+        help_text="Contenu de la page Identité COF → Notre vision (format Markdown).",
+    )
+
     active_explore_preset = models.ForeignKey(ExplorePreset, on_delete=models.SET_NULL, null=True, blank=True)
     VIDEO_CHOICES = (('youtube', 'Vidéo YouTube'), ('mp4', 'Fichier Local (MP4)'))
     main_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube')
@@ -218,3 +226,23 @@ class MenuItem(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Bulletin(BaseModel):
+    """
+    Bulletin d'information (Identité COF → Bulletins), affichés en ordre chronologique.
+    Contenu au format Markdown.
+    """
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
+    content_markdown = models.TextField(blank=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Bulletin d'information"
+        verbose_name_plural = "Bulletins d'information"
+        ordering = ["-published_at", "-created_at"]
+
+    def __str__(self):
+        return self.title

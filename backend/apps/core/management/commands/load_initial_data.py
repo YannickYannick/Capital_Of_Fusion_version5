@@ -33,6 +33,10 @@ class Command(BaseCommand):
 
         self.stdout.write("Création des MenuItem...")
         menu_data = [
+            {"name": "Identité COF", "slug": "identite-cof", "url": "/identite-cof/", "order": 1, "children": [
+                {"name": "Notre vision", "slug": "identite-vision", "url": "/identite-cof/notre-vision", "order": 1},
+                {"name": "Bulletins", "slug": "identite-bulletins", "url": "/identite-cof/bulletins", "order": 2},
+            ]},
             {"name": "Événements", "slug": "evenements", "url": "/evenements/", "order": 2, "children": [
                 {"name": "Liste & Événements", "slug": "evenements-liste", "url": "/evenements/", "order": 1},
                 {"name": "Festivals", "slug": "evenements-festivals", "url": "/evenements/festivals/", "order": 2},

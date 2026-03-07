@@ -3,17 +3,22 @@ Vues API Core — menu (items racine avec children récursifs), health check.
 """
 from django.http import JsonResponse
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import MenuItem, SiteConfiguration, ExplorePreset
-from .serializers import MenuItemSerializer, SiteConfigurationSerializer, ExplorePresetSerializer
+from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin
+from .serializers import (
+    MenuItemSerializer,
+    SiteConfigurationSerializer,
+    ExplorePresetSerializer,
+    BulletinSerializer,
+    BulletinAdminSerializer,
+)
+from .permissions import IsStaffOrSuperUser
 
 class SiteConfigurationAPIView(APIView):
-    """
-    GET /api/config/
-    Retourne la configuration singleton du site.
-    """
+    """GET /api/config/ — lecture publique de la configuration."""
     def get(self, request):
         config = SiteConfiguration.objects.first()
         if not config:
@@ -38,6 +43,83 @@ class MenuItemListAPIView(APIView):
     def get(self, request):
         items = MenuItem.objects.filter(parent=None, is_active=True).order_by("order")
         serializer = MenuItemSerializer(items, many=True)
+        return Response(serializer.data)
+
+
+class BulletinListAPIView(APIView):
+    """
+    GET /api/identite/bulletins/
+    Liste des bulletins publiés, ordre chronologique inverse (plus récent en premier).
+    """
+    def get(self, request):
+        qs = Bulletin.objects.filter(is_published=True).order_by("-published_at", "-created_at")
+        serializer = BulletinSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class BulletinDetailAPIView(APIView):
+    """
+    GET /api/identite/bulletins/<slug>/
+    Détail d'un bulletin par slug (publiés uniquement).
+    """
+    def get(self, request, slug):
+        bulletin = get_object_or_404(Bulletin, slug=slug, is_published=True)
+        serializer = BulletinSerializer(bulletin)
+        return Response(serializer.data)
+
+
+class SiteConfigurationAdminAPIView(APIView):
+    """PATCH /api/admin/config/ — vision_markdown (staff/superuser)."""
+    permission_classes = [IsStaffOrSuperUser]
+
+    def patch(self, request):
+        config = SiteConfiguration.objects.first()
+        if not config:
+            config = SiteConfiguration.objects.create()
+        vision = request.data.get("vision_markdown")
+        if vision is not None:
+            config.vision_markdown = vision
+            config.save(update_fields=["vision_markdown", "updated_at"])
+        serializer = SiteConfigurationSerializer(config, context={'request': request})
+        return Response(serializer.data)
+
+
+class BulletinAdminListCreateAPIView(APIView):
+    """
+    GET /api/admin/identite/bulletins/ — liste tous les bulletins (dont brouillons) pour staff.
+    POST /api/admin/identite/bulletins/ — création (staff/superuser).
+    """
+    permission_classes = [IsStaffOrSuperUser]
+
+    def get(self, request):
+        qs = Bulletin.objects.all().order_by("-published_at", "-created_at")
+        serializer = BulletinAdminSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BulletinAdminSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class BulletinAdminDetailAPIView(APIView):
+    """
+    GET/PATCH /api/admin/identite/bulletins/<slug>/ — détail et mise à jour (staff/superuser).
+    Retourne aussi les bulletins non publiés.
+    """
+    permission_classes = [IsStaffOrSuperUser]
+
+    def get(self, request, slug):
+        bulletin = get_object_or_404(Bulletin, slug=slug)
+        serializer = BulletinAdminSerializer(bulletin)
+        return Response(serializer.data)
+
+    def patch(self, request, slug):
+        bulletin = get_object_or_404(Bulletin, slug=slug)
+        serializer = BulletinAdminSerializer(bulletin, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data)
 
 

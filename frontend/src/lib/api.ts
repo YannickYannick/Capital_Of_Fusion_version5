@@ -9,7 +9,7 @@ import type { TheoryLessonApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
 import type { OrganizationNodeApi } from "@/types/organization";
 import type { ArtistApi } from "@/types/user";
-import type { SiteConfigurationApi } from "@/types/config";
+import type { SiteConfigurationApi, BulletinApi, BulletinAdminApi } from "@/types/config";
 import type { ProductCategoryApi, ProductApi } from "@/types/shop";
 import type { PractitionerApi, CareServiceApi } from "@/types/care";
 import type { ProjectCategoryApi, ProjectApi } from "@/types/projects";
@@ -49,6 +49,134 @@ export async function getSiteConfig(): Promise<SiteConfigurationApi> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/config/`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Config API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Liste des bulletins (Identité COF). GET /api/identite/bulletins/
+ */
+export async function getBulletins(): Promise<BulletinApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/identite/bulletins/`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`Bulletins API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'un bulletin par slug. GET /api/identite/bulletins/<slug>/
+ */
+export async function getBulletinBySlug(slug: string): Promise<BulletinApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/identite/bulletins/${encodeURIComponent(slug)}/`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`Bulletin API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Mise à jour de la vision (Notre vision). Staff/superuser.
+ * PATCH /api/admin/config/
+ */
+export async function patchSiteConfigVision(visionMarkdown: string): Promise<SiteConfigurationApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/config/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify({ vision_markdown: visionMarkdown }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || `Patch config API error: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
+ * Liste de tous les bulletins (dont brouillons) pour édition. Staff/superuser.
+ * GET /api/admin/identite/bulletins/
+ */
+export async function getAdminBulletins(): Promise<BulletinAdminApi[]> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/identite/bulletins/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Admin bulletins API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'un bulletin pour édition (y compris non publié). Staff/superuser.
+ * GET /api/admin/identite/bulletins/<slug>/
+ */
+export async function getAdminBulletinBySlug(slug: string): Promise<BulletinAdminApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Admin bulletin API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Création d'un bulletin. Staff/superuser.
+ * POST /api/admin/identite/bulletins/
+ */
+export async function createBulletin(data: {
+  title: string;
+  slug: string;
+  content_markdown?: string;
+  published_at?: string | null;
+  is_published?: boolean;
+}): Promise<BulletinAdminApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/identite/bulletins/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || `Create bulletin API error: ${res.status}`);
+  }
+  return res.json();
+}
+
+/**
+ * Mise à jour d'un bulletin. Staff/superuser.
+ * PATCH /api/admin/identite/bulletins/<slug>/
+ */
+export async function patchBulletin(
+  slug: string,
+  data: Partial<Pick<BulletinAdminApi, "title" | "slug" | "content_markdown" | "published_at" | "is_published">>
+): Promise<BulletinAdminApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || `Patch bulletin API error: ${res.status}`);
+  }
   return res.json();
 }
 
@@ -139,6 +267,35 @@ export async function getOrganizationNodeBySlug(
     `${base}/api/organization/nodes/${encodeURIComponent(slug)}/`
   );
   if (!res.ok) throw new Error(`Organization node API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Mise à jour partielle d'un noeud (descriptions, etc.). Réservé staff.
+ * PATCH /api/admin/organization/nodes/<slug>/
+ */
+export async function patchOrganizationNode(
+  slug: string,
+  data: Partial<Pick<OrganizationNodeApi, "description" | "short_description" | "content">>
+): Promise<OrganizationNodeApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(
+    `${base}/api/admin/organization/nodes/${encodeURIComponent(slug)}/`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || `Patch node API error: ${res.status}`);
+  }
   return res.json();
 }
 

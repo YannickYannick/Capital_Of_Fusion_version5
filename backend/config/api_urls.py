@@ -3,7 +3,18 @@ Routes API — menu, courses, events, organization, projects, auth.
 Routes admin — POST/PATCH/DELETE sécurisées superuser.
 """
 from django.urls import path, include
-from apps.core.views import MenuItemListAPIView, health_check, SiteConfigurationAPIView, seed_database, ExplorePresetViewSet
+from apps.core.views import (
+    MenuItemListAPIView,
+    health_check,
+    SiteConfigurationAPIView,
+    SiteConfigurationAdminAPIView,
+    seed_database,
+    ExplorePresetViewSet,
+    BulletinListAPIView,
+    BulletinDetailAPIView,
+    BulletinAdminListCreateAPIView,
+    BulletinAdminDetailAPIView,
+)
 from apps.courses.views import (
     CourseListAPIView, CourseDetailAPIView,
     TheoryLessonListAPIView, TheoryLessonDetailAPIView,
@@ -54,6 +65,8 @@ urlpatterns = [
     path("health/", health_check),
     path("config/", SiteConfigurationAPIView.as_view()),
     path("menu/items/", MenuItemListAPIView.as_view()),
+    path("identite/bulletins/", BulletinListAPIView.as_view()),
+    path("identite/bulletins/<slug:slug>/", BulletinDetailAPIView.as_view()),
     path("seed/", seed_database),
 
     # ── Courses (lecture) ────────────────────────────────────────────────────
@@ -83,7 +96,7 @@ urlpatterns = [
     path("users/artists/", ArtistListAPIView.as_view()),
     path("users/artists/<str:username>/", ArtistDetailAPIView.as_view()),
 
-    # ── Admin routes (POST / PATCH / DELETE) — superuser only ────────────────
+    # ── Admin routes (POST / PATCH / DELETE) — staff/superuser ──────────────
     path("admin/events/", EventAdminAPIView.as_view()),
     path("admin/events/<slug:slug>/", EventAdminDetailAPIView.as_view()),
     path("admin/courses/", CourseAdminAPIView.as_view()),
@@ -91,6 +104,9 @@ urlpatterns = [
     path("admin/courses/theory/", TheoryLessonAdminAPIView.as_view()),
     path("admin/courses/theory/<slug:slug>/", TheoryLessonAdminDetailAPIView.as_view()),
     path("admin/organization/nodes/<slug:slug>/", OrganizationNodeAdminDetailAPIView.as_view()),
+    path("admin/config/", SiteConfigurationAdminAPIView.as_view()),
+    path("admin/identite/bulletins/", BulletinAdminListCreateAPIView.as_view()),
+    path("admin/identite/bulletins/<slug:slug>/", BulletinAdminDetailAPIView.as_view()),
 ]
 
 urlpatterns += router.urls
