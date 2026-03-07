@@ -71,6 +71,7 @@ export function Navbar() {
           { id: "o1", name: "Structure", url: "/organisation/structure/" },
           { id: "o2", name: "Pôles", url: "/organisation/poles/" },
         ] as MenuItemApi[]
+      },
     ]
     : menuItems.map((item) => ({
       href: item.url || "/",
