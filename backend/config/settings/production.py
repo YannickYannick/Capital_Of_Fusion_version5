@@ -32,8 +32,10 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()
 # Fichiers statiques (admin, etc.) : WhiteNoise les sert en prod après collectstatic.
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Base de données : PostgreSQL si DB_NAME (ou DB_HOST) est défini, sinon SQLite pour test (données éphémères sur PaaS).
-if os.environ.get("DB_NAME") or os.environ.get("DB_HOST"):
+# Base de données : DATABASE_URL (Railway/Supabase) prioritaire, sinon DB_* (PostgreSQL), sinon SQLite.
+if os.environ.get("DATABASE_URL"):
+    DATABASES = {"default": env.db("DATABASE_URL")}  # env vient de .base
+elif os.environ.get("DB_NAME") or os.environ.get("DB_HOST"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

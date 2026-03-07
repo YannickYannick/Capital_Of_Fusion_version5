@@ -62,4 +62,8 @@ export interface ExplorePresetApi {
     cameraTargetX?: number;
     cameraTargetY?: number;
     cameraTargetZ?: number;
+
+    // Oscillation des autres planètes quand une est sélectionnée (sinus)
+    oscillationAmplitude?: number;
+    oscillationFrequency?: number;
 }

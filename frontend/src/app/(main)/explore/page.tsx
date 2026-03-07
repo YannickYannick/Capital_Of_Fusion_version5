@@ -33,8 +33,13 @@ function ExplorePageInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<OrganizationNodeApi | null>(null);
+  const [selectedPlanetScreenPos, setSelectedPlanetScreenPos] = useState<{ x: number; y: number } | null>(null);
   const [overlayNode, setOverlayNode] = useState<OrganizationNodeApi | null>(null);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
+
+  useEffect(() => {
+    if (!selectedNode) setSelectedPlanetScreenPos(null);
+  }, [selectedNode]);
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
@@ -61,6 +66,17 @@ function ExplorePageInner() {
 
   const handleSelectNode = useCallback((node: OrganizationNodeApi | null) => {
     setSelectedNode(node);
+  }, []);
+
+  const handleSelectedPlanetScreenPosition = useCallback((x: number, y: number) => {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    const margin = 80;
+    const w = typeof window !== "undefined" ? window.innerWidth : 1920;
+    const h = typeof window !== "undefined" ? window.innerHeight : 1080;
+    setSelectedPlanetScreenPos({
+      x: Math.max(margin, Math.min(w - margin, x)),
+      y: Math.max(margin, Math.min(h - margin, y)),
+    });
   }, []);
 
   const handleOpenOverlay = useCallback((node: OrganizationNodeApi) => {
@@ -107,41 +123,59 @@ function ExplorePageInner() {
           nodes={visibleNodes}
           onOpenOverlay={handleOpenOverlay}
           onSelectNode={handleSelectNode}
+          onSelectedPlanetScreenPosition={handleSelectedPlanetScreenPosition}
           controlsRef={controlsRef}
           cameraRef={cameraRef}
         />
       )}
 
-      {/* Barre d'action planète sélectionnée (centre, z-30) */}
+      {/* Barre d'action planète sélectionnée — centre du cadre aligné sur la planète (fallback: bas centré) */}
       <AnimatePresence>
         {selectedNode && !overlayNode && (
-          <motion.div
-            key="action-bar"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center gap-3 min-w-[260px]"
+          <div
+            className="fixed z-30 pointer-events-none"
+            style={
+              selectedPlanetScreenPos != null
+                ? {
+                    left: selectedPlanetScreenPos.x,
+                    top: selectedPlanetScreenPos.y,
+                    transform: "translate(-50%, -50%)",
+                  }
+                : {
+                    bottom: "6rem",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                  }
+            }
           >
-            <p className="text-white/40 text-xs uppercase tracking-widest font-semibold">Sélectionné</p>
-            <p className="text-white text-3xl font-bold text-center">{selectedNode.name}</p>
-            <div className="flex gap-3">
+            <motion.div
+              key="action-bar"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="pointer-events-auto px-8 py-6 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 min-w-[340px] max-w-[90vw]"
+            >
+            <p className="text-white/40 text-sm uppercase tracking-widest font-semibold">Sélectionné</p>
+            <p className="text-white text-4xl font-bold text-center leading-tight">{selectedNode.name}</p>
+            <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => handleOpenOverlay(selectedNode)}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/20 flex items-center gap-2"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-base font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/20 flex items-center gap-2"
               >
                 ↗ Détails
               </button>
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-medium transition border border-white/10 flex items-center gap-2"
+                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-base font-medium transition border border-white/10 flex items-center gap-2"
               >
                 ← Retour
               </button>
             </div>
           </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

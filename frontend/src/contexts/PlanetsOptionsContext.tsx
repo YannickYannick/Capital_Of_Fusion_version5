@@ -94,6 +94,9 @@ export interface PlanetsOptionsState {
     cameraTargetX: number;
     cameraTargetY: number;
     cameraTargetZ: number;
+    // Oscillation verticale (sinus) des autres planètes quand une est sélectionnée
+    oscillationAmplitude: number;
+    oscillationFrequency: number;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -189,6 +192,8 @@ const DEFAULTS: PlanetsOptionsState = {
     cameraTargetX: 0,
     cameraTargetY: 0,
     cameraTargetZ: 0,
+    oscillationAmplitude: 0.3,
+    oscillationFrequency: 0.5,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -244,6 +249,8 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     cameraTargetX: "camera_ref_target_x",
     cameraTargetY: "camera_ref_target_y",
     cameraTargetZ: "camera_ref_target_z",
+    oscillationAmplitude: "planets_oscillationAmplitude",
+    oscillationFrequency: "planets_oscillationFrequency",
 };
 
 function lsGet<T>(key: string, fallback: T): T {
@@ -319,6 +326,8 @@ function loadFromLS(): PlanetsOptionsState {
         cameraTargetX: lsGet(LS_KEYS.cameraTargetX!, DEFAULTS.cameraTargetX),
         cameraTargetY: lsGet(LS_KEYS.cameraTargetY!, DEFAULTS.cameraTargetY),
         cameraTargetZ: lsGet(LS_KEYS.cameraTargetZ!, DEFAULTS.cameraTargetZ),
+        oscillationAmplitude: lsGet(LS_KEYS.oscillationAmplitude!, DEFAULTS.oscillationAmplitude),
+        oscillationFrequency: lsGet(LS_KEYS.oscillationFrequency!, DEFAULTS.oscillationFrequency),
     };
 }
 

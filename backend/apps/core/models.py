@@ -141,6 +141,10 @@ class ExplorePreset(BaseModel):
     camera_target_y = models.FloatField(default=0)
     camera_target_z = models.FloatField(default=0)
 
+    # Oscillation verticale des autres planètes quand une planète est sélectionnée (sinus)
+    oscillation_amplitude = models.FloatField(default=0.3, help_text="Amplitude (unités) du mouvement vertical")
+    oscillation_frequency = models.FloatField(default=0.5, help_text="Fréquence (Hz) de l'oscillation")
+
     class Meta:
         verbose_name = "Preset Explore 3D"
         verbose_name_plural = "Presets Explore 3D"

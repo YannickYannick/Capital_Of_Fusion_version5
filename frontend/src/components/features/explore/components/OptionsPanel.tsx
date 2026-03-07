@@ -798,6 +798,26 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                             )}
                         </Section>
 
+                        {/* Oscillation des autres planètes quand une est sélectionnée */}
+                        <Section title="Oscillation (autres planètes)">
+                            <Slider
+                                label="Amplitude (haut/bas)"
+                                value={opts.oscillationAmplitude}
+                                min={0}
+                                max={2}
+                                step={0.05}
+                                onChange={(v) => opts.set("oscillationAmplitude", v)}
+                            />
+                            <Slider
+                                label="Fréquence (Hz)"
+                                value={opts.oscillationFrequency}
+                                min={0.1}
+                                max={2}
+                                step={0.05}
+                                onChange={(v) => opts.set("oscillationFrequency", v)}
+                            />
+                        </Section>
+
                         {/* Vidéo */}
                         <Section title="Superposition Vidéo">
                             <Slider

@@ -533,6 +533,10 @@ interface PlanetProps {
   verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
   verticalSphereRadius: number;
   totalNodes: number;
+  /** Quand une autre planète est sélectionnée, oscillation verticale sinus (amplitude/fréquence) */
+  oscillationAmplitude: number;
+  oscillationFrequency: number;
+  otherPlanetSelected: boolean;
 }
 
 function Planet({
@@ -576,6 +580,9 @@ function Planet({
   verticalMode,
   verticalSphereRadius,
   totalNodes,
+  oscillationAmplitude,
+  oscillationFrequency,
+  otherPlanetSelected,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);       // temps (ms) après délai
@@ -782,6 +789,12 @@ function Planet({
     // La perturbation s'amortit naturellement vers 0, donc la planète
     // revient toujours sur l'orbite sans springForce explicite
     const newPos = nominalPos.clone().add(s.vel);
+
+    // Oscillation verticale (sinus) des autres planètes quand une planète est sélectionnée (sauf la planète au centre)
+    if (otherPlanetSelected && !isSelected && oscillationAmplitude > 0 && oscillationFrequency > 0) {
+      newPos.y += oscillationAmplitude * Math.sin(2 * Math.PI * oscillationFrequency * state.clock.elapsedTime);
+    }
+
     groupRef.current.position.copy(newPos);
 
     // Mettre à jour le registre des positions
@@ -1080,30 +1093,33 @@ function CameraController({
     }
   });
 
-  // Reset caméra (déclenché par resetKey manuel ou autoReset)
+  // Reset caméra (déclenché par resetKey manuel ou autoReset) — une seule animation vers le preset (opts)
   const executeReset = useCallback(() => {
-    const refX = parseFloat(localStorage.getItem("camera_ref_x") ?? "0");
-    const refY = parseFloat(localStorage.getItem("camera_ref_y") ?? "6.84");
-    const refZ = parseFloat(localStorage.getItem("camera_ref_z") ?? "18.79");
-    const refTX = parseFloat(localStorage.getItem("camera_ref_target_x") ?? "0");
-    const refTY = parseFloat(localStorage.getItem("camera_ref_target_y") ?? "0");
-    const refTZ = parseFloat(localStorage.getItem("camera_ref_target_z") ?? "0");
+    const refX = opts.cameraX;
+    const refY = opts.cameraY;
+    const refZ = opts.cameraZ;
+    const refTX = opts.cameraTargetX;
+    const refTY = opts.cameraTargetY;
+    const refTZ = opts.cameraTargetZ;
 
     isAnimating.current = true;
     gsap.to(camera.position, {
       x: refX, y: refY, z: refZ,
       duration: 1.5,
       ease: "power2.inOut",
-      onUpdate: () => {
-        if (controlsRef.current) {
-          gsap.to(controlsRef.current.target, { x: refTX, y: refTY, z: refTZ, duration: 1.5, ease: "power2.inOut", overwrite: "auto" });
-          controlsRef.current.update();
-        }
-      },
       onComplete: () => { isAnimating.current = false; },
       overwrite: "auto"
     });
-  }, [camera, controlsRef]);
+    if (controlsRef.current) {
+      gsap.to(controlsRef.current.target, {
+        x: refTX, y: refTY, z: refTZ,
+        duration: 1.5,
+        ease: "power2.inOut",
+        onUpdate: () => controlsRef.current?.update(),
+        overwrite: "auto"
+      });
+    }
+  }, [camera, controlsRef, opts.cameraX, opts.cameraY, opts.cameraZ, opts.cameraTargetX, opts.cameraTargetY, opts.cameraTargetZ]);
 
   // Détection du resetKey (bouton de l'interface)
   useEffect(() => {
@@ -1119,24 +1135,40 @@ function CameraController({
     }
   }, [executeReset]);
 
-  // Zoom sur planète sélectionnée
+  // Zoom sur planète sélectionnée — caméra sur la droite (0,0,0) → planète pour que l'origine reste derrière
   useEffect(() => {
     if (!selectedNodePos || !controlsRef.current) return;
     if (prevSelectedPos.current?.equals(selectedNodePos)) return;
     prevSelectedPos.current = selectedNodePos.clone();
 
     const offset = 8 + (selectedNodeScale * 2);
-    // Quand on sélectionne une planète, on l'approche
-    // Le zoom va se placer juste devant la planète.
     const targetX = selectedNodePos.x;
     const targetY = selectedNodePos.y;
     const targetZ = selectedNodePos.z;
+    const isRoot = targetX === 0 && targetY === 0 && targetZ === 0;
+
+    let camX: number;
+    let camY: number;
+    let camZ: number;
+
+    if (isRoot) {
+      // Soleil au centre : pas de direction unique, garder un placement fixe
+      camX = targetX;
+      camY = targetY + offset * 0.2;
+      camZ = targetZ + offset;
+    } else {
+      // Planète en orbite : caméra sur la demi-droite origine → planète, au-delà de la planète
+      const dir = new THREE.Vector3(targetX, targetY, targetZ).normalize();
+      camX = targetX + offset * dir.x;
+      camY = targetY + offset * dir.y;
+      camZ = targetZ + offset * dir.z;
+    }
 
     isAnimating.current = true;
     gsap.to(camera.position, {
-      x: targetX,
-      y: targetY + offset * 0.2,
-      z: targetZ + offset,
+      x: camX,
+      y: camY,
+      z: camZ,
       duration: 1.5,
       ease: "power2.inOut",
       onComplete: () => { isAnimating.current = false; },
@@ -1193,6 +1225,8 @@ interface SceneContentProps {
   orbitalRampDuration: number;
   controlsRef: React.RefObject<{ target: THREE.Vector3; update: () => void } | null>;
   selectedNodePos: THREE.Vector3 | null;
+  /** Callback pour positionner le cadre de sélection au centre de la planète (coords écran) */
+  onSelectedPlanetScreenPosition?: (x: number, y: number) => void;
   showEntryTrajectory: boolean;
   verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
   autoDistributeOrbits: boolean;
@@ -1241,6 +1275,7 @@ function SceneContent({
   orbitalRampDuration,
   controlsRef,
   selectedNodePos,
+  onSelectedPlanetScreenPosition,
   showEntryTrajectory,
   verticalMode,
   autoDistributeOrbits,
@@ -1263,7 +1298,17 @@ function SceneContent({
   const allPositions = externalAllPositions || localAllPositions;
 
   // Track mouse position in 3D (plan Y=0)
-  const { camera, gl } = useThree();
+  const { camera, gl, size } = useThree();
+
+  // Projeter le centre de la planète sélectionnée en coordonnées écran (pour aligner le cadre)
+  useFrame(() => {
+    if (!onSelectedPlanetScreenPosition || !selectedNodePos) return;
+    const v = selectedNodePos.clone().project(camera);
+    const rect = gl.domElement.getBoundingClientRect();
+    const x = rect.left + (v.x * 0.5 + 0.5) * size.width;
+    const y = rect.top + (1 - (v.y * 0.5 + 0.5)) * size.height;
+    onSelectedPlanetScreenPosition(x, y);
+  });
   useEffect(() => {
     const canvas = gl.domElement;
     const handleMove = (e: MouseEvent) => {
@@ -1446,6 +1491,9 @@ function SceneContent({
             verticalMode={verticalMode}
             verticalSphereRadius={verticalSphereRadius}
             totalNodes={orbitNodes.length}
+            oscillationAmplitude={opts.oscillationAmplitude ?? 0.3}
+            oscillationFrequency={opts.oscillationFrequency ?? 0.5}
+            otherPlanetSelected={selectedId != null}
           />
         );
       })}
@@ -1466,7 +1514,8 @@ function SceneContent({
           }
         }}
         onEnd={() => {
-          if (opts.autoResetCamera) {
+          // Ne pas lancer le retour auto tant qu'une planète est sélectionnée
+          if (opts.autoResetCamera && !selectedId) {
             if ((window as any).__autoResetTimer) clearTimeout((window as any).__autoResetTimer);
             (window as any).__autoResetTimer = setTimeout(() => {
               if ((window as any).__exploreCameraReset) {
@@ -1504,6 +1553,8 @@ interface ExploreSceneProps {
   onOpenOverlay: (node: OrganizationNodeApi) => void;
   /** Appelé quand une planète est sélectionnée (1er clic) */
   onSelectNode: (node: OrganizationNodeApi | null) => void;
+  /** Position 2D écran du centre de la planète sélectionnée (pour aligner le cadre) */
+  onSelectedPlanetScreenPosition?: (x: number, y: number) => void;
   controlsRef?: React.MutableRefObject<any>;
   cameraRef?: React.MutableRefObject<any>;
 }
@@ -1513,7 +1564,7 @@ interface ExploreSceneProps {
  * animation Fan Effect, physique interactive, contrôles caméra GSAP.
  * S'appuie sur PlanetsOptionsContext pour tous les paramètres.
  */
-export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: externalControlsRef, cameraRef }: ExploreSceneProps) {
+export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPlanetScreenPosition, controlsRef: externalControlsRef, cameraRef }: ExploreSceneProps) {
   const opts = usePlanetsOptions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedIdRef = useRef<string | null>(null); // toujours synchrone, pas de stale closure
@@ -1539,7 +1590,11 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         return;
       }
 
-      // Premier clic sur une nouvelle planète → zoom uniquement
+      // Premier clic sur une nouvelle planète → annuler le retour auto et zoom
+      if (typeof window !== "undefined" && (window as any).__autoResetTimer) {
+        clearTimeout((window as any).__autoResetTimer);
+        (window as any).__autoResetTimer = null;
+      }
       setSelectedId(node.id);
       selectedIdRef.current = node.id;
       opts.set("freezePlanets", true);
@@ -1629,6 +1684,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, controlsRef: 
         orbitalRampDuration={opts.orbitalRampDuration}
         controlsRef={controlsRef}
         selectedNodePos={selectedNodePos}
+        onSelectedPlanetScreenPosition={onSelectedPlanetScreenPosition}
         showEntryTrajectory={opts.showEntryTrajectory}
         verticalMode={opts.verticalMode as "manual" | "homogeneous" | "jupiter" | "sphere"}
         autoDistributeOrbits={opts.autoDistributeOrbits}
