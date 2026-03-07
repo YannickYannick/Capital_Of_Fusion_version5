@@ -202,28 +202,6 @@ function AdminDashboard({ username }: { username: string }) {
                 </div>
             </div>
 
-            {/* Console Admin Embarquée */}
-            <div className="pt-4">
-                <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-4 flex items-center gap-2">
-                    🛠️ Console d'administration (Backend)
-                </p>
-                <div className="w-full h-[800px] rounded-3xl border border-white/10 overflow-hidden bg-white/5 shadow-2xl relative group">
-                    <iframe
-                        src="http://localhost:8000/admin/"
-                        className="w-full h-full border-none"
-                        title="Django Admin"
-                    />
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Link
-                            href="http://localhost:8000/admin/"
-                            target="_blank"
-                            className="px-4 py-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-xl text-xs text-white/60 hover:text-white transition-colors"
-                        >
-                            Ouvrir en plein écran ↗
-                        </Link>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }
