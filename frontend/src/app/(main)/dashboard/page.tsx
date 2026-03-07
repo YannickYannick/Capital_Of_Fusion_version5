@@ -253,7 +253,7 @@ function StaffDashboard({ username, staffRole }: { username: string; staffRole: 
                     <Link href="http://localhost:8000/admin/" target="_blank"
                         className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all duration-200 group">
                         <span className="text-2xl">⚙️</span>
-                        <span className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors">Admin</span>
+                        <span className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors">DB menu</span>
                         <span className="ml-auto text-xs text-white/20">↗</span>
                     </Link>
                 </div>
