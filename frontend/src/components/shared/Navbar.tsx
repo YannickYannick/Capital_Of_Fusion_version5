@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MobileNav } from "./MobileNav";
-import { getMenuItems, getStoredToken, logout } from "@/lib/api";
+import { getMenuItems } from "@/lib/api";
 import type { MenuItemApi } from "@/types/menu";
+import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * Navbar — transparente en haut, bg-black/80 backdrop-blur au scroll.
@@ -14,14 +15,10 @@ import type { MenuItemApi } from "@/types/menu";
  */
 export function Navbar() {
   const router = useRouter();
+  const { user, loading, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItemApi[] | null>(null);
   const [menuError, setMenuError] = useState(false);
-  const [hasToken, setHasToken] = useState(false);
-
-  useEffect(() => {
-    setHasToken(!!getStoredToken());
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -79,6 +76,10 @@ export function Navbar() {
       children: item.children ?? [],
     }));
 
+  const filteredLinks = user
+    ? links.filter(link => link.label.toLowerCase() !== "login" && link.href !== "/login")
+    : links;
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
@@ -95,7 +96,7 @@ export function Navbar() {
         </Link>
 
         <div className="hidden xl:flex items-center gap-2 lg:gap-4 flex-1 justify-end pl-2 flex-wrap lg:flex-nowrap">
-          {links.map(({ href, label, children }) =>
+          {filteredLinks.map(({ href, label, children }) =>
             children.length > 0 ? (
               <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
                 <Link href={href} className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1">
@@ -125,20 +126,15 @@ export function Navbar() {
               </Link>
             )
           )}
-          {hasToken ? (
-            <button
-              type="button"
-              onClick={async () => {
-                await logout();
-                setHasToken(false);
-                router.refresh();
-              }}
-              className="p-2 text-white/90 hover:text-white transition text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
-              aria-label="Déconnexion"
+          {!loading && user ? (
+            <Link
+              href="/dashboard"
+              className="ml-2 w-9 h-9 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-sm font-bold text-purple-300 hover:scale-105 transition-transform"
+              title="Mon Espace"
             >
-              Déconnexion
-            </button>
-          ) : (
+              {(user.first_name?.[0] ?? user.username[0]).toUpperCase()}
+            </Link>
+          ) : !loading && !user ? (
             <Link
               href="/login"
               className="p-2 text-white/90 hover:text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded inline-block"
@@ -159,16 +155,15 @@ export function Navbar() {
                 />
               </svg>
             </Link>
-          )}
+          ) : null}
         </div>
 
         <div className="xl:hidden">
           <MobileNav
-            items={links}
-            hasToken={hasToken}
+            items={filteredLinks}
+            hasToken={!!user}
             onLogout={async () => {
               await logout();
-              setHasToken(false);
               router.refresh();
             }}
           />
