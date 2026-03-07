@@ -1,3 +1,5 @@
+import { ExplorePresetApi } from "./explore";
+
 export interface SiteConfigurationApi {
     site_name: string;
     hero_title: string;
@@ -8,4 +10,5 @@ export interface SiteConfigurationApi {
     cycle_video_type: 'youtube' | 'mp4';
     cycle_video_youtube_id: string;
     cycle_video_file: string | null;
+    explore_config?: ExplorePresetApi | null;
 }

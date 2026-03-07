@@ -165,7 +165,7 @@ export default function EvenementsPage() {
   }, [type, upcoming]);
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-end mb-4">
           <AdminAddButton onAdd={() => setIsAdding(true)} label="Nouvel événement" />

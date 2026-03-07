@@ -59,7 +59,7 @@ export default async function FormationsPage() {
   const levels = [...new Set(courses.map((c) => c.level_name))];
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
 
         {/* Hero */}

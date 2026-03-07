@@ -7,7 +7,7 @@ export default async function AnnuairePage() {
     try { artists = await getArtists(); } catch (error) { console.error(error); }
 
     return (
-        <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+        <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">L'Annuaire</p>

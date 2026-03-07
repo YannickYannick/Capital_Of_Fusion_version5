@@ -24,3 +24,5 @@ backend/.venv/
 backend/**/migrations/__pycache__/
 backend/media/
 backend/staticfiles/
+backend/error.txt
+backend/migrate_err.txt

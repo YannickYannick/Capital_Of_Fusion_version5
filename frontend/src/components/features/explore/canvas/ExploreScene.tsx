@@ -995,6 +995,7 @@ function CameraController({
   autoResetDelay,
 }: CameraControllerProps) {
   const { camera } = useThree();
+  const opts = usePlanetsOptions();
   const isAnimating = useRef(false);
   const prevResetKey = useRef(resetKey);
   const prevSelectedPos = useRef<THREE.Vector3 | null>(null);
@@ -1008,31 +1009,69 @@ function CameraController({
     }
   }, [camera, fov]);
 
-  // Charger la position caméra depuis localStorage
+  // Synchronisation avec les réglages du preset (coordonnées de référence)
+  useEffect(() => {
+    const cam = camera;
+    const ctrl = controlsRef.current;
+    if (!cam) return;
+
+    // Si on n'est pas en train d'animer (ex: zoom planète), on s'aligne sur le preset
+    if (!isAnimating.current) {
+      cam.position.set(opts.cameraX, opts.cameraY, opts.cameraZ);
+      if (ctrl) {
+        ctrl.target.set(opts.cameraTargetX, opts.cameraTargetY, opts.cameraTargetZ);
+        ctrl.update();
+      }
+    }
+  }, [camera, controlsRef, opts.cameraX, opts.cameraY, opts.cameraZ, opts.cameraTargetX, opts.cameraTargetY, opts.cameraTargetZ]);
+
+  // Charger la position de la dernière session (si différente du preset par défaut)
   useEffect(() => {
     const savedPos = localStorage.getItem("explore_camera_pos");
     const savedTarget = localStorage.getItem("explore_camera_target");
-    if (savedPos) {
+
+    // On ne restaure la session que si le preset courant est à ses valeurs par défaut (0, 6.84, 18.79)
+    // Cela permet au preset chargé de prendre la priorité si l'utilisateur a configuré une vue spécifique.
+    const isDefaultPreset = opts.cameraX === 0 && opts.cameraY === 6.84 && opts.cameraZ === 18.79;
+
+    if (savedPos && isDefaultPreset) {
       try {
         const p = JSON.parse(savedPos);
         camera.position.set(p.x, p.y, p.z);
       } catch { /* ignore */ }
     }
-    if (savedTarget && controlsRef.current) {
+    if (savedTarget && controlsRef.current && isDefaultPreset) {
       try {
         const t = JSON.parse(savedTarget);
         controlsRef.current.target.set(t.x, t.y, t.z);
+        controlsRef.current.update();
       } catch { /* ignore */ }
     }
-  }, [camera, controlsRef]);
+  }, [camera, controlsRef]); // On ne met pas opts.cameraX en dep ici pour ne pas relancer le chargement LS à chaque changement de preset
 
   useFrame(() => {
-    // Sauvegarder la position caméra (throttled via saveTimer)
     if (!isAnimating.current) {
+      const pos = camera.position;
+      const tgt = controlsRef.current?.target;
+
+      // 1. Mettre à jour la ref globale pour la capture du preset (OptionsPanel)
+      if (opts.cameraRef) {
+        if (!opts.cameraRef.current) {
+          (opts.cameraRef as any).current = { x: 0, y: 0, z: 0, tx: 0, ty: 0, tz: 0 };
+        }
+        opts.cameraRef.current.x = pos.x;
+        opts.cameraRef.current.y = pos.y;
+        opts.cameraRef.current.z = pos.z;
+        if (tgt) {
+          opts.cameraRef.current.tx = tgt.x;
+          opts.cameraRef.current.ty = tgt.y;
+          opts.cameraRef.current.tz = tgt.z;
+        }
+      }
+
+      // 2. Sauvegarder dans LocalStorage (throttled)
       if (!saveTimer.current) {
         saveTimer.current = setTimeout(() => {
-          const pos = camera.position;
-          const tgt = controlsRef.current?.target;
           localStorage.setItem("explore_camera_pos", JSON.stringify({ x: pos.x, y: pos.y, z: pos.z }));
           if (tgt) localStorage.setItem("explore_camera_target", JSON.stringify({ x: tgt.x, y: tgt.y, z: tgt.z }));
           saveTimer.current = null;

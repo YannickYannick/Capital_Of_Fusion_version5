@@ -88,6 +88,12 @@ export interface PlanetsOptionsState {
     // ── Caméra ──
     autoResetCamera: boolean;
     autoResetDelay: number;
+    cameraX: number;
+    cameraY: number;
+    cameraZ: number;
+    cameraTargetX: number;
+    cameraTargetY: number;
+    cameraTargetZ: number;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -95,6 +101,7 @@ export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
         key: K,
         value: PlanetsOptionsState[K]
     ) => void;
+    setBatch: (values: Partial<PlanetsOptionsState>) => void;
     triggerRestart: () => void;
     triggerReset: () => void;
     restartKey: number;
@@ -176,6 +183,12 @@ const DEFAULTS: PlanetsOptionsState = {
     hoverPlanetTransitionSpeed: 10,
     autoResetCamera: false,
     autoResetDelay: 5,
+    cameraX: 0,
+    cameraY: 6.84,
+    cameraZ: 18.79,
+    cameraTargetX: 0,
+    cameraTargetY: 0,
+    cameraTargetZ: 0,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -225,6 +238,12 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     hoverPlanetSpeedRatio: "planets_hoverPlanetSpeedRatio",
     hoverOrbitTransitionSpeed: "planets_hoverOrbitTransitionSpeed",
     hoverPlanetTransitionSpeed: "planets_hoverPlanetTransitionSpeed",
+    cameraX: "camera_ref_x",
+    cameraY: "camera_ref_y",
+    cameraZ: "camera_ref_z",
+    cameraTargetX: "camera_ref_target_x",
+    cameraTargetY: "camera_ref_target_y",
+    cameraTargetZ: "camera_ref_target_z",
 };
 
 function lsGet<T>(key: string, fallback: T): T {
@@ -294,6 +313,12 @@ function loadFromLS(): PlanetsOptionsState {
         isTransitioningToExplore: false,
         autoResetCamera: DEFAULTS.autoResetCamera,
         autoResetDelay: DEFAULTS.autoResetDelay,
+        cameraX: lsGet(LS_KEYS.cameraX!, DEFAULTS.cameraX),
+        cameraY: lsGet(LS_KEYS.cameraY!, DEFAULTS.cameraY),
+        cameraZ: lsGet(LS_KEYS.cameraZ!, DEFAULTS.cameraZ),
+        cameraTargetX: lsGet(LS_KEYS.cameraTargetX!, DEFAULTS.cameraTargetX),
+        cameraTargetY: lsGet(LS_KEYS.cameraTargetY!, DEFAULTS.cameraTargetY),
+        cameraTargetZ: lsGet(LS_KEYS.cameraTargetZ!, DEFAULTS.cameraTargetZ),
     };
 }
 
@@ -328,6 +353,19 @@ export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
         []
     );
 
+    const setBatch = useCallback((values: Partial<PlanetsOptionsState>) => {
+        setState((prev) => {
+            const next = { ...prev, ...values };
+            Object.entries(values).forEach(([key, value]) => {
+                if (key !== "isTransitioningToExplore") {
+                    const lsKey = LS_KEYS[key as keyof PlanetsOptionsState];
+                    if (lsKey) lsSet(lsKey, value);
+                }
+            });
+            return next;
+        });
+    }, []);
+
     const triggerRestart = useCallback(() => {
         setRestartKey((k) => k + 1);
     }, []);
@@ -339,6 +377,7 @@ export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
     const value: PlanetsOptionsContextValue = {
         ...state,
         set,
+        setBatch,
         triggerRestart,
         triggerReset,
         restartKey,

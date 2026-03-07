@@ -84,7 +84,7 @@ export default function TheorieQuizPage() {
   const pct = Math.round((score / QUESTIONS.length) * 100);
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8 flex flex-col items-center">
+    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8 flex flex-col items-center">
       <div className="w-full max-w-2xl">
 
         {/* Header */}

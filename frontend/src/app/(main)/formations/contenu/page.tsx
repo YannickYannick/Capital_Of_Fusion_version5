@@ -63,7 +63,7 @@ const LEVEL_COLORS: Record<string, string> = {
 
 export default function FormationsContenuPage() {
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}

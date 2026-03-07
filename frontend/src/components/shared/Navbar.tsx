@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MobileNav } from "./MobileNav";
@@ -87,12 +88,19 @@ export function Navbar() {
         : "bg-transparent"
         }`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Navigation principale">
+      <nav className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${scrolled ? "h-20" : "h-56"} flex items-center justify-between`} aria-label="Navigation principale">
         <Link
           href="/"
-          className="text-xl md:text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 hover:scale-105 transition transform origin-left whitespace-nowrap flex-shrink-0"
+          className="hover:scale-105 transition transform origin-left whitespace-nowrap flex-shrink-0"
         >
-          Capital of Fusion
+          <Image
+            src="/logo.png"
+            alt="Capital of Fusion"
+            width={600}
+            height={200}
+            className={`transition-all duration-300 ${scrolled ? "h-16" : "h-48"} w-auto object-contain`}
+            priority
+          />
         </Link>
 
         <div className="hidden xl:flex items-center gap-2 lg:gap-4 flex-1 justify-end pl-2 flex-wrap lg:flex-nowrap">

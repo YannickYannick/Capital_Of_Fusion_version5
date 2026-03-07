@@ -3,11 +3,11 @@ Vues API Core — menu (items racine avec children récursifs), health check.
 """
 from django.http import JsonResponse
 from django.conf import settings
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import MenuItem, SiteConfiguration
-from .serializers import MenuItemSerializer, SiteConfigurationSerializer
+from .models import MenuItem, SiteConfiguration, ExplorePreset
+from .serializers import MenuItemSerializer, SiteConfigurationSerializer, ExplorePresetSerializer
 
 class SiteConfigurationAPIView(APIView):
     """
@@ -73,3 +73,12 @@ def seed_database(request):
         results['create_admin'] = f"Error: {str(e)}"
 
     return JsonResponse({"status": "done", "results": results})
+
+
+class ExplorePresetViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet pour gérer les presets Explore 3D.
+    """
+    queryset = ExplorePreset.objects.all().order_by("-created_at")
+    serializer_class = ExplorePresetSerializer
+    permission_classes = [] # On laisse ouvert pour l'instant ou on pourra restreindre plus tard

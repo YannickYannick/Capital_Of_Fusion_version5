@@ -72,5 +72,9 @@
 | [2026-03-05 22:30] Completed Task | Application Artistes & Config 3D | Succès du push forcé sur `main`. Preset 1 initialisé, artistes démo chargés, 3D fonctionnelle avec réglages Admin. |
 | [2026-03-05 22:50] Starting Task | Bonnes Pratiques & Workflow | Création `docs/bonnes_pratiques/`, rédaction post-mortem incident Git dans `docs/bugs/`, mise à jour `.cursorrules` (Section 6). |
 | [2026-03-05 23:05] Completed Task | Bonnes Pratiques & Workflow | Documentation structurée, règles BMAD mises à jour pour prévenir les verrous Git et erreurs de workspace sur Windows. |
+| [2026-03-07] Nettoyage & doc | Fichiers debug exclus du dépôt (`.gitignore` : `backend/error.txt`, `backend/migrate_err.txt`). |
+| [2026-03-07] Doc par feature | Création `docs/features/` : README (index), `explore-presets.md`, `landing-config.md`, `navbar-dashboard.md`. Référence depuis `docs/README.md`. |
+| [2026-03-07] API docs | Mise à jour `docs/bmad/03-api_docs.md` : section Core (GET `/api/config/`, CRUD `/api/core/presets/`). |
+| [2026-03-07] Trace session | Fichier `docs/history/trace_deduction_cursor_vs_antigravity_2026-03-07.md` (comparaison déduction Cursor / conv Antigravity). |
 
-*Dernière mise à jour : 2026-03-05*
+*Dernière mise à jour : 2026-03-07*

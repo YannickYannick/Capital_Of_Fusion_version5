@@ -133,6 +133,14 @@ class ExplorePreset(BaseModel):
     auto_reset_camera = models.BooleanField(default=False)
     auto_reset_delay = models.FloatField(default=5)
 
+    # Position de la caméra par défaut pour le preset
+    camera_x = models.FloatField(default=0)
+    camera_y = models.FloatField(default=6.84)
+    camera_z = models.FloatField(default=18.79)
+    camera_target_x = models.FloatField(default=0)
+    camera_target_y = models.FloatField(default=0)
+    camera_target_z = models.FloatField(default=0)
+
     class Meta:
         verbose_name = "Preset Explore 3D"
         verbose_name_plural = "Presets Explore 3D"
@@ -140,8 +148,19 @@ class ExplorePreset(BaseModel):
 
 class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=255, blank=True)
-    hero_title = models.CharField(max_length=255, blank=True)
+    hero_title = models.CharField(max_length=255, blank=True, default="Capital of Fusion")
     hero_subtitle = models.TextField(blank=True)
+    
+    # Nouveaux champs pour la personnalisation de la Homepage
+    hero_top_text = models.CharField(max_length=255, blank=True, default="Nouvelle Version Immersive")
+    hero_descr_1 = models.TextField(blank=True, default="Découvrez l'univers de la Bachata comme jamais.")
+    hero_descr_2 = models.TextField(blank=True, default="Une expérience interactive en 3D au cœur de la danse.")
+    hero_btn_1_text = models.CharField(max_length=100, blank=True, default="Commencer l'Expérience")
+    hero_btn_1_url = models.CharField(max_length=255, blank=True, default="/explore")
+    hero_btn_2_text = models.CharField(max_length=100, blank=True, default="Voir les Cours")
+    hero_btn_2_url = models.CharField(max_length=255, blank=True, default="/cours")
+    hero_footer_text = models.CharField(max_length=255, blank=True, default="Paris, France • École Nationale de Danse")
+
     active_explore_preset = models.ForeignKey(ExplorePreset, on_delete=models.SET_NULL, null=True, blank=True)
     VIDEO_CHOICES = (('youtube', 'Vidéo YouTube'), ('mp4', 'Fichier Local (MP4)'))
     main_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube')

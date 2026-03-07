@@ -3,7 +3,7 @@ Routes API — menu, courses, events, organization, projects, auth.
 Routes admin — POST/PATCH/DELETE sécurisées superuser.
 """
 from django.urls import path, include
-from apps.core.views import MenuItemListAPIView, health_check, SiteConfigurationAPIView, seed_database
+from apps.core.views import MenuItemListAPIView, health_check, SiteConfigurationAPIView, seed_database, ExplorePresetViewSet
 from apps.courses.views import (
     CourseListAPIView, CourseDetailAPIView,
     TheoryLessonListAPIView, TheoryLessonDetailAPIView,
@@ -45,6 +45,7 @@ router.register(r'projects/categories', ProjectCategoryViewSet, basename='projec
 router.register(r'projects/projects', ProjectViewSet, basename='project')
 router.register(r'trainings/passes', SubscriptionPassViewSet, basename='training-pass')
 router.register(r'trainings/sessions', TrainingSessionViewSet, basename='training-session')
+router.register(r'core/presets', ExplorePresetViewSet, basename='explore-preset')
 
 
 urlpatterns = [

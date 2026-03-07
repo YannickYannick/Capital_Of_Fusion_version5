@@ -4,8 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import type { PlanetsOptionsState } from "@/contexts/PlanetsOptionsContext";
-import { getSiteConfig } from "@/lib/api";
+import { getSiteConfig, createExplorePreset } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
+import type { ExplorePresetApi } from "@/types/explore";
 
 interface OptionsPanelProps {
     onOpenPlanetConfig: () => void;
@@ -106,6 +107,55 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelProps) {
     const [visible, setVisible] = useState(true);
     const opts = usePlanetsOptions();
+    const [saving, setSaving] = useState(false);
+
+    const handleSavePreset = async () => {
+        const name = prompt("Nom du preset :", "Nouveau Preset");
+        if (!name) return;
+
+        setSaving(true);
+        try {
+            // Extraire les options pures de l'état (exclure les fonctions et refs)
+            const optionsData: any = { name };
+            for (const key in opts) {
+                if (
+                    typeof (opts as any)[key] !== "function" &&
+                    key !== "cameraRef" &&
+                    key !== "restartKey" &&
+                    key !== "resetKey" &&
+                    key !== "name"
+                ) {
+                    // On convertit camelCase vers snake_case pour le backend si nécessaire ? 
+                    // Non, le serializer DRF peut être adapté ou on peut envoyer tel quel si on a les champs correspondants.
+                    // ATTENTION: Notre modèle Django utilise snake_case. 
+                    // Mais notre serializer ExplorePresetSerializer utilise to_representation pour cameliser le SORTIE.
+                    // Pour l'ENTRÉE (POST), DRF attend par défaut les noms de champs du modèle (snake_case).
+
+                    // Conversion inverse camelCase -> snake_case
+                    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+                    optionsData[snakeKey] = (opts as any)[key];
+                }
+            }
+
+            // Ajouter les coordonnées de la caméra live
+            if (opts.cameraRef.current) {
+                optionsData.camera_x = opts.cameraRef.current.x;
+                optionsData.camera_y = opts.cameraRef.current.y;
+                optionsData.camera_z = opts.cameraRef.current.z;
+                optionsData.camera_target_x = opts.cameraRef.current.tx;
+                optionsData.camera_target_y = opts.cameraRef.current.ty;
+                optionsData.camera_target_z = opts.cameraRef.current.tz;
+            }
+
+            await createExplorePreset(optionsData);
+            alert("Preset sauvegardé avec succès ! ✨");
+        } catch (err) {
+            console.error("Erreur sauvegarde preset:", err);
+            alert("Erreur lors de la sauvegarde : " + (err instanceof Error ? err.message : String(err)));
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <>
@@ -775,6 +825,24 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                                 onChange={(v) => opts.set("videoTransition", v * 1000)}
                             />
                         </Section>
+
+                        {/* Sauvegarde */}
+                        <div className="mt-4 pt-4 border-t border-white/20">
+                            <button
+                                type="button"
+                                onClick={handleSavePreset}
+                                disabled={saving}
+                                className={`w-full py-3 rounded-xl border border-purple-500/50 text-white font-bold transition-all shadow-lg shadow-purple-900/20 ${saving
+                                    ? "bg-purple-900/40 opacity-50 cursor-wait"
+                                    : "bg-purple-600 hover:bg-purple-500 hover:scale-[1.02] active:scale-[0.98]"
+                                    }`}
+                            >
+                                {saving ? "💾 Sauvegarde en cours..." : "💾 Enregistrer comme Preset"}
+                            </button>
+                            <p className="text-[10px] text-white/40 text-center mt-2 italic">
+                                Ces réglages seront enregistrés dans la base de données.
+                            </p>
+                        </div>
                     </motion.aside>
                 )}
             </AnimatePresence >

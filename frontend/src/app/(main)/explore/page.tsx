@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { getOrganizationNodes } from "@/lib/api";
+import { getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { PlanetOverlay } from "@/components/features/explore/components/PlanetOverlay";
@@ -26,6 +26,7 @@ const ExploreScene = dynamic(
 
 function ExplorePageInner() {
   const opts = usePlanetsOptions();
+  const { setBatch } = opts;
   const controlsRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const [nodes, setNodes] = useState<OrganizationNodeApi[]>([]);
@@ -38,11 +39,23 @@ function ExplorePageInner() {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
   useEffect(() => {
+    // 1. Charger les noeuds
     getOrganizationNodes()
       .then(setNodes)
       .catch((e) => setError(e instanceof Error ? e.message : "Erreur chargement"))
       .finally(() => setLoading(false));
-  }, []);
+
+    // 2. Charger le preset actif défini dans la config du site
+    getSiteConfig().then((config) => {
+      if (config.explore_config) {
+        // Filtrer pour ne garder que les réglages visuels (exclure metadata)
+        const { id, name, created_at, updated_at, ...visualOptions } = config.explore_config as any;
+        setBatch(visualOptions);
+      }
+    }).catch(err => {
+      console.warn("Erreur chargement preset explore actif:", err);
+    });
+  }, [setBatch]);
 
   const visibleNodes = nodes.filter((n) => n.is_visible_3d);
 

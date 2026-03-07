@@ -7,14 +7,16 @@ from .models import MenuItem, SiteConfiguration, ExplorePreset
 class ExplorePresetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExplorePreset
-        exclude = ["id", "created_at", "updated_at", "name"]
+        fields = "__all__"
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         new_data = {}
         for key, value in data.items():
+            # Conversion snake_case -> camelCase pour le frontend
             parts = key.split('_')
             camel_key = parts[0] + ''.join(x.title() for x in parts[1:])
-            new_data[camel_key] = value if key != 'light_config' else value
+            new_data[camel_key] = value
         return new_data
 
 class SiteConfigurationSerializer(serializers.ModelSerializer):

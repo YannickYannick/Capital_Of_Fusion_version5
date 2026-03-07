@@ -62,7 +62,7 @@ export default async function TheoriePage() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
 
         {/* Hero */}

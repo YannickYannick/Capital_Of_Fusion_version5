@@ -21,6 +21,19 @@ Index de la documentation du projet (méthodologie BMAD).
 
 ---
 
+## 🧩 Features (`features/`)
+
+Documentation par fonctionnalité : code concerné, comportement, configuration admin.
+
+| Fichier | Contenu |
+|---------|---------|
+| [README](features/README.md) | Index des features documentées |
+| [explore-presets.md](features/explore-presets.md) | Presets 3D Explore (sauvegarde, caméra, chargement depuis config) |
+| [landing-config.md](features/landing-config.md) | Configuration de la landing (hero, boutons) depuis l'admin |
+| [navbar-dashboard.md](features/navbar-dashboard.md) | Logo, avatar connecté, dashboard et lien DB menu (admins) |
+
+---
+
 ## 📖 Explications (`explication/`)
 
 Guides pour comprendre et utiliser des fonctionnalités du projet.
@@ -62,4 +75,4 @@ Source : `C:\...\Projet - site bachata V4\refactorisation_V5_Structuré\`
 
 ---
 
-*Dernière mise à jour : 2025-02-10*
+*Dernière mise à jour : 2026-03-07*

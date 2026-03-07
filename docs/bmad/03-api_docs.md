@@ -29,6 +29,13 @@
 | POST | `https://capitaloffusionversion5-production.up.railway.app/api/auth/logout/` |
 | GET | `https://capitaloffusionversion5-production.up.railway.app/api/auth/me/` |
 
+**Core (config + presets) :**
+
+| Méthode | URL |
+|--------|-----|
+| GET | `.../api/config/` |
+| GET / POST / PATCH / DELETE | `.../api/core/presets/` |
+
 **Hors API (Django admin) :** `https://capitaloffusionversion5-production.up.railway.app/admin/`
 
 ---
@@ -172,6 +179,21 @@
 
 ---
 
+### 2.6 Core — Config site & Presets Explore
+
+| Méthode | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/config/` | Configuration singleton du site : champs hero (titres, textes, liens boutons), vidéos, **active_explore_preset** (objet preset ou null). Utilisé par la landing et la page Explore pour charger le preset 3D par défaut. |
+| GET | `/api/core/presets/` | Liste des presets Explore 3D. |
+| POST | `/api/core/presets/` | Création d'un preset (options 3D + position caméra). Body : voir `ExplorePreset` (serializer). Auth optionnelle. |
+| GET | `/api/core/presets/<id>/` | Détail d'un preset. |
+| PATCH | `/api/core/presets/<id>/` | Mise à jour partielle. |
+| DELETE | `/api/core/presets/<id>/` | Suppression. |
+
+*Détail des champs et usage frontend : voir `docs/features/explore-presets.md` et `docs/features/landing-config.md`.*
+
+---
+
 ## 3. Codes de statut & erreurs
 
 - **200 OK** : requête réussie, corps = liste ou objet JSON.
@@ -183,4 +205,4 @@
 
 ---
 
-*Dernière mise à jour : 2025-02-10*
+*Dernière mise à jour : 2026-03-07*

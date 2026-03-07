@@ -70,7 +70,7 @@ const COLOR_CLASSES: Record<string, { ring: string; bg: string; text: string; ba
 
 export default function TheorieProgressionPage() {
   return (
-    <div className="min-h-screen pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}

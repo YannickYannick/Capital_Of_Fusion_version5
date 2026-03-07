@@ -14,6 +14,7 @@ import type { ProductCategoryApi, ProductApi } from "@/types/shop";
 import type { PractitionerApi, CareServiceApi } from "@/types/care";
 import type { ProjectCategoryApi, ProjectApi } from "@/types/projects";
 import type { SubscriptionPassApi, TrainingSessionApi } from "@/types/trainings";
+import type { ExplorePresetApi } from "@/types/explore";
 
 /**
  * Retourne l'URL de base de l'API (sans slash final).
@@ -341,5 +342,24 @@ export async function getTrainingSessions(): Promise<TrainingSessionApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/trainings/sessions/`);
   if (!res.ok) throw new Error(`Trainings Sessions API error: ${res.status}`);
+  return res.json();
+}
+
+// --- EXPLORE PRESETS ---
+export async function createExplorePreset(data: Partial<ExplorePresetApi>): Promise<ExplorePresetApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Token ${token}`;
+
+  const res = await fetch(`${base}/api/core/presets/`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || `Create Preset error: ${res.status}`);
+  }
   return res.json();
 }
