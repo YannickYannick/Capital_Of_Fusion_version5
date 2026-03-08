@@ -29,6 +29,8 @@ from apps.organization.views import (
     OrganizationNodeListAPIView,
     OrganizationNodeDetailAPIView,
     OrganizationNodeAdminDetailAPIView,
+    PoleListAPIView,
+    StaffListAPIView,
 )
 from apps.users.views import (
     LoginAPIView,
@@ -82,6 +84,8 @@ urlpatterns = [
     # ── Organization (lecture) ───────────────────────────────────────────────
     path("organization/nodes/", OrganizationNodeListAPIView.as_view()),
     path("organization/nodes/<slug:slug>/", OrganizationNodeDetailAPIView.as_view()),
+    path("organization/poles/", PoleListAPIView.as_view()),
+    path("organization/staff/", StaffListAPIView.as_view()),
 
     # ── Auth ─────────────────────────────────────────────────────────────────
     path("auth/login/", LoginAPIView.as_view()),

@@ -21,7 +21,7 @@ Section **Organisation** : page d’accueil avec liens vers **Structure** (organ
 
 ## Comportement
 
-- **/organisation** : deux cartes — Structure (organigramme) et Nœuds (annuaire).
+- **/organisation** : deux cartes — Structure (organigramme) et Nœuds (annuaire). Une troisième carte — Notre Staff — mène vers /organisation/staff (voir [organisation-poles-staff.md](organisation-poles-staff.md)).
 - **/organisation/structure** : organigramme hiérarchique (parent_slug). Clic sur un nœud → **/organisation/noeuds/[slug]** (fiche dédiée).
 - **/organisation/noeuds** : grille de cartes (style /artistes), toutes les entrées → fiche nœud.
 - **/organisation/noeuds/[slug]** : fiche type profil (hero image, à propos, colonne Cours + Événements du nœud, CTA « Explorer en 3D » vers /explore?node=slug).

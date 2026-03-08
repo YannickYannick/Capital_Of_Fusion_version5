@@ -1,9 +1,32 @@
 """
-Modèles Organization — OrganizationNode (récursif + 3D), OrganizationRole,
-UserOrganizationRole, NodeEvent. Alignés MCD Phase 1 section 1.3.
+Modèles Organization — Pole, OrganizationNode (récursif + 3D), OrganizationRole,
+UserOrganizationRole, NodeEvent, TeamMember. Alignés MCD Phase 1 section 1.3.
 """
 from django.db import models
 from apps.core.models import BaseModel
+
+
+class Pole(BaseModel):
+    """
+    Pôle d'appartenance pour staff/admin (ex: TEAM ORGA Direction, TEAM VIBE Bénévoles).
+    Un utilisateur staff ou admin peut être rattaché à un pôle ; le nombre de membres
+    est calculé automatiquement (count des User avec ce pole).
+    """
+    name = models.CharField(max_length=255, verbose_name="Nom du pôle")
+    slug = models.SlugField(max_length=255, unique=True)
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name="Ordre d'affichage",
+        help_text="Plus le nombre est petit, plus le pôle apparaît en haut dans les listes.",
+    )
+
+    class Meta:
+        verbose_name = "Pôle"
+        verbose_name_plural = "Pôles"
+        ordering = ["order", "name"]
+
+    def __str__(self):
+        return self.name
 
 
 class OrganizationNode(BaseModel):

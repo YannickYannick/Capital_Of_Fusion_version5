@@ -51,3 +51,29 @@ export interface OrganizationNodeApi {
   music_youtube_url: string;
   music_file: string | null;
 }
+
+/**
+ * Pôle d'appartenance (staff/admin). API GET /api/organization/poles/
+ */
+export interface PoleApi {
+  id: string;
+  name: string;
+  slug: string;
+  order: number;
+  members_count: number;
+}
+
+/**
+ * Membre du staff (Organisation). API GET /api/organization/staff/
+ */
+export interface StaffMemberApi {
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  profile_picture: string | null;
+  staff_role: string;
+  staff_role_display: string;
+  pole: { id: string; name: string; slug: string } | null;
+  bio: string;
+}

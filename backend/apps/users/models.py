@@ -39,6 +39,15 @@ class User(AbstractUser):
         blank=True,
         verbose_name="Rôle (Staff uniquement)",
     )
+    pole = models.ForeignKey(
+        "organization.Pole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="members",
+        verbose_name="Pôle (Staff / Admin)",
+        help_text="Pôle d'appartenance pour les comptes Staff et Admin. Le nombre de membres par pôle est calculé automatiquement.",
+    )
 
     class AccountStatus(models.TextChoices):
         PENDING = "PENDING", "En attente de validation"

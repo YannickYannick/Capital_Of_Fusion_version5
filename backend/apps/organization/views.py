@@ -6,9 +6,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
+from django.contrib.auth import get_user_model
 from apps.core.permissions import IsStaffOrSuperUser
-from .models import OrganizationNode
-from .serializers import OrganizationNodeSerializer
+from .models import OrganizationNode, Pole
+from .serializers import OrganizationNodeSerializer, PoleSerializer, StaffMemberSerializer
+
+User = get_user_model(), StaffMemberSerializer
 
 
 
@@ -33,6 +37,35 @@ class OrganizationNodeListAPIView(APIView):
                 is_visible_3d=True
             ).prefetch_related("node_events").order_by("created_at")
         serializer = OrganizationNodeSerializer(qs, many=True, context={"request": request})
+        return Response(serializer.data)
+
+
+class PoleListAPIView(APIView):
+    """
+    GET /api/organization/poles/
+    Liste des pôles avec le nombre de membres (utilisateurs staff/admin rattachés).
+    """
+    def get(self, request):
+        qs = Pole.objects.annotate(members_count=Count("members")).order_by("order", "name")
+        serializer = PoleSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class StaffListAPIView(APIView):
+    """
+    GET /api/organization/staff/
+    Liste des membres du staff (User avec user_type STAFF ou ADMIN).
+    Query: ?pole=<slug> pour filtrer par pôle.
+    """
+    def get(self, request):
+        qs = User.objects.filter(
+            user_type__in=[User.UserType.STAFF, User.UserType.ADMIN],
+            is_active=True,
+        ).select_related("pole").order_by("pole__order", "first_name", "last_name", "username")
+        pole_slug = request.query_params.get("pole")
+        if pole_slug:
+            qs = qs.filter(pole__slug=pole_slug)
+        serializer = StaffMemberSerializer(qs, many=True, context={"request": request})
         return Response(serializer.data)
 
 

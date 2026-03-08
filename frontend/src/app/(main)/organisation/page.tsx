@@ -30,6 +30,13 @@ export default function OrganisationPage() {
             <h2 className="text-xl font-bold text-white group-hover:text-fuchsia-300 mb-2">Nœuds</h2>
             <p className="text-white/60 text-sm">Annuaire des pôles avec cours et événements.</p>
           </Link>
+          <Link
+            href="/organisation/staff"
+            className="group p-8 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/10 border border-violet-500/30 hover:border-violet-500/50 hover:-translate-y-0.5 transition-all"
+          >
+            <h2 className="text-xl font-bold text-white group-hover:text-purple-300 mb-2">Notre Staff</h2>
+            <p className="text-white/60 text-sm">Les membres de l’équipe Capital of Fusion.</p>
+          </Link>
         </div>
       </div>
     </div>

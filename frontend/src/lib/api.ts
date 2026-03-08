@@ -7,7 +7,7 @@ import type { MenuItemApi } from "@/types/menu";
 import type { CourseApi } from "@/types/course";
 import type { TheoryLessonApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
-import type { OrganizationNodeApi } from "@/types/organization";
+import type { OrganizationNodeApi, PoleApi, StaffMemberApi } from "@/types/organization";
 import type { ArtistApi } from "@/types/user";
 import type { SiteConfigurationApi, BulletinApi, BulletinAdminApi } from "@/types/config";
 import type { ProductCategoryApi, ProductApi } from "@/types/shop";
@@ -263,6 +263,30 @@ export async function getOrganizationNodesForStructure(): Promise<OrganizationNo
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/organization/nodes/?for_structure=1`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization structure API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Liste des pôles avec nombre de membres (staff/admin). GET /api/organization/poles/
+ */
+export async function getPoles(): Promise<PoleApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/organization/poles/`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Poles API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Liste des membres du staff (Organisation). GET /api/organization/staff/
+ * @param poleSlug - filtre optionnel par slug de pôle
+ */
+export async function getStaffMembers(poleSlug?: string): Promise<StaffMemberApi[]> {
+  const base = getApiBaseUrl();
+  const url = poleSlug
+    ? `${base}/api/organization/staff/?pole=${encodeURIComponent(poleSlug)}`
+    : `${base}/api/organization/staff/`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Staff API error: ${res.status}`);
   return res.json();
 }
 

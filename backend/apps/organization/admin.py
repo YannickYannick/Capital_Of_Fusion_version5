@@ -1,5 +1,19 @@
 from django.contrib import admin
-from .models import OrganizationNode, OrganizationRole, UserOrganizationRole, NodeEvent, TeamMember
+from .models import OrganizationNode, OrganizationRole, UserOrganizationRole, NodeEvent, TeamMember, Pole
+
+
+@admin.register(Pole)
+class PoleAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug", "order", "members_count")
+    list_editable = ("order",)
+    prepopulated_fields = {"slug": ("name",)}
+    ordering = ("order", "name")
+
+    def members_count(self, obj):
+        """Nombre d'utilisateurs staff/admin rattachés à ce pôle."""
+        return obj.members.count()
+    members_count.short_description = "Membres"
+
 
 class NodeEventInline(admin.TabularInline):
     """Inline pour gérer les événements directement depuis le noeud."""
