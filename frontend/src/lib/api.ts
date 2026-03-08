@@ -257,6 +257,16 @@ export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
 }
 
 /**
+ * Tous les noeuds pour l’organigramme (avec parent_slug). GET /api/organization/nodes/?for_structure=1
+ */
+export async function getOrganizationNodesForStructure(): Promise<OrganizationNodeApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/organization/nodes/?for_structure=1`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Organization structure API error: ${res.status}`);
+  return res.json();
+}
+
+/**
  * Détail d'un noeud par slug (overlay). GET /api/organization/nodes/<slug>/
  */
 export async function getOrganizationNodeBySlug(

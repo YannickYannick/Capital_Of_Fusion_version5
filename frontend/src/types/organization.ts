@@ -18,6 +18,8 @@ export interface OrganizationNodeApi {
   name: string;
   slug: string;
   type: string;
+  /** Slug du noeud parent (null pour la racine). Utilisé pour l’organigramme. */
+  parent_slug?: string | null;
   description: string;
   short_description: string;
   cta_text: string;
@@ -44,4 +46,8 @@ export interface OrganizationNodeApi {
   entry_speed: number | null;
   is_visible_3d: boolean;
   node_events: NodeEventApi[];
+  /** Musique de fond (overlay) — configurable en admin uniquement */
+  music_type: "" | "youtube" | "file";
+  music_youtube_url: string;
+  music_file: string | null;
 }

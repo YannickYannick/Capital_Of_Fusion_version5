@@ -23,9 +23,10 @@ class NodeEventSerializer(serializers.ModelSerializer):
 
 
 class OrganizationNodeSerializer(serializers.ModelSerializer):
-    """Noeud avec paramètres 3D et événements pour Explore / overlay."""
+    """Noeud avec paramètres 3D et événements pour Explore / overlay / organigramme."""
 
     node_events = NodeEventSerializer(many=True, read_only=True)
+    parent_slug = serializers.SerializerMethodField()
 
     class Meta:
         model = OrganizationNode
@@ -34,6 +35,7 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "type",
+            "parent_slug",
             "description",
             "short_description",
             "cta_text",
@@ -41,6 +43,9 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
             "video_url",
             "cover_image",
             "content",
+            "music_type",
+            "music_youtube_url",
+            "music_file",
             "visual_source",
             "planet_type",
             "model_3d",
@@ -61,3 +66,6 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
             "is_visible_3d",
             "node_events",
         )
+
+    def get_parent_slug(self, obj):
+        return obj.parent.slug if obj.parent else None

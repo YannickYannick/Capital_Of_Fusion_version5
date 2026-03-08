@@ -174,6 +174,33 @@ class OrganizationNode(BaseModel):
         help_text="Afficher cette planète dans la scène 3D"
     )
 
+    # Musique de fond (overlay) — prend le pas sur la vidéo d'accueil quand l'overlay est ouvert. Configurable uniquement en admin.
+    MUSIC_TYPE_CHOICES = (
+        ("", "Aucune"),
+        ("youtube", "Lien YouTube"),
+        ("file", "Fichier audio/vidéo"),
+    )
+    music_type = models.CharField(
+        max_length=20,
+        choices=MUSIC_TYPE_CHOICES,
+        blank=True,
+        default="",
+        verbose_name="Type de musique de fond",
+        help_text="Jouée en fond quand l'overlay de cette planète est ouvert (remplace la vidéo d'accueil)."
+    )
+    music_youtube_url = models.URLField(
+        blank=True,
+        verbose_name="URL YouTube (musique)",
+        help_text="Ex: https://www.youtube.com/watch?v=VIDEO_ID — utilisé si type = Lien YouTube"
+    )
+    music_file = models.FileField(
+        upload_to="nodes/music/",
+        blank=True,
+        null=True,
+        verbose_name="Fichier musique",
+        help_text="Fichier audio ou vidéo — utilisé si type = Fichier"
+    )
+
     class Meta:
         verbose_name = "Noeud d'organisation"
         verbose_name_plural = "Noeuds d'organisation"

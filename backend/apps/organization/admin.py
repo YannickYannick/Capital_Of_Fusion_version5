@@ -57,6 +57,11 @@ class OrganizationNodeAdmin(admin.ModelAdmin):
             'fields': ['video_url'],
             'classes': ['collapse']
         }),
+        ('Musique de fond (overlay)', {
+            'fields': ['music_type', 'music_youtube_url', 'music_file'],
+            'classes': ['collapse'],
+            'description': 'Musique jouée en fond quand l\'overlay de cette planète est ouvert (remplace la vidéo d\'accueil). Uniquement configurable ici.'
+        }),
     ]
     
     def events_count(self, obj):

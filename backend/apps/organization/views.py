@@ -1,12 +1,12 @@
 """
 Vues API Organization — liste des noeuds (Explore 3D) ; détail par slug.
-Vues admin — modifier les noeuds d'organisation (réservé IsSuperUser).
+Vues admin — modifier les noeuds d'organisation (staff ou superuser).
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from apps.core.permissions import IsSuperUser
+from apps.core.permissions import IsStaffOrSuperUser
 from .models import OrganizationNode
 from .serializers import OrganizationNodeSerializer
 
@@ -15,15 +15,24 @@ from .serializers import OrganizationNodeSerializer
 class OrganizationNodeListAPIView(APIView):
     """
     GET /api/organization/nodes/
-    Liste des noeuds visibles en 3D (is_visible_3d=True), avec node_events.
-    Pour Explore 3D : planètes + paramètres orbit/planet.
+    Par défaut : noeuds visibles en 3D (is_visible_3d=True), avec node_events.
+    GET /api/organization/nodes/?for_structure=1 : tous les noeuds (pour l’organigramme), avec parent_slug.
     """
 
     def get(self, request):
-        qs = OrganizationNode.objects.filter(
-            is_visible_3d=True
-        ).prefetch_related("node_events").order_by("created_at")
-        serializer = OrganizationNodeSerializer(qs, many=True, context={'request': request})
+        for_structure = request.query_params.get("for_structure") in ("1", "true")
+        if for_structure:
+            qs = (
+                OrganizationNode.objects.all()
+                .select_related("parent")
+                .prefetch_related("node_events")
+                .order_by("created_at")
+            )
+        else:
+            qs = OrganizationNode.objects.filter(
+                is_visible_3d=True
+            ).prefetch_related("node_events").order_by("created_at")
+        serializer = OrganizationNodeSerializer(qs, many=True, context={"request": request})
         return Response(serializer.data)
 
 
@@ -47,11 +56,10 @@ class OrganizationNodeDetailAPIView(APIView):
 class OrganizationNodeAdminDetailAPIView(APIView):
     """
     PATCH /api/admin/organization/nodes/<slug>/ → modifier un noeud.
-    Réservé aux superusers.
-    Note : la création et suppression de noeuds se fait via l'admin Django
-    car cela affecte la structure 3D.
+    Réservé aux membres du staff (ou superusers).
+    Permet aux staff de modifier les descriptions depuis la page Explore.
     """
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request, slug):
         node = get_object_or_404(OrganizationNode, slug=slug)
