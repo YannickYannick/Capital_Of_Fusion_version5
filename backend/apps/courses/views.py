@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from apps.core.permissions import IsSuperUser
+from apps.core.permissions import IsSuperUser, IsStaffOrSuperUser
+from apps.core.models import PendingContentEdit
 from .models import Course, TheoryLesson
 from .serializers import (
     CourseSerializer, CourseWriteSerializer,
@@ -108,21 +109,33 @@ class CourseAdminAPIView(APIView):
 
 class CourseAdminDetailAPIView(APIView):
     """
-    PATCH /api/admin/courses/<slug>/ → modifier un cours.
-    DELETE /api/admin/courses/<slug>/ → supprimer un cours.
-    Réservés aux superusers.
+    PATCH /api/admin/courses/<slug>/ → modifier un cours. Admin : direct. Staff : en attente.
+    DELETE : admin uniquement.
     """
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request, slug):
         course = get_object_or_404(Course, slug=slug)
         serializer = CourseWriteSerializer(course, data=request.data, partial=True)
-        if serializer.is_valid():
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if getattr(request.user, "is_superuser", False):
             course = serializer.save()
             return Response(CourseSerializer(course).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.COURSE,
+            object_id=slug,
+            payload=request.data,
+            requested_by=request.user,
+        )
+        return Response(
+            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
     def delete(self, request, slug):
+        if not getattr(request.user, "is_superuser", False):
+            return Response({"detail": "Action non autorisée."}, status=status.HTTP_403_FORBIDDEN)
         course = get_object_or_404(Course, slug=slug)
         course.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -145,21 +158,33 @@ class TheoryLessonAdminAPIView(APIView):
 
 class TheoryLessonAdminDetailAPIView(APIView):
     """
-    PATCH /api/admin/courses/theory/<slug>/ → modifier une leçon.
-    DELETE /api/admin/courses/theory/<slug>/ → supprimer une leçon.
-    Réservés aux superusers.
+    PATCH /api/admin/courses/theory/<slug>/ → modifier une leçon. Admin : direct. Staff : en attente.
+    DELETE : admin uniquement.
     """
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request, slug):
         lesson = get_object_or_404(TheoryLesson, slug=slug)
         serializer = TheoryLessonWriteSerializer(lesson, data=request.data, partial=True)
-        if serializer.is_valid():
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if getattr(request.user, "is_superuser", False):
             lesson = serializer.save()
             return Response(TheoryLessonSerializer(lesson).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.THEORY_LESSON,
+            object_id=slug,
+            payload=request.data,
+            requested_by=request.user,
+        )
+        return Response(
+            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
     def delete(self, request, slug):
+        if not getattr(request.user, "is_superuser", False):
+            return Response({"detail": "Action non autorisée."}, status=status.HTTP_403_FORBIDDEN)
         lesson = get_object_or_404(TheoryLesson, slug=slug)
         lesson.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

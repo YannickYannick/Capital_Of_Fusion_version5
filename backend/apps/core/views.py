@@ -4,18 +4,21 @@ Vues API Core — menu (items racine avec children récursifs), health check.
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin
+from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin, PendingContentEdit
 from .serializers import (
     MenuItemSerializer,
     SiteConfigurationSerializer,
     ExplorePresetSerializer,
     BulletinSerializer,
     BulletinAdminSerializer,
+    PendingContentEditSerializer,
 )
-from .permissions import IsStaffOrSuperUser
+from .permissions import IsStaffOrSuperUser, IsSuperUser
+from .pending_edits import apply_pending_edit
 
 class SiteConfigurationAPIView(APIView):
     """GET /api/config/ — lecture publique de la configuration."""
@@ -69,7 +72,7 @@ class BulletinDetailAPIView(APIView):
 
 
 class SiteConfigurationAdminAPIView(APIView):
-    """PATCH /api/admin/config/ — vision_markdown (staff/superuser)."""
+    """PATCH /api/admin/config/ — vision_markdown. Admin : appliqué direct. Staff : demande en attente."""
     permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request):
@@ -77,11 +80,24 @@ class SiteConfigurationAdminAPIView(APIView):
         if not config:
             config = SiteConfiguration.objects.create()
         vision = request.data.get("vision_markdown")
-        if vision is not None:
+        if vision is None:
+            serializer = SiteConfigurationSerializer(config, context={'request': request})
+            return Response(serializer.data)
+        if getattr(request.user, "is_superuser", False):
             config.vision_markdown = vision
             config.save(update_fields=["vision_markdown", "updated_at"])
-        serializer = SiteConfigurationSerializer(config, context={'request': request})
-        return Response(serializer.data)
+            serializer = SiteConfigurationSerializer(config, context={'request': request})
+            return Response(serializer.data)
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.SITECONFIG,
+            object_id="",
+            payload={"vision_markdown": vision},
+            requested_by=request.user,
+        )
+        return Response(
+            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 class BulletinAdminListCreateAPIView(APIView):
@@ -117,10 +133,24 @@ class BulletinAdminDetailAPIView(APIView):
 
     def patch(self, request, slug):
         bulletin = get_object_or_404(Bulletin, slug=slug)
+        if getattr(request.user, "is_superuser", False):
+            serializer = BulletinAdminSerializer(bulletin, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
         serializer = BulletinAdminSerializer(bulletin, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        payload = dict(serializer.validated_data)
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.BULLETIN,
+            object_id=slug,
+            payload=payload,
+            requested_by=request.user,
+        )
+        return Response(
+            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 def seed_database(request):
@@ -163,4 +193,53 @@ class ExplorePresetViewSet(viewsets.ModelViewSet):
     """
     queryset = ExplorePreset.objects.all().order_by("-created_at")
     serializer_class = ExplorePresetSerializer
-    permission_classes = [] # On laisse ouvert pour l'instant ou on pourra restreindre plus tard
+    permission_classes = []
+
+
+class PendingContentEditListAPIView(APIView):
+    """
+    GET /api/admin/pending-edits/ — liste des modifications en attente.
+    Admin : toutes les demandes PENDING. Staff : uniquement les siennes.
+    """
+    permission_classes = [IsStaffOrSuperUser]
+
+    def get(self, request):
+        qs = PendingContentEdit.objects.filter(status=PendingContentEdit.Status.PENDING)
+        if not getattr(request.user, "is_superuser", False):
+            qs = qs.filter(requested_by=request.user)
+        qs = qs.select_related("requested_by", "reviewed_by").order_by("-created_at")
+        serializer = PendingContentEditSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class PendingContentEditDetailAPIView(APIView):
+    """
+    PATCH /api/admin/pending-edits/<id>/ — approuver ou refuser (admin uniquement).
+    Body: { "action": "approve" | "reject" }
+    """
+    permission_classes = [IsSuperUser]
+
+    def patch(self, request, pk):
+        edit = get_object_or_404(PendingContentEdit, pk=pk, status=PendingContentEdit.Status.PENDING)
+        action = (request.data.get("action") or "").strip().lower()
+        if action == "approve":
+            try:
+                apply_pending_edit(edit)
+            except Exception as e:
+                return Response(
+                    {"error": f"Erreur lors de l'application: {str(e)}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            edit.status = PendingContentEdit.Status.APPROVED
+        elif action == "reject":
+            edit.status = PendingContentEdit.Status.REJECTED
+        else:
+            return Response(
+                {"error": "action doit être 'approve' ou 'reject'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        edit.reviewed_by = request.user
+        edit.reviewed_at = timezone.now()
+        edit.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
+        serializer = PendingContentEditSerializer(edit)
+        return Response(serializer.data)

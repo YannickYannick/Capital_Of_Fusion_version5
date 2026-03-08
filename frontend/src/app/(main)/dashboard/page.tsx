@@ -151,6 +151,22 @@ function AdminDashboard({ username }: { username: string }) {
                 <PendingStaffSection />
             </div>
 
+            {/* Modifications de contenu en attente */}
+            <div>
+                <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">Modifications de contenu</p>
+                <Link
+                    href="/dashboard/pending-edits"
+                    className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/30 transition-all duration-200 group"
+                >
+                    <span className="text-2xl">📝</span>
+                    <div>
+                        <p className="font-semibold text-white group-hover:text-amber-300 transition-colors">Demandes à approuver</p>
+                        <p className="text-xs text-white/40 mt-0.5">Modifications proposées par le staff (pages, bulletins, événements…)</p>
+                    </div>
+                    <span className="ml-auto text-white/40 group-hover:text-amber-400">→</span>
+                </Link>
+            </div>
+
             {/* Accès rapides */}
             <div>
                 <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">Accès rapides</p>
@@ -206,6 +222,11 @@ function StaffDashboard({ username, staffRole }: { username: string; staffRole: 
                             <span className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors">{link.label}</span>
                         </Link>
                     ))}
+                    <Link href="/dashboard/pending-edits"
+                        className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all duration-200 group">
+                        <span className="text-2xl">📝</span>
+                        <span className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors">Mes demandes en attente</span>
+                    </Link>
                     <Link href="http://localhost:8000/admin/" target="_blank"
                         className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all duration-200 group">
                         <span className="text-2xl">⚙️</span>

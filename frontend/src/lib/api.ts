@@ -75,9 +75,10 @@ export async function getBulletinBySlug(slug: string): Promise<BulletinApi> {
 
 /**
  * Mise à jour de la vision (Notre vision). Staff/superuser.
+ * Si staff : 202 + { pending: true, message } (en attente d'approbation). Si admin : 200 + config.
  * PATCH /api/admin/config/
  */
-export async function patchSiteConfigVision(visionMarkdown: string): Promise<SiteConfigurationApi> {
+export async function patchSiteConfigVision(visionMarkdown: string): Promise<SiteConfigurationApi | { pending: true; message: string }> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
@@ -89,11 +90,12 @@ export async function patchSiteConfigVision(visionMarkdown: string): Promise<Sit
     },
     body: JSON.stringify({ vision_markdown: visionMarkdown }),
   });
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err || `Patch config API error: ${res.status}`);
+    const msg = (data && typeof data === "object" && "error" in data) ? String(data.error) : data?.detail || `Patch config API error: ${res.status}`;
+    throw new Error(msg);
   }
-  return res.json();
+  return data;
 }
 
 /**
@@ -157,12 +159,13 @@ export async function createBulletin(data: {
 
 /**
  * Mise à jour d'un bulletin. Staff/superuser.
+ * Si staff : 202 + { pending: true, message }. Si admin : 200 + bulletin.
  * PATCH /api/admin/identite/bulletins/<slug>/
  */
 export async function patchBulletin(
   slug: string,
   data: Partial<Pick<BulletinAdminApi, "title" | "slug" | "content_markdown" | "published_at" | "is_published">>
-): Promise<BulletinAdminApi> {
+): Promise<BulletinAdminApi | { pending: true; message: string }> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
@@ -174,11 +177,11 @@ export async function patchBulletin(
     },
     body: JSON.stringify(data),
   });
+  const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err || `Patch bulletin API error: ${res.status}`);
+    throw new Error(body?.error || body?.detail || `Patch bulletin API error: ${res.status}`);
   }
-  return res.json();
+  return body;
 }
 
 /** Query params pour la liste des cours */

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem, ExplorePreset, Bulletin
+from .models import DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem, ExplorePreset, Bulletin, PendingContentEdit
 
 
 @admin.register(DanceStyle)
@@ -52,3 +52,11 @@ class MenuItemAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "parent", "url", "order", "is_active")
     list_editable = ("order", "is_active")
     list_filter = ("parent", "is_active")
+
+
+@admin.register(PendingContentEdit)
+class PendingContentEditAdmin(admin.ModelAdmin):
+    list_display = ("id", "content_type", "object_id", "status", "requested_by", "created_at")
+    list_filter = ("status", "content_type")
+    search_fields = ("object_id", "requested_by__username")
+    readonly_fields = ("requested_by", "created_at", "updated_at")

@@ -7,8 +7,7 @@ import { getProjectBySlug, getProjectCategories } from "@/lib/api";
 import { updateProject } from "@/lib/adminApi";
 import type { ProjectApi, ProjectCategoryApi } from "@/types/projects";
 import { STATUS_CONFIG } from "@/types/projects";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { markdownToHtml } from "@/lib/markdownToHtml";
 
 // Admin components
 import { AdminEditButton } from "@/components/admin/AdminEditButton";
@@ -237,7 +236,7 @@ export default function ProjetDetailPage() {
                     </div>
                 )}
 
-                {/* Contenu riche via Markdown */}
+                {/* Contenu riche (Markdown converti en HTML) */}
                 {project.content ? (
                     <div
                         className="prose prose-invert prose-lg max-w-none
@@ -248,11 +247,8 @@ export default function ProjetDetailPage() {
               prose-blockquote:border-fuchsia-500 prose-blockquote:text-white/50
               prose-li:text-white/65
               animate-in fade-in duration-700 delay-300"
-                    >
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {project.content}
-                        </ReactMarkdown>
-                    </div>
+                        dangerouslySetInnerHTML={{ __html: markdownToHtml(project.content) }}
+                    />
                 ) : (
                     <div className="text-white/30 italic my-12 border border-white/5 p-8 rounded-2xl text-center">
                         Aucun contenu détaillé disponible pour le moment.

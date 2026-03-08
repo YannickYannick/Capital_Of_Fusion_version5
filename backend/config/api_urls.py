@@ -14,6 +14,8 @@ from apps.core.views import (
     BulletinDetailAPIView,
     BulletinAdminListCreateAPIView,
     BulletinAdminDetailAPIView,
+    PendingContentEditListAPIView,
+    PendingContentEditDetailAPIView,
 )
 from apps.courses.views import (
     CourseListAPIView, CourseDetailAPIView,
@@ -127,6 +129,8 @@ urlpatterns = [
     path("admin/config/", SiteConfigurationAdminAPIView.as_view()),
     path("admin/identite/bulletins/", BulletinAdminListCreateAPIView.as_view()),
     path("admin/identite/bulletins/<slug:slug>/", BulletinAdminDetailAPIView.as_view()),
+    path("admin/pending-edits/", PendingContentEditListAPIView.as_view()),
+    path("admin/pending-edits/<int:pk>/", PendingContentEditDetailAPIView.as_view()),
 ]
 
 urlpatterns += router.urls

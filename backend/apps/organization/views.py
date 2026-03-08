@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from apps.core.permissions import IsStaffOrSuperUser
+from apps.core.models import PendingContentEdit
 from .models import OrganizationNode, Pole
 from .serializers import OrganizationNodeSerializer, PoleSerializer, StaffMemberSerializer
 
@@ -88,24 +89,33 @@ class OrganizationNodeDetailAPIView(APIView):
 
 class OrganizationNodeAdminDetailAPIView(APIView):
     """
-    PATCH /api/admin/organization/nodes/<slug>/ → modifier un noeud.
-    Réservé aux membres du staff (ou superusers).
-    Permet aux staff de modifier les descriptions depuis la page Explore.
+    PATCH /api/admin/organization/nodes/<slug>/ → modifier un noeud. Admin : direct. Staff : en attente.
     """
     permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request, slug):
         node = get_object_or_404(OrganizationNode, slug=slug)
-        # Champs éditables depuis le frontend admin
         editable_fields = [
             "name", "description", "short_description", "content",
             "cta_text", "cta_url", "cover_image", "video_url",
             "planet_color", "orbit_radius", "orbit_speed", "planet_scale",
             "orbit_speed", "planet_type", "visual_source", "is_visible_3d",
         ]
-        for field in editable_fields:
-            if field in request.data:
-                setattr(node, field, request.data[field])
-        node.save()
-        serializer = OrganizationNodeSerializer(node, context={'request': request})
-        return Response(serializer.data)
+        if getattr(request.user, "is_superuser", False):
+            for field in editable_fields:
+                if field in request.data:
+                    setattr(node, field, request.data[field])
+            node.save()
+            serializer = OrganizationNodeSerializer(node, context={'request': request})
+            return Response(serializer.data)
+        payload = {k: v for k, v in request.data.items() if k in editable_fields}
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.ORGANIZATION_NODE,
+            object_id=slug,
+            payload=payload,
+            requested_by=request.user,
+        )
+        return Response(
+            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            status=status.HTTP_202_ACCEPTED,
+        )

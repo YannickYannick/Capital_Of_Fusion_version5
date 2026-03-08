@@ -29,6 +29,7 @@ export default function EditBulletinPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
 
@@ -60,6 +61,7 @@ export default function EditBulletinPage() {
     if (!canEdit || !slug) return;
     setSaving(true);
     setError(null);
+    setSuccessMessage(null);
     try {
       const payload = {
         title: title.trim(),
@@ -68,7 +70,12 @@ export default function EditBulletinPage() {
         published_at: publishedAt ? new Date(publishedAt).toISOString() : null,
         is_published: isPublished,
       };
-      const updated = await patchBulletin(slug, payload);
+      const result = await patchBulletin(slug, payload);
+      if (result && typeof result === "object" && "pending" in result && result.pending) {
+        setSuccessMessage("Modification enregistrée. Elle sera visible après approbation par un administrateur.");
+        return;
+      }
+      const updated = result as { slug: string };
       router.push(`/identite-cof/bulletins/${updated.slug}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur lors de l'enregistrement");
@@ -177,6 +184,7 @@ export default function EditBulletinPage() {
           </label>
         </div>
         {error && <p className="text-red-400 text-sm">{error}</p>}
+        {successMessage && <p className="text-green-400 text-sm">{successMessage}</p>}
         <div className="flex gap-2">
           <button
             type="submit"

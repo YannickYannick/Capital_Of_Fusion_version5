@@ -66,31 +66,39 @@ export function Navbar() {
     ] as MenuItemApi[],
   };
 
-  const fallbackLinks = [
-    identiteCofEntry,
-    { href: "/formations", label: "Formations", children: [
-      { id: "f1", name: "Contenu éducatif en ligne", url: "/formations/contenu/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "f2", name: "Catégories", url: "/formations/categories/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "f3", name: "Vidéothèque", url: "/formations/videotheque/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[] },
-    { href: "/artistes", label: "Artistes", children: [
-      { id: "a1", name: "Nos artistes", url: "/artistes/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[] },
-    { href: "#", label: "Autre", children: [
+  // "Promotions festivals" — festivals des partenaires (lien direct)
+  const promotionsFestivalsEntry = {
+    href: "/promotions-festivals",
+    label: "Promotions festivals",
+    children: [] as MenuItemApi[],
+  };
+
+  // "Organisation" et "Autre" — utilisés dans l'ordre fixe du menu
+  const organisationEntry = {
+    href: "/organisation",
+    label: "Organisation",
+    children: [
+      { id: "o1", name: "Structure", url: "/organisation/structure/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "o2", name: "Pôles", url: "/organisation/poles/", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[],
+  };
+  const autreEntry = {
+    href: "#",
+    label: "Autre",
+    children: [
       { id: "th1", name: "Théorie", url: "/theorie/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "ca1", name: "Care", url: "/care/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "p1", name: "Projets", url: "/projets/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "f1", name: "Fichiers", url: "/fichiers/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[] },
-    { href: "/organisation", label: "Organisation", children: [
-      { id: "o1", name: "Structure", url: "/organisation/structure/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "o2", name: "Pôles", url: "/organisation/poles/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[] },
-    { href: "/partenaires", label: "Nos partenaires", children: [
-      { id: "pstr", name: "Structures partenaires", url: "/partenaires/structures", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "pev", name: "Événements des partenaires", url: "/partenaires/evenements", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "pcours", name: "Cours des partenaires", url: "/partenaires/cours", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[] },
+    ] as MenuItemApi[],
+  };
+
+  const fallbackLinks = [
+    identiteCofEntry,
+    organisationEntry,
+    partenairesEntry,
+    promotionsFestivalsEntry,
+    autreEntry,
     enCoursEntry,
   ];
 
@@ -102,19 +110,23 @@ export function Navbar() {
             label: item.name,
             children: item.children ?? [],
           }))
-          // Ne pas afficher en racine Identité COF, Notre vision, Bulletins ; Cours, Événements, Shop, Trainings passent dans "En cours"
+          // Ne pas afficher en racine Identité COF, Notre vision, Bulletins, Formations ; Cours, Événements, Shop, Trainings passent dans "En cours"
           .filter((item) => {
             const h = (item.href || "").replace(/\/$/, "") || "/";
             return (
               item.label !== "Identité COF" &&
               item.label !== "Notre vision" &&
               item.label !== "Bulletins" &&
+              item.label !== "Formations" &&
+              item.label !== "Promotions festivals" &&
               item.label !== "Cours" &&
               item.label !== "Événements" &&
               item.label !== "Shop" &&
               item.label !== "Trainings" &&
               h !== "/identite-cof/notre-vision" &&
               h !== "/identite-cof/bulletins" &&
+              h !== "/formations" &&
+              h !== "/promotions-festivals" &&
               h !== "/cours" &&
               h !== "/evenements" &&
               h !== "/shop" &&
@@ -123,15 +135,26 @@ export function Navbar() {
           })
       : [];
 
-  // Toujours afficher "Identité COF" en premier, "Nos partenaires" et "En cours" en fin (injection)
+  // Ordre fixe du menu : Identité COF → Organisation → Nos partenaires → Promotions festivals → Autre → En cours
+  const findFromApi = (label: string) => apiLinks.find((l) => l.label === label);
+  const organisationFromApi = findFromApi("Organisation");
+  const autreFromApi = findFromApi("Autre");
+
   const links =
     apiLinks.length > 0
-      ? [identiteCofEntry, ...apiLinks, partenairesEntry, enCoursEntry]
+      ? [
+          identiteCofEntry,
+          organisationFromApi ?? organisationEntry,
+          partenairesEntry,
+          promotionsFestivalsEntry,
+          autreFromApi ?? autreEntry,
+          enCoursEntry,
+        ]
       : fallbackLinks;
 
-  const filteredLinks = user
-    ? links.filter(link => link.label.toLowerCase() !== "login" && link.href !== "/login")
-    : links;
+  const filteredLinks = links.filter(
+    link => link.label.toLowerCase() !== "login" && link.href !== "/login"
+  );
 
   return (
     <header
@@ -197,8 +220,9 @@ export function Navbar() {
           ) : !loading && !user ? (
             <Link
               href="/login"
-              className="p-2 text-white/90 hover:text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded inline-block"
+              className="ml-2 w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 transition-all"
               aria-label="Connexion"
+              title="Connexion"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

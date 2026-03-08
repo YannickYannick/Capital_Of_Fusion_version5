@@ -4,11 +4,11 @@ Vues admin — créer, modifier, supprimer (éservé IsSuperUser).
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from apps.core.permissions import IsSuperUser
+from apps.core.permissions import IsSuperUser, IsStaffOrSuperUser
+from apps.core.models import PendingContentEdit
 from .models import Event
 from .serializers import EventSerializer, EventWriteSerializer
 
@@ -75,11 +75,10 @@ class EventAdminAPIView(APIView):
 
 class EventAdminDetailAPIView(APIView):
     """
-    PATCH /api/admin/events/<slug>/  → modifier un événement.
-    DELETE /api/admin/events/<slug>/ → supprimer un événement.
-    Réservés aux superusers.
+    PATCH /api/admin/events/<slug>/  → modifier un événement. Admin : direct. Staff : en attente.
+    DELETE /api/admin/events/<slug>/ → supprimer (admin uniquement).
     """
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsStaffOrSuperUser]
 
     def _get_event(self, slug):
         return get_object_or_404(Event, slug=slug)
@@ -87,12 +86,25 @@ class EventAdminDetailAPIView(APIView):
     def patch(self, request, slug):
         event = self._get_event(slug)
         serializer = EventWriteSerializer(event, data=request.data, partial=True)
-        if serializer.is_valid():
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if getattr(request.user, "is_superuser", False):
             event = serializer.save()
             return Response(EventSerializer(event).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.EVENT,
+            object_id=slug,
+            payload=request.data,
+            requested_by=request.user,
+        )
+        return Response(
+            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
     def delete(self, request, slug):
+        if not getattr(request.user, "is_superuser", False):
+            return Response({"detail": "Action non autorisée."}, status=status.HTTP_403_FORBIDDEN)
         event = self._get_event(slug)
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

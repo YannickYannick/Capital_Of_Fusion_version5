@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAdminBulletinBySlug } from "@/lib/api";
+import { markdownToHtml } from "@/lib/markdownToHtml";
 import type { BulletinApi, BulletinAdminApi } from "@/types/config";
 
 function formatDate(dateStr: string | null): string {
@@ -107,9 +106,7 @@ export function BulletinDetailClient({ slug, initialBulletin }: BulletinDetailCl
         </time>
       </div>
       <div className={`${proseClasses} animate-in fade-in duration-500`}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {bulletin.content_markdown || "*Aucun contenu.*"}
-        </ReactMarkdown>
+        <div dangerouslySetInnerHTML={{ __html: markdownToHtml(bulletin.content_markdown || "*Aucun contenu.*") }} />
       </div>
     </article>
   );

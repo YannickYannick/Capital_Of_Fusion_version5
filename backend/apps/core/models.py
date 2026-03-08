@@ -1,10 +1,11 @@
 """
 Modèles Core — BaseModel abstrait, DanceStyle, Level, DanceProfession,
-SiteConfiguration, MenuItem.
+SiteConfiguration, MenuItem, Bulletin, PendingContentEdit.
 Alignés sur le MCD Phase 1 (sections 1.1).
 """
 import uuid
 from django.db import models
+from django.conf import settings
 
 
 class BaseModel(models.Model):
@@ -246,3 +247,51 @@ class Bulletin(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class PendingContentEdit(models.Model):
+    """
+    Demande de modification de contenu par un staff, en attente d'approbation admin.
+    Les admins appliquent directement ; les staff créent une demande que l'admin doit approuver.
+    """
+    class ContentType(models.TextChoices):
+        SITECONFIG = "siteconfig", "Configuration (Notre vision)"
+        BULLETIN = "bulletin", "Bulletin"
+        EVENT = "event", "Événement"
+        COURSE = "course", "Cours"
+        THEORY_LESSON = "theory_lesson", "Leçon de théorie"
+        ORGANIZATION_NODE = "organization_node", "Noeud organisation"
+        PROJECT = "project", "Projet"
+
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "En attente"
+        APPROVED = "APPROVED", "Approuvé"
+        REJECTED = "REJECTED", "Refusé"
+
+    content_type = models.CharField(max_length=32, choices=ContentType.choices)
+    object_id = models.CharField(max_length=255, blank=True, help_text="Slug ou id de l'objet (vide pour siteconfig)")
+    payload = models.JSONField(default=dict, help_text="Champs proposés (partial update)")
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="pending_content_edits",
+    )
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_content_edits",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Modification en attente"
+        verbose_name_plural = "Modifications en attente"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.get_content_type_display()} ({self.object_id or 'config'}) — {self.get_status_display()}"

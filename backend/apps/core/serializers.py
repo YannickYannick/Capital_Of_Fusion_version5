@@ -2,7 +2,22 @@
 Serializers Core — MenuItem récursif (parent → children) pour l’API menu.
 """
 from rest_framework import serializers
-from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin
+from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin, PendingContentEdit
+
+
+class PendingContentEditSerializer(serializers.ModelSerializer):
+    requested_by_username = serializers.CharField(source="requested_by.username", read_only=True)
+    content_type_display = serializers.CharField(source="get_content_type_display", read_only=True)
+
+    class Meta:
+        model = PendingContentEdit
+        fields = (
+            "id", "content_type", "content_type_display", "object_id", "payload",
+            "status", "requested_by", "requested_by_username",
+            "reviewed_by", "reviewed_at", "created_at", "updated_at",
+        )
+        read_only_fields = ("requested_by", "reviewed_by", "reviewed_at", "created_at", "updated_at")
+
 
 class ExplorePresetSerializer(serializers.ModelSerializer):
     class Meta:

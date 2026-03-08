@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useAuth } from "@/contexts/AuthContext";
 import { patchSiteConfigVision } from "@/lib/api";
+import { markdownToHtml } from "@/lib/markdownToHtml";
 
 const proseClasses =
   "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
@@ -20,28 +19,39 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
   const [editValue, setEditValue] = useState(initialVision);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
 
   const handleStartEdit = () => {
     setEditValue(vision);
     setSaveError(null);
+    setSaveMessage(null);
     setEditing(true);
   };
 
   const handleCancel = () => {
     setEditValue(vision);
     setSaveError(null);
+    setSaveMessage(null);
     setEditing(false);
   };
 
   const handleSave = async () => {
     setSaving(true);
     setSaveError(null);
+    setSaveMessage(null);
     try {
-      await patchSiteConfigVision(editValue);
+      const result = await patchSiteConfigVision(editValue);
+      if (result && typeof result === "object" && "pending" in result && result.pending) {
+        setVision(editValue);
+        setEditing(false);
+        setSaveMessage("Modification enregistrée. Elle sera visible après approbation par un administrateur.");
+        return;
+      }
       setVision(editValue);
       setEditing(false);
+      setSaveMessage("Enregistré.");
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : "Erreur lors de l'enregistrement");
     } finally {
@@ -83,11 +93,14 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             className="w-full min-h-[280px] px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 font-mono text-sm"
-            placeholder="Contenu Markdown de la page Notre vision…"
+            placeholder="Contenu Markdown ou HTML de la page Notre vision…"
             disabled={saving}
           />
           {saveError && (
             <p className="text-red-400 text-sm">{saveError}</p>
+          )}
+          {saveMessage && (
+            <p className="text-green-400 text-sm">{saveMessage}</p>
           )}
           <div className="flex gap-2">
             <button
@@ -109,9 +122,10 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
           </div>
         </div>
       ) : vision ? (
-        <div className={`${proseClasses} animate-in fade-in duration-500`}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{vision}</ReactMarkdown>
-        </div>
+        <div
+          className={`${proseClasses} animate-in fade-in duration-500`}
+          dangerouslySetInnerHTML={{ __html: markdownToHtml(vision) }}
+        />
       ) : (
         <p className="text-white/50 italic">
           Le contenu de notre vision sera bientôt renseigné.

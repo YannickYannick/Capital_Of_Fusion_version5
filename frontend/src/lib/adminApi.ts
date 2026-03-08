@@ -18,7 +18,9 @@ async function handleResponse(res: Response) {
     if (res.status === 204) return null;
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-        const msg = Object.values(data).flat().join(" ") || `Erreur ${res.status}`;
+        const msg = (data && typeof data === "object" && "error" in data)
+            ? String(data.error)
+            : Object.values(data).flat().join(" ") || `Erreur ${res.status}`;
         throw new Error(msg);
     }
     return data;
@@ -143,6 +145,48 @@ export async function deleteProject(slug: string) {
     const res = await fetch(`${getApiBaseUrl()}/api/projects/projects/${encodeURIComponent(slug)}/`, {
         method: "DELETE",
         headers: authHeaders(),
+    });
+    return handleResponse(res);
+}
+
+// ─── Modifications en attente (staff → admin) ──────────────────────────────────
+
+export interface PendingContentEditApi {
+    id: number;
+    content_type: string;
+    content_type_display: string;
+    object_id: string;
+    payload: Record<string, unknown>;
+    status: string;
+    requested_by: number;
+    requested_by_username: string;
+    reviewed_by: number | null;
+    reviewed_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export async function getPendingEdits(): Promise<PendingContentEditApi[]> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/pending-edits/`, {
+        headers: authHeaders(),
+    });
+    return handleResponse(res);
+}
+
+export async function approvePendingEdit(id: number): Promise<PendingContentEditApi> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/pending-edits/${id}/`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ action: "approve" }),
+    });
+    return handleResponse(res);
+}
+
+export async function rejectPendingEdit(id: number): Promise<PendingContentEditApi> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/pending-edits/${id}/`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ action: "reject" }),
     });
     return handleResponse(res);
 }
