@@ -54,6 +54,8 @@
 
 Sur **Railway**, si une variable `DATABASE_URL` est fournie, il faut soit la parser, soit utiliser les variables séparées. Beaucoup de projets utilisent `dj-database-url` ; ici on utilise `DB_*` pour rester simple. Si Railway n’expose que `DATABASE_URL`, il faudra l’ajouter dans les settings (ou remplir manuellement `DB_HOST`, `DB_USER`, etc. à partir de l’URL).
 
+**Important — Même base local / prod :** si tu configures la même `DATABASE_URL` (ex. Supabase) en local (`.env`) et sur Railway mais que les données diffèrent (ex. planètes visibles en local, pas en prod), voir le correctif documenté dans [bugs/production-database/bug_2026-03-07_railway_db_env_override.md](../bugs/production-database/bug_2026-03-07_railway_db_env_override.md) (éviter qu’un `.env` dans l’image n’écrase la variable Railway).
+
 ### 1.4 Migrations et statiques (automatique à distance)
 
 La **commande de démarrage** (Procfile) exécute à chaque déploiement :

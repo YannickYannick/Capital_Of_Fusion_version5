@@ -43,19 +43,39 @@ export function Navbar() {
     ] as MenuItemApi[],
   };
 
+  // "En cours" — sous-menu Cours, Événements, Shop, Trainings (plus en entrées racine)
+  const enCoursEntry = {
+    href: "/contact",
+    label: "En cours",
+    children: [
+      { id: "en-cours-cours", name: "Cours", url: "/cours", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "en-cours-evenements", name: "Événements", url: "/evenements", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "en-cours-shop", name: "Shop", url: "/shop", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "en-cours-trainings", name: "Trainings", url: "/trainings", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[],
+  };
+
+  // "Nos partenaires" — toujours affiché quand on utilise l'API (injection comme Identité COF / En cours)
+  const partenairesEntry = {
+    href: "/partenaires",
+    label: "Nos partenaires",
+    children: [
+      { id: "pstr", name: "Structures partenaires", url: "/partenaires/structures", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "pev", name: "Événements des partenaires", url: "/partenaires/evenements", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "pcours", name: "Cours des partenaires", url: "/partenaires/cours", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[],
+  };
+
   const fallbackLinks = [
     identiteCofEntry,
-    { href: "/cours", label: "Cours", children: [] as MenuItemApi[] },
     { href: "/formations", label: "Formations", children: [
       { id: "f1", name: "Contenu éducatif en ligne", url: "/formations/contenu/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "f2", name: "Catégories", url: "/formations/categories/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "f3", name: "Vidéothèque", url: "/formations/videotheque/", slug: "", icon: "", order: 0, is_active: true, children: [] },
     ] as MenuItemApi[] },
-    { href: "/trainings", label: "Trainings", children: [] as MenuItemApi[] },
     { href: "/artistes", label: "Artistes", children: [
       { id: "a1", name: "Nos artistes", url: "/artistes/", slug: "", icon: "", order: 0, is_active: true, children: [] },
     ] as MenuItemApi[] },
-    { href: "/shop", label: "Shop", children: [] as MenuItemApi[] },
     { href: "#", label: "Autre", children: [
       { id: "th1", name: "Théorie", url: "/theorie/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "ca1", name: "Care", url: "/care/", slug: "", icon: "", order: 0, is_active: true, children: [] },
@@ -66,6 +86,12 @@ export function Navbar() {
       { id: "o1", name: "Structure", url: "/organisation/structure/", slug: "", icon: "", order: 0, is_active: true, children: [] },
       { id: "o2", name: "Pôles", url: "/organisation/poles/", slug: "", icon: "", order: 0, is_active: true, children: [] },
     ] as MenuItemApi[] },
+    { href: "/partenaires", label: "Nos partenaires", children: [
+      { id: "pstr", name: "Structures partenaires", url: "/partenaires/structures", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "pev", name: "Événements des partenaires", url: "/partenaires/evenements", slug: "", icon: "", order: 0, is_active: true, children: [] },
+      { id: "pcours", name: "Cours des partenaires", url: "/partenaires/cours", slug: "", icon: "", order: 0, is_active: true, children: [] },
+    ] as MenuItemApi[] },
+    enCoursEntry,
   ];
 
   const apiLinks =
@@ -76,23 +102,31 @@ export function Navbar() {
             label: item.name,
             children: item.children ?? [],
           }))
-          // Ne pas afficher en racine "Identité COF" ni les sous-pages (Notre vision, Bulletins) — elles sont dans notre dropdown
+          // Ne pas afficher en racine Identité COF, Notre vision, Bulletins ; Cours, Événements, Shop, Trainings passent dans "En cours"
           .filter((item) => {
             const h = (item.href || "").replace(/\/$/, "") || "/";
             return (
               item.label !== "Identité COF" &&
               item.label !== "Notre vision" &&
               item.label !== "Bulletins" &&
+              item.label !== "Cours" &&
+              item.label !== "Événements" &&
+              item.label !== "Shop" &&
+              item.label !== "Trainings" &&
               h !== "/identite-cof/notre-vision" &&
-              h !== "/identite-cof/bulletins"
+              h !== "/identite-cof/bulletins" &&
+              h !== "/cours" &&
+              h !== "/evenements" &&
+              h !== "/shop" &&
+              h !== "/trainings"
             );
           })
       : [];
 
-  // Toujours afficher "Identité COF" en premier avec son dropdown (Notre vision, Bulletins)
+  // Toujours afficher "Identité COF" en premier, "Nos partenaires" et "En cours" en fin (injection)
   const links =
     apiLinks.length > 0
-      ? [identiteCofEntry, ...apiLinks]
+      ? [identiteCofEntry, ...apiLinks, partenairesEntry, enCoursEntry]
       : fallbackLinks;
 
   const filteredLinks = user

@@ -27,7 +27,7 @@ const sections = [
 
 export default function CareHubPage() {
     return (
-        <div className="min-h-screen bg-black text-white py-32 px-8 md:px-16">
+        <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

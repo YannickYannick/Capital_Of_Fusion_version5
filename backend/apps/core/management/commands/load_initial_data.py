@@ -72,10 +72,15 @@ class Command(BaseCommand):
                 {"name": "nos poles", "slug": "orga-poles", "url": "/organisation/poles/", "order": 3},
                 {"name": "Notre Staff", "slug": "orga-staff", "url": "/organisation/staff/", "order": 4},
             ]},
-            {"name": "DB", "slug": "db", "url": "http://localhost:8000/admin/", "order": 13, "children": [
+            {"name": "Nos partenaires", "slug": "nos-partenaires", "url": "/partenaires/", "order": 13, "children": [
+                {"name": "Structures partenaires", "slug": "partenaires-structures", "url": "/partenaires/structures", "order": 1},
+                {"name": "Événements des partenaires", "slug": "partenaires-evenements", "url": "/partenaires/evenements", "order": 2},
+                {"name": "Cours des partenaires", "slug": "partenaires-cours", "url": "/partenaires/cours", "order": 3},
+            ]},
+            {"name": "DB", "slug": "db", "url": "http://localhost:8000/admin/", "order": 14, "children": [
                 {"name": "Accès au schéma de la base de données", "slug": "db-access", "url": "http://localhost:8000/admin/", "order": 1},
             ]},
-            {"name": "Login", "slug": "login", "url": "/login/", "order": 14, "children": []},
+            {"name": "Login", "slug": "login", "url": "/login/", "order": 15, "children": []},
         ]
         
         # Reset menu items first to avoid duplication

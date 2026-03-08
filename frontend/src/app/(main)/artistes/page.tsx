@@ -33,25 +33,32 @@ export default function ArtistesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white py-24 px-8 md:px-16">
+    <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <h1 className="text-6xl font-black tracking-tighter mb-4 italic">NOS <span className="text-purple-500">ARTISTES</span></h1>
-            <p className="text-xl text-white/60 max-w-xl font-light leading-relaxed">
-              Découvrez les talents qui font battre le cœur de Capital of Fusion.
-              Membres officiels et artistes partenaires.
-            </p>
-          </motion.div>
+        <motion.header
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter mb-5 italic">
+            NOS <span className="text-purple-500">ARTISTES</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-white/60 max-w-2xl font-light leading-relaxed">
+            Découvrez les talents qui font battre le cœur de Capital of Fusion.
+            Membres officiels et artistes partenaires.
+          </p>
+        </motion.header>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex p-1 bg-white/[0.03] border border-white/10 rounded-2xl"
-          >
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="mb-14"
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40 mb-3">
+            Filtrer
+          </p>
+          <div className="flex flex-wrap gap-2 p-2 bg-white/[0.03] border border-white/10 rounded-2xl max-w-full">
             {[
               { id: 'all', label: 'Tous' },
               { id: 'staff', label: 'Team CoF' },
@@ -59,17 +66,18 @@ export default function ArtistesPage() {
             ].map((btn) => (
               <button
                 key={btn.id}
-                onClick={() => setFilter(btn.id as any)}
-                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${filter === btn.id
+                onClick={() => setFilter(btn.id as 'all' | 'staff' | 'others')}
+                className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+                  filter === btn.id
                     ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                    : 'text-white/40 hover:text-white'
-                  }`}
+                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                }`}
               >
                 {btn.label}
               </button>
             ))}
-          </motion.div>
-        </div>
+          </div>
+        </motion.section>
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[2rem] text-red-500 text-center">
@@ -77,13 +85,13 @@ export default function ArtistesPage() {
             <p className="text-sm font-light opacity-60">{error}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
             {artists.map((artist, idx) => (
               <motion.div
                 key={artist.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                transition={{ delay: Math.min(idx * 0.04, 0.3) }}
               >
                 <ArtistCard artist={artist} />
               </motion.div>

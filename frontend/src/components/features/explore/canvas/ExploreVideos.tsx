@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { usePathname } from "next/navigation";
 import type { SiteConfigurationApi } from "@/types/config";
 
@@ -30,6 +31,12 @@ const QUALITY_OPTIONS = [
 
 const DEFAULT_VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
 const DEFAULT_VIDEO_CYCLE = process.env.NEXT_PUBLIC_YOUTUBE_CYCLE_VIDEO_ID || "eZhq_RMYRKQ";
+
+function getYoutubeVideoId(url: string): string | null {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : null;
+}
 
 // Hook helper pour YT
 function useYTPlayer(videoId: string, ready: boolean, active: boolean) {
@@ -74,6 +81,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const isHome = pathname === "/";
     const isExplore = pathname === "/explore";
     const opts = usePlanetsOptions();
+    const { override: planetMusicOverride } = usePlanetMusicOverride();
 
     const [apiReady, setApiReady] = useState(false);
     const [cycleOpacity, setCycleOpacity] = useState(0);
@@ -97,11 +105,37 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const mainMp4Url = formatUrl(config?.main_video_file);
     const cycleMp4Url = formatUrl(config?.cycle_video_file);
 
-    const mainYT = useYTPlayer(mainYTId, apiReady, mainType === 'youtube');
-    const cycleYT = useYTPlayer(cycleYTId, apiReady, cycleType === 'youtube');
+    const mainYT = useYTPlayer(mainYTId, apiReady, mainType === 'youtube' && !planetMusicOverride);
+    const cycleYT = useYTPlayer(cycleYTId, apiReady, cycleType === 'youtube' && !planetMusicOverride);
+
+    const overrideYTId = planetMusicOverride?.type === "youtube" && planetMusicOverride?.youtubeUrl
+        ? getYoutubeVideoId(planetMusicOverride.youtubeUrl)
+        : "";
+    const overrideYT = useYTPlayer(overrideYTId || "jfKfPfyJRdk", apiReady, !!overrideYTId);
 
     const mainNativeRef = useRef<HTMLVideoElement>(null);
     const cycleNativeRef = useRef<HTMLVideoElement>(null);
+    const overrideNativeRef = useRef<HTMLVideoElement>(null);
+
+    // Quand override planète est actif, garder l'API YT chargée si besoin
+    useEffect(() => {
+        if (planetMusicOverride?.type !== "youtube" || !planetMusicOverride?.youtubeUrl) return;
+        if (mainType !== 'youtube' && cycleType !== 'youtube' && !window.YT?.Player) return;
+        if (typeof window === "undefined") return;
+        if (document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) return;
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+    }, [planetMusicOverride, mainType, cycleType]);
+
+    // Mute main/cycle quand override planète actif
+    useEffect(() => {
+        if (!planetMusicOverride) return;
+        if (mainYT.playerRef.current) mainYT.playerRef.current.mute();
+        if (cycleYT.playerRef.current) cycleYT.playerRef.current.mute();
+        if (mainNativeRef.current) mainNativeRef.current.muted = true;
+        if (cycleNativeRef.current) cycleNativeRef.current.muted = true;
+    }, [planetMusicOverride]);
 
     // Responsive scale pour YT
     useEffect(() => {
@@ -182,10 +216,19 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const handleMute = () => {
         const newMute = !muted;
         setMuted(newMute);
-        if (mainYT.playerRef.current) newMute ? mainYT.playerRef.current.mute() : mainYT.playerRef.current.unMute();
-        if (cycleYT.playerRef.current) newMute ? cycleYT.playerRef.current.mute() : cycleYT.playerRef.current.unMute();
-        if (mainNativeRef.current) mainNativeRef.current.muted = newMute;
-        if (cycleNativeRef.current) cycleNativeRef.current.muted = newMute;
+        if (planetMusicOverride) {
+            if (planetMusicOverride.type === "youtube" && overrideYT.playerRef.current) {
+                newMute ? overrideYT.playerRef.current.mute() : overrideYT.playerRef.current.unMute();
+            }
+            if (planetMusicOverride.type === "file" && overrideNativeRef.current) {
+                overrideNativeRef.current.muted = newMute;
+            }
+        } else {
+            if (mainYT.playerRef.current) newMute ? mainYT.playerRef.current.mute() : mainYT.playerRef.current.unMute();
+            if (cycleYT.playerRef.current) newMute ? cycleYT.playerRef.current.mute() : cycleYT.playerRef.current.unMute();
+            if (mainNativeRef.current) mainNativeRef.current.muted = newMute;
+            if (cycleNativeRef.current) cycleNativeRef.current.muted = newMute;
+        }
     };
 
     const handleQuality = (q: string) => {
@@ -196,7 +239,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     return (
         <>
-            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s` }}>
+            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s`, opacity: planetMusicOverride ? 0.3 : 1 }}>
                 {mainType === 'youtube' ? (
                     <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
@@ -207,7 +250,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 {opts.showVideoOverlay && <div className="absolute inset-0 bg-black/30 pointer-events-none" />}
             </div>
 
-            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: cycleOpacity, filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: planetMusicOverride ? 0 : cycleOpacity, filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
                 {cycleType === 'youtube' ? (
                     <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
@@ -216,6 +259,27 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                     )
                 )}
             </div>
+
+            {/* Musique de fond planète (override) — prend le pas sur la vidéo d'accueil */}
+            {planetMusicOverride && (
+                <div className="fixed inset-0 -z-10 overflow-hidden" style={{ transition: "opacity 0.5s" }}>
+                    {planetMusicOverride.type === "youtube" && overrideYTId && (
+                        <div ref={overrideYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
+                    )}
+                    {planetMusicOverride.type === "file" && planetMusicOverride.fileUrl && (
+                        <video
+                            ref={overrideNativeRef}
+                            src={planetMusicOverride.fileUrl}
+                            autoPlay
+                            loop
+                            muted={muted}
+                            playsInline
+                            className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover"
+                            style={{ transform: "translate(-50%, -50%)" }}
+                        />
+                    )}
+                </div>
+            )}
 
             <div className="fixed bottom-4 right-4 z-50 flex flex-col sm:flex-row items-end gap-2">
                 {(mainType === 'youtube' || cycleType === 'youtube') && (

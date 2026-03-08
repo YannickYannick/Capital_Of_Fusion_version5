@@ -16,3 +16,8 @@ body {
   background: transparent;
   font-family: var(--font-inter), sans-serif;
 }
+
+/* Curseur flèche sur le contenu (évite le curseur « texte » sur les titres) */
+main {
+  cursor: default;
+}

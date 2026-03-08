@@ -30,20 +30,20 @@ export default function PolesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-32 pb-24 px-8 md:px-16">
+    <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="mb-16"
+        <motion.header
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
         >
-          <h1 className="text-6xl font-black tracking-tighter mb-4 italic">
+          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter mb-5 italic">
             NOS <span className="text-purple-500">PÔLES</span>
           </h1>
-          <p className="text-xl text-white/60 max-w-xl font-light leading-relaxed">
+          <p className="text-lg sm:text-xl text-white/60 max-w-xl font-light leading-relaxed">
             Les équipes qui font vivre Capital of Fusion. Le nombre de membres est mis à jour automatiquement.
           </p>
-        </motion.div>
+        </motion.header>
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[2rem] text-red-500 text-center">

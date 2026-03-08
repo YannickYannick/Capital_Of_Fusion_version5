@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import { Navbar } from "@/components/shared/Navbar";
 import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
+import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { VideoBackgroundClient } from "@/components/features/explore/canvas/VideoBackgroundClient";
 import { getSiteConfig } from "@/lib/api";
@@ -12,15 +14,17 @@ import { getSiteConfig } from "@/lib/api";
 export default async function MainLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const config = await getSiteConfig().catch(() => null);
   return (
     <AuthProvider>
       <PlanetsOptionsProvider>
-        <Navbar />
-        <VideoBackgroundClient config={config} />
-        <main className="pt-16">{children}</main>
+        <PlanetMusicOverrideProvider>
+          <Navbar />
+          <VideoBackgroundClient config={config} />
+          <main className="pt-16">{children}</main>
+        </PlanetMusicOverrideProvider>
       </PlanetsOptionsProvider>
     </AuthProvider>
   );

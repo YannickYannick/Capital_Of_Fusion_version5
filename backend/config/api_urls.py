@@ -32,6 +32,14 @@ from apps.organization.views import (
     PoleListAPIView,
     StaffListAPIView,
 )
+from apps.partners.views import (
+    PartnerNodeListAPIView,
+    PartnerNodeDetailAPIView,
+    PartnerEventListAPIView,
+    PartnerEventDetailAPIView,
+    PartnerCourseListAPIView,
+    PartnerCourseDetailAPIView,
+)
 from apps.users.views import (
     LoginAPIView,
     GoogleLoginAPIView,
@@ -86,6 +94,14 @@ urlpatterns = [
     path("organization/nodes/<slug:slug>/", OrganizationNodeDetailAPIView.as_view()),
     path("organization/poles/", PoleListAPIView.as_view()),
     path("organization/staff/", StaffListAPIView.as_view()),
+
+    # ── Partners (lecture) ────────────────────────────────────────────────────
+    path("partners/nodes/", PartnerNodeListAPIView.as_view()),
+    path("partners/nodes/<slug:slug>/", PartnerNodeDetailAPIView.as_view()),
+    path("partners/events/", PartnerEventListAPIView.as_view()),
+    path("partners/events/<slug:slug>/", PartnerEventDetailAPIView.as_view()),
+    path("partners/courses/", PartnerCourseListAPIView.as_view()),
+    path("partners/courses/<slug:slug>/", PartnerCourseDetailAPIView.as_view()),
 
     # ── Auth ─────────────────────────────────────────────────────────────────
     path("auth/login/", LoginAPIView.as_view()),

@@ -4,10 +4,15 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
+import { patchOrganizationNode } from "@/lib/api";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
   onClose: () => void;
+  /** Si true, le membre du staff peut modifier les descriptions depuis cet overlay */
+  canEditDescriptions?: boolean;
+  /** Appelé après sauvegarde des descriptions (met à jour le noeud côté parent) */
+  onNodeUpdated?: (node: OrganizationNodeApi) => void;
 }
 
 function formatDate(s: string): string {
@@ -59,8 +64,14 @@ function CardContent({ ev }: { ev: NodeEventApi }) {
  * Grille 2 colonnes : média (vidéo/image/lettrine) + titre/CTA.
  * Section événements en scroll horizontal. Section à propos.
  */
-export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
+export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdated }: PlanetOverlayProps) {
   const [videoError, setVideoError] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editDescription, setEditDescription] = useState("");
+  const [editShortDescription, setEditShortDescription] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent) => {
@@ -68,6 +79,34 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
     },
     [onClose]
   );
+
+  const openEditForm = useCallback(() => {
+    if (!node) return;
+    setEditDescription(node.description || "");
+    setEditShortDescription(node.short_description || "");
+    setEditContent(node.content || "");
+    setSaveError(null);
+    setShowEditForm(true);
+  }, [node]);
+
+  const saveDescriptions = useCallback(async () => {
+    if (!node || !onNodeUpdated) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const updated = await patchOrganizationNode(node.slug, {
+        description: editDescription,
+        short_description: editShortDescription,
+        content: editContent,
+      });
+      onNodeUpdated(updated);
+      setShowEditForm(false);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
+  }, [node, editDescription, editShortDescription, editContent, onNodeUpdated]);
 
   return (
     <AnimatePresence>
@@ -94,14 +133,25 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Bouton fermer */}
-              <button
-                type="button"
-                onClick={onClose}
-                className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition text-lg"
-                aria-label="Fermer"
-              >
-                ×
-              </button>
+              <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+                {canEditDescriptions && (
+                  <button
+                    type="button"
+                    onClick={showEditForm ? () => setShowEditForm(false) : openEditForm}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition"
+                  >
+                    {showEditForm ? "Annuler" : "✏️ Modifier la description"}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition text-lg"
+                  aria-label="Fermer"
+                >
+                  ×
+                </button>
+              </div>
 
               {/* Header — grille 2 colonnes */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -206,14 +256,94 @@ export function PlanetOverlay({ node, onClose }: PlanetOverlayProps) {
                 </div>
               )}
 
-              {/* Section À propos */}
-              {(node.content || node.description) && (
+              {/* Section Description du nœud (ou formulaire d'édition staff) */}
+              {(node.description || showEditForm) && (
+                <div className="border-t border-white/10 px-8 py-6">
+                  <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
+                    Description
+                  </h2>
+                  {showEditForm ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs text-white/50 mb-1">Accroche courte (max 300 car.)</label>
+                        <textarea
+                          value={editShortDescription}
+                          onChange={(e) => setEditShortDescription(e.target.value.slice(0, 300))}
+                          rows={2}
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50"
+                          placeholder="Courte phrase sous le titre"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-white/50 mb-1">Description</label>
+                        <textarea
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          rows={4}
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50"
+                          placeholder="Description du nœud"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-white/50 mb-1">Contenu détaillé (À propos)</label>
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          rows={6}
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50"
+                          placeholder="Contenu riche (markdown possible)"
+                        />
+                      </div>
+                      {saveError && (
+                        <p className="text-red-400 text-sm">{saveError}</p>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={saveDescriptions}
+                          disabled={saving}
+                          className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium disabled:opacity-50"
+                        >
+                          {saving ? "Enregistrement…" : "Enregistrer"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowEditForm(false)}
+                          className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+                      {node.description}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Bouton "Modifier" visible pour staff même sans description (ouvre le formulaire) */}
+              {canEditDescriptions && !node.description && !showEditForm && (
+                <div className="border-t border-white/10 px-8 py-6">
+                  <button
+                    type="button"
+                    onClick={openEditForm}
+                    className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-sm font-medium transition"
+                  >
+                    ✏️ Ajouter / modifier la description
+                  </button>
+                </div>
+              )}
+
+              {/* Section À propos (contenu détaillé) */}
+              {node.content && (
                 <div className="border-t border-white/10 px-8 py-6">
                   <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
                     À propos
                   </h2>
                   <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-                    {node.content || node.description}
+                    {node.content}
                   </p>
                 </div>
               )}

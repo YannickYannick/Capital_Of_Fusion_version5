@@ -12,7 +12,7 @@ from apps.core.permissions import IsStaffOrSuperUser
 from .models import OrganizationNode, Pole
 from .serializers import OrganizationNodeSerializer, PoleSerializer, StaffMemberSerializer
 
-User = get_user_model(), StaffMemberSerializer
+User = get_user_model()
 
 
 

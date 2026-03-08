@@ -34,20 +34,19 @@ export function StaffCard({ member }: { member: StaffMemberApi }) {
           unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-        <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors uppercase italic tracking-tighter">
+        <div className="absolute bottom-0 left-0 right-0 p-4 pt-16 bg-gradient-to-t from-black/90 to-transparent">
+          <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-purple-400 transition-colors uppercase italic tracking-tighter line-clamp-2">
             {fullName}
           </h3>
-          <div className="flex flex-wrap gap-1 mt-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-[10px] font-bold uppercase tracking-widest">
             {member.staff_role_display && (
-              <span className="text-[10px] text-purple-400/80 font-black uppercase tracking-widest">
-                {member.staff_role_display}
-              </span>
+              <span className="text-purple-400/90">{member.staff_role_display}</span>
+            )}
+            {member.staff_role_display && member.pole && (
+              <span className="text-white/30">·</span>
             )}
             {member.pole && (
-              <span className="text-[10px] text-white/70 font-bold uppercase tracking-widest">
-                {member.pole.name}
-              </span>
+              <span className="text-white/70 line-clamp-1">{member.pole.name}</span>
             )}
           </div>
         </div>

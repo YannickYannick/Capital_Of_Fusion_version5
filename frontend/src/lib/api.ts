@@ -15,6 +15,7 @@ import type { PractitionerApi, CareServiceApi } from "@/types/care";
 import type { ProjectCategoryApi, ProjectApi } from "@/types/projects";
 import type { SubscriptionPassApi, TrainingSessionApi } from "@/types/trainings";
 import type { ExplorePresetApi } from "@/types/explore";
+import type { PartnerNodeApi, PartnerEventApi, PartnerCourseApi } from "@/types/partner";
 
 /**
  * Retourne l'URL de base de l'API (sans slash final).
@@ -301,6 +302,104 @@ export async function getOrganizationNodeBySlug(
     `${base}/api/organization/nodes/${encodeURIComponent(slug)}/`
   );
   if (!res.ok) throw new Error(`Organization node API error: ${res.status}`);
+  return res.json();
+}
+
+// ——— Partners ———
+
+/** Paramètres de requête pour la liste des événements partenaires (type, node, upcoming). */
+export interface PartnerEventsQuery {
+  type?: string;
+  node?: string;
+  upcoming?: boolean;
+}
+
+/** Paramètres de requête pour la liste des cours partenaires (style, level, node). */
+export interface PartnerCoursesQuery {
+  style?: string;
+  level?: string;
+  node?: string;
+}
+
+/**
+ * Liste des structures partenaires. GET /api/partners/nodes/
+ */
+export async function getPartnerNodes(): Promise<PartnerNodeApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/partners/nodes/`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Partner nodes API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Structures partenaires pour annuaire (avec parent_slug). GET /api/partners/nodes/?for_structure=1
+ */
+export async function getPartnerNodesForStructure(): Promise<PartnerNodeApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/partners/nodes/?for_structure=1`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Partner structure API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'une structure partenaire par slug. GET /api/partners/nodes/<slug>/
+ */
+export async function getPartnerNodeBySlug(slug: string): Promise<PartnerNodeApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/partners/nodes/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Partner node API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Liste des événements partenaires. GET /api/partners/events/
+ */
+export async function getPartnerEvents(params?: PartnerEventsQuery): Promise<PartnerEventApi[]> {
+  const base = getApiBaseUrl();
+  const search = new URLSearchParams();
+  if (params?.type) search.set("type", params.type);
+  if (params?.node) search.set("node", params.node);
+  if (params?.upcoming) search.set("upcoming", "1");
+  const qs = search.toString();
+  const url = qs ? `${base}/api/partners/events/?${qs}` : `${base}/api/partners/events/`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Partner events API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'un événement partenaire par slug. GET /api/partners/events/<slug>/
+ */
+export async function getPartnerEventBySlug(slug: string): Promise<PartnerEventApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/partners/events/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Partner event API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Liste des cours partenaires. GET /api/partners/courses/
+ */
+export async function getPartnerCourses(params?: PartnerCoursesQuery): Promise<PartnerCourseApi[]> {
+  const base = getApiBaseUrl();
+  const search = new URLSearchParams();
+  if (params?.style) search.set("style", params.style);
+  if (params?.level) search.set("level", params.level);
+  if (params?.node) search.set("node", params.node);
+  const qs = search.toString();
+  const url = qs ? `${base}/api/partners/courses/?${qs}` : `${base}/api/partners/courses/`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Partner courses API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * Détail d'un cours partenaire par slug. GET /api/partners/courses/<slug>/
+ */
+export async function getPartnerCourseBySlug(slug: string): Promise<PartnerCourseApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/partners/courses/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Partner course API error: ${res.status}`);
   return res.json();
 }
 

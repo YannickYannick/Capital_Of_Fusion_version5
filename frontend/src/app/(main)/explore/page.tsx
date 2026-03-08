@@ -5,6 +5,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { PlanetOverlay } from "@/components/features/explore/components/PlanetOverlay";
 import { OptionsPanel } from "@/components/features/explore/components/OptionsPanel";
 import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
@@ -37,11 +39,31 @@ function ExplorePageInner() {
   const [overlayNode, setOverlayNode] = useState<OrganizationNodeApi | null>(null);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
 
+  const { setOverride: setPlanetMusicOverride } = usePlanetMusicOverride();
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+
   useEffect(() => {
     if (!selectedNode) setSelectedPlanetScreenPos(null);
   }, [selectedNode]);
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+  // Musique de fond planète : activer quand l'overlay s'ouvre sur un nœud avec musique, désactiver à la fermeture
+  useEffect(() => {
+    if (!overlayNode || !overlayNode.music_type) {
+      setPlanetMusicOverride(null);
+      return;
+    }
+    const base = apiBaseUrl.replace(/\/$/, "");
+    if (overlayNode.music_type === "youtube" && overlayNode.music_youtube_url) {
+      setPlanetMusicOverride({ type: "youtube", youtubeUrl: overlayNode.music_youtube_url });
+      return;
+    }
+    if (overlayNode.music_type === "file" && overlayNode.music_file) {
+      const fileUrl = overlayNode.music_file.startsWith("http") ? overlayNode.music_file : `${base}${overlayNode.music_file.startsWith("/") ? "" : "/"}${overlayNode.music_file}`;
+      setPlanetMusicOverride({ type: "file", fileUrl });
+      return;
+    }
+    setPlanetMusicOverride(null);
+  }, [overlayNode, apiBaseUrl, setPlanetMusicOverride]);
 
   useEffect(() => {
     // 1. Charger les noeuds
@@ -92,6 +114,13 @@ function ExplorePageInner() {
     opts.triggerReset();
     opts.set("freezePlanets", false);
   }, [opts]);
+
+  const { user } = useAuth();
+  const canEditDescriptions = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const handleNodeUpdated = useCallback((updatedNode: OrganizationNodeApi) => {
+    setOverlayNode(updatedNode);
+    setNodes((prev) => prev.map((n) => (n.id === updatedNode.id ? updatedNode : n)));
+  }, []);
 
   const handleSaved = useCallback(() => {
     // Après sauvegarde, rejouer l'intro pour mettre à jour la scène
@@ -206,7 +235,12 @@ function ExplorePageInner() {
       </div>
 
       {/* Overlay détails planète (z-50) */}
-      <PlanetOverlay node={overlayNode} onClose={handleCloseOverlay} />
+      <PlanetOverlay
+        node={overlayNode}
+        onClose={handleCloseOverlay}
+        canEditDescriptions={canEditDescriptions}
+        onNodeUpdated={handleNodeUpdated}
+      />
 
       {/* Accessible fallback liste (screen readers) */}
       <ul className="sr-only" aria-label="Liste des planètes">
