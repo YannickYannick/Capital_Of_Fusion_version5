@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getPoles } from "@/lib/api";
 import type { PoleApi } from "@/types/organization";
 import { motion } from "framer-motion";
+import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 /**
  * Page Organisation / Pôles — liste des pôles avec le nombre de membres (staff/admin).
@@ -23,27 +24,21 @@ export default function PolesPage() {
 
   if (loading && poles.length === 0) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
-      <div className="max-w-4xl mx-auto">
-        <motion.header
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter mb-5 italic">
-            NOS <span className="text-purple-500">PÔLES</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-white/60 max-w-xl font-light leading-relaxed">
-            Les équipes qui font vivre Capital of Fusion. Le nombre de membres est mis à jour automatiquement.
-          </p>
-        </motion.header>
+    <StandardPageShell>
+      <div className="max-w-4xl mx-auto text-white">
+        <StandardPageHero
+          eyebrow="Organisation"
+          title="Nos"
+          highlight="Pôles"
+          description="Les équipes qui font vivre Capital of Fusion. Le nombre de membres est mis à jour automatiquement."
+        />
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[2rem] text-red-500 text-center">
@@ -76,6 +71,6 @@ export default function PolesPage() {
           </div>
         )}
       </div>
-    </div>
+    </StandardPageShell>
   );
 }

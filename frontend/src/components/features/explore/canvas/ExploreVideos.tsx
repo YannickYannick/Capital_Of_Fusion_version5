@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Vidéo de fond globale (YouTube ou MP4) :
+ * - Page d'accueil (/) : main_video.
+ * - Autres pages menu (hors /dashboard, /login, /register) : cycle_video (explore).
+ * - Contrôles : qualité, mute, voile. Override possible depuis Explore (musique planète).
+ */
 import { useEffect, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
@@ -177,37 +183,54 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     // Visibilité du cycle
     useEffect(() => {
+        // Transition vers explore depuis home
         if (opts.isTransitioningToExplore) {
             setCycleOpacity(1);
             return;
         }
-        if (!isExplore) {
+        
+        // Sur la page d'accueil : main_video uniquement (cycle masqué)
+        if (isHome) {
             setCycleOpacity(0);
             return;
         }
+        
+        // Sur toutes les autres pages (menu) : cycle_video visible
+        // Si enableVideoCycle est désactivé, afficher cycle en continu
         if (!opts.enableVideoCycle) {
             setCycleOpacity(1);
             return;
         }
+        
+        // Si enableVideoCycle est actif et on est sur /explore : cycle alterne
+        if (isExplore) {
+            let timer: ReturnType<typeof setTimeout>;
+            const visibleMs = opts.videoCycleVisible * 1000;
+            const hiddenMs = opts.videoCycleHidden * 1000;
 
-        let timer: ReturnType<typeof setTimeout>;
-        const visibleMs = opts.videoCycleVisible * 1000;
-        const hiddenMs = opts.videoCycleHidden * 1000;
+            function showCycle() {
+                setCycleOpacity(1);
+                timer = setTimeout(hideCycle, visibleMs);
+            }
+            function hideCycle() {
+                setCycleOpacity(0);
+                timer = setTimeout(showCycle, hiddenMs);
+            }
 
-        function showCycle() {
-            setCycleOpacity(1);
-            timer = setTimeout(hideCycle, visibleMs);
+            showCycle();
+            return () => clearTimeout(timer);
         }
-        function hideCycle() {
-            setCycleOpacity(0);
-            timer = setTimeout(showCycle, hiddenMs);
-        }
+        
+        // Autres pages menu : cycle_video toujours visible
+        setCycleOpacity(1);
+    }, [opts.enableVideoCycle, opts.videoCycleVisible, opts.videoCycleHidden, isExplore, isHome, opts.isTransitioningToExplore]);
 
-        showCycle();
-        return () => clearTimeout(timer);
-    }, [opts.enableVideoCycle, opts.videoCycleVisible, opts.videoCycleHidden, isExplore, opts.isTransitioningToExplore]);
-
-    const isVisibleGlobally = isHome || isExplore || opts.isTransitioningToExplore;
+    // Routes exclues de la vidéo de fond (admin, authentification)
+    const excludedRoutes = ["/dashboard", "/login", "/register"];
+    const isExcluded = excludedRoutes.some(route => pathname.startsWith(route));
+    
+    // La vidéo est visible sur toutes les pages sauf celles exclues
+    const isVisibleGlobally = !isExcluded || opts.isTransitioningToExplore;
     if (!isVisibleGlobally) return null;
 
     const grayscale = opts.grayscaleVideo ? "grayscale(100%)" : "none";

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { IconFileText, IconCloudDownload, IconSearch } from "@tabler/icons-react";
+import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 const documents = [
   { id: 1, title: "Statuts de l'association", category: "Administratif", date: "2024-01-15", size: "1.2 MB" },
@@ -12,26 +13,15 @@ const documents = [
 
 export default function FichiersPage() {
   return (
-    <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
-      <div className="max-w-7xl mx-auto">
-        {/* Hero centré — même format que /care */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-20 text-center"
-        >
-          <span className="text-purple-500 font-black uppercase tracking-[0.3em] text-[10px]">
-            Ressources
-          </span>
-          <h1 className="text-6xl sm:text-7xl md:text-9xl font-black tracking-tighter mt-4 italic">
-            BIBLIOTHÈQUE <span className="text-purple-500">FICHIERS</span>
-          </h1>
-          <p className="text-xl text-white/40 max-w-2xl mx-auto mt-6 font-light">
-            Consultez et téléchargez les documents officiels, plannings et ressources de Capital of Fusion.
-          </p>
-        </motion.div>
+    <StandardPageShell>
+      <div className="max-w-7xl mx-auto text-white">
+        <StandardPageHero
+          eyebrow="Ressources"
+          title="Bibliothèque"
+          highlight="fichiers"
+          description="Consultez et téléchargez les documents officiels, plannings et ressources de Capital of Fusion."
+        />
 
-        {/* Barre de recherche */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,7 +36,6 @@ export default function FichiersPage() {
           />
         </motion.div>
 
-        {/* Grille de documents */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {documents.map((doc, idx) => (
             <motion.div
@@ -77,7 +66,6 @@ export default function FichiersPage() {
           ))}
         </div>
 
-        {/* CTA bas de page */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -92,6 +80,6 @@ export default function FichiersPage() {
           </p>
         </motion.div>
       </div>
-    </div>
+    </StandardPageShell>
   );
 }

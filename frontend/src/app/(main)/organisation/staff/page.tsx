@@ -5,6 +5,7 @@ import { getStaffMembers, getPoles } from "@/lib/api";
 import type { StaffMemberApi, PoleApi } from "@/types/organization";
 import { StaffCard } from "@/components/features/organisation/StaffCard";
 import { motion } from "framer-motion";
+import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 /**
  * Page Organisation / Staff — liste des membres du staff (UX proche de /artistes).
@@ -34,30 +35,22 @@ export default function StaffPage() {
 
   if (loading && staff.length === 0) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
-      <div className="max-w-7xl mx-auto">
-        {/* Bloc titre + description */}
-        <motion.header
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter mb-5 italic">
-            NOTRE <span className="text-purple-500">STAFF</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-white/60 max-w-2xl font-light leading-relaxed">
-            Les personnes qui font vivre Capital of Fusion au quotidien. Filtrez par pôle pour découvrir les équipes.
-          </p>
-        </motion.header>
+    <StandardPageShell>
+      <div className="max-w-7xl mx-auto text-white">
+        <StandardPageHero
+          eyebrow="Organisation"
+          title="Notre"
+          highlight="Staff"
+          description="Les personnes qui font vivre Capital of Fusion au quotidien. Filtrez par pôle pour découvrir les équipes."
+        />
 
-        {/* Filtres par pôle — ligne dédiée, meilleur wrap */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -123,6 +116,6 @@ export default function StaffPage() {
           </div>
         )}
       </div>
-    </div>
+    </StandardPageShell>
   );
 }

@@ -10,25 +10,18 @@ npm run dev
 
 Puis ouvrir [http://localhost:3000](http://localhost:3000).
 
-## Routes
+## Template de pages (StandardPage)
 
-| Route | Page |
-|-------|------|
-| `/` | Landing |
-| `/explore` | Explore 3D |
-| `/cours` | Catalogue cours |
-| `/evenements` | Calendrier |
-| `/boutique` | Boutique (Phase 2) |
-| `/organisation` | Organisation (Phase 2) |
-| `/login` | Connexion |
+Les pages publiques (hors dashboard / login / register) utilisent un layout commun pour une UX homogène :
 
-## Vidéos YouTube
+- **StandardPageShell** — conteneur : `min-h-screen pt-64 pb-20 px-4 md:px-8`, `max-w-6xl mx-auto`.
+- **StandardPageHero** — hero centré : petit libellé violet (eyebrow), titre 5xl/6xl avec partie en gradient, description.
+- **StandardCardsGrid** — grille responsive 1 → 2 → 3 colonnes, `gap-8`.
 
-Les vidéos de fond (landing) sont des **embeds YouTube**. Configurer via variable d'environnement :
+Fichier : `src/components/shared/StandardPage.tsx`. Exemple d’usage : `/cours`, `/care`, `/artistes`, `/organisation/poles`, `/organisation/staff`, `/partenaires/structures`, `/fichiers`.
 
-```bash
-# .env.local
-NEXT_PUBLIC_YOUTUBE_VIDEO_ID=abc123
-```
+## Vidéo de fond YouTube
 
-Ou remplacer `VIDEO_ID` dans le code. Ex. : `dQw4w9WgXcQ` pour `https://youtube.com/watch?v=dQw4w9WgXcQ`.
+- **Page d’accueil (`/`)** : vidéo d’introduction (config `main_video`).
+- **Toutes les autres pages du menu** (sauf `/dashboard`, `/login`, `/register`) : vidéo explore en fond (`cycle_video`), contenu en translucide par-dessus.
+- Config optionnelle en `.env.local` : `NEXT_PUBLIC_YOUTUBE_VIDEO_ID`, `NEXT_PUBLIC_YOUTUBE_CYCLE_VIDEO_ID`.

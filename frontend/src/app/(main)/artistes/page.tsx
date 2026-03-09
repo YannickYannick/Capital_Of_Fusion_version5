@@ -5,6 +5,7 @@ import { getArtists } from "@/lib/api";
 import type { ArtistApi } from "@/types/user";
 import ArtistCard from "@/components/features/artists/ArtistCard";
 import { motion } from "framer-motion";
+import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 export default function ArtistesPage() {
   const [artists, setArtists] = useState<ArtistApi[]>([]);
@@ -26,28 +27,21 @@ export default function ArtistesPage() {
 
   if (loading && artists.length === 0) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-40 pb-24 px-6 sm:px-8 md:px-12 lg:px-16">
-      <div className="max-w-7xl mx-auto">
-        <motion.header
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter mb-5 italic">
-            NOS <span className="text-purple-500">ARTISTES</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-white/60 max-w-2xl font-light leading-relaxed">
-            Découvrez les talents qui font battre le cœur de Capital of Fusion.
-            Membres officiels et artistes partenaires.
-          </p>
-        </motion.header>
+    <StandardPageShell>
+      <div className="text-white">
+        <StandardPageHero
+          eyebrow="Nos artistes"
+          title="Nos"
+          highlight="Artistes"
+          description="Découvrez les talents qui font battre le cœur de Capital of Fusion. Membres officiels et artistes partenaires."
+        />
 
         <motion.section
           initial={{ opacity: 0, y: 8 }}
@@ -106,6 +100,6 @@ export default function ArtistesPage() {
           </div>
         )}
       </div>
-    </div>
+    </StandardPageShell>
   );
 }
