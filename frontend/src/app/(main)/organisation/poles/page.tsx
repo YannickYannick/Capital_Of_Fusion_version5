@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getPoles } from "@/lib/api";
 import type { PoleApi } from "@/types/organization";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 /**
@@ -48,18 +48,17 @@ export default function PolesPage() {
         ) : (
           <ul className="space-y-4">
             {poles.map((pole, idx) => (
-              <motion.li
+              <AnimatedDiv
                 key={pole.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04 }}
+                animation="fadeInUp"
+                delay={idx * 0.04}
                 className="flex items-center justify-between gap-6 py-5 px-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/20 transition-colors"
               >
                 <span className="text-lg font-semibold text-white">{pole.name}</span>
                 <span className="text-sm text-white/50 tabular-nums">
                   {pole.members_count} membre{pole.members_count !== 1 ? "s" : ""}
                 </span>
-              </motion.li>
+              </AnimatedDiv>
             ))}
           </ul>
         )}

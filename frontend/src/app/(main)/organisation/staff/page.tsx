@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getStaffMembers, getPoles } from "@/lib/api";
 import type { StaffMemberApi, PoleApi } from "@/types/organization";
 import { StaffCard } from "@/components/features/organisation/StaffCard";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 /**
@@ -51,10 +51,9 @@ export default function StaffPage() {
           description="Les personnes qui font vivre Capital of Fusion au quotidien. Filtrez par pôle pour découvrir les équipes."
         />
 
-        <motion.section
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
+        <AnimatedDiv
+          animation="fadeInUp"
+          delay={0.05}
           className="mb-14"
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40 mb-3">
@@ -85,7 +84,7 @@ export default function StaffPage() {
               </button>
             ))}
           </div>
-        </motion.section>
+        </AnimatedDiv>
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[2rem] text-red-500 text-center">
@@ -95,14 +94,13 @@ export default function StaffPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
             {staff.map((member, idx) => (
-              <motion.div
+              <AnimatedDiv
                 key={member.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(idx * 0.04, 0.3) }}
+                animation="fadeInUp"
+                delay={Math.min(idx * 0.04, 0.3)}
               >
                 <StaffCard member={member} />
-              </motion.div>
+              </AnimatedDiv>
             ))}
           </div>
         )}

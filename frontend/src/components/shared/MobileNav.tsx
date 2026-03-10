@@ -96,22 +96,27 @@ export function MobileNav({
                   </div>
                   {expandedSlug === label && (
                     <div id={`mobile-submenu-${label.replace(/\s+/g, "-")}`} className="pl-6 pb-2 flex flex-col gap-1" role="group" aria-label={`Sous-menu ${label}`}>
-                      {children.map((child) => (
-                        <Link
-                          key={child.id}
-                          href={child.url || "#"}
-                          onClick={() => setOpen(false)}
-                          className="py-1.5 text-sm text-white/80 hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
-                        >
-                          {child.name}
-                        </Link>
-                      ))}
+                      {children.map((child) => {
+                        const url = child.url || "#";
+                        return (
+                          <Link
+                            key={child.id}
+                            href={url}
+                            prefetch={!url.startsWith("/projets")}
+                            onClick={() => setOpen(false)}
+                            className="py-1.5 text-sm text-white/80 hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
+                          >
+                            {child.name}
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </>
               ) : (
                 <Link
                   href={href}
+                  prefetch={!href.startsWith("/projets")}
                   onClick={() => setOpen(false)}
                   className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
                 >

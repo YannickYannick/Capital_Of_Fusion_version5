@@ -187,15 +187,20 @@ export function Navbar() {
                 </Link>
                 <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="bg-black/95 backdrop-blur-md border border-white/10 rounded-lg py-2 min-w-[180px] shadow-xl">
-                    {children.map((child) => (
-                      <Link
-                        key={child.id}
-                        href={child.url || "#"}
-                        className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
-                      >
-                        {child.name}
-                      </Link>
-                    ))}
+                    {children.map((child) => {
+                      const url = child.url || "#";
+                      const isProjets = url.startsWith("/projets");
+                      return (
+                        <Link
+                          key={child.id}
+                          href={url}
+                          prefetch={!isProjets}
+                          className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
+                        >
+                          {child.name}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -203,6 +208,7 @@ export function Navbar() {
               <Link
                 key={href + label}
                 href={href}
+                prefetch={!href.startsWith("/projets")}
                 className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
               >
                 {label}

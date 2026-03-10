@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { getPartnerNodesForStructure } from "@/lib/api";
 import type { PartnerNodeApi } from "@/types/partner";
 import { PartnerNodeCard } from "@/components/features/partners/PartnerNodeCard";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Link from "next/link";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
@@ -59,14 +59,13 @@ export default function PartenairesStructuresPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {nodes.map((node, idx) => (
-              <motion.div
+              <AnimatedDiv
                 key={node.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                animation="fadeInUp"
+                delay={idx * 0.05}
               >
                 <PartnerNodeCard node={node} />
-              </motion.div>
+              </AnimatedDiv>
             ))}
           </div>
         )}

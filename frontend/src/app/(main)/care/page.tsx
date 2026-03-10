@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { StandardPageShell, StandardPageHero, StandardCardsGrid } from "@/components/shared/StandardPage";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 
 const sections = [
     {
@@ -39,11 +39,9 @@ export default function CareHubPage() {
             <StandardCardsGrid>
                 {sections.map((section, idx) => (
                     <Link key={idx} href={section.href}>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 }}
+                        <AnimatedDiv
+                            animation="fadeInScale"
+                            delay={idx * 0.1}
                             className="group relative h-[500px] overflow-hidden rounded-[3rem] border border-white/5 bg-white/[0.01]"
                         >
                             <Image
@@ -60,7 +58,7 @@ export default function CareHubPage() {
                                     {section.description}
                                 </p>
                             </div>
-                        </motion.div>
+                        </AnimatedDiv>
                     </Link>
                 ))}
             </StandardCardsGrid>

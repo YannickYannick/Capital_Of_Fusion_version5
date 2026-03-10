@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 
 export default function LandingPageClient() {
@@ -14,10 +13,7 @@ export default function LandingPageClient() {
     const handleStartPushed = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         setIsTransitioning(true);
-        // Déclenche le cycle fondu dans la GlobalVideoBackground (gérée dans layout.tsx)
         opts.set("isTransitioningToExplore", true);
-
-        // Délai pour laisser le temps au fondu vidéo paramétré dans GlobalVideoBackground (1.5s)
         setTimeout(() => {
             router.push("/explore");
         }, 1500);
@@ -25,10 +21,6 @@ export default function LandingPageClient() {
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
-            {/* Le fond vidéo principal est maintenant géré globalement dans layout.tsx (GlobalVideoBackground) */}
-
-            {/* Le voile dégradé de la page d'accueil - peut être toggle par l'overlay global si on le souhaite, 
-                mais on le garde local à la homepage pour l'instant sauf si opts le masque */}
             {opts.showVideoOverlay && (
                 <div
                     className="absolute inset-0 bg-gradient-to-b from-[#0a0e27] via-[#0a0e27]/60 to-transparent pointer-events-none"
@@ -57,11 +49,9 @@ export default function LandingPageClient() {
                     >
                         <span className="relative z-10">Commencer l&apos;Expérience</span>
                         {isTransitioning && (
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: 1.5, ease: "linear" }}
-                                className="absolute inset-0 bg-purple-400/30 z-0"
+                            <span
+                                className="absolute inset-0 bg-purple-400/30 z-0 w-0 origin-left animate-progress-full"
+                                aria-hidden
                             />
                         )}
                     </a>
@@ -77,7 +67,6 @@ export default function LandingPageClient() {
                     Paris, France • École Nationale de Danse
                 </p>
             </section>
-
         </div>
     );
 }

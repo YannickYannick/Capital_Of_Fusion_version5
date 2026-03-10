@@ -601,10 +601,11 @@ export async function getCareServices(): Promise<CareServiceApi[]> {
   return res.json();
 }
 
-// --- PROJECTS ---
+// --- PROJECTS --- (404 = endpoint absent ou backend non configuré → tableaux vides)
 export async function getProjectCategories(): Promise<ProjectCategoryApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/projects/categories/`);
+  if (res.status === 404) return [];
   if (!res.ok) throw new Error(`Project Categories API error: ${res.status}`);
   return res.json();
 }
@@ -612,6 +613,7 @@ export async function getProjectCategories(): Promise<ProjectCategoryApi[]> {
 export async function getProjects(): Promise<ProjectApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/projects/projects/`);
+  if (res.status === 404) return [];
   if (!res.ok) throw new Error(`Projects API error: ${res.status}`);
   return res.json();
 }
