@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import {
   getOrganizationNodeBySlug,
   getCourses,
@@ -103,11 +103,7 @@ export default function NoeudProfilPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <AnimatedDiv animation="fadeInUp">
             <span className="inline-block px-3 py-1 bg-purple-600/80 backdrop-blur-md text-[10px] uppercase tracking-widest font-black rounded-full border border-purple-500/30 text-white mb-4">
               {node.type === "ROOT" ? "Racine" : node.type === "BRANCH" ? "Branche" : "Événement"}
             </span>
@@ -117,7 +113,7 @@ export default function NoeudProfilPage() {
             {node.short_description && (
               <p className="text-lg text-white/80 max-w-2xl mt-2">{node.short_description}</p>
             )}
-          </motion.div>
+          </AnimatedDiv>
         </div>
       </section>
 
@@ -125,11 +121,7 @@ export default function NoeudProfilPage() {
       <section className="max-w-7xl mx-auto px-8 md:px-16 py-16 grid grid-cols-1 lg:grid-cols-3 gap-16">
         <div className="lg:col-span-2">
           {(node.description || node.content) && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-            >
+            <AnimatedDiv animation="fadeIn">
               <h2 className="text-xs uppercase tracking-[0.3em] font-black mb-8 text-white/30 italic underline decoration-purple-500/50 decoration-4 underline-offset-8">
                 À propos
               </h2>
@@ -140,7 +132,7 @@ export default function NoeudProfilPage() {
                   <p>{node.description || "Aucune description pour ce nœud."}</p>
                 )}
               </div>
-            </motion.div>
+            </AnimatedDiv>
           )}
 
           {!node.description && !node.content && (
@@ -150,10 +142,8 @@ export default function NoeudProfilPage() {
 
         <div className="space-y-12">
           {/* Cours */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+          <AnimatedDiv
+            animation="fadeIn"
             className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
           >
             <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-6 text-white/30 italic">
@@ -188,13 +178,12 @@ export default function NoeudProfilPage() {
                 Voir tous les cours →
               </Link>
             )}
-          </motion.div>
+          </AnimatedDiv>
 
           {/* Événements */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+          <AnimatedDiv
+            animation="fadeIn"
+            delay={0.1}
             className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
           >
             <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-6 text-white/30 italic">
@@ -230,7 +219,7 @@ export default function NoeudProfilPage() {
                 Voir tous les événements →
               </Link>
             )}
-          </motion.div>
+          </AnimatedDiv>
         </div>
       </section>
 

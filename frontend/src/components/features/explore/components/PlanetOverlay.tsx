@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
 import { patchOrganizationNode } from "@/lib/api";
@@ -27,11 +26,9 @@ function formatDate(s: string): string {
 
 function EventCard({ ev, index }: { ev: NodeEventApi; index: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.3 }}
-      className="flex-shrink-0 w-52 rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-purple-500/40 transition"
+    <div
+      className="flex-shrink-0 w-52 rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-purple-500/40 transition animate-slideInX"
+      style={{ animationDelay: `${index * 0.1}s` }}
     >
       {ev.external_url ? (
         <a href={ev.external_url} target="_blank" rel="noopener noreferrer">
@@ -40,7 +37,7 @@ function EventCard({ ev, index }: { ev: NodeEventApi; index: number }) {
       ) : (
         <CardContent ev={ev} />
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -108,50 +105,60 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     }
   }, [node, editDescription, editShortDescription, editContent, onNodeUpdated]);
 
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (node) setIsClosing(false);
+  }, [node]);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [onClose]);
+
+  const handleBackdropClickWithAnimation = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) handleClose();
+    },
+    [handleClose]
+  );
+
+  if (!node) return null;
+
   return (
-    <AnimatePresence>
-      {node && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="overlay-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
-            onClick={handleBackdropClick}
-          >
-            {/* Modal */}
-            <motion.div
-              key="overlay-modal"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative w-full max-w-5xl max-h-[85vh] overflow-y-auto rounded-2xl bg-[#0a0e27]/95 border border-white/10 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 ${isClosing ? "animate-fadeOut" : "animate-fadeIn"}`}
+        onClick={handleBackdropClickWithAnimation}
+      >
+        {/* Modal */}
+        <div
+          className={`relative w-full max-w-5xl max-h-[85vh] overflow-y-auto rounded-2xl bg-[#0a0e27]/95 border border-white/10 shadow-2xl ${isClosing ? "animate-fadeOutScale" : "animate-fadeInScale"}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Bouton fermer */}
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            {canEditDescriptions && (
+              <button
+                type="button"
+                onClick={showEditForm ? () => setShowEditForm(false) : openEditForm}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition"
+              >
+                {showEditForm ? "Annuler" : "✏️ Modifier la description"}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition text-lg"
+              aria-label="Fermer"
             >
-              {/* Bouton fermer */}
-              <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-                {canEditDescriptions && (
-                  <button
-                    type="button"
-                    onClick={showEditForm ? () => setShowEditForm(false) : openEditForm}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition"
-                  >
-                    {showEditForm ? "Annuler" : "✏️ Modifier la description"}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition text-lg"
-                  aria-label="Fermer"
-                >
-                  ×
-                </button>
-              </div>
+              ×
+            </button>
+          </div>
 
               {/* Header — grille 2 colonnes */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -336,21 +343,19 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                 </div>
               )}
 
-              {/* Section À propos (contenu détaillé) */}
-              {node.content && (
-                <div className="border-t border-white/10 px-8 py-6">
-                  <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
-                    À propos
-                  </h2>
-                  <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-                    {node.content}
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          {/* Section À propos (contenu détaillé) */}
+          {node.content && (
+            <div className="border-t border-white/10 px-8 py-6">
+              <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
+                À propos
+              </h2>
+              <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+                {node.content}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

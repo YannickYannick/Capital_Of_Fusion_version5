@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getArtistByUsername } from "@/lib/api";
 import type { ArtistApi } from "@/types/user";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -59,11 +59,7 @@ export default function ArtistProfilePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 max-w-7xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                    >
+                    <AnimatedDiv animation="fadeInUp">
                         <div className="flex flex-wrap gap-2 mb-4 text-purple-400">
                             {artist.professions.map((prof) => (
                                 <span key={prof.id} className="px-3 py-1 bg-purple-600/20 backdrop-blur-md text-[10px] uppercase tracking-widest font-black rounded-full border border-purple-500/30">
@@ -74,29 +70,23 @@ export default function ArtistProfilePage() {
                         <h1 className="text-6xl md:text-9xl font-black italic tracking-tighter mb-4">
                             {artist.first_name} <span className="text-purple-500">{artist.last_name}</span>
                         </h1>
-                    </motion.div>
+                    </AnimatedDiv>
                 </div>
             </section>
 
             <section className="max-w-7xl mx-auto px-8 md:px-16 py-16 grid grid-cols-1 lg:grid-cols-3 gap-16">
                 <div className="lg:col-span-2">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                    >
+                    <AnimatedDiv animation="fadeIn">
                         <h2 className="text-xs uppercase tracking-[0.3em] font-black mb-8 text-white/30 italic underline decoration-purple-500/50 decoration-4 underline-offset-8">Biographie</h2>
                         <div className="prose prose-invert max-w-none text-lg text-white/70 leading-relaxed font-light">
                             {artist.bio || "Aucune biographie disponible pour cet artiste."}
                         </div>
-                    </motion.div>
+                    </AnimatedDiv>
                 </div>
 
                 <div className="space-y-8">
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                    <AnimatedDiv
+                        animation="fadeIn"
                         className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
                     >
                         <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-8 text-white/30 italic">Details</h3>
@@ -116,7 +106,7 @@ export default function ArtistProfilePage() {
                         <button className="w-full mt-12 py-5 bg-white text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-purple-500 hover:text-white transition-all duration-500 shadow-2xl hover:shadow-purple-500/20">
                             Booking Info
                         </button>
-                    </motion.div>
+                    </AnimatedDiv>
                 </div>
             </section>
 

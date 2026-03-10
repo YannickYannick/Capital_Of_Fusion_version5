@@ -11,7 +11,6 @@ import { PlanetOverlay } from "@/components/features/explore/components/PlanetOv
 import { OptionsPanel } from "@/components/features/explore/components/OptionsPanel";
 import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
 import { DebugPanel } from "@/components/features/explore/components/DebugPanel";
-import { motion, AnimatePresence } from "framer-motion";
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
 const ExploreScene = dynamic(
@@ -159,32 +158,24 @@ function ExplorePageInner() {
       )}
 
       {/* Barre d'action planète sélectionnée — centre du cadre aligné sur la planète (fallback: bas centré) */}
-      <AnimatePresence>
-        {selectedNode && !overlayNode && (
-          <div
-            className="fixed z-30 pointer-events-none"
-            style={
-              selectedPlanetScreenPos != null
-                ? {
-                    left: selectedPlanetScreenPos.x,
-                    top: selectedPlanetScreenPos.y,
-                    transform: "translate(-50%, -50%)",
-                  }
-                : {
-                    bottom: "6rem",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }
-            }
-          >
-            <motion.div
-              key="action-bar"
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="pointer-events-auto px-8 py-6 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 min-w-[340px] max-w-[90vw]"
-            >
+      {selectedNode && !overlayNode && (
+        <div
+          className="fixed z-30 pointer-events-none"
+          style={
+            selectedPlanetScreenPos != null
+              ? {
+                  left: selectedPlanetScreenPos.x,
+                  top: selectedPlanetScreenPos.y,
+                  transform: "translate(-50%, -50%)",
+                }
+              : {
+                  bottom: "6rem",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }
+          }
+        >
+          <div className="pointer-events-auto px-8 py-6 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 min-w-[340px] max-w-[90vw] animate-fadeInScale">
             <p className="text-white/40 text-sm uppercase tracking-widest font-semibold">Sélectionné</p>
             <p className="text-white text-4xl font-bold text-center leading-tight">{selectedNode.name}</p>
             <div className="flex gap-4">
@@ -203,10 +194,9 @@ function ExplorePageInner() {
                 ← Retour
               </button>
             </div>
-          </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {/* Panneau Options (droite, z-20) */}
       <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} nodes={nodes} />

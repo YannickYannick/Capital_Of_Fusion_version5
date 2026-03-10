@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { getOrganizationNodesForStructure } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { NodeCard } from "@/components/features/organisation/NodeCard";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Link from "next/link";
 
 export default function NoeudsPage() {
@@ -41,17 +41,14 @@ export default function NoeudsPage() {
           >
             ← Organisation
           </Link>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
+          <AnimatedDiv animation="fadeIn">
             <h1 className="text-6xl font-black tracking-tighter mb-4 italic">
               NOS <span className="text-purple-500">NŒUDS</span>
             </h1>
             <p className="text-xl text-white/60 max-w-xl font-light leading-relaxed">
               Pôles, antennes et communautés de Capital of Fusion. Découvrez les cours et événements près de chez vous.
             </p>
-          </motion.div>
+          </AnimatedDiv>
         </div>
 
         {error ? (
@@ -62,14 +59,13 @@ export default function NoeudsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {nodes.map((node, idx) => (
-              <motion.div
+              <AnimatedDiv
                 key={node.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                animation="fadeInUp"
+                delay={idx * 0.05}
               >
                 <NodeCard node={node} />
-              </motion.div>
+              </AnimatedDiv>
             ))}
           </div>
         )}

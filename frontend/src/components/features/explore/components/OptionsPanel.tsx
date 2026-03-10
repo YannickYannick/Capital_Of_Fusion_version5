@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import type { PlanetsOptionsState } from "@/contexts/PlanetsOptionsContext";
 import { getSiteConfig, createExplorePreset } from "@/lib/api";
@@ -157,6 +156,20 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
         }
     };
 
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(visible);
+
+    useEffect(() => {
+        if (visible) {
+            setShouldRender(true);
+            setIsClosing(false);
+        } else if (shouldRender) {
+            setIsClosing(true);
+            const timer = setTimeout(() => setShouldRender(false), 300);
+            return () => clearTimeout(timer);
+        }
+    }, [visible, shouldRender]);
+
     return (
         <>
             {/* Toggle button */}
@@ -169,16 +182,10 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                 ⚙️
             </button>
 
-            <AnimatePresence>
-                {visible && (
-                    <motion.aside
-                        key="options-panel"
-                        initial={{ x: 300, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: 300, opacity: 0 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="fixed top-24 right-14 z-20 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-2xl text-sm p-4 flex flex-col gap-3"
-                    >
+            {shouldRender && (
+                <aside
+                    className={`fixed top-24 right-14 z-20 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-2xl text-sm p-4 flex flex-col gap-3 ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
+                >
                         <h2 className="text-xs font-bold text-white/50 uppercase tracking-widest">Options 3D</h2>
 
                         {/* Actions rapides */}
@@ -862,10 +869,9 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                             <p className="text-[10px] text-white/40 text-center mt-2 italic">
                                 Ces réglages seront enregistrés dans la base de données.
                             </p>
-                        </div>
-                    </motion.aside>
-                )}
-            </AnimatePresence >
+                    </div>
+                </aside>
+            )}
         </>
     );
 }

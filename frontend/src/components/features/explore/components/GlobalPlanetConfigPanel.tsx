@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback, useEffect } from "react";
 import type { OrganizationNodeApi } from "@/types/organization";
 
 interface LocalNodeChanges {
@@ -68,16 +67,9 @@ function NodeRow({
             </div>
 
             {/* Détails accordéon */}
-            <AnimatePresence>
-                {expanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                    >
-                        <div className="px-4 pb-4 flex flex-col gap-3 border-t border-white/10 mt-1 pt-3">
+            {expanded && (
+                <div className="overflow-hidden animate-fadeIn">
+                    <div className="px-4 pb-4 flex flex-col gap-3 border-t border-white/10 mt-1 pt-3">
                             {/* Rayon d'orbite */}
                             <SliderRow
                                 label="Rayon d'orbite"
@@ -144,9 +136,8 @@ function NodeRow({
                                 />
                             )}
                         </div>
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
         </li>
     );
 }
@@ -240,29 +231,34 @@ export function GlobalPlanetConfigPanel({
         }
     }, [allChanges, nodes, apiBaseUrl, onSaved]);
 
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <>
-                    {/* Backdrop */}
-                    <motion.div
-                        key="backdrop"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
-                        onClick={onClose}
-                    />
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(isOpen);
 
-                    {/* Panneau */}
-                    <motion.aside
-                        key="panel"
-                        initial={{ x: "100%" }}
-                        animate={{ x: 0 }}
-                        exit={{ x: "100%" }}
-                        transition={{ type: "spring", stiffness: 300, damping: 35 }}
-                        className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-[600px] bg-black/90 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col"
-                    >
+    useEffect(() => {
+        if (isOpen) {
+            setShouldRender(true);
+            setIsClosing(false);
+        } else if (shouldRender) {
+            setIsClosing(true);
+            const timer = setTimeout(() => setShouldRender(false), 300);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, shouldRender]);
+
+    if (!shouldRender) return null;
+
+    return (
+        <>
+            {/* Backdrop */}
+            <div
+                className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm ${isClosing ? "animate-fadeOut" : "animate-fadeIn"}`}
+                onClick={onClose}
+            />
+
+            {/* Panneau */}
+            <aside
+                className={`fixed top-0 right-0 bottom-0 z-50 w-full max-w-[600px] bg-black/90 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
+            >
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 flex-shrink-0">
                             <div>
@@ -323,9 +319,7 @@ export function GlobalPlanetConfigPanel({
                                             : "Sauvegarder Tout"}
                             </button>
                         </div>
-                    </motion.aside>
+                    </aside>
                 </>
-            )}
-        </AnimatePresence>
     );
 }
