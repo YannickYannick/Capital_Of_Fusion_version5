@@ -151,7 +151,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         return () => window.removeEventListener("resize", update);
     }, []);
 
-    // Load YT API conditionally
+    // Load YT API conditionally — DEFERRED by 1.5s to improve FCP
     useEffect(() => {
         if (mainType !== 'youtube' && cycleType !== 'youtube') return;
         if (typeof window === "undefined") return;
@@ -162,23 +162,45 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             return;
         }
 
-        // On vérifie régulièrement si YT API devient disponible (robuste au fast refresh et React Strict Mode)
-        const interval = setInterval(() => {
-            if (window.YT?.Player) {
-                setApiReady(true);
-                clearInterval(interval);
+        // Différer le chargement de l'API YouTube pour améliorer le FCP
+        const DEFER_YT_MS = 1500;
+        
+        const loadYT = () => {
+            // On vérifie régulièrement si YT API devient disponible
+            const interval = setInterval(() => {
+                if (window.YT?.Player) {
+                    setApiReady(true);
+                    clearInterval(interval);
+                }
+            }, 100);
+
+            // Ajout du script seulement s'il n'existe pas
+            if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+                const tag = document.createElement("script");
+                tag.src = "https://www.youtube.com/iframe_api";
+                tag.async = true;
+                document.head.appendChild(tag);
             }
-        }, 100);
 
-        // Ajout du script seulement s'il n'existe pas
-        if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-            const tag = document.createElement("script");
-            tag.src = "https://www.youtube.com/iframe_api";
-            document.head.appendChild(tag);
-        }
+            return () => clearInterval(interval);
+        };
 
-        // Nettoyage de l'intervalle si le composant est démonté
-        return () => clearInterval(interval);
+        // Différer le chargement ou charger immédiatement si requestIdleCallback dispo
+        let cleanupInterval: (() => void) | undefined;
+        const deferTimer = setTimeout(() => {
+            if ('requestIdleCallback' in window) {
+                (window as any).requestIdleCallback(() => {
+                    cleanupInterval = loadYT();
+                });
+            } else {
+                cleanupInterval = loadYT();
+            }
+        }, DEFER_YT_MS);
+
+        return () => {
+            clearTimeout(deferTimer);
+            cleanupInterval?.();
+        };
     }, [mainType, cycleType]);
 
     // Visibilité du cycle

@@ -277,10 +277,12 @@ function getEntryPosition(
 }
 
 // ─────────────────────────────────────────────────────────
-//  Orbit ring
+//  Orbit ring (memoized)
 // ─────────────────────────────────────────────────────────
 
-function OrbitRing({
+import { memo } from "react";
+
+const OrbitRing = memo(function OrbitRing({
   radius,
   shape,
   roundness,
@@ -310,22 +312,22 @@ function OrbitRing({
   return (
     <Line points={points} color="#ffffff" opacity={0.1} transparent lineWidth={1} />
   );
-}
+});
 
 // ─────────────────────────────────────────────────────────
-//  Planet geometries par type
+//  Planet geometries par type (memoized for performance)
 // ─────────────────────────────────────────────────────────
 
-function WirePlanet({ scale, color }: { scale: number; color: THREE.Color }) {
+const WirePlanet = memo(function WirePlanet({ scale, color }: { scale: number; color: THREE.Color }) {
   return (
     <mesh scale={scale}>
       <sphereGeometry args={[1, 16, 16]} />
       <meshBasicMaterial color={color} wireframe transparent opacity={0.8} />
     </mesh>
   );
-}
+});
 
-function DottedPlanet({ scale }: { scale: number }) {
+const DottedPlanet = memo(function DottedPlanet({ scale }: { scale: number }) {
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     const positions: number[] = [];
@@ -347,9 +349,9 @@ function DottedPlanet({ scale }: { scale: number }) {
       <pointsMaterial color="#ffffff" size={0.015} transparent opacity={0.8} sizeAttenuation />
     </points>
   );
-}
+});
 
-function GlassPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
+const GlassPlanet = memo(function GlassPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
   return (
     <mesh scale={scale}>
       <sphereGeometry args={[1, 64, 64]} />
@@ -363,18 +365,18 @@ function GlassPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
       />
     </mesh>
   );
-}
+});
 
-function ChromePlanet({ scale }: { scale: number }) {
+const ChromePlanet = memo(function ChromePlanet({ scale }: { scale: number }) {
   return (
     <mesh scale={scale}>
       <sphereGeometry args={[1, 64, 64]} />
       <meshStandardMaterial roughness={0.05} metalness={1.0} color="#cccccc" />
     </mesh>
   );
-}
+});
 
-function NetworkPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
+const NetworkPlanet = memo(function NetworkPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
   const { points, lines } = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     for (let i = 0; i < 60; i++) {
@@ -415,9 +417,9 @@ function NetworkPlanet({ scale, color }: { scale: number; color: THREE.Color }) 
       ))}
     </group>
   );
-}
+});
 
-function StarPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
+const StarPlanet = memo(function StarPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
   const particles = useMemo(() => {
     const pts: [number, number, number][] = [];
     for (let i = 0; i < 20; i++) {
@@ -444,9 +446,9 @@ function StarPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
       ))}
     </group>
   );
-}
+});
 
-function GlbPlanet({
+const GlbPlanet = memo(function GlbPlanet({
   url,
   scale,
 }: {
@@ -476,7 +478,7 @@ function GlbPlanet({
     );
   }
   return <primitive object={scene} />;
-}
+});
 
 // ─────────────────────────────────────────────────────────
 //  Composant planète unifié (orbital + entrée + physique)
