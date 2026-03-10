@@ -209,13 +209,56 @@ frontend/
 
 ---
 
-## 8. Prochaines optimisations suggérées
+## 8. Résultats Lighthouse Post-Optimisation
 
-1. **CSS critique inline** - Réduire le render-blocking de `app/layout.css`
-2. **Code splitting Three.js** - Lazy load des types de planètes individuellement
-3. **Préchargement chunks** - Hints pour les routes fréquentes
-4. **Tree shaking** - Vérifier les imports non utilisés
+### Métriques `/explore` (Mars 2026)
+
+| Métrique | Avant V2 | Après V2 | Évolution |
+|----------|----------|----------|-----------|
+| **FCP** | 0.4s | 0.4s | = stable |
+| **LCP** | 0.5s | 0.5s | = stable |
+| **CLS** | ~0 | 0.002 | 🟢 excellent |
+| **Speed Index** | 2.9s | 2.5s | 🟢 **-400ms** |
+| **TBT** | 1,580ms | 1,530ms | 🟡 -50ms |
+| **TTI** | 7.1s | 6.9s | 🟡 -200ms |
+| **First Load JS** | 162 KB | 109 KB | 🟢 **-53 KB (-33%)** |
+
+### Analyse
+
+**Points forts :**
+- FCP et LCP excellents (contenu visible rapidement)
+- CLS quasi parfait (stabilité visuelle)
+- Bundle JS réduit de 33%
+
+**Points à améliorer :**
+- TBT encore élevé (1,530ms) à cause de Three.js
+- TTI de 6.9s (scène 3D bloque le thread principal)
+
+### Goulots d'étranglement restants
+
+| Fichier | Temps CPU | Taille |
+|---------|-----------|--------|
+| `ExploreScene.tsx.js` | 788ms | 2.4 MB |
+| `main-app.js` | 658ms | 1.7 MB |
 
 ---
 
-*Document généré automatiquement - Mars 2026*
+## 9. Prochaines optimisations suggérées
+
+### Priorité haute
+1. **Code splitting Three.js** - Lazy load des types de planètes individuellement
+2. **Accessibilité** - 57 inputs sans labels, 1 bouton contraste insuffisant
+
+### Priorité moyenne
+3. **Optimisation images** - `logo.png` surdimensionné (23 KB récupérables)
+4. **Meta description** - Manquante pour le SEO
+5. **Font display** - Ajouter `font-display: swap` (270ms potentiels)
+
+### Priorité basse
+6. **CSS critique inline** - Réduire le render-blocking
+7. **Préchargement chunks** - Hints pour les routes fréquentes
+8. **Tree shaking** - Vérifier les imports non utilisés
+
+---
+
+*Dernière mise à jour : Mars 2026*
