@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback, useEffect, useRef, startTransition } from "react";
+import { useState, useCallback, useEffect, useRef, startTransition, useDeferredValue } from "react";
 import { getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
@@ -22,6 +22,48 @@ const ExploreScene = dynamic(
 );
 
 // ─────────────────────────────────────────────────────────
+//  Skeleton de chargement (orbites CSS animées)
+// ─────────────────────────────────────────────────────────
+
+function ExploreSkeleton() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center z-20 overflow-hidden">
+      {/* Soleil central pulsant */}
+      <div className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 animate-pulse shadow-lg shadow-amber-500/50" />
+      
+      {/* Orbites animées */}
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div
+          key={i}
+          className="absolute rounded-full border border-white/10 animate-spin"
+          style={{
+            width: `${80 + i * 60}px`,
+            height: `${80 + i * 60}px`,
+            animationDuration: `${8 + i * 4}s`,
+            animationDirection: i % 2 === 0 ? "reverse" : "normal",
+          }}
+        >
+          {/* Planète sur l'orbite */}
+          <div
+            className="absolute w-3 h-3 rounded-full bg-purple-500/80 shadow-md shadow-purple-500/50"
+            style={{
+              top: "50%",
+              left: "-6px",
+              transform: "translateY(-50%)",
+            }}
+          />
+        </div>
+      ))}
+      
+      {/* Texte de chargement */}
+      <div className="absolute bottom-1/4 text-white/40 text-sm tracking-widest uppercase animate-pulse">
+        Initialisation du système solaire...
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
 //  Inner page (inside Provider)
 // ─────────────────────────────────────────────────────────
 
@@ -37,6 +79,12 @@ function ExplorePageInner() {
   const [selectedPlanetScreenPos, setSelectedPlanetScreenPos] = useState<{ x: number; y: number } | null>(null);
   const [overlayNode, setOverlayNode] = useState<OrganizationNodeApi | null>(null);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
+  
+  // Solution 1: Différer le montage de Three.js après le FCP
+  const [mountScene, setMountScene] = useState(false);
+  
+  // Solution 3: useDeferredValue pour ne pas bloquer l'UI pendant le rendu 3D
+  const deferredNodes = useDeferredValue(nodes);
 
   const { setOverride: setPlanetMusicOverride } = usePlanetMusicOverride();
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -85,7 +133,28 @@ function ExplorePageInner() {
     });
   }, [setBatch]);
 
-  const visibleNodes = nodes.filter((n) => n.is_visible_3d);
+  // Solution 1 + 3: Monter Three.js après le FCP via requestIdleCallback + startTransition
+  useEffect(() => {
+    if (!loading && !error && nodes.length > 0 && !mountScene) {
+      const mount = () => {
+        // Solution 3: Utiliser startTransition pour marquer le montage comme non-urgent
+        startTransition(() => {
+          setMountScene(true);
+        });
+      };
+      
+      if (typeof requestIdleCallback !== "undefined") {
+        const id = requestIdleCallback(mount, { timeout: 200 });
+        return () => cancelIdleCallback(id);
+      } else {
+        const id = setTimeout(mount, 50);
+        return () => clearTimeout(id);
+      }
+    }
+  }, [loading, error, nodes.length, mountScene]);
+
+  // Solution 3: Utiliser les nodes différés pour le rendu 3D (ne bloque pas l'UI)
+  const visibleNodes = deferredNodes.filter((n) => n.is_visible_3d);
 
   const handleSelectNode = useCallback((node: OrganizationNodeApi | null) => {
     setSelectedNode(node);
@@ -133,11 +202,9 @@ function ExplorePageInner() {
     <div className="fixed inset-0 z-10">
       {/* La vidéo est gérée globalement dans layout.tsx (GlobalVideoBackground) */}
 
-      {/* Chargement */}
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center z-20">
-          <div className="w-10 h-10 rounded-full border-2 border-purple-500/40 border-t-purple-500 animate-spin" />
-        </div>
+      {/* Skeleton de chargement (affiché UNIQUEMENT pendant le chargement des données ET avant le montage de Three.js) */}
+      {!mountScene && (
+        <ExploreSkeleton />
       )}
 
       {/* Erreur */}
@@ -147,8 +214,8 @@ function ExplorePageInner() {
         </div>
       )}
 
-      {/* Canvas 3D */}
-      {!loading && !error && visibleNodes.length > 0 && (
+      {/* Canvas 3D - monté seulement après le FCP (Solution 1: Lazy Loading Progressif) */}
+      {mountScene && !error && visibleNodes.length > 0 && (
         <ExploreScene
           nodes={visibleNodes}
           onOpenOverlay={handleOpenOverlay}

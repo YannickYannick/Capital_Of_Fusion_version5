@@ -6,16 +6,17 @@ import {
   useState,
   useEffect,
   useCallback,
+  useDeferredValue,
   type MutableRefObject,
 } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Line } from "@react-three/drei";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import { DynamicPlanet, type PlanetType } from "./planets";
 
 // ─────────────────────────────────────────────────────────
 //  Helpers
@@ -295,7 +296,7 @@ const OrbitRing = memo(function OrbitRing({
 }) {
   const points = useMemo<[number, number, number][]>(() => {
     const pts: [number, number, number][] = [];
-    const segments = 128;
+    const segments = 64;
     for (let i = 0; i <= segments; i++) {
       const t = i / segments;
       const phase = t * Math.PI * 2;
@@ -315,170 +316,9 @@ const OrbitRing = memo(function OrbitRing({
 });
 
 // ─────────────────────────────────────────────────────────
-//  Planet geometries par type (memoized for performance)
+//  Planet geometries - Code splitting via ./planets/
+//  Les composants sont chargés dynamiquement via React.lazy()
 // ─────────────────────────────────────────────────────────
-
-const WirePlanet = memo(function WirePlanet({ scale, color }: { scale: number; color: THREE.Color }) {
-  return (
-    <mesh scale={scale}>
-      <sphereGeometry args={[1, 16, 16]} />
-      <meshBasicMaterial color={color} wireframe transparent opacity={0.8} />
-    </mesh>
-  );
-});
-
-const DottedPlanet = memo(function DottedPlanet({ scale }: { scale: number }) {
-  const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    const positions: number[] = [];
-    for (let i = 0; i < 1500; i++) {
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
-      positions.push(
-        Math.sin(phi) * Math.cos(theta),
-        Math.sin(phi) * Math.sin(theta),
-        Math.cos(phi)
-      );
-    }
-    g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    return g;
-  }, []);
-
-  return (
-    <points geometry={geo} scale={scale}>
-      <pointsMaterial color="#ffffff" size={0.015} transparent opacity={0.8} sizeAttenuation />
-    </points>
-  );
-});
-
-const GlassPlanet = memo(function GlassPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
-  return (
-    <mesh scale={scale}>
-      <sphereGeometry args={[1, 64, 64]} />
-      <meshPhysicalMaterial
-        color={color}
-        transmission={0.9}
-        roughness={0.1}
-        metalness={0.9}
-        clearcoat={1}
-        transparent
-      />
-    </mesh>
-  );
-});
-
-const ChromePlanet = memo(function ChromePlanet({ scale }: { scale: number }) {
-  return (
-    <mesh scale={scale}>
-      <sphereGeometry args={[1, 64, 64]} />
-      <meshStandardMaterial roughness={0.05} metalness={1.0} color="#cccccc" />
-    </mesh>
-  );
-});
-
-const NetworkPlanet = memo(function NetworkPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
-  const { points, lines } = useMemo(() => {
-    const pts: THREE.Vector3[] = [];
-    for (let i = 0; i < 60; i++) {
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
-      pts.push(
-        new THREE.Vector3(
-          Math.sin(phi) * Math.cos(theta),
-          Math.sin(phi) * Math.sin(theta),
-          Math.cos(phi)
-        )
-      );
-    }
-    const lns: Array<[number, number, number][]> = [];
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i + 1; j < pts.length; j++) {
-        if (pts[i].distanceTo(pts[j]) < 0.5) {
-          lns.push([pts[i].toArray() as [number, number, number], pts[j].toArray() as [number, number, number]]);
-        }
-      }
-    }
-    return { points: pts, lines: lns };
-  }, []);
-
-  const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    g.setFromPoints(points);
-    return g;
-  }, [points]);
-
-  return (
-    <group scale={scale}>
-      <points geometry={geo}>
-        <pointsMaterial color={color} size={0.04} transparent opacity={0.4} />
-      </points>
-      {lines.map((pair, i) => (
-        <Line key={i} points={pair} color={color} opacity={0.4} transparent lineWidth={0.5} />
-      ))}
-    </group>
-  );
-});
-
-const StarPlanet = memo(function StarPlanet({ scale, color }: { scale: number; color: THREE.Color }) {
-  const particles = useMemo(() => {
-    const pts: [number, number, number][] = [];
-    for (let i = 0; i < 20; i++) {
-      pts.push([
-        (Math.random() - 0.5) * scale * 3,
-        (Math.random() - 0.5) * scale * 3,
-        (Math.random() - 0.5) * scale * 3,
-      ]);
-    }
-    return pts;
-  }, [scale]);
-
-  return (
-    <group>
-      <mesh scale={scale}>
-        <icosahedronGeometry args={[1, 1]} />
-        <meshBasicMaterial color={color} wireframe transparent opacity={0.6} />
-      </mesh>
-      {particles.map((pos, i) => (
-        <mesh key={i} position={pos}>
-          <sphereGeometry args={[scale * 0.1, 6, 6]} />
-          <meshBasicMaterial color={color} transparent opacity={0.8} />
-        </mesh>
-      ))}
-    </group>
-  );
-});
-
-const GlbPlanet = memo(function GlbPlanet({
-  url,
-  scale,
-}: {
-  url: string;
-  scale: number;
-}) {
-  const [scene, setScene] = useState<THREE.Group | null>(null);
-
-  useEffect(() => {
-    if (!url) return;
-    const loader = new GLTFLoader();
-    loader.load(url, (gltf) => {
-      const box = new THREE.Box3().setFromObject(gltf.scene);
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      if (maxDim > 0) gltf.scene.scale.setScalar(scale / maxDim);
-      setScene(gltf.scene);
-    });
-  }, [url, scale]);
-
-  if (!scene) {
-    return (
-      <mesh scale={scale}>
-        <icosahedronGeometry args={[1, 1]} />
-        <meshBasicMaterial color="#888888" wireframe transparent opacity={0.4} />
-      </mesh>
-    );
-  }
-  return <primitive object={scene} />;
-});
 
 // ─────────────────────────────────────────────────────────
 //  Composant planète unifié (orbital + entrée + physique)
@@ -839,27 +679,15 @@ function Planet({
           gapSize={0.3}
         />
       )}
-      {visualSource === "glb" && node.model_3d ? (
-        <GlbPlanet url={node.model_3d} scale={displayScale} />
-      ) : visualSource === "gif" && node.planet_texture ? (
-        <mesh>
-          <planeGeometry args={[displayScale * 2, displayScale * 2]} />
-          <meshBasicMaterial color="#ffffff" transparent side={THREE.DoubleSide} />
-        </mesh>
-      ) : planetType === "wire" ? (
-        <WirePlanet scale={displayScale} color={color} />
-      ) : planetType === "dotted" ? (
-        <DottedPlanet scale={displayScale} />
-      ) : planetType === "chrome" ? (
-        <ChromePlanet scale={displayScale} />
-      ) : planetType === "network" ? (
-        <NetworkPlanet scale={displayScale} color={color} />
-      ) : planetType === "star" ? (
-        <StarPlanet scale={displayScale} color={color} />
-      ) : (
-        // glass (default)
-        <GlassPlanet scale={displayScale} color={color} />
-      )}
+      {/* Solution 2: Code splitting - les planètes sont chargées dynamiquement */}
+      <DynamicPlanet
+        type={(planetType || "glass") as PlanetType}
+        scale={displayScale}
+        color={color}
+        visualSource={visualSource as "preset" | "glb" | "gif"}
+        modelUrl={node.model_3d}
+        textureUrl={node.planet_texture}
+      />
 
       {/* Glow effect au hover/sélection */}
       {(isHovered || isSelected) && (
@@ -965,7 +793,7 @@ function Sun({
       onPointerOut={() => { document.body.style.cursor = "default"; onHover(false); }}
     >
       <mesh ref={meshRef} scale={displayScale}>
-        <sphereGeometry args={[1, 64, 64]} />
+        <sphereGeometry args={[1, 32, 32]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
@@ -1575,11 +1403,14 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPla
   const controlsRef = externalControlsRef || localControlsRef;
   const allPositions = useRef<Map<string, THREE.Vector3>>(new Map());
 
+  // Solution 3: Utiliser useDeferredValue pour ne pas bloquer l'UI pendant les calculs
+  const deferredNodes = useDeferredValue(nodes);
+
   // Synchroniser la ref avec l'état
   useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
 
-  const rootNode = useMemo(() => nodes.find((n) => n.type === "ROOT") ?? null, [nodes]);
-  const orbitNodes = useMemo(() => nodes.filter((n) => n.type !== "ROOT"), [nodes]);
+  const rootNode = useMemo(() => deferredNodes.find((n) => n.type === "ROOT") ?? null, [deferredNodes]);
+  const orbitNodes = useMemo(() => deferredNodes.filter((n) => n.type !== "ROOT"), [deferredNodes]);
 
   const handlePlanetClick = useCallback(
     (node: OrganizationNodeApi) => {
