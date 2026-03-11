@@ -4,8 +4,7 @@
  */
 
 import type { MenuItemApi } from "@/types/menu";
-import type { CourseApi } from "@/types/course";
-import type { TheoryLessonApi } from "@/types/course";
+import type { CourseApi, CourseListApi, SchedulePlanningApi, TheoryLessonApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
 import type { OrganizationNodeApi, PoleApi, StaffMemberApi } from "@/types/organization";
 import type { ArtistApi } from "@/types/user";
@@ -189,17 +188,19 @@ export interface CoursesQuery {
   style?: string;
   level?: string;
   node?: string;
+  day?: number;
 }
 
 /**
  * Liste des cours actifs. GET /api/courses/
  */
-export async function getCourses(params?: CoursesQuery): Promise<CourseApi[]> {
+export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]> {
   const base = getApiBaseUrl();
   const search = new URLSearchParams();
   if (params?.style) search.set("style", params.style);
   if (params?.level) search.set("level", params.level);
   if (params?.node) search.set("node", params.node);
+  if (params?.day !== undefined) search.set("day", params.day.toString());
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/?${qs}` : `${base}/api/courses/`;
   const res = await fetch(url);
@@ -214,6 +215,29 @@ export async function getCourseBySlug(slug: string): Promise<CourseApi> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/courses/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Course API error: ${res.status}`);
+  return res.json();
+}
+
+/** Query params pour le planning des cours */
+export interface SchedulesQuery {
+  day?: number;
+  style?: string;
+  level?: string;
+}
+
+/**
+ * Liste des horaires de cours (planning). GET /api/courses/schedules/
+ */
+export async function getCourseSchedules(params?: SchedulesQuery): Promise<SchedulePlanningApi[]> {
+  const base = getApiBaseUrl();
+  const search = new URLSearchParams();
+  if (params?.day !== undefined) search.set("day", params.day.toString());
+  if (params?.style) search.set("style", params.style);
+  if (params?.level) search.set("level", params.level);
+  const qs = search.toString();
+  const url = qs ? `${base}/api/courses/schedules/?${qs}` : `${base}/api/courses/schedules/`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Schedules API error: ${res.status}`);
   return res.json();
 }
 

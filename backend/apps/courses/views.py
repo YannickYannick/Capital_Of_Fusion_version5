@@ -11,10 +11,9 @@ from apps.core.permissions import IsSuperUser, IsStaffOrSuperUser
 from apps.core.models import PendingContentEdit
 from .models import Course, TheoryLesson
 from .serializers import (
-    CourseSerializer, CourseWriteSerializer,
-    TheoryLessonSerializer, TheoryLessonWriteSerializer
+    CourseSerializer, CourseListSerializer, CourseWriteSerializer,
+    TheoryLessonSerializer, TheoryLessonWriteSerializer, ScheduleSerializer
 )
-
 
 
 class CourseListAPIView(APIView):
@@ -26,7 +25,8 @@ class CourseListAPIView(APIView):
     def get(self, request):
         qs = Course.objects.filter(is_active=True).select_related(
             "style", "level", "node"
-        )
+        ).prefetch_related("schedules", "teachers")
+        
         style = request.query_params.get("style")
         if style:
             qs = qs.filter(style__slug=style)
@@ -39,24 +39,83 @@ class CourseListAPIView(APIView):
                 qs = qs.filter(node_id=node)
             else:
                 qs = qs.filter(node__slug=node)
-        serializer = CourseSerializer(qs, many=True)
+        
+        # Filtre par jour de la semaine
+        day = request.query_params.get("day")
+        if day is not None:
+            try:
+                qs = qs.filter(schedules__day_of_week=int(day)).distinct()
+            except ValueError:
+                pass
+        
+        serializer = CourseListSerializer(qs, many=True)
         return Response(serializer.data)
 
 
 class CourseDetailAPIView(APIView):
     """
     GET /api/courses/<slug>/
-    Détail d'un cours actif par slug. 404 si non trouvé ou inactif.
+    Détail d'un cours actif par slug avec schedules et teachers. 404 si non trouvé ou inactif.
     """
 
     def get(self, request, slug):
         course = get_object_or_404(
-            Course.objects.select_related("style", "level", "node"),
+            Course.objects.select_related("style", "level", "node").prefetch_related("schedules", "teachers"),
             slug=slug,
             is_active=True,
         )
         serializer = CourseSerializer(course)
         return Response(serializer.data)
+
+
+class ScheduleListAPIView(APIView):
+    """
+    GET /api/courses/schedules/
+    Liste de tous les horaires de cours actifs. Utile pour le planning.
+    Query params: ?day=0 (lundi), ?style=slug, ?level=slug
+    """
+
+    def get(self, request):
+        from .models import Schedule
+        qs = Schedule.objects.filter(course__is_active=True).select_related(
+            "course", "course__style", "course__level", "course__node"
+        ).order_by("day_of_week", "start_time")
+
+        day = request.query_params.get("day")
+        if day is not None:
+            try:
+                qs = qs.filter(day_of_week=int(day))
+            except ValueError:
+                pass
+
+        style = request.query_params.get("style")
+        if style:
+            qs = qs.filter(course__style__slug=style)
+
+        level = request.query_params.get("level")
+        if level:
+            qs = qs.filter(course__level__slug=level)
+
+        data = []
+        for schedule in qs:
+            data.append({
+                "id": str(schedule.id),
+                "course_id": str(schedule.course.id),
+                "course_name": schedule.course.name,
+                "course_slug": schedule.course.slug,
+                "style_name": schedule.course.style.name,
+                "style_slug": schedule.course.style.slug,
+                "level_name": schedule.course.level.name,
+                "level_slug": schedule.course.level.slug,
+                "level_color": schedule.course.level.color,
+                "node_name": schedule.course.node.name,
+                "day_of_week": schedule.day_of_week,
+                "day_display": schedule.get_day_of_week_display(),
+                "start_time": schedule.start_time.strftime("%H:%M"),
+                "end_time": schedule.end_time.strftime("%H:%M"),
+                "location_name": schedule.location_name,
+            })
+        return Response(data)
 
 
 class TheoryLessonListAPIView(APIView):

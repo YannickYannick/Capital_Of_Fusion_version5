@@ -18,7 +18,7 @@ from apps.core.views import (
     PendingContentEditDetailAPIView,
 )
 from apps.courses.views import (
-    CourseListAPIView, CourseDetailAPIView,
+    CourseListAPIView, CourseDetailAPIView, ScheduleListAPIView,
     TheoryLessonListAPIView, TheoryLessonDetailAPIView,
     CourseAdminAPIView, CourseAdminDetailAPIView,
     TheoryLessonAdminAPIView, TheoryLessonAdminDetailAPIView,
@@ -84,6 +84,7 @@ urlpatterns = [
 
     # ── Courses (lecture) ────────────────────────────────────────────────────
     path("courses/", CourseListAPIView.as_view()),
+    path("courses/schedules/", ScheduleListAPIView.as_view()),
     path("courses/theory/", TheoryLessonListAPIView.as_view()),
     path("courses/theory/<slug:slug>/", TheoryLessonDetailAPIView.as_view()),
     path("courses/<slug:slug>/", CourseDetailAPIView.as_view()),
