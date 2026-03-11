@@ -1,0 +1,167 @@
+[
+  {
+    "score": 64,
+    "fcp": 245,
+    "lcp": 497,
+    "tbt": 775,
+    "cls": "0.001",
+    "tti": 4233,
+    "si": 3904,
+    "page": "/",
+    "url": "https://capital-of-fusion-version5.vercel.app/"
+  },
+  {
+    "score": 60,
+    "fcp": 252,
+    "lcp": 513,
+    "tbt": 21914,
+    "cls": "0.008",
+    "tti": 26607,
+    "si": 6475,
+    "page": "/explore",
+    "url": "https://capital-of-fusion-version5.vercel.app/explore"
+  },
+  {
+    "score": 46,
+    "fcp": 245,
+    "lcp": 3633,
+    "tbt": 695,
+    "cls": "0.001",
+    "tti": 3719,
+    "si": 3815,
+    "page": "/artistes",
+    "url": "https://capital-of-fusion-version5.vercel.app/artistes"
+  },
+  {
+    "score": 76,
+    "fcp": 245,
+    "lcp": 599,
+    "tbt": 389,
+    "cls": "0.008",
+    "tti": 3462,
+    "si": 2684,
+    "page": "/care",
+    "url": "https://capital-of-fusion-version5.vercel.app/care"
+  },
+  {
+    "score": 75,
+    "fcp": 245,
+    "lcp": 482,
+    "tbt": 394,
+    "cls": "0.001",
+    "tti": 3261,
+    "si": 2970,
+    "page": "/cours",
+    "url": "https://capital-of-fusion-version5.vercel.app/cours"
+  },
+  {
+    "score": 100,
+    "fcp": 242,
+    "lcp": 425,
+    "tbt": 0,
+    "cls": "0.000",
+    "tti": 427,
+    "si": 500,
+    "page": "/evenements",
+    "url": "https://capital-of-fusion-version5.vercel.app/evenements"
+  },
+  {
+    "score": 70,
+    "fcp": 245,
+    "lcp": 473,
+    "tbt": 523,
+    "cls": "0.001",
+    "tti": 3501,
+    "si": 3289,
+    "page": "/shop",
+    "url": "https://capital-of-fusion-version5.vercel.app/shop"
+  },
+  {
+    "score": 71,
+    "fcp": 245,
+    "lcp": 472,
+    "tbt": 507,
+    "cls": "0.001",
+    "tti": 3402,
+    "si": 3228,
+    "page": "/trainings",
+    "url": "https://capital-of-fusion-version5.vercel.app/trainings"
+  },
+  {
+    "score": 80,
+    "fcp": 245,
+    "lcp": 449,
+    "tbt": 316,
+    "cls": "0.001",
+    "tti": 3336,
+    "si": 2858,
+    "page": "/theorie",
+    "url": "https://capital-of-fusion-version5.vercel.app/theorie"
+  },
+  {
+    "score": 99,
+    "fcp": 242,
+    "lcp": 402,
+    "tbt": 0,
+    "cls": "0.000",
+    "tti": 402,
+    "si": 1265,
+    "page": "/projets",
+    "url": "https://capital-of-fusion-version5.vercel.app/projets"
+  },
+  {
+    "score": 69,
+    "fcp": 245,
+    "lcp": 429,
+    "tbt": 578,
+    "cls": "0.001",
+    "tti": 3599,
+    "si": 3240,
+    "page": "/fichiers",
+    "url": "https://capital-of-fusion-version5.vercel.app/fichiers"
+  },
+  {
+    "score": 95,
+    "fcp": 241,
+    "lcp": 384,
+    "tbt": 0,
+    "cls": "0.000",
+    "tti": 384,
+    "si": 2390,
+    "page": "/organisation/structure",
+    "url": "https://capital-of-fusion-version5.vercel.app/organisation/structure"
+  },
+  {
+    "score": 73,
+    "fcp": 245,
+    "lcp": 452,
+    "tbt": 473,
+    "cls": "0.001",
+    "tti": 3382,
+    "si": 2921,
+    "page": "/organisation/poles",
+    "url": "https://capital-of-fusion-version5.vercel.app/organisation/poles"
+  },
+  {
+    "score": 70,
+    "fcp": 245,
+    "lcp": 465,
+    "tbt": 522,
+    "cls": "0.001",
+    "tti": 3584,
+    "si": 3212,
+    "page": "/partenaires/structures",
+    "url": "https://capital-of-fusion-version5.vercel.app/partenaires/structures"
+  },
+  {
+    "score": 71,
+    "fcp": 247,
+    "lcp": 377,
+    "tbt": 505,
+    "cls": "0.001",
+    "tti": 3315,
+    "si": 3133,
+    "page": "/identite-cof/notre-vision",
+    "url": "https://capital-of-fusion-version5.vercel.app/identite-cof/notre-vision"
+  }
+]

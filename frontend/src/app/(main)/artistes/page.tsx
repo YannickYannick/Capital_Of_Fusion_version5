@@ -85,7 +85,7 @@ export default function ArtistesPage() {
                 animation="fadeInUp"
                 delay={Math.min(idx * 0.04, 0.3)}
               >
-                <ArtistCard artist={artist} />
+                <ArtistCard artist={artist} priority={idx < 4} />
               </AnimatedDiv>
             ))}
           </div>

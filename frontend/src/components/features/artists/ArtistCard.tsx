@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArtistApi } from "@/types/user";
 
-export default function ArtistCard({ artist }: { artist: ArtistApi }) {
-    const photoUrl = artist.profile_picture || "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop";
+export default function ArtistCard({ artist, priority = false }: { artist: ArtistApi; priority?: boolean }) {
+    const photoUrl = artist.profile_picture || "/images/placeholder-artist.jpg";
     const fullName = `${artist.first_name || ""} ${artist.last_name || ""}`.trim() || artist.username;
 
     return (
@@ -14,7 +14,8 @@ export default function ArtistCard({ artist }: { artist: ArtistApi }) {
                     alt={fullName}
                     fill
                     className="object-cover transition-transform group-hover:scale-105"
-                    unoptimized
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    priority={priority}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4">
