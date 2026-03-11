@@ -211,7 +211,7 @@ frontend/
 
 ## 8. Résultats Lighthouse Post-Optimisation
 
-### Métriques `/explore` (Mars 2026)
+### Métriques `/explore` - Local (Mars 2026)
 
 | Métrique | Avant V2 | Après V2 | Évolution |
 |----------|----------|----------|-----------|
@@ -223,42 +223,61 @@ frontend/
 | **TTI** | 7.1s | 6.9s | 🟡 -200ms |
 | **First Load JS** | 162 KB | 109 KB | 🟢 **-53 KB (-33%)** |
 
+### Métriques `/explore` - Production (Vercel, Mars 2026)
+
+| Métrique | Local | Production | Analyse |
+|----------|-------|------------|---------|
+| **FCP** | 0.4s | 0.9s | Latence réseau normale |
+| **LCP** | 0.5s | 0.9s | Latence réseau normale |
+| **CLS** | 0.002 | **0** | 🟢 Parfait |
+| **Speed Index** | 2.5s | 5.1s | Latence réseau |
+| **TBT** | 1,530ms | **380ms** | 🟢 **-75% en prod !** |
+| **TTI** | 6.9s | **2.6s** | 🟢 **-62% en prod !** |
+
 ### Analyse
 
 **Points forts :**
-- FCP et LCP excellents (contenu visible rapidement)
-- CLS quasi parfait (stabilité visuelle)
-- Bundle JS réduit de 33%
+- **TBT de 380ms** : L'optimisation Vercel (minification, compression) réduit drastiquement le temps de blocage
+- **TTI de 2.6s** : Page interactive en moins de 3 secondes
+- **CLS parfait (0)** : Aucun décalage visuel
+- Bundle JS réduit de 33% (-53 KB)
 
-**Points à améliorer :**
-- TBT encore élevé (1,530ms) à cause de Three.js
-- TTI de 6.9s (scène 3D bloque le thread principal)
+**Différences local/production :**
+- FCP/LCP plus élevés en production à cause de la latence réseau (normal)
+- TBT/TTI significativement meilleurs en production grâce aux optimisations Vercel :
+  - Code minifié et compressé
+  - Gzip/Brotli activé
+  - Edge caching
 
-### Goulots d'étranglement restants
-
-| Fichier | Temps CPU | Taille |
-|---------|-----------|--------|
-| `ExploreScene.tsx.js` | 788ms | 2.4 MB |
-| `main-app.js` | 658ms | 1.7 MB |
+**Points à améliorer (priorité réduite) :**
+- TBT de 380ms reste un peu élevé (objectif < 200ms)
+- Optimisations Three.js toujours pertinentes pour mobile
 
 ---
 
-## 9. Prochaines optimisations suggérées
+## 9. Conclusion V2
 
-### Priorité haute
+✅ **Objectif atteint** : Le site est maintenant performant en production avec :
+- **TTI < 3s** (2.6s)
+- **TBT acceptable** (380ms)
+- **Stabilité visuelle parfaite** (CLS = 0)
+- **Bundle réduit de 33%**
+
+---
+
+## 10. Prochaines optimisations suggérées (optionnelles)
+
+### Priorité moyenne (si besoin mobile)
 1. **Code splitting Three.js** - Lazy load des types de planètes individuellement
 2. **Accessibilité** - 57 inputs sans labels, 1 bouton contraste insuffisant
 
-### Priorité moyenne
+### Priorité basse
 3. **Optimisation images** - `logo.png` surdimensionné (23 KB récupérables)
 4. **Meta description** - Manquante pour le SEO
 5. **Font display** - Ajouter `font-display: swap` (270ms potentiels)
-
-### Priorité basse
 6. **CSS critique inline** - Réduire le render-blocking
 7. **Préchargement chunks** - Hints pour les routes fréquentes
-8. **Tree shaking** - Vérifier les imports non utilisés
 
 ---
 
-*Dernière mise à jour : Mars 2026*
+*Dernière mise à jour : 7 Mars 2026*
