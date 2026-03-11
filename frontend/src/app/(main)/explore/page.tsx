@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, startTransition } from "react";
 import { getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
@@ -18,7 +18,7 @@ const ExploreScene = dynamic(
     import("@/components/features/explore/canvas/ExploreScene").then(
       (mod) => ({ default: mod.ExploreScene })
     ),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 );
 
 // ─────────────────────────────────────────────────────────
@@ -65,21 +65,23 @@ function ExplorePageInner() {
   }, [overlayNode, apiBaseUrl, setPlanetMusicOverride]);
 
   useEffect(() => {
-    // 1. Charger les noeuds
-    getOrganizationNodes()
-      .then(setNodes)
-      .catch((e) => setError(e instanceof Error ? e.message : "Erreur chargement"))
-      .finally(() => setLoading(false));
-
-    // 2. Charger le preset actif défini dans la config du site
-    getSiteConfig().then((config) => {
-      if (config.explore_config) {
-        // Filtrer pour ne garder que les réglages visuels (exclure metadata)
-        const { id, name, created_at, updated_at, ...visualOptions } = config.explore_config as any;
-        setBatch(visualOptions);
-      }
-    }).catch(err => {
-      console.warn("Erreur chargement preset explore actif:", err);
+    // Charger les données en parallèle pour réduire le temps de chargement
+    Promise.all([
+      getOrganizationNodes(),
+      getSiteConfig()
+    ]).then(([nodesData, config]) => {
+      // Utiliser startTransition pour ne pas bloquer les interactions utilisateur
+      startTransition(() => {
+        setNodes(nodesData);
+        if (config.explore_config) {
+          const { id, name, created_at, updated_at, ...visualOptions } = config.explore_config as any;
+          setBatch(visualOptions);
+        }
+      });
+    }).catch((e) => {
+      setError(e instanceof Error ? e.message : "Erreur chargement");
+    }).finally(() => {
+      setLoading(false);
     });
   }, [setBatch]);
 

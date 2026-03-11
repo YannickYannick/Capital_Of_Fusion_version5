@@ -4,11 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import { usePrefetchExplore } from "@/hooks/usePrefetchExplore";
 
 export default function LandingPageClient() {
     const router = useRouter();
     const opts = usePlanetsOptions();
     const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Précharge Three.js et ExploreScene après 3s sur la page d'accueil
+    usePrefetchExplore(3000);
 
     const handleStartPushed = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
