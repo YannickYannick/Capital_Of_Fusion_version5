@@ -17,7 +17,46 @@ body {
   font-family: var(--font-inter), sans-serif;
 }
 
-/* Curseur flèche sur le contenu (évite le curseur « texte » sur les titres) */
+/* Curseur flèche sur le contenu (évite le curseur « texte » sur les titres) */
 main {
   cursor: default;
+}
+
+/* Option B : Ombre sur le texte blanc pour améliorer la lisibilité sur fond vidéo */
+/* Appliqué uniquement aux éléments avec texte blanc (text-white, text-white/XX) */
+.text-shadow-contrast .text-white,
+.text-shadow-contrast [class*="text-white/"] {
+  text-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.8),
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Ombres plus fortes sur les titres blancs */
+.text-shadow-contrast h1.text-white,
+.text-shadow-contrast h2.text-white,
+.text-shadow-contrast h3.text-white,
+.text-shadow-contrast h4.text-white,
+.text-shadow-contrast h5.text-white,
+.text-shadow-contrast h6.text-white,
+.text-shadow-contrast h1[class*="text-white/"],
+.text-shadow-contrast h2[class*="text-white/"],
+.text-shadow-contrast h3[class*="text-white/"],
+.text-shadow-contrast h4[class*="text-white/"],
+.text-shadow-contrast h5[class*="text-white/"],
+.text-shadow-contrast h6[class*="text-white/"] {
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.9),
+    0 4px 12px rgba(0, 0, 0, 0.7),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Ombre sur les paragraphes et spans blancs dans les conteneurs */
+.text-shadow-contrast p.text-white,
+.text-shadow-contrast span.text-white,
+.text-shadow-contrast p[class*="text-white/"],
+.text-shadow-contrast span[class*="text-white/"] {
+  text-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.5);
 }

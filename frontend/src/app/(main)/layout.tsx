@@ -4,6 +4,7 @@ import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
 import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { VideoBackgroundClient } from "@/components/features/explore/canvas/VideoBackgroundClient";
+import { MainContent } from "@/components/shared/MainContent";
 import { getSiteConfig } from "@/lib/api";
 
 /**
@@ -23,7 +24,7 @@ export default async function MainLayout({
         <PlanetMusicOverrideProvider>
           <Navbar />
           <VideoBackgroundClient config={config} />
-          <main className="pt-16">{children}</main>
+          <MainContent>{children}</MainContent>
         </PlanetMusicOverrideProvider>
       </PlanetsOptionsProvider>
     </AuthProvider>

@@ -284,7 +284,13 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     return (
         <>
-            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s`, opacity: planetMusicOverride ? 0.3 : 1 }}>
+            {/* Option C : Fond noir solide (remplace toutes les vidéos) */}
+            {opts.useBlackBackground && (
+                <div className="fixed inset-0 -z-10 bg-[#0a0e27]" />
+            )}
+
+            {/* Vidéo principale (masquée si option C active) */}
+            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s, opacity 0.5s`, opacity: opts.useBlackBackground ? 0 : (planetMusicOverride ? 0.3 : 1) }}>
                 {mainType === 'youtube' ? (
                     <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
@@ -292,10 +298,10 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         <video ref={mainNativeRef} src={mainMp4Url} autoPlay loop muted playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
                     )
                 )}
-                {opts.showVideoOverlay && <div className="absolute inset-0 bg-black/30 pointer-events-none" />}
             </div>
 
-            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: planetMusicOverride ? 0 : cycleOpacity, filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
+            {/* Vidéo cycle (masquée si option C active) */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: opts.useBlackBackground ? 0 : (planetMusicOverride ? 0 : cycleOpacity), filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
                 {cycleType === 'youtube' ? (
                     <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
@@ -307,7 +313,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
             {/* Musique de fond planète (override) — prend le pas sur la vidéo d'accueil */}
             {planetMusicOverride && (
-                <div className="fixed inset-0 -z-10 overflow-hidden" style={{ transition: "opacity 0.5s" }}>
+                <div className="fixed inset-0 -z-10 overflow-hidden" style={{ transition: "opacity 0.5s", opacity: opts.useBlackBackground ? 0 : 1 }}>
                     {planetMusicOverride.type === "youtube" && overrideYTId && (
                         <div ref={overrideYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                     )}
@@ -326,7 +332,13 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 </div>
             )}
 
-            <div className="fixed bottom-4 right-4 z-50 flex flex-col sm:flex-row items-end gap-2">
+            {/* Option A : Voile sombre global (au-dessus de toutes les vidéos) */}
+            {opts.showVideoOverlay && !opts.useBlackBackground && (
+                <div className="fixed inset-0 -z-10 bg-black/50 pointer-events-none" />
+            )}
+
+            <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+                {/* Contrôles de qualité vidéo */}
                 {(mainType === 'youtube' || cycleType === 'youtube') && (
                     <div className="flex rounded-lg overflow-hidden border border-white/20 bg-black/60 backdrop-blur-sm">
                         {QUALITY_OPTIONS.map(({ value, label }) => (
@@ -336,9 +348,36 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         ))}
                     </div>
                 )}
-                <button type="button" onClick={() => opts.set("showVideoOverlay", !opts.showVideoOverlay)} className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2">
-                    {opts.showVideoOverlay ? "👁️‍🗨️ Masquer voile" : "👁️ Afficher voile"}
-                </button>
+                
+                {/* Contrôles de contraste (A, B, C) */}
+                <div className="flex flex-wrap justify-end gap-1 max-w-xs">
+                    <button 
+                        type="button" 
+                        onClick={() => opts.set("showVideoOverlay", !opts.showVideoOverlay)} 
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.showVideoOverlay ? "bg-purple-500 border-purple-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
+                        title="Ajoute un voile sombre sur la vidéo"
+                    >
+                        A: Voile
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={() => opts.set("enableTextShadow", !opts.enableTextShadow)} 
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.enableTextShadow ? "bg-purple-500 border-purple-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
+                        title="Ajoute une ombre sur les textes"
+                    >
+                        B: Ombre texte
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={() => opts.set("useBlackBackground", !opts.useBlackBackground)} 
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.useBlackBackground ? "bg-purple-500 border-purple-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
+                        title="Remplace la vidéo par un fond noir"
+                    >
+                        C: Fond noir
+                    </button>
+                </div>
+
+                {/* Contrôle son */}
                 <button type="button" onClick={handleMute} className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2">
                     {muted ? "🔇 Activer le son" : "🔊 Son activé"}
                 </button>
