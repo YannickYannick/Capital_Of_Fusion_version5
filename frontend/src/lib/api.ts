@@ -11,9 +11,9 @@ import type { OrganizationNodeApi, PoleApi, StaffMemberApi } from "@/types/organ
 import type { ArtistApi } from "@/types/user";
 import type { SiteConfigurationApi, BulletinApi, BulletinAdminApi } from "@/types/config";
 import type { ProductCategoryApi, ProductApi } from "@/types/shop";
-import type { PractitionerApi, CareServiceApi } from "@/types/care";
+import type { PractitionerApi, PractitionerListApi, ServiceCategoryApi, CareServiceApi } from "@/types/care";
 import type { ProjectCategoryApi, ProjectApi } from "@/types/projects";
-import type { SubscriptionPassApi, TrainingSessionApi } from "@/types/trainings";
+import type { SubscriptionPassApi, TrainingSessionApi, TrainingRegistrationApi } from "@/types/trainings";
 import type { ExplorePresetApi } from "@/types/explore";
 import type { PartnerNodeApi, PartnerEventApi, PartnerCourseApi } from "@/types/partner";
 
@@ -572,6 +572,8 @@ export async function getTheoryLessonBySlug(slug: string): Promise<TheoryLessonA
  */
 
 // --- SHOP ---
+
+/** Liste des catégories de produits. GET /api/shop/categories/ */
 export async function getProductCategories(): Promise<ProductCategoryApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/shop/categories/`);
@@ -579,29 +581,87 @@ export async function getProductCategories(): Promise<ProductCategoryApi[]> {
   return res.json();
 }
 
-export async function getProducts(): Promise<ProductApi[]> {
+/** Détail d'une catégorie par slug. GET /api/shop/categories/<slug>/ */
+export async function getProductCategoryBySlug(slug: string): Promise<ProductCategoryApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/shop/products/`);
+  const res = await fetch(`${base}/api/shop/categories/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Shop Category API error: ${res.status}`);
+  return res.json();
+}
+
+export interface ProductsQuery {
+  category?: string;
+  featured?: boolean;
+}
+
+/** Liste des produits. GET /api/shop/products/ */
+export async function getProducts(params?: ProductsQuery): Promise<ProductApi[]> {
+  const base = getApiBaseUrl();
+  const search = new URLSearchParams();
+  if (params?.category) search.set("category", params.category);
+  if (params?.featured) search.set("featured", "1");
+  const qs = search.toString();
+  const url = qs ? `${base}/api/shop/products/?${qs}` : `${base}/api/shop/products/`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Shop Products API error: ${res.status}`);
   return res.json();
 }
 
+/** Détail d'un produit par slug. GET /api/shop/products/<slug>/ */
+export async function getProductBySlug(slug: string): Promise<ProductApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/shop/products/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Shop Product API error: ${res.status}`);
+  return res.json();
+}
+
 // --- CARE ---
-export async function getPractitioners(): Promise<PractitionerApi[]> {
+
+/** Liste des catégories de soins. GET /api/care/categories/ */
+export async function getServiceCategories(): Promise<ServiceCategoryApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/care/categories/`);
+  if (!res.ok) throw new Error(`Care Categories API error: ${res.status}`);
+  return res.json();
+}
+
+/** Liste des praticiens. GET /api/care/practitioners/ */
+export async function getPractitioners(): Promise<PractitionerListApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/care/practitioners/`);
   if (!res.ok) throw new Error(`Care Practitioners API error: ${res.status}`);
   return res.json();
 }
 
-export async function getCareServices(): Promise<CareServiceApi[]> {
+/** Détail d'un praticien par slug. GET /api/care/practitioners/<slug>/ */
+export async function getPractitionerBySlug(slug: string): Promise<PractitionerApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/care/services/`);
+  const res = await fetch(`${base}/api/care/practitioners/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Care Practitioner API error: ${res.status}`);
+  return res.json();
+}
+
+export interface CareServicesQuery {
+  category?: string;
+  practitioner?: string;
+}
+
+/** Liste des services/soins. GET /api/care/services/ */
+export async function getCareServices(params?: CareServicesQuery): Promise<CareServiceApi[]> {
+  const base = getApiBaseUrl();
+  const search = new URLSearchParams();
+  if (params?.category) search.set("category", params.category);
+  if (params?.practitioner) search.set("practitioner", params.practitioner);
+  const qs = search.toString();
+  const url = qs ? `${base}/api/care/services/?${qs}` : `${base}/api/care/services/`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Care Services API error: ${res.status}`);
   return res.json();
 }
 
-// --- PROJECTS --- (404 = endpoint absent ou backend non configuré → tableaux vides)
+// --- PROJECTS ---
+
+/** Liste des catégories de projets. GET /api/projects/categories/ */
 export async function getProjectCategories(): Promise<ProjectCategoryApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/projects/categories/`);
@@ -610,14 +670,26 @@ export async function getProjectCategories(): Promise<ProjectCategoryApi[]> {
   return res.json();
 }
 
-export async function getProjects(): Promise<ProjectApi[]> {
+export interface ProjectsQuery {
+  status?: "IN_PROGRESS" | "UPCOMING" | "COMPLETED";
+  category?: string;
+}
+
+/** Liste des projets. GET /api/projects/projects/ */
+export async function getProjects(params?: ProjectsQuery): Promise<ProjectApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/projects/projects/`);
+  const search = new URLSearchParams();
+  if (params?.status) search.set("status", params.status);
+  if (params?.category) search.set("category", params.category);
+  const qs = search.toString();
+  const url = qs ? `${base}/api/projects/projects/?${qs}` : `${base}/api/projects/projects/`;
+  const res = await fetch(url);
   if (res.status === 404) return [];
   if (!res.ok) throw new Error(`Projects API error: ${res.status}`);
   return res.json();
 }
 
+/** Détail d'un projet par slug. GET /api/projects/projects/<slug>/ */
 export async function getProjectBySlug(slug: string): Promise<ProjectApi> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/projects/projects/${encodeURIComponent(slug)}/`);
@@ -626,6 +698,8 @@ export async function getProjectBySlug(slug: string): Promise<ProjectApi> {
 }
 
 // --- TRAININGS ---
+
+/** Liste des pass d'abonnement. GET /api/trainings/passes/ */
 export async function getSubscriptionPasses(): Promise<SubscriptionPassApi[]> {
   const base = getApiBaseUrl();
   const res = await fetch(`${base}/api/trainings/passes/`);
@@ -633,10 +707,45 @@ export async function getSubscriptionPasses(): Promise<SubscriptionPassApi[]> {
   return res.json();
 }
 
-export async function getTrainingSessions(): Promise<TrainingSessionApi[]> {
+export interface TrainingSessionsQuery {
+  upcoming?: boolean;
+  level?: string;
+}
+
+/** Liste des sessions de training. GET /api/trainings/sessions/ */
+export async function getTrainingSessions(params?: TrainingSessionsQuery): Promise<TrainingSessionApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/trainings/sessions/`);
+  const search = new URLSearchParams();
+  if (params?.upcoming) search.set("upcoming", "1");
+  if (params?.level) search.set("level", params.level);
+  const qs = search.toString();
+  const url = qs ? `${base}/api/trainings/sessions/?${qs}` : `${base}/api/trainings/sessions/`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Trainings Sessions API error: ${res.status}`);
+  return res.json();
+}
+
+/** Détail d'une session par slug. GET /api/trainings/sessions/<slug>/ */
+export async function getTrainingSessionBySlug(slug: string): Promise<TrainingSessionApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/trainings/sessions/${encodeURIComponent(slug)}/`);
+  if (!res.ok) throw new Error(`Training Session API error: ${res.status}`);
+  return res.json();
+}
+
+/** Inscription à une session. POST /api/trainings/sessions/<slug>/register/ */
+export async function registerToTrainingSession(slug: string): Promise<TrainingRegistrationApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/trainings/sessions/${encodeURIComponent(slug)}/register/`, {
+    method: "POST",
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Registration error: ${res.status}`);
+  }
   return res.json();
 }
 

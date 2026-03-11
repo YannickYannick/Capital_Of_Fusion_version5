@@ -55,7 +55,7 @@ from apps.users.views import (
 
 from rest_framework.routers import DefaultRouter
 from apps.shop.views import ProductCategoryViewSet, ProductViewSet
-from apps.care.views import PractitionerViewSet, CareServiceViewSet
+from apps.care.views import PractitionerViewSet, ServiceCategoryViewSet, CareServiceViewSet
 from apps.projects.views import ProjectCategoryViewSet, ProjectViewSet
 from apps.trainings.views import SubscriptionPassViewSet, TrainingSessionViewSet
 
@@ -63,6 +63,7 @@ router = DefaultRouter()
 router.register(r'shop/categories', ProductCategoryViewSet, basename='shop-category')
 router.register(r'shop/products', ProductViewSet, basename='shop-product')
 router.register(r'care/practitioners', PractitionerViewSet, basename='care-practitioner')
+router.register(r'care/categories', ServiceCategoryViewSet, basename='care-category')
 router.register(r'care/services', CareServiceViewSet, basename='care-service')
 router.register(r'projects/categories', ProjectCategoryViewSet, basename='project-category')
 router.register(r'projects/projects', ProjectViewSet, basename='project')
