@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getArtists } from "@/lib/api";
 import type { ArtistApi } from "@/types/user";
 import ArtistCard from "@/components/features/artists/ArtistCard";
 import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
+import { AdminToolbar } from "@/components/shared/AdminEditButton";
+
+const DJANGO_ADMIN_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ArtistesPage() {
   const [artists, setArtists] = useState<ArtistApi[]>([]);
@@ -13,7 +16,7 @@ export default function ArtistesPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'staff' | 'others'>('all');
 
-  useEffect(() => {
+  const fetchArtists = useCallback(() => {
     setLoading(true);
     let staffOnly: boolean | undefined = undefined;
     if (filter === 'staff') staffOnly = true;
@@ -25,6 +28,10 @@ export default function ArtistesPage() {
       .finally(() => setLoading(false));
   }, [filter]);
 
+  useEffect(() => {
+    fetchArtists();
+  }, [fetchArtists]);
+
   if (loading && artists.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -35,6 +42,11 @@ export default function ArtistesPage() {
 
   return (
     <StandardPageShell>
+      <AdminToolbar
+        pageType="Artistes"
+        djangoAdminUrl={`${DJANGO_ADMIN_BASE}/admin/users/user/`}
+        onRefresh={fetchArtists}
+      />
       <div className="text-white">
         <StandardPageHero
           eyebrow="Nos artistes"
