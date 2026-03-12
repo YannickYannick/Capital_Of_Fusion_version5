@@ -111,13 +111,15 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const mainMp4Url = formatUrl(config?.main_video_file);
     const cycleMp4Url = formatUrl(config?.cycle_video_file);
 
-    const mainYT = useYTPlayer(mainYTId, apiReady, mainType === 'youtube' && !planetMusicOverride);
-    const cycleYT = useYTPlayer(cycleYTId, apiReady, cycleType === 'youtube' && !planetMusicOverride);
+    // Don't create YT players if iframes are disabled
+    const ytEnabled = !opts.disableYouTubeIframes;
+    const mainYT = useYTPlayer(mainYTId, apiReady && ytEnabled, mainType === 'youtube' && !planetMusicOverride && ytEnabled);
+    const cycleYT = useYTPlayer(cycleYTId, apiReady && ytEnabled, cycleType === 'youtube' && !planetMusicOverride && ytEnabled);
 
     const overrideYTId = planetMusicOverride?.type === "youtube" && planetMusicOverride?.youtubeUrl
         ? getYoutubeVideoId(planetMusicOverride.youtubeUrl)
         : "";
-    const overrideYT = useYTPlayer(overrideYTId || "jfKfPfyJRdk", apiReady, !!overrideYTId);
+    const overrideYT = useYTPlayer(overrideYTId || "jfKfPfyJRdk", apiReady && ytEnabled, !!overrideYTId && ytEnabled);
 
     const mainNativeRef = useRef<HTMLVideoElement>(null);
     const cycleNativeRef = useRef<HTMLVideoElement>(null);
@@ -152,7 +154,9 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     }, []);
 
     // Load YT API conditionally — DEFERRED by 1.5s to improve FCP
+    // Skip loading entirely if YouTube iframes are disabled
     useEffect(() => {
+        if (opts.disableYouTubeIframes) return;
         if (mainType !== 'youtube' && cycleType !== 'youtube') return;
         if (typeof window === "undefined") return;
 
@@ -201,7 +205,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             clearTimeout(deferTimer);
             cleanupInterval?.();
         };
-    }, [mainType, cycleType]);
+    }, [mainType, cycleType, opts.disableYouTubeIframes]);
 
     // Visibilité du cycle
     useEffect(() => {
@@ -282,15 +286,19 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         setQuality(q);
     };
 
+    // Determine if we should show black background (either option C or YouTube disabled)
+    const showBlackBg = opts.useBlackBackground || opts.disableYouTubeIframes;
+
     return (
         <>
             {/* Option C : Fond noir solide (remplace toutes les vidéos) */}
-            {opts.useBlackBackground && (
+            {/* Also used when YouTube iframes are disabled for performance testing */}
+            {showBlackBg && (
                 <div className="fixed inset-0 -z-10 bg-[#0a0e27]" />
             )}
 
-            {/* Vidéo principale (masquée si option C active) */}
-            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s, opacity 0.5s`, opacity: opts.useBlackBackground ? 0 : (planetMusicOverride ? 0.3 : 1) }}>
+            {/* Vidéo principale (masquée si option C active ou YouTube disabled) */}
+            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s, opacity 0.5s`, opacity: showBlackBg ? 0 : (planetMusicOverride ? 0.3 : 1) }}>
                 {mainType === 'youtube' ? (
                     <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
@@ -300,8 +308,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 )}
             </div>
 
-            {/* Vidéo cycle (masquée si option C active) */}
-            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: opts.useBlackBackground ? 0 : (planetMusicOverride ? 0 : cycleOpacity), filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
+            {/* Vidéo cycle (masquée si option C active ou YouTube disabled) */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: showBlackBg ? 0 : (planetMusicOverride ? 0 : cycleOpacity), filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
                 {cycleType === 'youtube' ? (
                     <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
@@ -313,7 +321,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
             {/* Musique de fond planète (override) — prend le pas sur la vidéo d'accueil */}
             {planetMusicOverride && (
-                <div className="fixed inset-0 -z-10 overflow-hidden" style={{ transition: "opacity 0.5s", opacity: opts.useBlackBackground ? 0 : 1 }}>
+                <div className="fixed inset-0 -z-10 overflow-hidden" style={{ transition: "opacity 0.5s", opacity: showBlackBg ? 0 : 1 }}>
                     {planetMusicOverride.type === "youtube" && overrideYTId && (
                         <div ref={overrideYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                     )}
@@ -333,7 +341,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             )}
 
             {/* Option A : Voile sombre global (au-dessus de toutes les vidéos) */}
-            {opts.showVideoOverlay && !opts.useBlackBackground && (
+            {opts.showVideoOverlay && !showBlackBg && (
                 <div className="fixed inset-0 -z-10 bg-black/50 pointer-events-none" />
             )}
 
@@ -374,6 +382,14 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         title="Remplace la vidéo par un fond noir"
                     >
                         C: Fond noir
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={() => opts.set("disableYouTubeIframes", !opts.disableYouTubeIframes)} 
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.disableYouTubeIframes ? "bg-red-500 border-red-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
+                        title="Désactive complètement les iframes YouTube (test perf)"
+                    >
+                        🚫 YT
                     </button>
                 </div>
 

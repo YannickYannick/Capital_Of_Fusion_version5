@@ -74,6 +74,7 @@ export interface PlanetsOptionsState {
     showVideoOverlay: boolean;
     enableTextShadow: boolean;
     useBlackBackground: boolean;
+    disableYouTubeIframes: boolean;
     showEntryTrajectory: boolean;
     // ── Nouveaux Modes ──
     verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
@@ -177,6 +178,7 @@ const DEFAULTS: PlanetsOptionsState = {
     showVideoOverlay: false,
     enableTextShadow: false,
     useBlackBackground: false,
+    disableYouTubeIframes: false,
     showEntryTrajectory: false,
     verticalMode: "manual",
     autoDistributeOrbits: false,
@@ -238,6 +240,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     showVideoOverlay: "video_showOverlay",
     enableTextShadow: "video_enableTextShadow",
     useBlackBackground: "video_useBlackBackground",
+    disableYouTubeIframes: "video_disableYouTubeIframes",
     showEntryTrajectory: "planets_showEntryTrajectory",
     verticalMode: "planets_verticalMode",
     autoDistributeOrbits: "planets_autoDistributeOrbits",
@@ -314,6 +317,7 @@ function loadFromLS(): PlanetsOptionsState {
         showVideoOverlay: lsGet(LS_KEYS.showVideoOverlay!, DEFAULTS.showVideoOverlay),
         enableTextShadow: lsGet(LS_KEYS.enableTextShadow!, DEFAULTS.enableTextShadow),
         useBlackBackground: lsGet(LS_KEYS.useBlackBackground!, DEFAULTS.useBlackBackground),
+        disableYouTubeIframes: lsGet(LS_KEYS.disableYouTubeIframes!, DEFAULTS.disableYouTubeIframes),
         showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
         verticalMode: lsGet(LS_KEYS.verticalMode!, DEFAULTS.verticalMode),
         autoDistributeOrbits: lsGet(LS_KEYS.autoDistributeOrbits!, DEFAULTS.autoDistributeOrbits),
