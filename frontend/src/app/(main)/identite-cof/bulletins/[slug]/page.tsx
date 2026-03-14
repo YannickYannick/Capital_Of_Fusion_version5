@@ -1,5 +1,5 @@
 /**
- * Page détail d'un bulletin (Identité COF — Bulletins).
+ * Page détail d'une information (Identité COF — Dernières informations).
  * Les staff peuvent aussi voir les brouillons et accéder à "Modifier".
  */
 import { getBulletinBySlug, getBulletins } from "@/lib/api";
@@ -23,11 +23,11 @@ export async function generateMetadata({
   try {
     const bulletin = await getBulletinBySlug(slug);
     return {
-      title: `${bulletin.title} | Bulletins | Identité COF`,
+      title: `${bulletin.title} | Dernières informations | Identité COF`,
       description: bulletin.title,
     };
   } catch {
-    return { title: "Bulletin | Identité COF" };
+    return { title: "Information | Identité COF" };
   }
 }
 

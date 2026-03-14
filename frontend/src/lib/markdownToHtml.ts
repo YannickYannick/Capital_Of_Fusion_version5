@@ -1,6 +1,6 @@
 /**
  * Conversion Markdown → HTML sécurisée (sanitization XSS).
- * Utilisée pour afficher le contenu Notre vision, bulletins, projets, etc. en blocs HTML.
+ * Utilisée pour afficher le contenu Notre vision, dernières informations, projets, etc. en blocs HTML.
  */
 import { marked } from "marked";
 import DOMPurify from "isomorphic-dompurify";

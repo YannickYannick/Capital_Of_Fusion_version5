@@ -1,6 +1,6 @@
 import { ExplorePresetApi } from "./explore";
 
-/** Bulletin d'information (Identité COF → Bulletins) */
+/** Dernière information (Identité COF → Dernières informations) */
 export interface BulletinApi {
     id: string;
     title: string;
@@ -10,7 +10,7 @@ export interface BulletinApi {
     created_at: string;
 }
 
-/** Bulletin avec champs admin (is_published) pour édition staff */
+/** Information avec champs admin (is_published) pour édition staff */
 export interface BulletinAdminApi extends BulletinApi {
     is_published: boolean;
 }
@@ -21,6 +21,8 @@ export interface SiteConfigurationApi {
     hero_subtitle: string;
     /** Contenu markdown de la page Identité COF → Notre vision */
     vision_markdown?: string;
+    /** Contenu markdown de la page Identité COF → Notre histoire */
+    history_markdown?: string;
     main_video_type: 'youtube' | 'mp4';
     main_video_youtube_id: string;
     main_video_file: string | null;

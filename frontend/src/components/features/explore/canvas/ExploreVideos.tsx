@@ -44,13 +44,23 @@ function getYoutubeVideoId(url: string): string | null {
     return m ? m[1] : null;
 }
 
-// Hook helper pour YT
-function useYTPlayer(videoId: string, ready: boolean, active: boolean) {
+// Hook helper pour YT avec marqueurs de performance
+function useYTPlayer(videoId: string, ready: boolean, active: boolean, label: string) {
     const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<YTPlayer | null>(null);
 
     useEffect(() => {
         if (!active || !ready || !containerRef.current || !videoId) return;
+
+        // Marqueur: début d'initialisation du player
+        if (typeof performance !== "undefined") {
+            try {
+                performance.mark(`yt-player-${label}-init`);
+            } catch {
+                // ignore
+            }
+        }
+
         const player = new window.YT!.Player(containerRef.current, {
             videoId,
             width: 1920,
@@ -65,6 +75,34 @@ function useYTPlayer(videoId: string, ready: boolean, active: boolean) {
                     playerRef.current = e.target;
                     e.target.mute();
                     try { e.target.setPlaybackQuality("hd1080"); } catch (err) { }
+
+                    // Marqueur: player prêt + mesure depuis l'API prête
+                    if (typeof performance !== "undefined") {
+                        try {
+                            performance.mark(`yt-player-${label}-ready`);
+                            // Mesure globale depuis l'API prête (si le marqueur existe)
+                            const hasApiReady =
+                                performance.getEntriesByName("yt-api-ready").length > 0;
+                            if (hasApiReady) {
+                                const measure = performance.measure(
+                                    `yt-player-${label}-from-api`,
+                                    "yt-api-ready",
+                                    `yt-player-${label}-ready`
+                                );
+                                if (process.env.NODE_ENV !== "production") {
+                                    // eslint-disable-next-line no-console
+                                    console.log(
+                                        "[YTPerf] Player",
+                                        label,
+                                        "ready in",
+                                        `${measure.duration.toFixed(0)} ms`
+                                    );
+                                }
+                            }
+                        } catch {
+                            // ignore
+                        }
+                    }
                 },
                 onStateChange: (e: { target: YTPlayer; data: number }) => {
                     if (e.data === 1) {
@@ -90,6 +128,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const { override: planetMusicOverride } = usePlanetMusicOverride();
 
     const [apiReady, setApiReady] = useState(false);
+    /** Délai avant de créer le player "cycle" pour étaler la charge (perf: évite 2 iframes lourds en même temps) */
+    const [cyclePlayerAllowed, setCyclePlayerAllowed] = useState(false);
     const [cycleOpacity, setCycleOpacity] = useState(0);
     const [scale, setScale] = useState(1);
     const [quality, setQuality] = useState("hd1080");
@@ -113,13 +153,28 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     // Don't create YT players if iframes are disabled
     const ytEnabled = !opts.disableYouTubeIframes;
-    const mainYT = useYTPlayer(mainYTId, apiReady && ytEnabled, mainType === 'youtube' && !planetMusicOverride && ytEnabled);
-    const cycleYT = useYTPlayer(cycleYTId, apiReady && ytEnabled, cycleType === 'youtube' && !planetMusicOverride && ytEnabled);
+    const mainYT = useYTPlayer(
+        mainYTId,
+        apiReady && ytEnabled,
+        mainType === 'youtube' && !planetMusicOverride && ytEnabled,
+        "main"
+    );
+    const cycleYT = useYTPlayer(
+        cycleYTId,
+        apiReady && ytEnabled,
+        cycleType === 'youtube' && !planetMusicOverride && ytEnabled && cyclePlayerAllowed,
+        "cycle"
+    );
 
     const overrideYTId = planetMusicOverride?.type === "youtube" && planetMusicOverride?.youtubeUrl
         ? getYoutubeVideoId(planetMusicOverride.youtubeUrl)
         : "";
-    const overrideYT = useYTPlayer(overrideYTId || "jfKfPfyJRdk", apiReady && ytEnabled, !!overrideYTId && ytEnabled);
+    const overrideYT = useYTPlayer(
+        overrideYTId || "jfKfPfyJRdk",
+        apiReady && ytEnabled,
+        !!overrideYTId && ytEnabled,
+        "override"
+    );
 
     const mainNativeRef = useRef<HTMLVideoElement>(null);
     const cycleNativeRef = useRef<HTMLVideoElement>(null);
@@ -135,6 +190,13 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         tag.src = "https://www.youtube.com/iframe_api";
         document.head.appendChild(tag);
     }, [planetMusicOverride, mainType, cycleType]);
+
+    // Autoriser le player "cycle" après un délai pour étaler la charge (perf)
+    useEffect(() => {
+        if (!apiReady || !ytEnabled || cycleType !== 'youtube') return;
+        const t = setTimeout(() => setCyclePlayerAllowed(true), 1200);
+        return () => clearTimeout(t);
+    }, [apiReady, ytEnabled, cycleType]);
 
     // Mute main/cycle quand override planète actif
     useEffect(() => {
@@ -163,6 +225,13 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         // Si l'API est déjà dispo
         if (window.YT?.Player) {
             setApiReady(true);
+            if (typeof performance !== "undefined") {
+                try {
+                    performance.mark("yt-api-ready");
+                } catch {
+                    // ignore
+                }
+            }
             return;
         }
 
@@ -170,10 +239,41 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         const DEFER_YT_MS = 1500;
         
         const loadYT = () => {
+            if (typeof performance !== "undefined") {
+                try {
+                    performance.mark("yt-api-load-start");
+                } catch {
+                    // ignore
+                }
+            }
+
             // On vérifie régulièrement si YT API devient disponible
             const interval = setInterval(() => {
                 if (window.YT?.Player) {
                     setApiReady(true);
+                    if (typeof performance !== "undefined") {
+                        try {
+                            performance.mark("yt-api-ready");
+                            const hasStart =
+                                performance.getEntriesByName("yt-api-load-start").length > 0;
+                            if (hasStart) {
+                                const measure = performance.measure(
+                                    "yt-api-total",
+                                    "yt-api-load-start",
+                                    "yt-api-ready"
+                                );
+                                if (process.env.NODE_ENV !== "production") {
+                                    // eslint-disable-next-line no-console
+                                    console.log(
+                                        "[YTPerf] YouTube Iframe API ready in",
+                                        `${measure.duration.toFixed(0)} ms`
+                                    );
+                                }
+                            }
+                        } catch {
+                            // ignore
+                        }
+                    }
                     clearInterval(interval);
                 }
             }, 100);

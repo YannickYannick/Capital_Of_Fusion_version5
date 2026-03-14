@@ -278,6 +278,23 @@ function getEntryPosition(
 }
 
 // ─────────────────────────────────────────────────────────
+//  First Frame Detector (performance monitoring)
+// ─────────────────────────────────────────────────────────
+
+function FirstFrameDetector({ onFirstFrame }: { onFirstFrame?: () => void }) {
+  const called = useRef(false);
+  
+  useFrame(() => {
+    if (!called.current && onFirstFrame) {
+      called.current = true;
+      onFirstFrame();
+    }
+  });
+  
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────
 //  Orbit ring (memoized)
 // ─────────────────────────────────────────────────────────
 
@@ -379,6 +396,12 @@ interface PlanetProps {
   oscillationAmplitude: number;
   oscillationFrequency: number;
   otherPlanetSelected: boolean;
+  /** Appelé quand cette planète a fini son animation d'entrée et est en orbite */
+  onEnterOrbit?: () => void;
+  /** Appelé à chaque frame en phase d'entrée avec le temps CPU passé dans les calculs de trajectoire (ms) */
+  onTrajectoryFrame?: (cpuMs: number) => void;
+  /** Option B : ombre sur le label (enableTextShadow) */
+  showTextShadow?: boolean;
 }
 
 function Planet({
@@ -425,6 +448,9 @@ function Planet({
   oscillationAmplitude,
   oscillationFrequency,
   otherPlanetSelected,
+  onEnterOrbit,
+  onTrajectoryFrame,
+  showTextShadow,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);       // temps (ms) après délai
@@ -528,7 +554,9 @@ function Planet({
     }
 
     if (!s.hasEnteredOrbit) {
-      // ── Phase 1 : animation d'entrée ──
+      // ── Phase 1 : animation d'entrée (mesure CPU pour perf) ──
+      const t0 = typeof performance !== "undefined" ? performance.now() : 0;
+
       entryElapsed.current += dt;
       const start = entryStartPos.current ?? new THREE.Vector3(entryStartX, entryStartY, entryStartZ ?? orbitRadius);
 
@@ -561,11 +589,16 @@ function Planet({
       const lastEased = applyEasing(Math.max(0, tNorm - 0.01), entryEasing);
       entryFinalSpeed.current = entrySpeedStart + (entrySpeedEnd - entrySpeedStart) * lastEased;
 
+      if (typeof performance !== "undefined" && onTrajectoryFrame) {
+        onTrajectoryFrame(performance.now() - t0);
+      }
+
       if (tNorm >= 1) {
         s.hasEnteredOrbit = true;
         s.phase = targetOrbitPhase;
         orbitEntryTime.current = state.clock.elapsedTime;
         groupRef.current.position.copy(targetOrbitPos);
+        onEnterOrbit?.();
       } else {
         return; // On attend la frame suivante pour continuer l'approche
       }
@@ -698,7 +731,7 @@ function Planet({
       )}
 
       {/* Label */}
-      <LabelSprite text={node.name} offsetY={displayScale + 1.2} />
+      <LabelSprite text={node.name} offsetY={displayScale + 1.2} showTextShadow={showTextShadow} />
     </group>
   );
 }
@@ -710,9 +743,12 @@ function Planet({
 function LabelSprite({
   text,
   offsetY,
+  showTextShadow = false,
 }: {
   text: string;
   offsetY: number;
+  /** Option B : ombre portée sur le texte (liée à enableTextShadow du contexte) */
+  showTextShadow?: boolean;
 }) {
   const spriteRef = useRef<THREE.Sprite>(null);
   const texture = useMemo(() => {
@@ -721,16 +757,25 @@ function LabelSprite({
     canvas.height = 64;
     const ctx = canvas.getContext("2d")!;
     ctx.clearRect(0, 0, 256, 64);
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.roundRect(4, 4, 248, 56, 12);
-    ctx.fill();
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 22px Inter, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    if (showTextShadow) {
+      ctx.shadowColor = "rgba(0,0,0,0.85)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+    }
     ctx.fillText(text, 128, 32);
+    if (showTextShadow) {
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
     return new THREE.CanvasTexture(canvas);
-  }, [text]);
+  }, [text, showTextShadow]);
 
   useFrame(({ camera }) => {
     if (!spriteRef.current) return;
@@ -760,6 +805,8 @@ interface SunProps {
   globalPlanetScale: number;
   onHover: (v: boolean) => void;
   speedMultiplierRef: React.MutableRefObject<number>;
+  /** Option B : ombre sur le label (enableTextShadow) */
+  showTextShadow?: boolean;
 }
 
 function Sun({
@@ -772,6 +819,7 @@ function Sun({
   onHover,
   globalPlanetScale,
   speedMultiplierRef,
+  showTextShadow,
 }: SunProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = hexToColor(node.planet_color || "#fbbf24");
@@ -807,7 +855,7 @@ function Sun({
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial color={color} transparent opacity={0.06} />
       </mesh>
-      <LabelSprite text={node.name} offsetY={displayScale + 1.5} />
+      <LabelSprite text={node.name} offsetY={displayScale + 1.5} showTextShadow={showTextShadow} />
     </group>
   );
 }
@@ -1070,6 +1118,9 @@ interface SceneContentProps {
   verticalJupiterAmplitude: number;
   verticalSphereRadius: number;
   allPositions?: React.MutableRefObject<Map<string, THREE.Vector3>>;
+  onFirstFrame?: () => void;
+  /** Appelé quand toutes les planètes (orbitNodes) ont fini leur animation d'entrée */
+  onAllPlanetsOnOrbit?: () => void;
 }
 
 function SceneContent({
@@ -1119,6 +1170,8 @@ function SceneContent({
   verticalJupiterAmplitude,
   verticalSphereRadius,
   allPositions: externalAllPositions,
+  onFirstFrame,
+  onAllPlanetsOnOrbit,
 }: SceneContentProps) {
   const router = useRouter();
   const opts = usePlanetsOptions();
@@ -1126,6 +1179,28 @@ function SceneContent({
   const mousePosRef = useRef(new THREE.Vector3());
   const localAllPositions = useRef<Map<string, THREE.Vector3>>(new Map());
   const allPositions = externalAllPositions || localAllPositions;
+  const planetsOnOrbitCount = useRef(0);
+  const allPlanetsOnOrbitCalled = useRef(false);
+  const trajectoryCpuMsRef = useRef(0);
+
+  const handlePlanetEnterOrbit = useCallback(() => {
+    if (allPlanetsOnOrbitCalled.current || !onAllPlanetsOnOrbit) return;
+    planetsOnOrbitCount.current += 1;
+    if (planetsOnOrbitCount.current >= orbitNodes.length) {
+      allPlanetsOnOrbitCalled.current = true;
+      onAllPlanetsOnOrbit(trajectoryCpuMsRef.current);
+    }
+  }, [onAllPlanetsOnOrbit, orbitNodes.length]);
+
+  const handleTrajectoryFrame = useCallback((cpuMs: number) => {
+    trajectoryCpuMsRef.current += cpuMs;
+  }, []);
+
+  useEffect(() => {
+    planetsOnOrbitCount.current = 0;
+    allPlanetsOnOrbitCalled.current = false;
+    trajectoryCpuMsRef.current = 0;
+  }, [restartKey]);
 
   // Track mouse position in 3D (plan Y=0)
   const { camera, gl, size } = useThree();
@@ -1171,6 +1246,10 @@ function SceneContent({
 
   // Vitesse globale (ralentit au survol des orbites et s'arrête si planète pointée)
   const speedMultiplierRef = useRef(1);
+  // Raycaster : rayon 3D depuis la caméra vers la souris. Sert à savoir si le pointeur
+  // vise la zone des orbites (distance à l'origine, hauteur Y) pour adapter la vitesse
+  // de rotation (hoverOrbitSpeedRatio / hoverPlanetSpeedRatio). Pas utilisé pour les clics
+  // (gérés par R3F sur les meshes).
   const raycasterRef = useRef(new THREE.Raycaster());
 
   useFrame((state, delta) => {
@@ -1230,6 +1309,9 @@ function SceneContent({
 
   return (
     <>
+      {/* Détecteur de première frame (performance monitoring) */}
+      <FirstFrameDetector onFirstFrame={onFirstFrame} />
+
       {/* Éclairage Dynamique V5 */}
       {opts.lightConfig && (
         <>
@@ -1324,6 +1406,9 @@ function SceneContent({
             oscillationAmplitude={opts.oscillationAmplitude ?? 0.3}
             oscillationFrequency={opts.oscillationFrequency ?? 0.5}
             otherPlanetSelected={selectedId != null}
+            onEnterOrbit={handlePlanetEnterOrbit}
+            onTrajectoryFrame={handleTrajectoryFrame}
+            showTextShadow={opts.enableTextShadow}
           />
         );
       })}
@@ -1387,6 +1472,12 @@ interface ExploreSceneProps {
   onSelectedPlanetScreenPosition?: (x: number, y: number) => void;
   controlsRef?: React.MutableRefObject<any>;
   cameraRef?: React.MutableRefObject<any>;
+  /** Callbacks de performance */
+  onFirstFrame?: () => void;
+  onSceneReady?: () => void;
+  onPlanetsLoaded?: (count: number) => void;
+  /** Appelé quand toutes les planètes sont en orbite (fin phase d'entrée) */
+  onAllPlanetsOnOrbit?: () => void;
 }
 
 /**
@@ -1394,7 +1485,7 @@ interface ExploreSceneProps {
  * animation Fan Effect, physique interactive, contrôles caméra GSAP.
  * S'appuie sur PlanetsOptionsContext pour tous les paramètres.
  */
-export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPlanetScreenPosition, controlsRef: externalControlsRef, cameraRef }: ExploreSceneProps) {
+export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPlanetScreenPosition, controlsRef: externalControlsRef, cameraRef, onFirstFrame, onSceneReady, onPlanetsLoaded, onAllPlanetsOnOrbit }: ExploreSceneProps) {
   const opts = usePlanetsOptions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedIdRef = useRef<string | null>(null); // toujours synchrone, pas de stale closure
@@ -1402,9 +1493,18 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPla
   const localControlsRef = useRef<{ target: THREE.Vector3; update: () => void } | null>(null);
   const controlsRef = externalControlsRef || localControlsRef;
   const allPositions = useRef<Map<string, THREE.Vector3>>(new Map());
+  const firstFrameCalled = useRef(false);
+  const sceneReadyCalled = useRef(false);
 
   // Solution 3: Utiliser useDeferredValue pour ne pas bloquer l'UI pendant les calculs
   const deferredNodes = useDeferredValue(nodes);
+  
+  // Marquer les planètes comme chargées quand les nodes sont prêts
+  useEffect(() => {
+    if (deferredNodes.length > 0 && onPlanetsLoaded) {
+      onPlanetsLoaded(deferredNodes.length);
+    }
+  }, [deferredNodes.length, onPlanetsLoaded]);
 
   // Synchroniser la ref avec l'état
   useEffect(() => { selectedIdRef.current = selectedId; }, [selectedId]);
@@ -1478,7 +1578,14 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPla
         gl.shadowMap.enabled = true;
         gl.shadowMap.type = THREE.PCFSoftShadowMap;
         gl.setClearColor(0x000000, 0);
+        
+        // Marquer la scène comme prête
+        if (!sceneReadyCalled.current && onSceneReady) {
+          sceneReadyCalled.current = true;
+          onSceneReady();
+        }
       }}
+      frameloop="always"
       // Clic dans le vide → reset
       onPointerMissed={() => {
         if (selectedId) handleReset();
@@ -1531,7 +1638,15 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPla
         verticalJupiterAmplitude={opts.verticalJupiterAmplitude}
         verticalSphereRadius={opts.verticalSphereRadius}
         allPositions={allPositions}
+        onFirstFrame={() => {
+          if (!firstFrameCalled.current && onFirstFrame) {
+            firstFrameCalled.current = true;
+            onFirstFrame();
+          }
+        }}
+        onAllPlanetsOnOrbit={onAllPlanetsOnOrbit}
       />
+
     </Canvas>
   );
 }

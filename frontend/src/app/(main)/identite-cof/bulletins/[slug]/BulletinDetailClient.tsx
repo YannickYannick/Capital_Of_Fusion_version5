@@ -54,7 +54,7 @@ export function BulletinDetailClient({ slug, initialBulletin }: BulletinDetailCl
     return (
       <article>
         <Link href="/identite-cof/bulletins" className="text-white/60 hover:text-white text-sm mb-4 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
         <p className="text-white/70">Chargement…</p>
       </article>
@@ -65,7 +65,7 @@ export function BulletinDetailClient({ slug, initialBulletin }: BulletinDetailCl
     return (
       <article>
         <Link href="/identite-cof/bulletins" className="text-white/60 hover:text-white text-sm mb-4 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
         <p className="text-white/70">Bulletin introuvable.</p>
       </article>
@@ -78,10 +78,10 @@ export function BulletinDetailClient({ slug, initialBulletin }: BulletinDetailCl
         href="/identite-cof/bulletins"
         className="text-white/60 hover:text-white text-sm mb-6 inline-block"
       >
-        ← Retour aux bulletins
+        ← Retour aux dernières informations
       </Link>
       <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-2">Bulletins</p>
+        <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-2">Dernières informations</p>
         <div className="flex flex-wrap items-center gap-3 mb-2">
           <h1 className="text-4xl font-black text-white tracking-tight">
             {bulletin.title}

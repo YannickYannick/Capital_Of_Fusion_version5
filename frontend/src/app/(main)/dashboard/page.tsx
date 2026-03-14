@@ -161,7 +161,7 @@ function AdminDashboard({ username }: { username: string }) {
                     <span className="text-2xl">📝</span>
                     <div>
                         <p className="font-semibold text-white group-hover:text-amber-300 transition-colors">Demandes à approuver</p>
-                        <p className="text-xs text-white/40 mt-0.5">Modifications proposées par le staff (pages, bulletins, événements…)</p>
+                        <p className="text-xs text-white/40 mt-0.5">Modifications proposées par le staff (pages, dernières informations, événements…)</p>
                     </div>
                     <span className="ml-auto text-white/40 group-hover:text-amber-400">→</span>
                 </Link>

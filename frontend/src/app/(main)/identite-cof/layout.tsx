@@ -1,5 +1,5 @@
 /**
- * Layout Identité COF — Notre vision & Bulletins.
+ * Layout Identité COF — Notre vision, Notre histoire & Dernières informations.
  * Aligné sur formations/contenu : pt-64 pb-20, max-w-4xl.
  */
 export default function IdentiteCofLayout({

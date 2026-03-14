@@ -156,7 +156,7 @@ const DEFAULTS: PlanetsOptionsState = {
     entrySpeedStart: 2,
     entrySpeedEnd: 8,
     entryEasing: "easeOut",
-    entryDuration: 3.5,
+    entryDuration: 1.8,
     entryTrajectory: "linear",
     fanDistance: 30,
     // ── Cinématique Orbite ──

@@ -61,7 +61,7 @@ export default function NouveauBulletinPage() {
       <div>
         <p className="text-white/80">Connexion requise.</p>
         <Link href="/identite-cof/bulletins" className="text-purple-400 hover:underline mt-2 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
       </div>
     );
@@ -70,9 +70,9 @@ export default function NouveauBulletinPage() {
   if (!canEdit) {
     return (
       <div>
-        <p className="text-white/80">Droits insuffisants pour créer un bulletin.</p>
+        <p className="text-white/80">Droits insuffisants pour créer une information.</p>
         <Link href="/identite-cof/bulletins" className="text-purple-400 hover:underline mt-2 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
       </div>
     );
@@ -84,7 +84,7 @@ export default function NouveauBulletinPage() {
         href="/identite-cof/bulletins"
         className="text-white/60 hover:text-white text-sm mb-4 inline-block"
       >
-        ← Retour aux bulletins
+        ← Retour aux dernières informations
       </Link>
       <h1 className="text-3xl font-bold text-white mb-6">Créer un bulletin</h1>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
@@ -145,7 +145,7 @@ export default function NouveauBulletinPage() {
             disabled={saving}
             className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-500 disabled:opacity-50"
           >
-            {saving ? "Création…" : "Créer le bulletin"}
+            {saving ? "Création…" : "Créer l'information"}
           </button>
           <Link
             href="/identite-cof/bulletins"

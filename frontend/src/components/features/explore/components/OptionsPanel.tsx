@@ -72,7 +72,7 @@ function ToggleBtn({
         <button
             type="button"
             onClick={onClick}
-            className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all border ${active
+            className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all border cursor-pointer ${active
                 ? "bg-purple-600/30 border-purple-500/50 text-white"
                 : "bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10"
                 }`}
@@ -89,7 +89,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
         <div className="border-t border-white/10 pt-2">
             <button
                 type="button"
-                className="w-full flex items-center justify-between text-xs font-semibold text-white/50 uppercase tracking-wider mb-2"
+                className="w-full flex items-center justify-between text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 cursor-pointer"
                 onClick={() => setOpen((v) => !v)}
             >
                 <span>{title}</span>
@@ -101,10 +101,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 /**
- * Panneau d'options fixe (droite, z-20) pour contrôler la scène 3D en temps réel.
+ * Panneau d'options 3D (droite) pour contrôler la scène Explore en temps réel.
+ * Affiché uniquement pour les admins (géré par la page Explore). Caché par défaut (visible = false).
+ * Bouton engrenage et panneau en position fixed (sans wrapper plein écran) pour rester cliquables au-dessus du canvas.
  */
 export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelProps) {
-    const [visible, setVisible] = useState(true);
+    const [visible, setVisible] = useState(false);
     const opts = usePlanetsOptions();
     const [saving, setSaving] = useState(false);
 
@@ -124,13 +126,7 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                     key !== "resetKey" &&
                     key !== "name"
                 ) {
-                    // On convertit camelCase vers snake_case pour le backend si nécessaire ? 
-                    // Non, le serializer DRF peut être adapté ou on peut envoyer tel quel si on a les champs correspondants.
-                    // ATTENTION: Notre modèle Django utilise snake_case. 
-                    // Mais notre serializer ExplorePresetSerializer utilise to_representation pour cameliser le SORTIE.
-                    // Pour l'ENTRÉE (POST), DRF attend par défaut les noms de champs du modèle (snake_case).
-
-                    // Conversion inverse camelCase -> snake_case
+                    // Backend Django attend snake_case ; conversion camelCase → snake_case
                     const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
                     optionsData[snakeKey] = (opts as any)[key];
                 }
@@ -172,11 +168,11 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
 
     return (
         <>
-            {/* Toggle button */}
+            {/* Bouton toggle et panneau en fixed (z-50) pour rester au-dessus du canvas et recevoir les clics */}
             <button
                 type="button"
                 onClick={() => setVisible((v) => !v)}
-                className="fixed top-24 right-4 z-30 p-2.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-black/60 transition shadow-lg"
+                className="fixed top-32 right-4 z-50 p-2.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-black/60 transition shadow-lg cursor-pointer"
                 title="Options 3D"
             >
                 ⚙️
@@ -184,7 +180,7 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
 
             {shouldRender && (
                 <aside
-                    className={`fixed top-24 right-14 z-20 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-2xl text-sm p-4 flex flex-col gap-3 ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
+                    className={`fixed top-44 right-14 z-50 w-64 max-h-[50vh] overflow-y-auto rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-2xl text-sm p-4 flex flex-col gap-3 ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
                 >
                         <h2 className="text-xs font-bold text-white/50 uppercase tracking-widest">Options 3D</h2>
 
@@ -193,7 +189,7 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                             <button
                                 type="button"
                                 onClick={onOpenPlanetConfig}
-                                className="w-full px-3 py-2 rounded-lg bg-purple-600/30 border border-purple-500/40 text-white text-xs font-medium hover:bg-purple-600/50 transition"
+                                className="w-full px-3 py-2 rounded-lg bg-purple-600/30 border border-purple-500/40 text-white text-xs font-medium hover:bg-purple-600/50 transition cursor-pointer"
                             >
                                 ⚙️ Configurer les Planètes
                             </button>

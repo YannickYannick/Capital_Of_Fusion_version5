@@ -47,7 +47,7 @@ export function BulletinsListClient() {
       <div>
         <div className="text-center mb-14">
           <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Identité COF</p>
-          <h1 className="text-5xl font-black text-white tracking-tight mb-4">Bulletins d&apos;information</h1>
+          <h1 className="text-5xl font-black text-white tracking-tight mb-4">Dernières informations</h1>
         </div>
         <p className="text-white/60 text-sm">Chargement…</p>
       </div>
@@ -58,7 +58,7 @@ export function BulletinsListClient() {
     return (
       <div>
         <div className="text-center mb-14">
-          <h1 className="text-5xl font-black text-white tracking-tight mb-4">Bulletins d&apos;information</h1>
+          <h1 className="text-5xl font-black text-white tracking-tight mb-4">Dernières informations</h1>
         </div>
         <p className="text-red-400">{error}</p>
       </div>
@@ -71,13 +71,13 @@ export function BulletinsListClient() {
       <div className="text-center mb-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Identité COF</p>
         <h1 className="text-5xl font-black text-white tracking-tight mb-4">
-          Bulletins{" "}
+          Dernières informations{" "}
           <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             d&apos;information
           </span>
         </h1>
         <p className="text-white/60 max-w-xl mx-auto mb-6">
-          Les bulletins sont affichés du plus récent au plus ancien.
+          Les dernières informations sont affichées du plus récent au plus ancien.
         </p>
         {canEdit && (
           <Link
@@ -91,10 +91,10 @@ export function BulletinsListClient() {
 
       {bulletins.length === 0 ? (
         <p className="text-white/50 italic text-center animate-in fade-in duration-500">
-          Aucun bulletin pour le moment.
+          Aucune information pour le moment.
           {canEdit
-            ? " Cliquez sur « Créer un bulletin » pour en ajouter."
-            : " Les bulletins peuvent être ajoutés dans l'admin (Bulletins d'information)."}
+            ? " Cliquez sur « Créer une information » pour en ajouter."
+            : " Les informations peuvent être ajoutées dans l'admin (Dernières informations)."}
         </p>
       ) : (
         <ul className="flex flex-col gap-4 animate-in fade-in duration-500">

@@ -11,6 +11,7 @@ import { PlanetOverlay } from "@/components/features/explore/components/PlanetOv
 import { OptionsPanel } from "@/components/features/explore/components/OptionsPanel";
 import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
 import { DebugPanel } from "@/components/features/explore/components/DebugPanel";
+import { useExplorePerformance } from "@/hooks/useExplorePerformance";
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
 const ExploreScene = dynamic(
@@ -86,6 +87,13 @@ function ExplorePageInner() {
   // Solution 3: useDeferredValue pour ne pas bloquer l'UI pendant le rendu 3D
   const deferredNodes = useDeferredValue(nodes);
 
+  // Performance monitoring
+  const perf = useExplorePerformance({ 
+    debug: process.env.NODE_ENV === "development",
+    trackFps: true,
+    fpsSampleDuration: 5,
+  });
+
   const { setOverride: setPlanetMusicOverride } = usePlanetMusicOverride();
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
@@ -113,12 +121,15 @@ function ExplorePageInner() {
   }, [overlayNode, apiBaseUrl, setPlanetMusicOverride]);
 
   useEffect(() => {
-    // Charger les données en parallèle pour réduire le temps de chargement
+    const t0 = performance.now();
+    // Charger les données en parallèle (une seule fois au montage)
     Promise.all([
-      getOrganizationNodes(),
+      getOrganizationNodes().then((data) => {
+        perf.setNodesApiMs(performance.now() - t0);
+        return data;
+      }),
       getSiteConfig()
     ]).then(([nodesData, config]) => {
-      // Utiliser startTransition pour ne pas bloquer les interactions utilisateur
       startTransition(() => {
         setNodes(nodesData);
         if (config.explore_config) {
@@ -131,15 +142,21 @@ function ExplorePageInner() {
     }).finally(() => {
       setLoading(false);
     });
+    // setBatch uniquement : ne pas mettre perf en deps (objet recréé chaque rendu → boucle de requêtes)
   }, [setBatch]);
 
   // Solution 1 + 3: Monter Three.js après le FCP via requestIdleCallback + startTransition
   useEffect(() => {
     if (!loading && !error && nodes.length > 0 && !mountScene) {
+      // Marquer le début de l'init Canvas
+      perf.markCanvasInit();
+      
       const mount = () => {
         // Solution 3: Utiliser startTransition pour marquer le montage comme non-urgent
         startTransition(() => {
           setMountScene(true);
+          // Marquer que le Canvas est prêt à être monté
+          perf.markCanvasReady();
         });
       };
       
@@ -151,7 +168,7 @@ function ExplorePageInner() {
         return () => clearTimeout(id);
       }
     }
-  }, [loading, error, nodes.length, mountScene]);
+  }, [loading, error, nodes.length, mountScene, perf]);
 
   // Solution 3: Utiliser les nodes différés pour le rendu 3D (ne bloque pas l'UI)
   const visibleNodes = deferredNodes.filter((n) => n.is_visible_3d);
@@ -186,6 +203,7 @@ function ExplorePageInner() {
   }, [opts]);
 
   const { user } = useAuth();
+  const isAdmin = user?.user_type === "ADMIN";
   const canEditDescriptions = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
   const handleNodeUpdated = useCallback((updatedNode: OrganizationNodeApi) => {
     setOverlayNode(updatedNode);
@@ -214,16 +232,22 @@ function ExplorePageInner() {
         </div>
       )}
 
-      {/* Canvas 3D - monté seulement après le FCP (Solution 1: Lazy Loading Progressif) */}
+      {/* Canvas 3D - z-0 pour rester sous les panneaux (Options, Debug, etc.) */}
       {mountScene && !error && visibleNodes.length > 0 && (
-        <ExploreScene
+        <div className="absolute inset-0 z-0">
+          <ExploreScene
           nodes={visibleNodes}
           onOpenOverlay={handleOpenOverlay}
           onSelectNode={handleSelectNode}
           onSelectedPlanetScreenPosition={handleSelectedPlanetScreenPosition}
           controlsRef={controlsRef}
           cameraRef={cameraRef}
-        />
+          onFirstFrame={perf.markFirstFrame}
+          onSceneReady={perf.markSceneReady}
+          onPlanetsLoaded={(count) => perf.markPlanetsLoaded(count)}
+          onAllPlanetsOnOrbit={perf.markAllPlanetsOnOrbit}
+          />
+        </div>
       )}
 
       {/* Barre d'action planète sélectionnée — centre du cadre aligné sur la planète (fallback: bas centré) */}
@@ -267,20 +291,21 @@ function ExplorePageInner() {
         </div>
       )}
 
-      {/* Panneau Options (droite, z-20) */}
-      <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} nodes={nodes} />
+      {/* Options 3D, Config planètes et Debug caméra : visibles uniquement pour les comptes admin */}
+      {isAdmin && (
+        <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} nodes={nodes} />
+      )}
+      {isAdmin && (
+        <GlobalPlanetConfigPanel
+          nodes={nodes}
+          isOpen={planetConfigOpen}
+          onClose={() => setPlanetConfigOpen(false)}
+          onSaved={handleSaved}
+          apiBaseUrl={apiBaseUrl}
+        />
+      )}
 
-      {/* Panneau Config Planètes (slide-in droite, z-50) */}
-      <GlobalPlanetConfigPanel
-        nodes={nodes}
-        isOpen={planetConfigOpen}
-        onClose={() => setPlanetConfigOpen(false)}
-        onSaved={handleSaved}
-        apiBaseUrl={apiBaseUrl}
-      />
-
-      {/* Debug Panel (gauche, z-20) */}
-      {opts.showDebugInfo && (
+      {isAdmin && opts.showDebugInfo && (
         <DebugPanel controlsRef={controlsRef} cameraRef={cameraRef} />
       )}
 

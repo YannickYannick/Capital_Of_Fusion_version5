@@ -39,7 +39,8 @@ export function Navbar() {
     label: "Identité COF",
     children: [
       { id: "id-vision", name: "Notre vision", url: "/identite-cof/notre-vision", slug: "identite-vision", icon: "", order: 1, is_active: true, children: [] },
-      { id: "id-bulletins", name: "Bulletins", url: "/identite-cof/bulletins", slug: "identite-bulletins", icon: "", order: 2, is_active: true, children: [] },
+      { id: "id-histoire", name: "Notre histoire", url: "/identite-cof/notre-histoire", slug: "identite-histoire", icon: "", order: 2, is_active: true, children: [] },
+      { id: "id-bulletins", name: "Dernières informations", url: "/identite-cof/bulletins", slug: "identite-bulletins", icon: "", order: 3, is_active: true, children: [] },
     ] as MenuItemApi[],
   };
 
@@ -116,7 +117,8 @@ export function Navbar() {
             return (
               item.label !== "Identité COF" &&
               item.label !== "Notre vision" &&
-              item.label !== "Bulletins" &&
+              item.label !== "Notre histoire" &&
+              item.label !== "Dernières informations" &&
               item.label !== "Formations" &&
               item.label !== "Promotions festivals" &&
               item.label !== "Cours" &&
@@ -124,6 +126,7 @@ export function Navbar() {
               item.label !== "Shop" &&
               item.label !== "Trainings" &&
               h !== "/identite-cof/notre-vision" &&
+              h !== "/identite-cof/notre-histoire" &&
               h !== "/identite-cof/bulletins" &&
               h !== "/formations" &&
               h !== "/promotions-festivals" &&

@@ -40,7 +40,7 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
         model = SiteConfiguration
         fields = [
             "site_name", "hero_title", "hero_subtitle",
-            "vision_markdown",
+            "vision_markdown", "history_markdown",
             "main_video_type", "main_video_youtube_id", "main_video_file",
             "cycle_video_type", "cycle_video_youtube_id", "cycle_video_file",
             "explore_config",

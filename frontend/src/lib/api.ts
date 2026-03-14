@@ -98,6 +98,30 @@ export async function patchSiteConfigVision(visionMarkdown: string): Promise<Sit
 }
 
 /**
+ * Mise à jour de l'histoire (Notre histoire). Staff/superuser.
+ * PATCH /api/admin/config/
+ */
+export async function patchSiteConfigHistory(historyMarkdown: string): Promise<SiteConfigurationApi | { pending: true; message: string }> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/config/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify({ history_markdown: historyMarkdown }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = (data && typeof data === "object" && "error" in data) ? String(data.error) : data?.detail || `Patch config API error: ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+/**
  * Liste de tous les bulletins (dont brouillons) pour édition. Staff/superuser.
  * GET /api/admin/identite/bulletins/
  */

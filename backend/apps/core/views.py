@@ -72,26 +72,31 @@ class BulletinDetailAPIView(APIView):
 
 
 class SiteConfigurationAdminAPIView(APIView):
-    """PATCH /api/admin/config/ — vision_markdown. Admin : appliqué direct. Staff : demande en attente."""
+    """PATCH /api/admin/config/ — vision_markdown, history_markdown. Admin : appliqué direct. Staff : demande en attente."""
     permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request):
         config = SiteConfiguration.objects.first()
         if not config:
             config = SiteConfiguration.objects.create()
-        vision = request.data.get("vision_markdown")
-        if vision is None:
+        payload = {}
+        if request.data.get("vision_markdown") is not None:
+            payload["vision_markdown"] = request.data["vision_markdown"]
+        if request.data.get("history_markdown") is not None:
+            payload["history_markdown"] = request.data["history_markdown"]
+        if not payload:
             serializer = SiteConfigurationSerializer(config, context={'request': request})
             return Response(serializer.data)
         if getattr(request.user, "is_superuser", False):
-            config.vision_markdown = vision
-            config.save(update_fields=["vision_markdown", "updated_at"])
+            for key, value in payload.items():
+                setattr(config, key, value)
+            config.save(update_fields=list(payload.keys()) + ["updated_at"])
             serializer = SiteConfigurationSerializer(config, context={'request': request})
             return Response(serializer.data)
         PendingContentEdit.objects.create(
             content_type=PendingContentEdit.ContentType.SITECONFIG,
             object_id="",
-            payload={"vision_markdown": vision},
+            payload=payload,
             requested_by=request.user,
         )
         return Response(

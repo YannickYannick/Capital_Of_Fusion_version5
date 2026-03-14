@@ -173,6 +173,13 @@ class SiteConfiguration(models.Model):
         verbose_name="Notre vision (Markdown)",
         help_text="Contenu de la page Identité COF → Notre vision (format Markdown).",
     )
+    # Identité COF — Notre histoire (page markdown)
+    history_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Notre histoire (Markdown)",
+        help_text="Contenu de la page Identité COF → Notre histoire (format Markdown).",
+    )
 
     active_explore_preset = models.ForeignKey(ExplorePreset, on_delete=models.SET_NULL, null=True, blank=True)
     VIDEO_CHOICES = (('youtube', 'Vidéo YouTube'), ('mp4', 'Fichier Local (MP4)'))

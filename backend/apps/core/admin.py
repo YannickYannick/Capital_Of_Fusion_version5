@@ -33,6 +33,7 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Général", {"fields": ("site_name", "hero_title", "hero_subtitle")}),
         ("Identité COF — Notre vision", {"fields": ("vision_markdown",)}),
+        ("Identité COF — Notre histoire", {"fields": ("history_markdown",)}),
         ("Explore 3D", {"fields": ("active_explore_preset",)}),
         ("Vidéo Accueil", {"fields": ("main_video_type", "main_video_youtube_id", "main_video_file")}),
         ("Vidéo Cycle", {"fields": ("cycle_video_type", "cycle_video_youtube_id", "cycle_video_file")}),

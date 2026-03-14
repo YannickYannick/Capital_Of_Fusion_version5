@@ -48,7 +48,7 @@ export default function EditBulletinPage() {
         );
         setIsPublished("is_published" in b ? b.is_published : true);
       })
-      .catch(() => setError("Bulletin introuvable"))
+      .catch(() => setError("Information introuvable"))
       .finally(() => setLoading(false));
   }, [slug, canEdit]);
 
@@ -89,7 +89,7 @@ export default function EditBulletinPage() {
       <div>
         <p className="text-white/80">Connexion requise.</p>
         <Link href="/identite-cof/bulletins" className="text-purple-400 hover:underline mt-2 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
       </div>
     );
@@ -98,9 +98,9 @@ export default function EditBulletinPage() {
   if (!canEdit) {
     return (
       <div>
-        <p className="text-white/80">Droits insuffisants pour modifier ce bulletin.</p>
+        <p className="text-white/80">Droits insuffisants pour modifier cette information.</p>
         <Link href="/identite-cof/bulletins" className="text-purple-400 hover:underline mt-2 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
       </div>
     );
@@ -119,7 +119,7 @@ export default function EditBulletinPage() {
       <div>
         <p className="text-red-400">{error}</p>
         <Link href="/identite-cof/bulletins" className="text-purple-400 hover:underline mt-2 inline-block">
-          ← Retour aux bulletins
+          ← Retour aux dernières informations
         </Link>
       </div>
     );
@@ -131,9 +131,9 @@ export default function EditBulletinPage() {
         href={`/identite-cof/bulletins/${slug}`}
         className="text-white/60 hover:text-white text-sm mb-4 inline-block"
       >
-        ← Retour au bulletin
+        ← Retour à l'information
       </Link>
-      <h1 className="text-3xl font-bold text-white mb-6">Modifier le bulletin</h1>
+      <h1 className="text-3xl font-bold text-white mb-6">Modifier l'information</h1>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
         <div>
           <label className="block text-white/70 text-sm mb-1">Titre</label>
