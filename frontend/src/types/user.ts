@@ -25,6 +25,8 @@ export interface ArtistApi {
     /** URL de la photo de profil (alias API / champ backend) */
     profile_image?: string | null;
     professions: DanceProfessionApi[];
+    /** Styles de danse (optionnel, selon l’API) */
+    styles?: Array<{ id: string; name: string }>;
     dance_level: LevelPublicApi | null;
     is_staff_member: boolean;
     is_vibe: boolean;
