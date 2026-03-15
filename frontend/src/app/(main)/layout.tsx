@@ -1,16 +1,12 @@
 import type { ReactNode } from "react";
-import { Navbar } from "@/components/shared/Navbar";
-import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
-import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { VideoBackgroundClient } from "@/components/features/explore/canvas/VideoBackgroundClient";
-import { MainContent } from "@/components/shared/MainContent";
+import { ClientLayoutWrapper } from "@/components/layout/ClientLayoutWrapper";
 import { getSiteConfig } from "@/lib/api";
 
 /**
  * Layout (main) — partagé par toutes les pages publiques.
- * Landing, Explore, Cours, Événements, Boutique, Organisation, Login, Dashboard.
- * Navbar fixe, vidéo fond possible sur landing.
+ * Vidéo et contextes Explore (PlanetsOptions, PlanetMusicOverride) sont chargés
+ * conditionnellement via ClientLayoutWrapper selon le type de page (accueil, explore, menu, détail, user).
  */
 export default async function MainLayout({
   children,
@@ -20,13 +16,7 @@ export default async function MainLayout({
   const config = await getSiteConfig().catch(() => null);
   return (
     <AuthProvider>
-      <PlanetsOptionsProvider>
-        <PlanetMusicOverrideProvider>
-          <Navbar />
-          <VideoBackgroundClient config={config} />
-          <MainContent>{children}</MainContent>
-        </PlanetMusicOverrideProvider>
-      </PlanetsOptionsProvider>
+      <ClientLayoutWrapper config={config}>{children}</ClientLayoutWrapper>
     </AuthProvider>
   );
 }

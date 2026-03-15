@@ -332,17 +332,22 @@ const OrbitRing = memo(function OrbitRing({
   );
 });
 
-/** Anneau affiché quand la souris est dans la zone où les planètes ralentissent (survol). */
+/** Anneau affiché quand la souris est dans la zone où les planètes ralentissent (survol). Couleur et opacité configurables via admin. */
 function OrbitZoneIndicator({
   inOrbitZoneRef,
   orbitZoneRadiusRef,
   show,
+  color,
+  opacity,
 }: {
   inOrbitZoneRef: React.MutableRefObject<boolean>;
   orbitZoneRadiusRef: React.MutableRefObject<number>;
   show: boolean;
+  color: string;
+  opacity: number;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const colorObj = hexToColor(color);
   useFrame(() => {
     if (!meshRef.current || !show) return;
     meshRef.current.visible = inOrbitZoneRef.current && orbitZoneRadiusRef.current > 0;
@@ -353,8 +358,8 @@ function OrbitZoneIndicator({
       <ringGeometry args={[0.92, 1, 64]} />
       <meshBasicMaterial
         transparent
-        opacity={0.28}
-        color="#a855f7"
+        opacity={opacity}
+        color={colorObj}
         side={THREE.DoubleSide}
         depthWrite={false}
       />
@@ -1402,12 +1407,14 @@ function SceneContent({
           );
         })}
 
-      {/* Zone de ralentissement au survol : anneau violet visible quand la souris est dans la zone des orbites */}
+      {/* Zone de ralentissement au survol : anneau visible quand la souris est dans la zone des orbites (config. admin) */}
       {verticalMode !== "sphere" && (
         <OrbitZoneIndicator
           inOrbitZoneRef={inOrbitZoneRef}
           orbitZoneRadiusRef={orbitZoneRadiusRef}
-          show={true}
+          show={opts.showOrbitZoneIndicator ?? true}
+          color={opts.orbitZoneIndicatorColor ?? "#a855f7"}
+          opacity={opts.orbitZoneIndicatorOpacity ?? 0.28}
         />
       )}
 

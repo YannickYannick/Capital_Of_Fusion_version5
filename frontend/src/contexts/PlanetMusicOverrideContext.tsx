@@ -38,12 +38,13 @@ export function PlanetMusicOverrideProvider({ children }: { children: ReactNode 
   );
 }
 
+const FALLBACK_MUSIC_OVERRIDE: PlanetMusicOverrideContextValue = {
+  override: null,
+  setOverride: () => {},
+};
+
 export function usePlanetMusicOverride(): PlanetMusicOverrideContextValue {
   const ctx = useContext(PlanetMusicOverrideContext);
-  if (!ctx) {
-    throw new Error(
-      "usePlanetMusicOverride must be used within PlanetMusicOverrideProvider"
-    );
-  }
-  return ctx;
+  if (ctx) return ctx;
+  return FALLBACK_MUSIC_OVERRIDE;
 }

@@ -100,6 +100,10 @@ export interface PlanetsOptionsState {
     // Oscillation verticale (sinus) des autres planètes quand une est sélectionnée
     oscillationAmplitude: number;
     oscillationFrequency: number;
+    // Indicateur visuel zone de ralentissement (cercle au survol)
+    showOrbitZoneIndicator: boolean;
+    orbitZoneIndicatorColor: string;
+    orbitZoneIndicatorOpacity: number;
 }
 
 export interface PlanetsOptionsContextValue extends PlanetsOptionsState {
@@ -200,6 +204,9 @@ const DEFAULTS: PlanetsOptionsState = {
     cameraTargetZ: 0,
     oscillationAmplitude: 0.3,
     oscillationFrequency: 0.5,
+    showOrbitZoneIndicator: true,
+    orbitZoneIndicatorColor: "#a855f7",
+    orbitZoneIndicatorOpacity: 0.28,
 };
 
 const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
@@ -338,8 +345,11 @@ function loadFromLS(): PlanetsOptionsState {
         cameraTargetX: lsGet(LS_KEYS.cameraTargetX!, DEFAULTS.cameraTargetX),
         cameraTargetY: lsGet(LS_KEYS.cameraTargetY!, DEFAULTS.cameraTargetY),
         cameraTargetZ: lsGet(LS_KEYS.cameraTargetZ!, DEFAULTS.cameraTargetZ),
-        oscillationAmplitude: lsGet(LS_KEYS.oscillationAmplitude!, DEFAULTS.oscillationAmplitude),
-        oscillationFrequency: lsGet(LS_KEYS.oscillationFrequency!, DEFAULTS.oscillationFrequency),
+    oscillationAmplitude: lsGet(LS_KEYS.oscillationAmplitude!, DEFAULTS.oscillationAmplitude),
+    oscillationFrequency: lsGet(LS_KEYS.oscillationFrequency!, DEFAULTS.oscillationFrequency),
+    showOrbitZoneIndicator: DEFAULTS.showOrbitZoneIndicator,
+    orbitZoneIndicatorColor: DEFAULTS.orbitZoneIndicatorColor,
+    orbitZoneIndicatorOpacity: DEFAULTS.orbitZoneIndicatorOpacity,
     };
 }
 
@@ -348,6 +358,11 @@ function loadFromLS(): PlanetsOptionsState {
 // ─────────────────────────────────────────────────────────
 
 const PlanetsOptionsContext = createContext<PlanetsOptionsContextValue | null>(null);
+
+/** Ref statique pour le fallback quand le provider est absent (pages menu/détail/user). */
+const FALLBACK_CAMERA_REF: React.RefObject<{ x: number; y: number; z: number; tx: number; ty: number; tz: number }> = {
+    current: { x: 0, y: 6.84, z: 18.79, tx: 0, ty: 0, tz: 0 },
+};
 
 export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<PlanetsOptionsState>(DEFAULTS);
@@ -415,6 +430,15 @@ export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
 
 export function usePlanetsOptions(): PlanetsOptionsContextValue {
     const ctx = useContext(PlanetsOptionsContext);
-    if (!ctx) throw new Error("usePlanetsOptions must be used within PlanetsOptionsProvider");
-    return ctx;
+    if (ctx) return ctx;
+    return {
+        ...DEFAULTS,
+        set: () => {},
+        setBatch: () => {},
+        triggerRestart: () => {},
+        triggerReset: () => {},
+        restartKey: 0,
+        resetKey: 0,
+        cameraRef: FALLBACK_CAMERA_REF,
+    };
 }

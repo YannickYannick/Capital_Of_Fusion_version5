@@ -146,6 +146,24 @@ class ExplorePreset(BaseModel):
     oscillation_amplitude = models.FloatField(default=0.3, help_text="Amplitude (unités) du mouvement vertical")
     oscillation_frequency = models.FloatField(default=0.5, help_text="Fréquence (Hz) de l'oscillation")
 
+    # Indicateur visuel de la zone de ralentissement (cercle au survol)
+    show_orbit_zone_indicator = models.BooleanField(
+        default=True,
+        verbose_name="Afficher le cercle de zone de ralentissement",
+        help_text="Affiche un anneau quand la souris est dans la zone où les planètes ralentissent.",
+    )
+    orbit_zone_indicator_color = models.CharField(
+        max_length=20,
+        default="#a855f7",
+        verbose_name="Couleur du cercle (hex)",
+        help_text="Couleur de l'anneau (ex. #a855f7 violet).",
+    )
+    orbit_zone_indicator_opacity = models.FloatField(
+        default=0.28,
+        verbose_name="Opacité du cercle",
+        help_text="Opacité de l'anneau (0 = transparent, 1 = opaque).",
+    )
+
     class Meta:
         verbose_name = "Preset Explore 3D"
         verbose_name_plural = "Presets Explore 3D"

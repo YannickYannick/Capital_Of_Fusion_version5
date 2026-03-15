@@ -66,4 +66,9 @@ export interface ExplorePresetApi {
     // Oscillation des autres planètes quand une est sélectionnée (sinus)
     oscillationAmplitude?: number;
     oscillationFrequency?: number;
+
+    // Indicateur zone de ralentissement (cercle au survol)
+    showOrbitZoneIndicator?: boolean;
+    orbitZoneIndicatorColor?: string;
+    orbitZoneIndicatorOpacity?: number;
 }
