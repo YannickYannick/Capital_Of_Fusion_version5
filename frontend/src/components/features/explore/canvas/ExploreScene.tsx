@@ -332,6 +332,36 @@ const OrbitRing = memo(function OrbitRing({
   );
 });
 
+/** Anneau affiché quand la souris est dans la zone où les planètes ralentissent (survol). */
+function OrbitZoneIndicator({
+  inOrbitZoneRef,
+  orbitZoneRadiusRef,
+  show,
+}: {
+  inOrbitZoneRef: React.MutableRefObject<boolean>;
+  orbitZoneRadiusRef: React.MutableRefObject<number>;
+  show: boolean;
+}) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  useFrame(() => {
+    if (!meshRef.current || !show) return;
+    meshRef.current.visible = inOrbitZoneRef.current && orbitZoneRadiusRef.current > 0;
+    meshRef.current.scale.setScalar(orbitZoneRadiusRef.current);
+  });
+  return (
+    <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} visible={false} renderOrder={1}>
+      <ringGeometry args={[0.92, 1, 64]} />
+      <meshBasicMaterial
+        transparent
+        opacity={0.28}
+        color="#a855f7"
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
 // ─────────────────────────────────────────────────────────
 //  Planet geometries - Code splitting via ./planets/
 //  Les composants sont chargés dynamiquement via React.lazy()
@@ -402,6 +432,8 @@ interface PlanetProps {
   onTrajectoryFrame?: (cpuMs: number) => void;
   /** Option B : ombre sur le label (enableTextShadow) */
   showTextShadow?: boolean;
+  /** Ref pour afficher le label seulement quand le curseur est dans la zone des orbites (ou planète survolée/sélectionnée) */
+  inOrbitZoneRef?: React.MutableRefObject<boolean>;
 }
 
 function Planet({
@@ -451,6 +483,7 @@ function Planet({
   onEnterOrbit,
   onTrajectoryFrame,
   showTextShadow,
+  inOrbitZoneRef,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);       // temps (ms) après délai
@@ -730,8 +763,15 @@ function Planet({
         </mesh>
       )}
 
-      {/* Label */}
-      <LabelSprite text={node.name} offsetY={displayScale + 1.2} showTextShadow={showTextShadow} />
+      {/* Label : visible uniquement quand curseur dans la zone ou planète survolée/sélectionnée */}
+      <LabelSprite
+        text={node.name}
+        offsetY={displayScale + 1.2}
+        showTextShadow={showTextShadow}
+        inOrbitZoneRef={inOrbitZoneRef}
+        isHovered={isHovered}
+        isSelected={isSelected}
+      />
     </group>
   );
 }
@@ -744,11 +784,18 @@ function LabelSprite({
   text,
   offsetY,
   showTextShadow = false,
+  inOrbitZoneRef,
+  isHovered = false,
+  isSelected = false,
 }: {
   text: string;
   offsetY: number;
   /** Option B : ombre portée sur le texte (liée à enableTextShadow du contexte) */
   showTextShadow?: boolean;
+  /** Si fourni, le label n’est visible que lorsque le curseur est dans la zone des orbites ou cette planète est survolée/sélectionnée */
+  inOrbitZoneRef?: React.MutableRefObject<boolean>;
+  isHovered?: boolean;
+  isSelected?: boolean;
 }) {
   const spriteRef = useRef<THREE.Sprite>(null);
   const texture = useMemo(() => {
@@ -782,6 +829,9 @@ function LabelSprite({
     const dist = camera.position.length();
     const s = Math.max(0.5, dist * 0.12);
     spriteRef.current.scale.set(s * 1.8, s * 0.45, 1);
+    if (inOrbitZoneRef) {
+      spriteRef.current.visible = inOrbitZoneRef.current || isHovered || isSelected;
+    }
   });
 
   return (
@@ -807,6 +857,8 @@ interface SunProps {
   speedMultiplierRef: React.MutableRefObject<number>;
   /** Option B : ombre sur le label (enableTextShadow) */
   showTextShadow?: boolean;
+  /** Ref pour afficher le label seulement quand le curseur est dans la zone des orbites (ou soleil survolé/sélectionné) */
+  inOrbitZoneRef?: React.MutableRefObject<boolean>;
 }
 
 function Sun({
@@ -820,6 +872,7 @@ function Sun({
   globalPlanetScale,
   speedMultiplierRef,
   showTextShadow,
+  inOrbitZoneRef,
 }: SunProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const color = hexToColor(node.planet_color || "#fbbf24");
@@ -855,7 +908,14 @@ function Sun({
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial color={color} transparent opacity={0.06} />
       </mesh>
-      <LabelSprite text={node.name} offsetY={displayScale + 1.5} showTextShadow={showTextShadow} />
+      <LabelSprite
+        text={node.name}
+        offsetY={displayScale + 1.5}
+        showTextShadow={showTextShadow}
+        inOrbitZoneRef={inOrbitZoneRef}
+        isHovered={isHovered}
+        isSelected={isSelected}
+      />
     </group>
   );
 }
@@ -1251,6 +1311,9 @@ function SceneContent({
   // de rotation (hoverOrbitSpeedRatio / hoverPlanetSpeedRatio). Pas utilisé pour les clics
   // (gérés par R3F sur les meshes).
   const raycasterRef = useRef(new THREE.Raycaster());
+  // Refs pour l’indicateur visuel de la zone de ralentissement (affiché quand inOrbitZone)
+  const inOrbitZoneRef = useRef(false);
+  const orbitZoneRadiusRef = useRef(0);
 
   useFrame((state, delta) => {
     // Reconstruire le rayon depuis le dernier NDC pointé
@@ -1265,12 +1328,14 @@ function SceneContent({
       maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius).r;
     }
 
+    const orbitZoneRadius = maxR + 5;
+
     // Le centre du système est à [0,0,0]. 
     // On trouve approximativement la distance la plus courte entre le rayon (écran) et l'origine (système central)
     const distanceToOrigin = ray.distanceToPoint(new THREE.Vector3(0, 0, 0));
 
     // Si le pointeur vise à l'intérieur du disque global d'orbites
-    if (distanceToOrigin <= maxR + 5 && distanceToOrigin >= 0.1) {
+    if (distanceToOrigin <= orbitZoneRadius && distanceToOrigin >= 0.1) {
       // On vérifie que la hauteur du rayon (Y) lorsqu'il "croise" l'orbite 
       // est à l'intérieur de l'amplitude verticale maximale des planètes
 
@@ -1295,6 +1360,9 @@ function SceneContent({
         inOrbitZone = true;
       }
     }
+
+    inOrbitZoneRef.current = inOrbitZone;
+    orbitZoneRadiusRef.current = orbitZoneRadius;
 
     // Si une planète est pointée -> multiplier = hoverPlanetSpeedRatio
     // Si zone d'orbite survolée -> multiplier = hoverOrbitSpeedRatio
@@ -1334,6 +1402,15 @@ function SceneContent({
           );
         })}
 
+      {/* Zone de ralentissement au survol : anneau violet visible quand la souris est dans la zone des orbites */}
+      {verticalMode !== "sphere" && (
+        <OrbitZoneIndicator
+          inOrbitZoneRef={inOrbitZoneRef}
+          orbitZoneRadiusRef={orbitZoneRadiusRef}
+          show={true}
+        />
+      )}
+
       {/* Soleil ROOT */}
       {rootNode && (
         <Sun
@@ -1349,6 +1426,7 @@ function SceneContent({
           isHovered={hoveredId === rootNode.id}
           onHover={(v) => setHoveredId(v ? rootNode.id : null)}
           speedMultiplierRef={speedMultiplierRef}
+          inOrbitZoneRef={inOrbitZoneRef}
         />
       )}
 
@@ -1409,6 +1487,7 @@ function SceneContent({
             onEnterOrbit={handlePlanetEnterOrbit}
             onTrajectoryFrame={handleTrajectoryFrame}
             showTextShadow={opts.enableTextShadow}
+            inOrbitZoneRef={inOrbitZoneRef}
           />
         );
       })}

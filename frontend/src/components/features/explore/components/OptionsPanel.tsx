@@ -168,11 +168,12 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
 
     return (
         <>
-            {/* Bouton toggle et panneau en fixed (z-50) pour rester au-dessus du canvas et recevoir les clics */}
+            {/* Bouton et panneau sous la navbar (z-[60] > navbar z-50) et top suffisant pour ne pas être masqués par la hauteur du header (h-56 = 14rem) */}
             <button
                 type="button"
                 onClick={() => setVisible((v) => !v)}
-                className="fixed top-32 right-4 z-50 p-2.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-black/60 transition shadow-lg cursor-pointer"
+                className="fixed right-4 z-[60] p-2.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-black/60 transition shadow-lg cursor-pointer pointer-events-auto"
+                style={{ top: "max(14rem, 220px)" }}
                 title="Options 3D"
             >
                 ⚙️
@@ -180,7 +181,8 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
 
             {shouldRender && (
                 <aside
-                    className={`fixed top-44 right-14 z-50 w-64 max-h-[50vh] overflow-y-auto rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-2xl text-sm p-4 flex flex-col gap-3 ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
+                    className={`fixed right-14 z-[60] w-64 max-h-[50vh] overflow-y-auto rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-2xl text-sm p-4 flex flex-col gap-3 ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
+                    style={{ top: "max(15rem, 260px)" }}
                 >
                         <h2 className="text-xs font-bold text-white/50 uppercase tracking-widest">Options 3D</h2>
 

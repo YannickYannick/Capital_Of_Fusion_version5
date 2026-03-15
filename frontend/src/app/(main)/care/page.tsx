@@ -5,24 +5,34 @@ import Image from "next/image";
 import { StandardPageShell, StandardPageHero, StandardCardsGrid } from "@/components/shared/StandardPage";
 import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 
+/**
+ * Cartes de l’espace Care. Pour les rendre éditables depuis l’admin,
+ * on peut ajouter un modèle CareHubSection en base et une API dédiée.
+ */
 const sections = [
     {
-        title: "Soins & Récupération",
-        description: "Prenez soin de votre corps avec nos services dédiés aux danseurs.",
-        href: "/care/soins",
+        title: "Norme de sécurité",
+        description: "Les règles et bonnes pratiques pour évoluer en toute sécurité.",
+        href: "/care/norme-securite",
         image: "https://images.unsplash.com/photo-1544126592-807daa2b565b?w=800&auto=format&fit=crop"
+    },
+    {
+        title: "Care of your leader, care of your follower",
+        description: "Prendre soin de son partenaire en danse : écoute, respect et bienveillance.",
+        href: "/care/care-leader-follower",
+        image: "https://images.unsplash.com/photo-1529390079861-591de354faf5?w=800&auto=format&fit=crop"
+    },
+    {
+        title: "Code de conduite",
+        description: "Les valeurs et engagements de Capital of Fusion pour un cadre sain et respectueux.",
+        href: "/care/code-conduite",
+        image: "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?w=800&auto=format&fit=crop"
     },
     {
         title: "Nos Praticiens",
         description: "Découvrez l'équipe d'experts qui vous accompagne.",
         href: "/care/praticiens",
         image: "https://images.unsplash.com/photo-1598331668826-20cecc596b86?w=800&auto=format&fit=crop"
-    },
-    {
-        title: "Réservation",
-        description: "Prenez rendez-vous en ligne en quelques clics.",
-        href: "/care/reservation",
-        image: "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?w=800&auto=format&fit=crop"
     }
 ];
 
