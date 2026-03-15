@@ -56,10 +56,10 @@ export default async function ProfilsPage() {
               >
                 {/* Photo */}
                 <div className="aspect-square relative bg-black/20 overflow-hidden">
-                  {artist.profile_image ? (
+                  {(artist.profile_image ?? artist.profile_picture) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={artist.profile_image}
+                      src={(artist.profile_image ?? artist.profile_picture) ?? ""}
                       alt={artist.display_name || artist.username}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

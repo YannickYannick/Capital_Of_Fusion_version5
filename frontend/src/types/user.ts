@@ -22,6 +22,8 @@ export interface ArtistApi {
     last_name: string;
     bio: string;
     profile_picture: string | null;
+    /** URL de la photo de profil (alias API / champ backend) */
+    profile_image?: string | null;
     professions: DanceProfessionApi[];
     dance_level: LevelPublicApi | null;
     is_staff_member: boolean;
