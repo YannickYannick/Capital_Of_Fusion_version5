@@ -6,6 +6,7 @@
  * Montage différé pour prioriser le FCP.
  */
 import { useEffect, useRef, useState } from "react";
+import type { YTPlayer } from "@/types/youtube.d";
 
 export type CycleVideoConfig = {
   cycle_video_type: "youtube" | "mp4";
@@ -16,18 +17,6 @@ export type CycleVideoConfig = {
 const DEFAULT_CYCLE_YT_ID = process.env.NEXT_PUBLIC_YOUTUBE_CYCLE_VIDEO_ID || "eZhq_RMYRKQ";
 const DEFER_MOUNT_MS = 400;
 const DEFER_YT_MS = 800;
-
-declare global {
-  interface Window {
-    YT?: { Player: new (el: HTMLElement, opts: unknown) => YTPlayer };
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-
-interface YTPlayer {
-  mute: () => void;
-  destroy: () => void;
-}
 
 function formatMediaUrl(path: string | null | undefined): string | null {
   if (!path) return null;

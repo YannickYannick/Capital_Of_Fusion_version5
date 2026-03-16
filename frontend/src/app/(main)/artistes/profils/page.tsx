@@ -60,7 +60,7 @@ export default async function ProfilsPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={(artist.profile_image ?? artist.profile_picture) ?? ""}
-                      alt={`${(artist.first_name || "").trim()} ${(artist.last_name || "").trim()}`.trim() || artist.username}
+                      alt={(artist.display_name ?? `${(artist.first_name || "").trim()} ${(artist.last_name || "").trim()}`.trim()) || artist.username}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
@@ -74,7 +74,7 @@ export default async function ProfilsPage() {
                 {/* Infos */}
                 <div className="p-4">
                   <h3 className="text-white font-bold group-hover:text-purple-400 transition-colors truncate">
-                    {`${(artist.first_name || "").trim()} ${(artist.last_name || "").trim()}`.trim() || artist.username}
+                    {(artist.display_name ?? `${(artist.first_name || "").trim()} ${(artist.last_name || "").trim()}`.trim()) || artist.username}
                   </h3>
                   {artist.professions && artist.professions.length > 0 && (
                     <p className="text-white/50 text-sm mt-1 truncate">

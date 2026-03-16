@@ -1,22 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-declare global {
-  interface Window {
-    YT?: { Player: new (el: HTMLElement, opts: unknown) => YTPlayer };
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-
-interface YTPlayer {
-  mute: () => void;
-  unMute: () => void;
-  isMuted: () => boolean;
-  setPlaybackQuality: (quality: string) => void;
-  getAvailableQualityLevels: () => string[];
-  destroy: () => void;
-}
+import type { YTPlayer } from "@/types/youtube.d";
 
 const QUALITY_OPTIONS = [
   { value: "medium", label: "360p" },

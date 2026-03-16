@@ -2,7 +2,7 @@
  * Page principale Formations — catalogue de cours avec filtres style/niveau.
  */
 import { getCourses } from "@/lib/api";
-import type { CourseApi } from "@/types/course";
+import type { CourseListApi } from "@/types/course";
 
 const LEVEL_COLORS: Record<string, string> = {
   "Débutant": "from-emerald-500/20 to-emerald-500/5 border-emerald-500/40 text-emerald-400",
@@ -18,7 +18,7 @@ const STYLE_ICONS: Record<string, string> = {
   "Urban Kiz": "🏙️",
 };
 
-function CourseCard({ course }: { course: CourseApi }) {
+function CourseCard({ course }: { course: CourseListApi }) {
   const levelColor = LEVEL_COLORS[course.level_name] ?? "from-white/10 to-white/5 border-white/20 text-white/70";
   const icon = STYLE_ICONS[course.style_name] ?? "🎵";
 
@@ -48,7 +48,7 @@ function CourseCard({ course }: { course: CourseApi }) {
 }
 
 export default async function FormationsPage() {
-  let courses: CourseApi[] = [];
+  let courses: CourseListApi[] = [];
   try {
     courses = await getCourses();
   } catch {

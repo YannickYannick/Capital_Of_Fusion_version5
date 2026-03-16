@@ -177,6 +177,9 @@ Après avoir sauvegardé les variables, **lancer un redeploy** (Deployments → 
 
 ## En cas de problème
 
+- **Build Vercel échoue (Type error: Property 'X' does not exist on type 'Y')**  
+  Erreur TypeScript au build : un champ utilisé dans le code n’est pas déclaré sur le type (ex. `ArtistApi`). Corriger en ajoutant le champ au type (ex. dans `frontend/src/types/user.ts`) en optionnel si l’API ne l’envoie pas toujours (`champ?: type`), puis commit + push. Vérifier que le **dernier commit** sur `main` est bien celui poussé (Vercel clone le commit indiqué ; en cas de Redeploy sur un ancien déploiement, le vieux commit est reconstruit). Préférer un nouveau déploiement depuis la branche `main` plutôt qu’un Redeploy sur un build précédent.
+
 - **502 / 503 backend :** vérifier que la commande de démarrage est bien gunicorn et que `PORT` est utilisé (Railway/Render injectent `PORT`). Si erreur « gunicorn: command not found », utiliser `python -m gunicorn` au lieu de `gunicorn`.
 - **CORS bloqué :** les URLs \*.vercel.app sont autorisées par le code (regex en prod). Si l’erreur continue :
   1. **Railway doit déployer le code à jour.** Si le correctif CORS est sur une branche (ex. `fix/vercel-api-connection`), soit merger cette branche dans `main` et pousser (Railway déploie alors depuis `main`), soit dans Railway → Settings du service → **Branch** = ta branche, puis **Redeploy**.

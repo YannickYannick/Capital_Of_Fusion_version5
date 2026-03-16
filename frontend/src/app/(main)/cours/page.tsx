@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getCourses } from "@/lib/api";
 import { createCourse, updateCourse, deleteCourse } from "@/lib/adminApi";
-import type { CourseApi } from "@/types/course";
+import type { CourseListApi } from "@/types/course";
 import { AdminAddButton, AdminEditButton } from "@/components/admin/AdminEditButton";
 import { AdminModal, AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "@/components/admin/AdminModal";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
@@ -29,7 +29,7 @@ function CourseModal({
   onClose,
   onSuccess,
 }: {
-  course: CourseApi | null;
+  course: CourseListApi | null;
   onClose: () => void;
   onSuccess: () => void;
 }) {
@@ -125,14 +125,14 @@ function CourseModal({
 }
 
 export default function CoursPage() {
-  const [courses, setCourses] = useState<CourseApi[]>([]);
+  const [courses, setCourses] = useState<CourseListApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState("");
   const [style, setStyle] = useState("");
 
   // Admin state
-  const [editingCourse, setEditingCourse] = useState<CourseApi | null>(null);
+  const [editingCourse, setEditingCourse] = useState<CourseListApi | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
   const fetchCourses = () => {

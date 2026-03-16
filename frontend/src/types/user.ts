@@ -24,6 +24,8 @@ export interface ArtistApi {
     profile_picture: string | null;
     /** URL de la photo de profil (alias API / champ backend) */
     profile_image?: string | null;
+    /** Nom d’affichage (optionnel, sinon first_name + last_name) */
+    display_name?: string | null;
     professions: DanceProfessionApi[];
     /** Styles de danse (optionnel, selon l’API) */
     styles?: Array<{ id: string; name: string }>;

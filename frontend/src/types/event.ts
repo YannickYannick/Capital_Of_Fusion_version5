@@ -7,10 +7,13 @@ export interface EventApi {
   slug: string;
   type: string;
   description: string;
+  short_description?: string | null;
   start_date: string;
   end_date: string;
   location_name: string;
   node: string | null;
   node_name: string | null;
   image: string | null;
+  /** Alias possible de l’API */
+  cover_image?: string | null;
 }

@@ -57,8 +57,8 @@ export default async function FestivalsPage() {
 }
 
 function EventCard({ event, index }: { event: EventApi; index: number }) {
-  const startDate = new Date(event.start_datetime);
-  const endDate = event.end_datetime ? new Date(event.end_datetime) : null;
+  const startDate = new Date(event.start_date);
+  const endDate = event.end_date ? new Date(event.end_date) : null;
   
   const dateStr = startDate.toLocaleDateString("fr-FR", {
     day: "numeric",
@@ -74,11 +74,11 @@ function EventCard({ event, index }: { event: EventApi; index: number }) {
     >
       {/* Image */}
       <div className="aspect-video relative bg-black/20 overflow-hidden">
-        {event.cover_image ? (
+        {(event.cover_image ?? event.image) ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={event.cover_image}
-            alt={event.title}
+            src={(event.cover_image ?? event.image) ?? ""}
+            alt={event.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
@@ -105,15 +105,15 @@ function EventCard({ event, index }: { event: EventApi; index: number }) {
           Festival
         </span>
         <h3 className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">
-          {event.title}
+          {event.name}
         </h3>
-        {event.location && (
+        {event.location_name && (
           <p className="text-white/50 text-sm mt-2 flex items-center gap-2">
-            <span>📍</span> {event.location}
+            <span>📍</span> {event.location_name}
           </p>
         )}
-        {event.short_description && (
-          <p className="text-white/60 text-sm mt-2 line-clamp-2">{event.short_description}</p>
+        {(event.short_description ?? event.description) && (
+          <p className="text-white/60 text-sm mt-2 line-clamp-2">{event.short_description ?? event.description}</p>
         )}
       </div>
     </Link>

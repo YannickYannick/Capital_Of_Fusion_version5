@@ -1185,7 +1185,7 @@ interface SceneContentProps {
   allPositions?: React.MutableRefObject<Map<string, THREE.Vector3>>;
   onFirstFrame?: () => void;
   /** Appelé quand toutes les planètes (orbitNodes) ont fini leur animation d'entrée */
-  onAllPlanetsOnOrbit?: () => void;
+  onAllPlanetsOnOrbit?: (trajectoryCpuMs?: number) => void;
 }
 
 function SceneContent({
@@ -1563,7 +1563,7 @@ interface ExploreSceneProps {
   onSceneReady?: () => void;
   onPlanetsLoaded?: (count: number) => void;
   /** Appelé quand toutes les planètes sont en orbite (fin phase d'entrée) */
-  onAllPlanetsOnOrbit?: () => void;
+  onAllPlanetsOnOrbit?: (trajectoryCpuMs?: number) => void;
 }
 
 /**

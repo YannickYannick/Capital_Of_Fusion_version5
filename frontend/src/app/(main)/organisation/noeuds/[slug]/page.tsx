@@ -16,7 +16,7 @@ import {
   getApiBaseUrl,
 } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
-import type { CourseApi } from "@/types/course";
+import type { CourseListApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
 
 function formatDate(dateStr: string): string {
@@ -39,7 +39,7 @@ export default function NoeudProfilPage() {
   const params = useParams();
   const slug = typeof params?.slug === "string" ? params.slug : "";
   const [node, setNode] = useState<OrganizationNodeApi | null>(null);
-  const [courses, setCourses] = useState<CourseApi[]>([]);
+  const [courses, setCourses] = useState<CourseListApi[]>([]);
   const [events, setEvents] = useState<EventApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
