@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
 import type { MenuItemApi } from "@/types/menu";
@@ -16,6 +17,8 @@ import { useAuth } from "@/contexts/AuthContext";
  */
 export function Navbar() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("navbar");
   const { user, loading, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItemApi[] | null>(null);
@@ -218,11 +221,30 @@ export function Navbar() {
               </Link>
             )
           )}
+          <div className="flex items-center gap-1 ml-2" aria-label={t("language")}>
+            {(["fr", "en", "es"] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => {
+                  document.cookie = `locale=${l}; path=/; max-age=31536000`;
+                  router.refresh();
+                }}
+                className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition ${
+                  locale === l
+                    ? "bg-purple-500/20 border-purple-500/50 text-purple-300"
+                    : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-purple-500/30 hover:text-purple-200"
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
           {!loading && user ? (
             <Link
               href="/dashboard"
               className="ml-2 w-9 h-9 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-sm font-bold text-purple-300 hover:scale-105 transition-transform"
-              title="Mon Espace"
+              title={t("mySpace")}
             >
               {(user.first_name?.[0] ?? user.username[0]).toUpperCase()}
             </Link>
@@ -230,8 +252,8 @@ export function Navbar() {
             <Link
               href="/login"
               className="ml-2 w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 transition-all"
-              aria-label="Connexion"
-              title="Connexion"
+              aria-label={t("login")}
+              title={t("login")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
