@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "modeltranslation",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -93,6 +94,15 @@ LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "Europe/Paris"
 USE_I18N = True
 USE_TZ = True
+
+LANGUAGES = [
+    ("fr", "Francais"),
+    ("en", "English"),
+    ("es", "Espanol"),
+]
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = "fr"
+MODELTRANSLATION_FALLBACK_LANGUAGES = ("fr", "en")
 
 STATIC_URL = "static/"
 MEDIA_URL = "/media/"
