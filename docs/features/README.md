@@ -13,6 +13,7 @@ Documentation par feature : où c’est dans le code, comment ça fonctionne, co
 | [Nos partenaires](partenaires.md) | `partenaires.md` | Structures, événements et cours partenaires (app `partners`, APIs dédiées, pages type organisation/événements/cours) |
 | [Landing — Config admin](landing-config.md) | `landing-config.md` | Hero et boutons (titres, textes, liens) configurables dans l’admin |
 | [Navbar & Dashboard](navbar-dashboard.md) | `navbar-dashboard.md` | Logo, avatar connecté, lien DB menu (admins), dashboard sans iframes |
+| **i18n / traduction** | [../explication/traduction-i18n.md](../explication/traduction-i18n.md) | Multilingue FR/EN/ES, next-intl + modeltranslation + Gemini ; spec complète dans explication |
 
 ---
 

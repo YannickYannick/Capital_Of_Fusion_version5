@@ -43,6 +43,7 @@ Guides pour comprendre et utiliser des fonctionnalités du projet.
 | [seo-guide.md](explication/seo-guide.md) | SEO : title, description, Open Graph, robots, sitemap (étapes et où c’est dans le code) |
 | [donnees_demo.md](explication/donnees_demo.md) | Données démo : commandes `load_initial_data` / `load_demo_data`, contenu créé |
 | [hebergement.md](explication/hebergement.md) | Hébergement cible : Vercel (front) + Railway ou Render (back), pour ~100 users/jour |
+| [traduction-i18n.md](explication/traduction-i18n.md) | i18n FR/EN/ES : next-intl, django-modeltranslation, Gemini Flash, user stories, erreurs et workflow admin |
 
 ---
 
@@ -75,4 +76,4 @@ Source : `C:\...\Projet - site bachata V4\refactorisation_V5_Structuré\`
 
 ---
 
-*Dernière mise à jour : 2026-03-07*
+*Dernière mise à jour : 2026-03-08*

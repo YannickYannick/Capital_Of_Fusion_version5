@@ -192,6 +192,41 @@
 
 ---
 
+## Epic 7 — Internationalisation (FR / EN / ES)
+
+Spécification détaillée, flux d’erreurs et workflow admin : **[../explication/traduction-i18n.md](../explication/traduction-i18n.md)**.
+
+### US-7.1 — Choisir la langue du site (interface)
+
+**En tant que** visiteur,  
+**je veux** basculer entre français, anglais et espagnol pour l’interface et les URLs,  
+**afin de** consulter le site dans ma langue.
+
+- **AC 1 :** Sélecteur de langue visible (desktop + mobile), URLs avec préfixe `/fr`, `/en`, `/es` (SEO).
+- **AC 2 :** Les libellés de navigation et textes statiques viennent des fichiers de messages (next-intl).
+
+### US-7.2 — Contenu dynamique dans ma langue
+
+**En tant que** visiteur,  
+**je veux** voir les titres et descriptions des cours, événements, etc. dans la langue choisie quand une traduction validée existe,  
+**afin de** comprendre l’offre sans être bloqué par le français.
+
+- **AC 1 :** L’API accepte une langue (ex. paramètre ou en-tête) et renvoie les champs traduits **validés**.
+- **AC 2 :** Si la traduction validée manque, **affichage du texte français** (fallback).
+
+### US-7.3 — Traduire le contenu depuis l’admin
+
+**En tant que** staff,  
+**je veux** lancer une traduction automatique (Gemini) par objet ou en masse, puis valider avant publication,  
+**afin de** gagner du temps tout en contrôlant la qualité.
+
+- **AC 1 :** Commande `translate_models` + bouton « Traduire » sur la fiche + action « Traduire la sélection » en liste.
+- **AC 2 :** Les traductions auto ne **remplacent pas** une version existante sans signal explicite (« mise à jour disponible »).
+- **AC 3 :** Statut **en attente de validation** avant exposition publique ; barre de progression « X / Y langues ».
+- **AC 4 :** Si le texte FR change, les traductions sont marquées **obsolètes** ; en cas d’erreur API : **retry** + fallback FR côté site.
+
+---
+
 ## Correspondance PRD ↔ User Stories
 
 | Epic PRD | User Stories |
@@ -202,7 +237,8 @@
 | Epic 4 | US-4.1, US-4.2 |
 | Epic 5 | US-5.1, US-5.2 |
 | Epic 6 | US-6.1 à US-6.4 (backlog) |
+| Epic 7 (i18n) | US-7.1 à US-7.3 — voir [traduction-i18n.md](../explication/traduction-i18n.md) |
 
 ---
 
-*Dernière mise à jour : 2025-02-10*
+*Dernière mise à jour : 2026-03-08*
