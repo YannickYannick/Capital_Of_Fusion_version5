@@ -30,13 +30,34 @@ export function getApiBaseUrl(): string {
   return "http://localhost:8000";
 }
 
+type ApiLocale = "fr" | "en" | "es";
+
+function getLocaleFromCookie(): ApiLocale | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split(";")
+    .map((v) => v.trim())
+    .find((v) => v.startsWith("locale="));
+  if (!match) return null;
+  const value = match.split("=").slice(1).join("=").trim();
+  if (value === "fr" || value === "en" || value === "es") return value;
+  return null;
+}
+
+function addLangParam(url: string, lang: ApiLocale | null): string {
+  if (!lang) return url;
+  return url.includes("?") ? `${url}&lang=${encodeURIComponent(lang)}` : `${url}?lang=${encodeURIComponent(lang)}`;
+}
+
 /**
  * Récupère les entrées de menu racine (avec children récursifs).
  * GET /api/menu/items/
  */
 export async function getMenuItems(): Promise<MenuItemApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/menu/items/`, { next: { revalidate: 60 } });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/menu/items/`, lang);
+  const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Menu API error: ${res.status}`);
   return res.json();
 }
@@ -47,7 +68,9 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
  */
 export async function getSiteConfig(): Promise<SiteConfigurationApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/config/`, { next: { revalidate: 60 } });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/config/`, lang);
+  const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Config API error: ${res.status}`);
   return res.json();
 }
@@ -57,7 +80,9 @@ export async function getSiteConfig(): Promise<SiteConfigurationApi> {
  */
 export async function getBulletins(): Promise<BulletinApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/identite/bulletins/`, { next: { revalidate: 60 } });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/identite/bulletins/`, lang);
+  const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Bulletins API error: ${res.status}`);
   return res.json();
 }
@@ -67,7 +92,9 @@ export async function getBulletins(): Promise<BulletinApi[]> {
  */
 export async function getBulletinBySlug(slug: string): Promise<BulletinApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/identite/bulletins/${encodeURIComponent(slug)}/`, { next: { revalidate: 60 } });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/identite/bulletins/${encodeURIComponent(slug)}/`, lang);
+  const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Bulletin API error: ${res.status}`);
   return res.json();
 }
@@ -220,11 +247,13 @@ export interface CoursesQuery {
  */
 export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]> {
   const base = getApiBaseUrl();
+  const lang = getLocaleFromCookie();
   const search = new URLSearchParams();
   if (params?.style) search.set("style", params.style);
   if (params?.level) search.set("level", params.level);
   if (params?.node) search.set("node", params.node);
   if (params?.day !== undefined) search.set("day", params.day.toString());
+  if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/?${qs}` : `${base}/api/courses/`;
   const res = await fetch(url);
@@ -237,7 +266,9 @@ export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]
  */
 export async function getCourseBySlug(slug: string): Promise<CourseApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/courses/${encodeURIComponent(slug)}/`);
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/courses/${encodeURIComponent(slug)}/`, lang);
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Course API error: ${res.status}`);
   return res.json();
 }
@@ -254,10 +285,12 @@ export interface SchedulesQuery {
  */
 export async function getCourseSchedules(params?: SchedulesQuery): Promise<SchedulePlanningApi[]> {
   const base = getApiBaseUrl();
+  const lang = getLocaleFromCookie();
   const search = new URLSearchParams();
   if (params?.day !== undefined) search.set("day", params.day.toString());
   if (params?.style) search.set("style", params.style);
   if (params?.level) search.set("level", params.level);
+  if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/schedules/?${qs}` : `${base}/api/courses/schedules/`;
   const res = await fetch(url);
@@ -277,10 +310,12 @@ export interface EventsQuery {
  */
 export async function getEvents(params?: EventsQuery): Promise<EventApi[]> {
   const base = getApiBaseUrl();
+  const lang = getLocaleFromCookie();
   const search = new URLSearchParams();
   if (params?.type) search.set("type", params.type);
   if (params?.node) search.set("node", params.node);
   if (params?.upcoming) search.set("upcoming", "1");
+  if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/events/?${qs}` : `${base}/api/events/`;
   const res = await fetch(url);
@@ -293,7 +328,9 @@ export async function getEvents(params?: EventsQuery): Promise<EventApi[]> {
  */
 export async function getEventBySlug(slug: string): Promise<EventApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/events/${encodeURIComponent(slug)}/`);
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/events/${encodeURIComponent(slug)}/`, lang);
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Event API error: ${res.status}`);
   return res.json();
 }
@@ -303,7 +340,9 @@ export async function getEventBySlug(slug: string): Promise<EventApi> {
  */
 export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/organization/nodes/`, { cache: 'no-store' });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/organization/nodes/`, lang);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization nodes API error: ${res.status}`);
   return res.json();
 }
@@ -313,7 +352,9 @@ export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
  */
 export async function getOrganizationNodesForStructure(): Promise<OrganizationNodeApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/organization/nodes/?for_structure=1`, { cache: 'no-store' });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/organization/nodes/?for_structure=1`, lang);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization structure API error: ${res.status}`);
   return res.json();
 }
@@ -323,7 +364,9 @@ export async function getOrganizationNodesForStructure(): Promise<OrganizationNo
  */
 export async function getPoles(): Promise<PoleApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/organization/poles/`, { cache: "no-store" });
+  const lang = getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/organization/poles/`, lang);
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Poles API error: ${res.status}`);
   return res.json();
 }
@@ -334,10 +377,11 @@ export async function getPoles(): Promise<PoleApi[]> {
  */
 export async function getStaffMembers(poleSlug?: string): Promise<StaffMemberApi[]> {
   const base = getApiBaseUrl();
+  const lang = getLocaleFromCookie();
   const url = poleSlug
     ? `${base}/api/organization/staff/?pole=${encodeURIComponent(poleSlug)}`
     : `${base}/api/organization/staff/`;
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(addLangParam(url, lang), { cache: "no-store" });
   if (!res.ok) throw new Error(`Staff API error: ${res.status}`);
   return res.json();
 }
@@ -349,8 +393,12 @@ export async function getOrganizationNodeBySlug(
   slug: string
 ): Promise<OrganizationNodeApi> {
   const base = getApiBaseUrl();
+  const lang = getLocaleFromCookie();
   const res = await fetch(
-    `${base}/api/organization/nodes/${encodeURIComponent(slug)}/`
+    addLangParam(
+      `${base}/api/organization/nodes/${encodeURIComponent(slug)}/`,
+      lang
+    )
   );
   if (!res.ok) throw new Error(`Organization node API error: ${res.status}`);
   return res.json();
