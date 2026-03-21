@@ -1,0 +1,79 @@
+Section,Page ou contexte,Zone visible (utilisateur),Type,Identifiant technique,Cible FR,Cible EN,Cible ES,Commentaire lié à la traduction
+Parcours visiteur,Layout,Libellés navbar (Langue,,,,,,ça me va mais Lees libellés son traduit qu'en français actuellement
+Parcours visiteur,Layout,Libellés menu déroulant (Identité COF,,,,,,ça me va mais Lees libellés son traduit qu'en français actuellement
+Parcours visiteur,Layout,Entrées menu pilotées par API,dynamique,MenuItem.name,name_fr,name_en,name_es,Je sais pas a quoi ça correspond
+Parcours visiteur,Layout,Fond vidéo / config site,dynamique,SiteConfiguration (vidéos),champs non traduits ou partiels,idem,idem,pas besoin de tradcution pour l'instant
+Parcours visiteur,/,Titres / sous-titres hero landing,en dur,LandingPageClient.tsx,Texte FR,Texte en dur EN,Texte en dur ES,ça me va mais Lees titres sont traduit qu'en français actuellement
+Parcours visiteur,/,Hero unifié SiteConfiguration (option),dynamique,hero_title,,,,pas besoin pour l'instant
+Parcours visiteur,/,Boutons CTA (Commencer,,,,,,Faut les tradduire en fonction de la langue en statique
+Parcours visiteur,/identite-cof/notre-vision,Corps page Notre vision,dynamique,vision_markdown,vision_markdown_fr,vision_markdown_en,vision_markdown_es,okay on garde
+Parcours visiteur,/identite-cof/notre-histoire,Corps Notre histoire,dynamique,history_markdown,history_markdown_fr,history_markdown_en,history_markdown_es,okay on garde
+Parcours visiteur,/identite-cof/bulletins,Titre de chaque carte,dynamique,Bulletin.title,title_fr,title_en,title_es,okay on garde
+Parcours visiteur,/identite-cof/bulletins/[slug],Titre du bulletin,dynamique,title,title_fr,title_en,title_es,okay on garde
+Parcours visiteur,/identite-cof/bulletins/[slug],Contenu markdown,dynamique,content_markdown,content_markdown_fr,content_markdown_en,content_markdown_es,okay on garde
+Parcours visiteur,/identite-cof/bulletins/*/edit,Édition bulletin,dynamique,title,,,,"Okay, c'est pour les admins français"
+Parcours visiteur,/organisation/poles,Nom de chaque pôle,dynamique,Pole.name,name_fr,name_en,name_es,okay on garde
+Parcours visiteur,/organisation/structure,Noms / descriptions nœuds,dynamique,OrganizationNode,name_fr,,,okay on garde
+Parcours visiteur,/organisation/noeuds/[slug],Titre,,,,,,pas besoin de tradcution
+Parcours visiteur,/organisation/staff,Nom,,,,,,pas besoin de tradcution
+Parcours visiteur,/cours,Nom + description cours,dynamique,Course.name,,,,Besoin de traduction pour que les etrangers comprennent
+Parcours visiteur,/cours,Filtres styles / niveaux / professions,dynamique,DanceStyle,,,,Besoin de traduction pour que les etrangers comprennent
+Parcours visiteur,/cours/[slug],Détail cours,dynamique,Course,*_fr,*_en,*_es,okay on garde
+Parcours visiteur,/cours/[slug],Lieu créneaux,dynamique,Schedule.location_name,location_name_fr,location_name_en,location_name_es,Pas besoin de traduction pour le nom d'un lieu
+Parcours visiteur,/cours/planning,,,,,,,"besoin de traduction, mais normalement les cours et evennement seront deja traduit donc rien a faire"
+Parcours visiteur,/evenements,Nom,,,,,,"besoin de traduction, mais normalement les cours et evennement seront deja traduit donc rien a faire"
+Parcours visiteur,/evenements/[slug],Détail + passes,dynamique,Event + EventPass.name,*_fr,*_en,*_es,Okay good
+Parcours visiteur,/evenements/festivals,Liste festivals,dynamique,Event,*_fr,*_en,*_es,Okay good
+Parcours visiteur,/explore,,,,,,,Okay good
+Parcours visiteur,/formations/*,Cartes cours,dynamique,Course,*_fr,*_en,*_es,Okay good
+Parcours visiteur,/theorie/cours,Titres + contenu leçons,dynamique,TheoryLesson.title,,,,Faudra des version espagnol et anglaise pour chaque lesson
+Parcours visiteur,/partenaires/structures,,,,,,,"Okay good, les structures gardent leur nom"
+Parcours visiteur,/partenaires/evenements,Événements,dynamique,Event,*_fr,*_en,*_es,"good, meme structure que la page /evenements"
+Parcours visiteur,/partenaires/cours,Cours,dynamique,Course,*_fr,*_en,*_es,"good, meme structure que la page /evenements"
+Parcours visiteur,/shop/*,Produits / catégories,BDD hors translation.py core,modèles shop,—,—,—,Faudra des version espagnol et anglaise pour chaque produit
+Parcours visiteur,/care/*,Soins / praticiens,BDD care,—,—,—,—,Faudra des version espagnol et anglaise pour chaque praticiens
+Parcours visiteur,/login,,,,,,,Faudra des version espagnol et anglaise pour chaque utilisateur
+Parcours visiteur,/dashboard/pending-edits,File d'attente,métier,PendingContentEdit,—,—,—,La c'est pour les français tkt
+Inventaire BDD (champ),core.SiteConfiguration,site_name,dynamique,site_name,site_name_fr,site_name_en,site_name_es,le site est toujours le meme pas besoin de traduction
+Inventaire BDD (champ),core.SiteConfiguration,hero_title,dynamique,hero_title,hero_title_fr,hero_title_en,hero_title_es,le site est toujours le meme pas besoin de traduction
+Inventaire BDD (champ),core.SiteConfiguration,hero_subtitle,dynamique,hero_subtitle,hero_subtitle_fr,hero_subtitle_en,hero_subtitle_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,hero_top_text,dynamique,hero_top_text,hero_top_text_fr,hero_top_text_en,hero_top_text_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,hero_descr_1,dynamique,hero_descr_1,hero_descr_1_fr,hero_descr_1_en,hero_descr_1_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,hero_descr_2,dynamique,hero_descr_2,hero_descr_2_fr,hero_descr_2_en,hero_descr_2_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,hero_btn_1_text,dynamique,hero_btn_1_text,hero_btn_1_text_fr,hero_btn_1_text_en,hero_btn_1_text_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,hero_btn_2_text,dynamique,hero_btn_2_text,hero_btn_2_text_fr,hero_btn_2_text_en,hero_btn_2_text_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,hero_footer_text,dynamique,hero_footer_text,hero_footer_text_fr,hero_footer_text_en,hero_footer_text_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,vision_markdown,dynamique,vision_markdown,vision_markdown_fr,vision_markdown_en,vision_markdown_es,Okay good
+Inventaire BDD (champ),core.SiteConfiguration,history_markdown,dynamique,history_markdown,history_markdown_fr,history_markdown_en,history_markdown_es,Okay good
+Inventaire BDD (champ),core.MenuItem,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),core.Bulletin,title,dynamique,title,title_fr,title_en,title_es,Okay good
+Inventaire BDD (champ),core.Bulletin,content_markdown,dynamique,content_markdown,content_markdown_fr,content_markdown_en,content_markdown_es,Okay good
+Inventaire BDD (champ),core.DanceStyle,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),core.DanceStyle,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),core.Level,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),core.Level,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),core.DanceProfession,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),core.DanceProfession,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),organization.Pole,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),organization.OrganizationNode,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),organization.OrganizationNode,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),organization.OrganizationNode,short_description,dynamique,short_description,short_description_fr,short_description_en,short_description_es,Okay good
+Inventaire BDD (champ),organization.OrganizationNode,content,dynamique,content,content_fr,content_en,content_es,Okay good
+Inventaire BDD (champ),organization.OrganizationNode,cta_text,dynamique,cta_text,cta_text_fr,cta_text_en,cta_text_es,Okay good
+Inventaire BDD (champ),organization.OrganizationRole,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),organization.OrganizationRole,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),organization.NodeEvent,title,dynamique,title,title_fr,title_en,title_es,Okay good
+Inventaire BDD (champ),organization.NodeEvent,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),organization.NodeEvent,location,dynamique,location,location_fr,location_en,location_es,pas besoin de tradcution pour un lieu
+Inventaire BDD (champ),organization.TeamMember,name,dynamique,name,name_fr,name_en,name_es,pas besoin de tradcution pour un nom de personne
+Inventaire BDD (champ),organization.TeamMember,role,dynamique,role,role_fr,role_en,role_es,Okay good
+Inventaire BDD (champ),organization.TeamMember,bio,dynamique,bio,bio_fr,bio_en,bio_es,Okay good
+Inventaire BDD (champ),courses.Course,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),courses.Course,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),courses.Schedule,location_name,dynamique,location_name,location_name_fr,location_name_en,location_name_es,pas besoin de tradcution pour un lieu
+Inventaire BDD (champ),courses.TheoryLesson,title,dynamique,title,title_fr,title_en,title_es,Okay good
+Inventaire BDD (champ),courses.TheoryLesson,content,dynamique,content,content_fr,content_en,content_es,Okay good
+Inventaire BDD (champ),events.Event,name,dynamique,name,name_fr,name_en,name_es,Okay good
+Inventaire BDD (champ),events.Event,description,dynamique,description,description_fr,description_en,description_es,Okay good
+Inventaire BDD (champ),events.Event,location_name,dynamique,location_name,location_name_fr,location_name_en,location_name_es,pas besoin de tradcution pour un lieu
+Inventaire BDD (champ),events.EventPass,name,dynamique,name,name_fr,name_en,name_es,Cest quoi ?

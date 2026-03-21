@@ -190,3 +190,76 @@ export async function rejectPendingEdit(id: number): Promise<PendingContentEditA
     });
     return handleResponse(res);
 }
+
+// ─── Traductions (admin) ─────────────────────────────────────────────────────
+export type TranslateTargetLang = "en" | "es";
+
+export interface AdminTranslateResponse {
+    results: Record<
+        TranslateTargetLang,
+        | { status: "ok"; output: string }
+        | { status: "error"; error: string }
+    >;
+}
+
+export async function translateModelsAdmin(payload: {
+    targets: TranslateTargetLang[];
+    limit?: number;
+    dry_run?: boolean;
+    model?: string;
+    fields?: string[];
+}): Promise<AdminTranslateResponse> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/translate/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+    });
+    return handleResponse(res) as Promise<AdminTranslateResponse>;
+}
+
+export interface AdminTranslatePreviewResponse {
+    model: string;
+    object_id: number;
+    field: string;
+    target: TranslateTargetLang;
+    source: string;
+    current_target: string;
+    suggestion: string;
+}
+
+export async function previewTranslationAdmin(payload: {
+    model: string;
+    object_id?: number;
+    field: string;
+    target: TranslateTargetLang;
+}): Promise<AdminTranslatePreviewResponse> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/translate/preview/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+    });
+    return handleResponse(res) as Promise<AdminTranslatePreviewResponse>;
+}
+
+export interface AdminTranslateApplyResponse {
+    model: string;
+    object_id: number;
+    field: string;
+    target: TranslateTargetLang;
+    saved: boolean;
+}
+
+export async function applyTranslationAdmin(payload: {
+    model: string;
+    object_id?: number;
+    field: string;
+    target: TranslateTargetLang;
+    value: string;
+}): Promise<AdminTranslateApplyResponse> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/translate/apply/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+    });
+    return handleResponse(res) as Promise<AdminTranslateApplyResponse>;
+}

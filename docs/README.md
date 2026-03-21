@@ -4,6 +4,14 @@ Index de la documentation du projet (méthodologie BMAD).
 
 ---
 
+## Index technique (brownfield / IA)
+
+| Fichier | Rôle |
+|---------|------|
+| [**index.md**](index.md) | Point d’entrée unique : vue d’ensemble monorepo, liens vers architecture, API, modèles, guide dev (workflow **document-project**) |
+
+---
+
 ## 📋 BMAD — Documents de référence (`bmad/`)
 
 | # | Fichier | Rôle |

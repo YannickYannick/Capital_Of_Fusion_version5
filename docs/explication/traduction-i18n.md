@@ -2,6 +2,8 @@
 
 Documentation de référence pour la traduction du site : **frontend** (next-intl), **backend** (django-modeltranslation), **traduction automatique** (Gemini Flash via Google AI Studio), **user stories** validées et **gestion des erreurs / mises à jour**.
 
+**Tableaux de données (MCP / inventaire)** : dossier [`../mcp-traduction/README.md`](../mcp-traduction/README.md) — champs BDD, pages, vue visiteur FR/EN/ES.
+
 **Branche de travail prévue :** `traduction`  
 **Statut :** spécification et doc — implémentation à faire.
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { patchSiteConfigVision } from "@/lib/api";
 import { markdownToHtml } from "@/lib/markdownToHtml";
@@ -14,6 +15,7 @@ interface NotreVisionClientProps {
 
 export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [vision, setVision] = useState(initialVision);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(initialVision);
@@ -22,6 +24,15 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+
+  // Quand la locale change, le Server Component recharge `initialVision`,
+  // mais comme on le stocke dans du state, il faut le resynchroniser.
+  useEffect(() => {
+    if (!editing) {
+      setVision(initialVision);
+      setEditValue(initialVision);
+    }
+  }, [initialVision, editing]);
 
   const handleStartEdit = () => {
     setEditValue(vision);
@@ -47,11 +58,13 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
         setVision(editValue);
         setEditing(false);
         setSaveMessage("Modification enregistrée. Elle sera visible après approbation par un administrateur.");
+        router.refresh();
         return;
       }
       setVision(editValue);
       setEditing(false);
       setSaveMessage("Enregistré.");
+      router.refresh();
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : "Erreur lors de l'enregistrement");
     } finally {

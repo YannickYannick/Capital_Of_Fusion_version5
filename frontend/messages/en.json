@@ -2,7 +2,49 @@
   "navbar": {
     "language": "Language",
     "mySpace": "My Space",
-    "login": "Login"
+    "login": "Log in",
+    "ariaMainNav": "Main navigation",
+    "logoAlt": "Capital of Fusion",
+    "mobile": {
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "mobileNavLabel": "Mobile menu",
+      "logout": "Log out",
+      "expandSubmenu": "Expand submenu {label}",
+      "submenuFor": "Submenu {label}"
+    },
+    "menu": {
+      "identiteCof": "COF identity",
+      "ourVision": "Our vision",
+      "ourHistory": "Our history",
+      "ourBulletins": "Latest updates",
+      "ongoing": "Current",
+      "courses": "Classes",
+      "events": "Events",
+      "shop": "Shop",
+      "trainings": "Trainings",
+      "ourPartners": "Our partners",
+      "partnerStructures": "Partner organizations",
+      "partnerEvents": "Partner events",
+      "partnerCourses": "Partner classes",
+      "promotionsFestivals": "Festival promotions",
+      "organisation": "Organization",
+      "structure": "Structure",
+      "poles": "Poles",
+      "other": "Other",
+      "theory": "Theory",
+      "care": "Care",
+      "projects": "Projects",
+      "files": "Files"
+    }
+  },
+  "landing": {
+    "badge": "New immersive experience",
+    "title": "Capital of Fusion",
+    "subtitle1": "Discover the world of Bachata like never before.",
+    "subtitle2": "An interactive 3D experience at the heart of dance.",
+    "ctaExplore": "Start the experience",
+    "ctaCourses": "View classes",
+    "footerLine": "Paris, France • National Dance School"
   }
 }
-

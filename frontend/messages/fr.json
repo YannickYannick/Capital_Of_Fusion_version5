@@ -2,7 +2,49 @@
   "navbar": {
     "language": "Langue",
     "mySpace": "Mon Espace",
-    "login": "Connexion"
+    "login": "Connexion",
+    "ariaMainNav": "Navigation principale",
+    "logoAlt": "Capital of Fusion",
+    "mobile": {
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu",
+      "mobileNavLabel": "Menu mobile",
+      "logout": "Déconnexion",
+      "expandSubmenu": "Déplier le sous-menu {label}",
+      "submenuFor": "Sous-menu {label}"
+    },
+    "menu": {
+      "identiteCof": "Identité COF",
+      "ourVision": "Notre vision",
+      "ourHistory": "Notre histoire",
+      "ourBulletins": "Dernières informations",
+      "ongoing": "En cours",
+      "courses": "Cours",
+      "events": "Événements",
+      "shop": "Shop",
+      "trainings": "Trainings",
+      "ourPartners": "Nos partenaires",
+      "partnerStructures": "Structures partenaires",
+      "partnerEvents": "Événements des partenaires",
+      "partnerCourses": "Cours des partenaires",
+      "promotionsFestivals": "Promotions festivals",
+      "organisation": "Organisation",
+      "structure": "Structure",
+      "poles": "Pôles",
+      "other": "Autre",
+      "theory": "Théorie",
+      "care": "Care",
+      "projects": "Projets",
+      "files": "Fichiers"
+    }
+  },
+  "landing": {
+    "badge": "Nouvelle Version Immersive",
+    "title": "Capital of Fusion",
+    "subtitle1": "Découvrez l'univers de la Bachata comme jamais.",
+    "subtitle2": "Une expérience interactive en 3D au cœur de la danse.",
+    "ctaExplore": "Commencer l'Expérience",
+    "ctaCourses": "Voir les Cours",
+    "footerLine": "Paris, France • École Nationale de Danse"
   }
 }
-

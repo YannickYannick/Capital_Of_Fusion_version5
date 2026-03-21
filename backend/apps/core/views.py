@@ -1,13 +1,18 @@
 """
 Vues API Core — menu (items racine avec children récursifs), health check.
 """
+import os
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.core.management import call_command
+from django.apps import apps
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from google import genai
+from .gemini_utils import gemini_error_message
 from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin, PendingContentEdit
 from .serializers import (
     MenuItemSerializer,
@@ -19,6 +24,36 @@ from .serializers import (
 )
 from .permissions import IsStaffOrSuperUser, IsSuperUser
 from .pending_edits import apply_pending_edit
+
+# Langues alignées sur modeltranslation (vision_markdown_fr / _en / _es).
+TRANSLATION_LANGS = frozenset({"fr", "en", "es"})
+
+
+def _request_translation_lang(request):
+    lang = (request.GET.get("lang") or "fr").strip().lower()
+    return lang if lang in TRANSLATION_LANGS else "fr"
+
+
+def _apply_siteconfig_translated_payload(config: SiteConfiguration, payload: dict, lang: str) -> None:
+    """
+    Écrit sur les colonnes réelles modeltranslation (ex. vision_markdown_fr).
+    setattr(config, "vision_markdown", ...) ne persiste pas de façon fiable sans
+    activation de langue cohérente avec modeltranslation.
+    """
+    for base in ("vision_markdown", "history_markdown"):
+        if base in payload:
+            setattr(config, f"{base}_{lang}", payload[base])
+    config.save()
+
+
+def _user_is_admin_direct(user) -> bool:
+    """Superuser ou compte ADMIN (même si is_superuser désynchronisé en base)."""
+    if not user or not user.is_authenticated:
+        return False
+    if getattr(user, "is_superuser", False):
+        return True
+    return getattr(user, "user_type", None) == "ADMIN"
+
 
 class SiteConfigurationAPIView(APIView):
     """GET /api/config/ — lecture publique de la configuration."""
@@ -76,6 +111,7 @@ class SiteConfigurationAdminAPIView(APIView):
     permission_classes = [IsStaffOrSuperUser]
 
     def patch(self, request):
+        lang = _request_translation_lang(request)
         config = SiteConfiguration.objects.first()
         if not config:
             config = SiteConfiguration.objects.create()
@@ -87,16 +123,15 @@ class SiteConfigurationAdminAPIView(APIView):
         if not payload:
             serializer = SiteConfigurationSerializer(config, context={'request': request})
             return Response(serializer.data)
-        if getattr(request.user, "is_superuser", False):
-            for key, value in payload.items():
-                setattr(config, key, value)
-            config.save(update_fields=list(payload.keys()) + ["updated_at"])
+        if _user_is_admin_direct(request.user):
+            _apply_siteconfig_translated_payload(config, payload, lang)
             serializer = SiteConfigurationSerializer(config, context={'request': request})
             return Response(serializer.data)
+        pending_payload = {**payload, "_lang": lang}
         PendingContentEdit.objects.create(
             content_type=PendingContentEdit.ContentType.SITECONFIG,
             object_id="",
-            payload=payload,
+            payload=pending_payload,
             requested_by=request.user,
         )
         return Response(
@@ -138,14 +173,26 @@ class BulletinAdminDetailAPIView(APIView):
 
     def patch(self, request, slug):
         bulletin = get_object_or_404(Bulletin, slug=slug)
-        if getattr(request.user, "is_superuser", False):
-            serializer = BulletinAdminSerializer(bulletin, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+        lang = _request_translation_lang(request)
+        if _user_is_admin_direct(request.user):
+            data = request.data
+            if "title" in data:
+                setattr(bulletin, f"title_{lang}", data["title"])
+            if "content_markdown" in data:
+                setattr(bulletin, f"content_markdown_{lang}", data["content_markdown"])
+            if "slug" in data:
+                bulletin.slug = data["slug"]
+            if "published_at" in data:
+                bulletin.published_at = data["published_at"]
+            if "is_published" in data:
+                bulletin.is_published = data["is_published"]
+            bulletin.save()
+            serializer = BulletinAdminSerializer(bulletin, context={"request": request})
             return Response(serializer.data)
         serializer = BulletinAdminSerializer(bulletin, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         payload = dict(serializer.validated_data)
+        payload["_lang"] = lang
         PendingContentEdit.objects.create(
             content_type=PendingContentEdit.ContentType.BULLETIN,
             object_id=slug,
@@ -248,3 +295,217 @@ class PendingContentEditDetailAPIView(APIView):
         edit.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
         serializer = PendingContentEditSerializer(edit)
         return Response(serializer.data)
+
+
+class AdminTranslateAPIView(APIView):
+    """
+    POST /api/admin/translate/
+
+    Permet de déclencher la commande management `translate_models` pour les traductions EN/ES.
+    Ce endpoint est prévu pour l'UX "bouton admin → popup → lancer traduction".
+    """
+
+    permission_classes = [IsSuperUser]
+
+    def post(self, request):
+        targets = request.data.get("targets") or []
+        if isinstance(targets, str):
+            targets = [targets]
+
+        targets = [str(t).lower().strip() for t in targets]
+        allowed = {"en", "es"}
+        if not targets or any(t not in allowed for t in targets):
+            return Response(
+                {"error": "targets doit contenir uniquement 'en' et/ou 'es'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Limite prudente : translate_models peut consommer plusieurs requêtes Gemini par objet (un champ manquant = une requête)
+        limit = request.data.get("limit", 1)
+        try:
+            limit = int(limit)
+        except (TypeError, ValueError):
+            return Response({"error": "limit doit être un entier"}, status=status.HTTP_400_BAD_REQUEST)
+
+        dry_run = bool(request.data.get("dry_run", False))
+
+        model_filter = str(request.data.get("model") or "").strip()
+        fields_filter = request.data.get("fields") or []
+        if isinstance(fields_filter, str):
+            fields_filter = [f.strip() for f in fields_filter.split(",") if f.strip()]
+        fields_filter = [str(f).strip() for f in fields_filter if str(f).strip()]
+
+        results = {}
+        # Important: call_command peut être long, mais c'est un endpoint admin.
+        from io import StringIO
+
+        for lang in targets:
+            out = StringIO()
+            try:
+                call_command(
+                    "translate_models",
+                    target=lang,
+                    limit=limit,
+                    dry_run=dry_run,
+                    model=model_filter,
+                    fields=",".join(fields_filter) if fields_filter else "",
+                    stdout=out,
+                )
+                results[lang] = {"status": "ok", "output": out.getvalue().strip()}
+            except Exception as e:
+                results[lang] = {"status": "error", "error": str(e)}
+
+        return Response({"results": results}, status=status.HTTP_200_OK)
+
+
+class _TranslationAdminMixin:
+    ALLOWED_TARGETS = {"en", "es"}
+    # Liste blanche explicite (extensible) des champs traduisibles via popup admin.
+    ALLOWED_MODEL_FIELDS = {
+        "core.SiteConfiguration": {"vision_markdown", "history_markdown"},
+    }
+
+    def _parse_target(self, request):
+        target = str(request.data.get("target") or "").strip().lower()
+        if target not in self.ALLOWED_TARGETS:
+            raise ValueError("target doit être 'en' ou 'es'")
+        return target
+
+    def _parse_model_field(self, request):
+        model_name = str(request.data.get("model") or "").strip()
+        field_name = str(request.data.get("field") or "").strip()
+        if model_name not in self.ALLOWED_MODEL_FIELDS:
+            raise ValueError("model non autorisé")
+        if field_name not in self.ALLOWED_MODEL_FIELDS[model_name]:
+            raise ValueError("field non autorisé pour ce model")
+        return model_name, field_name
+
+    def _resolve_object(self, *, model_name: str, request):
+        app_label, model_label = model_name.split(".", 1)
+        Model = apps.get_model(app_label, model_label)
+
+        object_id = request.data.get("object_id")
+        if model_name == "core.SiteConfiguration":
+            if object_id in (None, "", 0, "0"):
+                obj = Model.objects.first()
+                if not obj:
+                    obj = Model.objects.create()
+                return obj
+        if object_id in (None, ""):
+            raise ValueError("object_id est requis pour ce model")
+        try:
+            object_id = int(object_id)
+        except (TypeError, ValueError):
+            raise ValueError("object_id doit être un entier")
+        return get_object_or_404(Model, pk=object_id)
+
+    def _gemini_translate(self, *, text: str, target_lang: str, context: str) -> str:
+        api_key = os.getenv("GEMINI_API_KEY", "")
+        if not api_key:
+            raise RuntimeError("Missing GEMINI_API_KEY environment variable")
+        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
+        client = genai.Client(api_key=api_key)
+
+        prompt = (
+            f"Tu es un traducteur professionnel.\n"
+            f"Contexte du champ : {context}\n"
+            f"Langue cible : {target_lang}\n\n"
+            f"Règles :\n"
+            f"- Traduire uniquement.\n"
+            f"- Conserver la mise en forme (Markdown si présent) et les retours à la ligne.\n"
+            f"- Ne pas altérer les slugs / codes / URLs.\n\n"
+            f"Texte à traduire :\n{text}"
+        )
+        try:
+            resp = client.models.generate_content(model=model_name, contents=prompt)
+        except Exception as e:
+            msg = str(e)
+            raise RuntimeError(
+                gemini_error_message(msg, api_key=api_key, model_name=model_name)
+            ) from e
+        return (getattr(resp, "text", None) or str(resp)).strip()
+
+
+class AdminTranslatePreviewAPIView(_TranslationAdminMixin, APIView):
+    """
+    POST /api/admin/translate/preview/
+    Body: { model, object_id?, field, target }
+    Retour: source + valeur cible actuelle + suggestion Gemini.
+    """
+
+    permission_classes = [IsSuperUser]
+
+    def post(self, request):
+        try:
+            target = self._parse_target(request)
+            model_name, field_name = self._parse_model_field(request)
+            obj = self._resolve_object(model_name=model_name, request=request)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        source_val = getattr(obj, field_name, "") or ""
+        if not source_val:
+            return Response(
+                {"error": "Le champ source FR est vide, rien à traduire."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        current_target = getattr(obj, f"{field_name}_{target}", "") or ""
+        context = f"{model_name}.{field_name}"
+        try:
+            suggestion = self._gemini_translate(
+                text=str(source_val),
+                target_lang=target,
+                context=context,
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {
+                "model": model_name,
+                "object_id": obj.pk,
+                "field": field_name,
+                "target": target,
+                "source": str(source_val),
+                "current_target": str(current_target),
+                "suggestion": suggestion,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class AdminTranslateApplyAPIView(_TranslationAdminMixin, APIView):
+    """
+    POST /api/admin/translate/apply/
+    Body: { model, object_id?, field, target, value }
+    Écrit explicitement la traduction choisie par l'admin.
+    """
+
+    permission_classes = [IsSuperUser]
+
+    def post(self, request):
+        try:
+            target = self._parse_target(request)
+            model_name, field_name = self._parse_model_field(request)
+            obj = self._resolve_object(model_name=model_name, request=request)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        value = request.data.get("value")
+        if value is None:
+            return Response({"error": "value est requis"}, status=status.HTTP_400_BAD_REQUEST)
+        value = str(value)
+
+        setattr(obj, f"{field_name}_{target}", value)
+        obj.save(update_fields=[f"{field_name}_{target}", "updated_at"])
+
+        return Response(
+            {
+                "model": model_name,
+                "object_id": obj.pk,
+                "field": field_name,
+                "target": target,
+                "saved": True,
+            },
+            status=status.HTTP_200_OK,
+        )

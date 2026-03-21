@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Type d'une entrée de menu pour la nav (racine ou fallback).
@@ -28,6 +29,7 @@ export function MobileNav({
 }) {
   const [open, setOpen] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
+  const t = useTranslations("navbar");
 
   return (
     <div className="md:hidden">
@@ -35,7 +37,7 @@ export function MobileNav({
         type="button"
         onClick={() => setOpen(!open)}
         className="p-2 text-white/90 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
-        aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+        aria-label={open ? t("mobile.closeMenu") : t("mobile.openMenu")}
         aria-expanded={open}
         aria-controls="mobile-menu"
       >
@@ -64,7 +66,12 @@ export function MobileNav({
         </svg>
       </button>
       {open && (
-        <div id="mobile-menu" role="navigation" aria-label="Menu mobile" className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
+        <div
+          id="mobile-menu"
+          role="navigation"
+          aria-label={t("mobile.mobileNavLabel")}
+          className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto"
+        >
           {items.map(({ href, label, children }) => (
             <div key={href + label}>
               {children.length > 0 ? (
@@ -87,7 +94,7 @@ export function MobileNav({
                       className="p-3 -mr-3 text-white/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded"
                       aria-expanded={expandedSlug === label}
                       aria-controls={`mobile-submenu-${label.replace(/\s+/g, "-")}`}
-                      aria-label={`Déplier le sous-menu ${label}`}
+                      aria-label={t("mobile.expandSubmenu", { label })}
                     >
                       <span className={`text-xs transition inline-block ${expandedSlug === label ? "rotate-180" : ""}`}>
                         ▾
@@ -95,7 +102,12 @@ export function MobileNav({
                     </button>
                   </div>
                   {expandedSlug === label && (
-                    <div id={`mobile-submenu-${label.replace(/\s+/g, "-")}`} className="pl-6 pb-2 flex flex-col gap-1" role="group" aria-label={`Sous-menu ${label}`}>
+                    <div
+                      id={`mobile-submenu-${label.replace(/\s+/g, "-")}`}
+                      className="pl-6 pb-2 flex flex-col gap-1"
+                      role="group"
+                      aria-label={t("mobile.submenuFor", { label })}
+                    >
                       {children.map((child) => {
                         const url = child.url || "#";
                         return (
@@ -133,18 +145,18 @@ export function MobileNav({
                 setOpen(false);
               }}
               className="w-full text-left px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
-              aria-label="Déconnexion"
+              aria-label={t("mobile.logout")}
             >
-              Déconnexion
+              {t("mobile.logout")}
             </button>
           ) : (
             <Link
               href="/login"
               onClick={() => setOpen(false)}
               className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
-              aria-label="Connexion"
+              aria-label={t("login")}
             >
-              Connexion
+              {t("login")}
             </Link>
           )}
         </div>

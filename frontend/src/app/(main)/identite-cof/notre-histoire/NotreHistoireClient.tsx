@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { patchSiteConfigHistory } from "@/lib/api";
 import { markdownToHtml } from "@/lib/markdownToHtml";
@@ -15,6 +16,7 @@ interface NotreHistoireClientProps {
 
 export function NotreHistoireClient({ initialHistory }: NotreHistoireClientProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [history, setHistory] = useState(initialHistory);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(initialHistory);
@@ -23,6 +25,14 @@ export function NotreHistoireClient({ initialHistory }: NotreHistoireClientProps
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+
+  // Synchronisation avec la prop `initialHistory` (rechargée après changement de locale).
+  useEffect(() => {
+    if (!editing) {
+      setHistory(initialHistory);
+      setEditValue(initialHistory);
+    }
+  }, [initialHistory, editing]);
 
   const handleStartEdit = () => {
     setEditValue(history);
@@ -48,11 +58,13 @@ export function NotreHistoireClient({ initialHistory }: NotreHistoireClientProps
         setHistory(editValue);
         setEditing(false);
         setSaveMessage("Modification enregistrée. Elle sera visible après approbation par un administrateur.");
+        router.refresh();
         return;
       }
       setHistory(editValue);
       setEditing(false);
       setSaveMessage("Enregistré.");
+      router.refresh();
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : "Erreur lors de l'enregistrement");
     } finally {

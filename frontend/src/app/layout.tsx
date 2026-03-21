@@ -38,7 +38,7 @@ export const metadata: Metadata = {
  * Layout racine — 1 layout partagé pour toutes les pages (main).
  * Vidéos fond : YouTube (embeds).
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

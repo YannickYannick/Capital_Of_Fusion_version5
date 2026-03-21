@@ -2,18 +2,56 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
 import type { MenuItemApi } from "@/types/menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { AdminTranslateButton } from "@/components/admin/AdminTranslateButton";
+
+function normPath(u: string): string {
+  return (u || "").replace(/\/$/, "") || "/";
+}
+
+/** Slugs racine masqués (remplacés par les entrées injectées Identité / En cours / etc.). */
+const EXCLUDED_ROOT_SLUGS = new Set([
+  "identite-cof",
+  "formations",
+  "cours",
+  "evenements",
+  "shop",
+  "trainings",
+  "promotions-festivals",
+  "login",
+]);
+
+const EXCLUDED_ROOT_PATHS = new Set([
+  "/identite-cof",
+  "/identite-cof/notre-vision",
+  "/identite-cof/notre-histoire",
+  "/identite-cof/bulletins",
+  "/formations",
+  "/promotions-festivals",
+  "/cours",
+  "/evenements",
+  "/shop",
+  "/trainings",
+]);
+
+type NavLink = {
+  href: string;
+  label: string;
+  slug?: string;
+  children: MenuItemApi[];
+};
 
 /**
  * Navbar — transparente en haut, bg-black/80 backdrop-blur au scroll.
  * Menu piloté par l'API GET /api/menu/items/ (admin Django).
  * Fallback liens statiques si l'API est indisponible.
+ * Libellés injectés via next-intl (`navbar.menu.*`).
  */
 export function Navbar() {
   const router = useRouter();
@@ -36,115 +74,282 @@ export function Navbar() {
       .catch(() => setMenuError(true));
   }, []);
 
-  // Entrée "Identité COF" toujours en premier (affichée même si l'API ne la renvoie pas encore)
-  const identiteCofEntry = {
-    href: "/identite-cof",
-    label: "Identité COF",
-    children: [
-      { id: "id-vision", name: "Notre vision", url: "/identite-cof/notre-vision", slug: "identite-vision", icon: "", order: 1, is_active: true, children: [] },
-      { id: "id-histoire", name: "Notre histoire", url: "/identite-cof/notre-histoire", slug: "identite-histoire", icon: "", order: 2, is_active: true, children: [] },
-      { id: "id-bulletins", name: "Dernières informations", url: "/identite-cof/bulletins", slug: "identite-bulletins", icon: "", order: 3, is_active: true, children: [] },
-    ] as MenuItemApi[],
-  };
-
-  // "En cours" — sous-menu Cours, Événements, Shop, Trainings (plus en entrées racine)
-  const enCoursEntry = {
-    href: "/contact",
-    label: "En cours",
-    children: [
-      { id: "en-cours-cours", name: "Cours", url: "/cours", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "en-cours-evenements", name: "Événements", url: "/evenements", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "en-cours-shop", name: "Shop", url: "/shop", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "en-cours-trainings", name: "Trainings", url: "/trainings", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[],
-  };
-
-  // "Nos partenaires" — toujours affiché quand on utilise l'API (injection comme Identité COF / En cours)
-  const partenairesEntry = {
-    href: "/partenaires",
-    label: "Nos partenaires",
-    children: [
-      { id: "pstr", name: "Structures partenaires", url: "/partenaires/structures", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "pev", name: "Événements des partenaires", url: "/partenaires/evenements", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "pcours", name: "Cours des partenaires", url: "/partenaires/cours", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[],
-  };
-
-  // "Promotions festivals" — festivals des partenaires (lien direct)
-  const promotionsFestivalsEntry = {
-    href: "/promotions-festivals",
-    label: "Promotions festivals",
-    children: [] as MenuItemApi[],
-  };
-
-  // "Organisation" et "Autre" — utilisés dans l'ordre fixe du menu
-  const organisationEntry = {
-    href: "/organisation",
-    label: "Organisation",
-    children: [
-      { id: "o1", name: "Structure", url: "/organisation/structure/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "o2", name: "Pôles", url: "/organisation/poles/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[],
-  };
-  const autreEntry = {
-    href: "#",
-    label: "Autre",
-    children: [
-      { id: "th1", name: "Théorie", url: "/theorie/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "ca1", name: "Care", url: "/care/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "p1", name: "Projets", url: "/projets/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-      { id: "f1", name: "Fichiers", url: "/fichiers/", slug: "", icon: "", order: 0, is_active: true, children: [] },
-    ] as MenuItemApi[],
-  };
-
-  const fallbackLinks = [
+  const {
     identiteCofEntry,
-    organisationEntry,
+    enCoursEntry,
     partenairesEntry,
     promotionsFestivalsEntry,
+    organisationEntry,
     autreEntry,
-    enCoursEntry,
-  ];
+  } = useMemo(() => {
+    const identiteCofEntry: NavLink = {
+      href: "/identite-cof",
+      label: t("menu.identiteCof"),
+      children: [
+        {
+          id: "id-vision",
+          name: t("menu.ourVision"),
+          url: "/identite-cof/notre-vision",
+          slug: "identite-vision",
+          icon: "",
+          order: 1,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "id-histoire",
+          name: t("menu.ourHistory"),
+          url: "/identite-cof/notre-histoire",
+          slug: "identite-histoire",
+          icon: "",
+          order: 2,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "id-bulletins",
+          name: t("menu.ourBulletins"),
+          url: "/identite-cof/bulletins",
+          slug: "identite-bulletins",
+          icon: "",
+          order: 3,
+          is_active: true,
+          children: [],
+        },
+      ],
+    };
 
-  const apiLinks =
-    menuItems?.length && !menuError
-      ? menuItems
-          .map((item) => ({
-            href: item.url || "/",
-            label: item.name,
-            children: item.children ?? [],
-          }))
-          // Ne pas afficher en racine Identité COF, Notre vision, Bulletins, Formations ; Cours, Événements, Shop, Trainings passent dans "En cours"
-          .filter((item) => {
-            const h = (item.href || "").replace(/\/$/, "") || "/";
-            return (
-              item.label !== "Identité COF" &&
-              item.label !== "Notre vision" &&
-              item.label !== "Notre histoire" &&
-              item.label !== "Dernières informations" &&
-              item.label !== "Formations" &&
-              item.label !== "Promotions festivals" &&
-              item.label !== "Cours" &&
-              item.label !== "Événements" &&
-              item.label !== "Shop" &&
-              item.label !== "Trainings" &&
-              h !== "/identite-cof/notre-vision" &&
-              h !== "/identite-cof/notre-histoire" &&
-              h !== "/identite-cof/bulletins" &&
-              h !== "/formations" &&
-              h !== "/promotions-festivals" &&
-              h !== "/cours" &&
-              h !== "/evenements" &&
-              h !== "/shop" &&
-              h !== "/trainings"
-            );
-          })
-      : [];
+    const enCoursEntry: NavLink = {
+      href: "/contact",
+      label: t("menu.ongoing"),
+      children: [
+        {
+          id: "en-cours-cours",
+          name: t("menu.courses"),
+          url: "/cours",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "en-cours-evenements",
+          name: t("menu.events"),
+          url: "/evenements",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "en-cours-shop",
+          name: t("menu.shop"),
+          url: "/shop",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "en-cours-trainings",
+          name: t("menu.trainings"),
+          url: "/trainings",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+      ],
+    };
 
-  // Ordre fixe du menu : Identité COF → Organisation → Nos partenaires → Promotions festivals → Autre → En cours
-  const findFromApi = (label: string) => apiLinks.find((l) => l.label === label);
-  const organisationFromApi = findFromApi("Organisation");
-  const autreFromApi = findFromApi("Autre");
+    const partenairesEntry: NavLink = {
+      href: "/partenaires",
+      label: t("menu.ourPartners"),
+      children: [
+        {
+          id: "pstr",
+          name: t("menu.partnerStructures"),
+          url: "/partenaires/structures",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "pev",
+          name: t("menu.partnerEvents"),
+          url: "/partenaires/evenements",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "pcours",
+          name: t("menu.partnerCourses"),
+          url: "/partenaires/cours",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+      ],
+    };
+
+    const promotionsFestivalsEntry: NavLink = {
+      href: "/promotions-festivals",
+      label: t("menu.promotionsFestivals"),
+      children: [],
+    };
+
+    const organisationEntry: NavLink = {
+      href: "/organisation",
+      label: t("menu.organisation"),
+      children: [
+        {
+          id: "o1",
+          name: t("menu.structure"),
+          url: "/organisation/structure/",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "o2",
+          name: t("menu.poles"),
+          url: "/organisation/poles/",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+      ],
+    };
+
+    const autreEntry: NavLink = {
+      href: "#",
+      label: t("menu.other"),
+      children: [
+        {
+          id: "th1",
+          name: t("menu.theory"),
+          url: "/theorie/",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "ca1",
+          name: t("menu.care"),
+          url: "/care/",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "p1",
+          name: t("menu.projects"),
+          url: "/projets/",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "f1",
+          name: t("menu.files"),
+          url: "/fichiers/",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+      ],
+    };
+
+    return {
+      identiteCofEntry,
+      enCoursEntry,
+      partenairesEntry,
+      promotionsFestivalsEntry,
+      organisationEntry,
+      autreEntry,
+    };
+  }, [t]);
+
+  const fallbackLinks = useMemo(
+    () => [
+      identiteCofEntry,
+      organisationEntry,
+      partenairesEntry,
+      promotionsFestivalsEntry,
+      autreEntry,
+      enCoursEntry,
+    ],
+    [
+      identiteCofEntry,
+      organisationEntry,
+      partenairesEntry,
+      promotionsFestivalsEntry,
+      autreEntry,
+      enCoursEntry,
+    ],
+  );
+
+  const apiLinks = useMemo(() => {
+    if (!menuItems?.length || menuError) return [];
+    return menuItems
+      .map((item) => ({
+        href: item.url || "/",
+        label: item.name,
+        slug: item.slug,
+        children: item.children ?? [],
+      }))
+      .filter((item) => {
+        if (item.slug && EXCLUDED_ROOT_SLUGS.has(item.slug)) return false;
+        const h = normPath(item.href);
+        if (EXCLUDED_ROOT_PATHS.has(h)) return false;
+        return true;
+      });
+  }, [menuItems, menuError]);
+
+  const organisationFromApi = useMemo(() => {
+    if (!menuItems?.length || menuError) return null;
+    const m = menuItems.find((item) => item.slug === "organisation");
+    if (!m) return null;
+    return {
+      href: m.url || "/",
+      label: m.name,
+      children: m.children ?? [],
+    };
+  }, [menuItems, menuError]);
+
+  const autreFromApi = useMemo(() => {
+    if (!menuItems?.length || menuError) return null;
+    const m = menuItems.find((item) => item.slug === "autre");
+    if (!m) return null;
+    return {
+      href: m.url || "/",
+      label: m.name,
+      children: m.children ?? [],
+    };
+  }, [menuItems, menuError]);
 
   const links =
     apiLinks.length > 0
@@ -158,25 +363,25 @@ export function Navbar() {
         ]
       : fallbackLinks;
 
-  const filteredLinks = links.filter(
-    link => link.label.toLowerCase() !== "login" && link.href !== "/login"
-  );
+  const filteredLinks = links.filter((link) => normPath(link.href).toLowerCase() !== "/login");
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-        ? "bg-black/80 backdrop-blur-md border-b border-white/10"
-        : "bg-transparent"
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "bg-black/80 backdrop-blur-md border-b border-white/10" : "bg-transparent"
+      }`}
     >
-      <nav className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${scrolled ? "h-20" : "h-56"} flex items-center justify-between`} aria-label="Navigation principale">
+      <nav
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${scrolled ? "h-20" : "h-56"} flex items-center justify-between`}
+        aria-label={t("ariaMainNav")}
+      >
         <Link
           href="/"
           className="hover:scale-105 transition transform origin-left whitespace-nowrap flex-shrink-0"
         >
           <Image
             src="/logo.png"
-            alt="Capital of Fusion"
+            alt={t("logoAlt")}
             width={600}
             height={200}
             className={`transition-all duration-300 ${scrolled ? "h-16" : "h-48"} w-auto object-contain`}
@@ -188,7 +393,10 @@ export function Navbar() {
           {filteredLinks.map(({ href, label, children }) =>
             children.length > 0 ? (
               <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
-                <Link href={href} className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1">
+                <Link
+                  href={href}
+                  className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                >
                   {label}
                 </Link>
                 <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -219,7 +427,7 @@ export function Navbar() {
               >
                 {label}
               </Link>
-            )
+            ),
           )}
           <div className="flex items-center gap-1 ml-2" aria-label={t("language")}>
             {(["fr", "en", "es"] as const).map((l) => (
@@ -228,7 +436,7 @@ export function Navbar() {
                 type="button"
                 onClick={() => {
                   document.cookie = `locale=${l}; path=/; max-age=31536000`;
-                  router.refresh();
+                  window.location.reload();
                 }}
                 className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition ${
                   locale === l
@@ -240,6 +448,7 @@ export function Navbar() {
               </button>
             ))}
           </div>
+          <AdminTranslateButton />
           {!loading && user ? (
             <Link
               href="/dashboard"

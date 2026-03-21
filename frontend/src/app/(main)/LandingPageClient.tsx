@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePrefetchExplore } from "@/hooks/usePrefetchExplore";
 
 export default function LandingPageClient() {
     const router = useRouter();
+    const t = useTranslations("landing");
     const opts = usePlanetsOptions();
     const [isTransitioning, setIsTransitioning] = useState(false);
 
-    // Précharge Three.js et ExploreScene après 3s sur la page d'accueil
     usePrefetchExplore(3000);
 
     const handleStartPushed = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -34,15 +35,15 @@ export default function LandingPageClient() {
 
             <section className="relative z-10 max-w-3xl mx-auto text-center">
                 <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
-                    Nouvelle Version Immersive
+                    {t("badge")}
                 </p>
                 <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-200 bg-clip-text text-transparent">
-                    Capital of Fusion
+                    {t("title")}
                 </h1>
                 <p className="mt-6 text-lg sm:text-xl text-white/85 leading-relaxed">
-                    Découvrez l&apos;univers de la Bachata comme jamais.
+                    {t("subtitle1")}
                     <br />
-                    Une expérience interactive en 3D au cœur de la danse.
+                    {t("subtitle2")}
                 </p>
 
                 <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
@@ -51,7 +52,7 @@ export default function LandingPageClient() {
                         onClick={handleStartPushed}
                         className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition cursor-pointer relative overflow-hidden group"
                     >
-                        <span className="relative z-10">Commencer l&apos;Expérience</span>
+                        <span className="relative z-10">{t("ctaExplore")}</span>
                         {isTransitioning && (
                             <span
                                 className="absolute inset-0 bg-purple-400/30 z-0 w-0 origin-left animate-progress-full"
@@ -63,12 +64,12 @@ export default function LandingPageClient() {
                         href="/cours"
                         className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition"
                     >
-                        Voir les Cours
+                        {t("ctaCourses")}
                     </Link>
                 </div>
 
                 <p className="mt-8 text-sm text-white/50">
-                    Paris, France • École Nationale de Danse
+                    {t("footerLine")}
                 </p>
             </section>
         </div>

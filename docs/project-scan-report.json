@@ -1,0 +1,52 @@
+{
+  "workflow_version": "1.2.0",
+  "workflow_name": "document-project",
+  "timestamps": {
+    "started": "2025-03-07T12:00:00Z",
+    "last_updated": "2025-03-07T12:00:00Z",
+    "completed": "2025-03-07T12:00:00Z"
+  },
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "output_folder": "docs/",
+  "repository_type": "monorepo",
+  "project_parts": [
+    {
+      "part_id": "frontend",
+      "project_type_id": "web",
+      "root_path": "frontend/",
+      "summary": "Next.js 15, React 19, Tailwind, next-intl, Three.js"
+    },
+    {
+      "part_id": "backend",
+      "project_type_id": "backend",
+      "root_path": "backend/",
+      "summary": "Django 5, DRF, PostgreSQL, modeltranslation"
+    }
+  ],
+  "completed_steps": [
+    {
+      "step": "step_1",
+      "status": "completed",
+      "summary": "Classified as monorepo with 2 parts (web + backend)"
+    },
+    {
+      "step": "step_12",
+      "status": "completed",
+      "summary": "Documentation pack written to docs/ (index, overview, architecture, api, data-models, dev guide, components, source tree)"
+    }
+  ],
+  "current_step": "completed",
+  "outputs_generated": [
+    "index.md",
+    "project-overview.md",
+    "architecture.md",
+    "source-tree-analysis.md",
+    "api-contracts.md",
+    "data-models-backend.md",
+    "development-guide.md",
+    "component-inventory-frontend.md",
+    "project-scan-report.json"
+  ],
+  "resume_instructions": "Workflow terminé ; mettre à jour les .md si le code change significativement."
+}

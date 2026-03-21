@@ -32,15 +32,29 @@ export function getApiBaseUrl(): string {
 
 type ApiLocale = "fr" | "en" | "es";
 
-function getLocaleFromCookie(): ApiLocale | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie
-    .split(";")
-    .map((v) => v.trim())
-    .find((v) => v.startsWith("locale="));
-  if (!match) return null;
-  const value = match.split("=").slice(1).join("=").trim();
-  if (value === "fr" || value === "en" || value === "es") return value;
+async function getLocaleFromCookie(): Promise<ApiLocale | null> {
+  // Côté client : `document.cookie`.
+  if (typeof document !== "undefined") {
+    const match = document.cookie
+      .split(";")
+      .map((v) => v.trim())
+      .find((v) => v.startsWith("locale="));
+    if (!match) return null;
+    const value = match.split("=").slice(1).join("=").trim();
+    if (value === "fr" || value === "en" || value === "es") return value;
+    return null;
+  }
+
+  // Côté serveur : `next/headers` (pour que les Server Components
+  // puissent appeler l'API Django avec `?lang=...`).
+  try {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const requested = cookieStore.get("locale")?.value;
+    if (requested === "fr" || requested === "en" || requested === "es") return requested;
+  } catch {
+    // ignore : environnement non compatible
+  }
   return null;
 }
 
@@ -55,7 +69,7 @@ function addLangParam(url: string, lang: ApiLocale | null): string {
  */
 export async function getMenuItems(): Promise<MenuItemApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/menu/items/`, lang);
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Menu API error: ${res.status}`);
@@ -68,7 +82,7 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
  */
 export async function getSiteConfig(): Promise<SiteConfigurationApi> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/config/`, lang);
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Config API error: ${res.status}`);
@@ -80,7 +94,7 @@ export async function getSiteConfig(): Promise<SiteConfigurationApi> {
  */
 export async function getBulletins(): Promise<BulletinApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/identite/bulletins/`, lang);
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Bulletins API error: ${res.status}`);
@@ -92,7 +106,7 @@ export async function getBulletins(): Promise<BulletinApi[]> {
  */
 export async function getBulletinBySlug(slug: string): Promise<BulletinApi> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/identite/bulletins/${encodeURIComponent(slug)}/`, lang);
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Bulletin API error: ${res.status}`);
@@ -108,7 +122,9 @@ export async function patchSiteConfigVision(visionMarkdown: string): Promise<Sit
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/config/`, {
+  const lang = (await getLocaleFromCookie()) ?? "fr";
+  const url = addLangParam(`${base}/api/admin/config/`, lang);
+  const res = await fetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -132,7 +148,9 @@ export async function patchSiteConfigHistory(historyMarkdown: string): Promise<S
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/config/`, {
+  const lang = (await getLocaleFromCookie()) ?? "fr";
+  const url = addLangParam(`${base}/api/admin/config/`, lang);
+  const res = await fetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -171,7 +189,12 @@ export async function getAdminBulletinBySlug(slug: string): Promise<BulletinAdmi
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`, {
+  const lang = (await getLocaleFromCookie()) ?? "fr";
+  const url = addLangParam(
+    `${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`,
+    lang
+  );
+  const res = await fetch(url, {
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Admin bulletin API error: ${res.status}`);
@@ -219,7 +242,12 @@ export async function patchBulletin(
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`, {
+  const lang = (await getLocaleFromCookie()) ?? "fr";
+  const url = addLangParam(
+    `${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`,
+    lang
+  );
+  const res = await fetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -247,7 +275,7 @@ export interface CoursesQuery {
  */
 export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const search = new URLSearchParams();
   if (params?.style) search.set("style", params.style);
   if (params?.level) search.set("level", params.level);
@@ -266,7 +294,7 @@ export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]
  */
 export async function getCourseBySlug(slug: string): Promise<CourseApi> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/courses/${encodeURIComponent(slug)}/`, lang);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Course API error: ${res.status}`);
@@ -285,7 +313,7 @@ export interface SchedulesQuery {
  */
 export async function getCourseSchedules(params?: SchedulesQuery): Promise<SchedulePlanningApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const search = new URLSearchParams();
   if (params?.day !== undefined) search.set("day", params.day.toString());
   if (params?.style) search.set("style", params.style);
@@ -310,7 +338,7 @@ export interface EventsQuery {
  */
 export async function getEvents(params?: EventsQuery): Promise<EventApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const search = new URLSearchParams();
   if (params?.type) search.set("type", params.type);
   if (params?.node) search.set("node", params.node);
@@ -328,7 +356,7 @@ export async function getEvents(params?: EventsQuery): Promise<EventApi[]> {
  */
 export async function getEventBySlug(slug: string): Promise<EventApi> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/events/${encodeURIComponent(slug)}/`, lang);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Event API error: ${res.status}`);
@@ -340,7 +368,7 @@ export async function getEventBySlug(slug: string): Promise<EventApi> {
  */
 export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/organization/nodes/`, lang);
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization nodes API error: ${res.status}`);
@@ -352,7 +380,7 @@ export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
  */
 export async function getOrganizationNodesForStructure(): Promise<OrganizationNodeApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/organization/nodes/?for_structure=1`, lang);
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization structure API error: ${res.status}`);
@@ -364,7 +392,7 @@ export async function getOrganizationNodesForStructure(): Promise<OrganizationNo
  */
 export async function getPoles(): Promise<PoleApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/organization/poles/`, lang);
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Poles API error: ${res.status}`);
@@ -377,7 +405,7 @@ export async function getPoles(): Promise<PoleApi[]> {
  */
 export async function getStaffMembers(poleSlug?: string): Promise<StaffMemberApi[]> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const url = poleSlug
     ? `${base}/api/organization/staff/?pole=${encodeURIComponent(poleSlug)}`
     : `${base}/api/organization/staff/`;
@@ -393,7 +421,7 @@ export async function getOrganizationNodeBySlug(
   slug: string
 ): Promise<OrganizationNodeApi> {
   const base = getApiBaseUrl();
-  const lang = getLocaleFromCookie();
+  const lang = await getLocaleFromCookie();
   const res = await fetch(
     addLangParam(
       `${base}/api/organization/nodes/${encodeURIComponent(slug)}/`,

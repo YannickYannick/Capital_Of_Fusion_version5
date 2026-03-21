@@ -2,7 +2,49 @@
   "navbar": {
     "language": "Idioma",
     "mySpace": "Mi espacio",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "ariaMainNav": "Navegación principal",
+    "logoAlt": "Capital of Fusion",
+    "mobile": {
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "mobileNavLabel": "Menú móvil",
+      "logout": "Cerrar sesión",
+      "expandSubmenu": "Desplegar submenú {label}",
+      "submenuFor": "Submenú {label}"
+    },
+    "menu": {
+      "identiteCof": "Identidad COF",
+      "ourVision": "Nuestra visión",
+      "ourHistory": "Nuestra historia",
+      "ourBulletins": "Últimas novedades",
+      "ongoing": "En curso",
+      "courses": "Clases",
+      "events": "Eventos",
+      "shop": "Shop",
+      "trainings": "Trainings",
+      "ourPartners": "Nuestros socios",
+      "partnerStructures": "Estructuras socias",
+      "partnerEvents": "Eventos de socios",
+      "partnerCourses": "Clases de socios",
+      "promotionsFestivals": "Promociones festivales",
+      "organisation": "Organización",
+      "structure": "Estructura",
+      "poles": "Polos",
+      "other": "Otro",
+      "theory": "Teoría",
+      "care": "Care",
+      "projects": "Proyectos",
+      "files": "Archivos"
+    }
+  },
+  "landing": {
+    "badge": "Nueva versión inmersiva",
+    "title": "Capital of Fusion",
+    "subtitle1": "Descubre el universo de la bachata como nunca.",
+    "subtitle2": "Una experiencia interactiva en 3D en el corazón del baile.",
+    "ctaExplore": "Comenzar la experiencia",
+    "ctaCourses": "Ver clases",
+    "footerLine": "París, Francia • Escuela Nacional de Danza"
   }
 }
-

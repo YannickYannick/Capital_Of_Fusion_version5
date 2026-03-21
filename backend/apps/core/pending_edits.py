@@ -7,6 +7,15 @@ from django.conf import settings
 
 from apps.core.models import PendingContentEdit, SiteConfiguration, Bulletin
 
+TRANSLATION_LANGS = frozenset({"fr", "en", "es"})
+
+
+def _apply_siteconfig_translated_payload(config: SiteConfiguration, payload: dict, lang: str) -> None:
+    for base in ("vision_markdown", "history_markdown"):
+        if base in payload:
+            setattr(config, f"{base}_{lang}", payload[base])
+    config.save()
+
 
 def apply_pending_edit(edit: PendingContentEdit) -> None:
     """
@@ -21,18 +30,35 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
         config = SiteConfiguration.objects.first()
         if not config:
             config = SiteConfiguration.objects.create()
-        for key, value in payload.items():
-            if hasattr(config, key):
-                setattr(config, key, value)
-        config.save(update_fields=list(payload.keys()) + ["updated_at"])
+        raw = dict(edit.payload or {})
+        lang = raw.pop("_lang", None) or "fr"
+        if lang not in TRANSLATION_LANGS:
+            lang = "fr"
+        filtered = {
+            k: v
+            for k, v in raw.items()
+            if k in ("vision_markdown", "history_markdown")
+        }
+        _apply_siteconfig_translated_payload(config, filtered, lang)
         return
 
     if ct == PendingContentEdit.ContentType.BULLETIN:
-        from apps.core.serializers import BulletinAdminSerializer
         bulletin = Bulletin.objects.get(slug=oid)
-        serializer = BulletinAdminSerializer(bulletin, data=payload, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        raw = dict(edit.payload or {})
+        lang = raw.pop("_lang", None) or "fr"
+        if lang not in TRANSLATION_LANGS:
+            lang = "fr"
+        if "title" in raw:
+            setattr(bulletin, f"title_{lang}", raw["title"])
+        if "content_markdown" in raw:
+            setattr(bulletin, f"content_markdown_{lang}", raw["content_markdown"])
+        if "slug" in raw:
+            bulletin.slug = raw["slug"]
+        if "published_at" in raw:
+            bulletin.published_at = raw["published_at"]
+        if "is_published" in raw:
+            bulletin.is_published = raw["is_published"]
+        bulletin.save()
         return
 
     if ct == PendingContentEdit.ContentType.EVENT:
