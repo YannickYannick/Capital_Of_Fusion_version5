@@ -5,6 +5,21 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPendingEdits, approvePendingEdit, rejectPendingEdit, type PendingContentEditApi } from "@/lib/adminApi";
 
+function payloadSummary(edit: PendingContentEditApi): string | null {
+  const p = edit.payload;
+  if (!p || typeof p !== "object") return null;
+  if ("kind" in p && p.kind === "translation" && "translation_proposal" in p && p.translation_proposal) {
+    const tp = p.translation_proposal as Record<string, Record<string, string>>;
+    const langs = Object.keys(tp).map((k) => k.toUpperCase()).join(", ");
+    const fields = new Set<string>();
+    Object.values(tp).forEach((block) => {
+      if (block && typeof block === "object") Object.keys(block).forEach((f) => fields.add(f));
+    });
+    return `Traductions (${langs}) — champs : ${[...fields].join(", ")}`;
+  }
+  return null;
+}
+
 export default function PendingEditsPage() {
   const { user, loading: authLoading } = useAuth();
   const [edits, setEdits] = useState<PendingContentEditApi[]>([]);
@@ -88,7 +103,9 @@ export default function PendingEditsPage() {
           </div>
         ) : (
           <ul className="space-y-4">
-            {edits.map((edit) => (
+            {edits.map((edit) => {
+              const summary = payloadSummary(edit);
+              return (
               <li
                 key={edit.id}
                 className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-wrap items-center justify-between gap-4"
@@ -111,6 +128,9 @@ export default function PendingEditsPage() {
                       })}
                     </span>
                   </p>
+                  {summary && (
+                    <p className="text-amber-200/90 text-xs mt-2 font-medium">{summary}</p>
+                  )}
                 </div>
                 {isAdmin && (
                   <div className="flex gap-2 shrink-0">
@@ -133,7 +153,8 @@ export default function PendingEditsPage() {
                   </div>
                 )}
               </li>
-            ))}
+            );
+            })}
           </ul>
         )}
       </div>

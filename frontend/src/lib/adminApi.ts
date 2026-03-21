@@ -232,6 +232,8 @@ export async function previewTranslationAdmin(payload: {
     object_id?: number;
     field: string;
     target: TranslateTargetLang;
+    /** Texte FR du formulaire (même si non encore enregistré en base). */
+    source_text?: string;
 }): Promise<AdminTranslatePreviewResponse> {
     const res = await fetch(`${getApiBaseUrl()}/api/admin/translate/preview/`, {
         method: "POST",
@@ -239,6 +241,21 @@ export async function previewTranslationAdmin(payload: {
         body: JSON.stringify(payload),
     });
     return handleResponse(res) as Promise<AdminTranslatePreviewResponse>;
+}
+
+/** Staff : proposition de traductions en attente validation admin. */
+export async function submitTranslationPending(payload: {
+    model: string;
+    translation_proposal: Partial<
+        Record<TranslateTargetLang, Record<string, string>>
+    >;
+}): Promise<{ ok: boolean; pending: boolean }> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/translate/submit-pending/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+    });
+    return handleResponse(res) as Promise<{ ok: boolean; pending: boolean }>;
 }
 
 export interface AdminTranslateApplyResponse {

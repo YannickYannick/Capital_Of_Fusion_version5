@@ -9,7 +9,6 @@ import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
 import type { MenuItemApi } from "@/types/menu";
 import { useAuth } from "@/contexts/AuthContext";
-import { AdminTranslateButton } from "@/components/admin/AdminTranslateButton";
 
 function normPath(u: string): string {
   return (u || "").replace(/\/$/, "") || "/";
@@ -448,7 +447,6 @@ export function Navbar() {
               </button>
             ))}
           </div>
-          <AdminTranslateButton />
           {!loading && user ? (
             <Link
               href="/dashboard"

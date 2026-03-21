@@ -22,7 +22,7 @@ from .serializers import (
     BulletinAdminSerializer,
     PendingContentEditSerializer,
 )
-from .permissions import IsStaffOrSuperUser, IsSuperUser
+from .permissions import IsStaffOrSuperUser, IsSuperUser, IsSuperUserOrAdminType
 from .pending_edits import apply_pending_edit
 
 # Langues alignées sur modeltranslation (vision_markdown_fr / _en / _es).
@@ -429,11 +429,12 @@ class _TranslationAdminMixin:
 class AdminTranslatePreviewAPIView(_TranslationAdminMixin, APIView):
     """
     POST /api/admin/translate/preview/
-    Body: { model, object_id?, field, target }
+    Body: { model, object_id?, field, target, source_text? }
+    source_text optionnel : texte FR du textarea (même non sauvegardé).
     Retour: source + valeur cible actuelle + suggestion Gemini.
     """
 
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsStaffOrSuperUser]
 
     def post(self, request):
         try:
@@ -443,7 +444,12 @@ class AdminTranslatePreviewAPIView(_TranslationAdminMixin, APIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        source_val = getattr(obj, field_name, "") or ""
+        override = request.data.get("source_text")
+        if override is not None and str(override).strip() != "":
+            source_val = str(override)
+        else:
+            src_fr = getattr(obj, f"{field_name}_fr", None)
+            source_val = (src_fr if src_fr is not None else "") or getattr(obj, field_name, "") or ""
         if not source_val:
             return Response(
                 {"error": "Le champ source FR est vide, rien à traduire."},
@@ -481,7 +487,7 @@ class AdminTranslateApplyAPIView(_TranslationAdminMixin, APIView):
     Écrit explicitement la traduction choisie par l'admin.
     """
 
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsSuperUserOrAdminType]
 
     def post(self, request):
         try:
@@ -509,3 +515,75 @@ class AdminTranslateApplyAPIView(_TranslationAdminMixin, APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class AdminTranslateSubmitPendingAPIView(_TranslationAdminMixin, APIView):
+    """
+    POST /api/admin/translate/submit-pending/
+    Staff uniquement : enregistre une proposition de traductions EN/ES en attente de validation admin.
+
+    Body: {
+      "model": "core.SiteConfiguration",
+      "translation_proposal": {
+        "en": { "vision_markdown": "..." },
+        "es": { "history_markdown": "..." }
+      }
+    }
+    """
+
+    permission_classes = [IsStaffOrSuperUser]
+
+    def post(self, request):
+        if _user_is_admin_direct(request.user):
+            return Response(
+                {
+                    "error": "Les administrateurs enregistrent les traductions via « Appliquer » (pas de file d'attente).",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        model_name = str(request.data.get("model") or "").strip()
+        if model_name not in self.ALLOWED_MODEL_FIELDS:
+            return Response({"error": "model non autorisé"}, status=status.HTTP_400_BAD_REQUEST)
+
+        proposal = request.data.get("translation_proposal")
+        if not isinstance(proposal, dict):
+            return Response(
+                {"error": "translation_proposal doit être un objet { en?: {...}, es?: {...} }"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        allowed_fields = self.ALLOWED_MODEL_FIELDS[model_name]
+        cleaned: dict = {}
+        for lang in ("en", "es"):
+            block = proposal.get(lang)
+            if not block:
+                continue
+            if not isinstance(block, dict):
+                return Response(
+                    {"error": f"translation_proposal.{lang} doit être un objet"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            inner = {}
+            for k, v in block.items():
+                if k not in allowed_fields:
+                    continue
+                inner[k] = str(v) if v is not None else ""
+            if inner:
+                cleaned[lang] = inner
+
+        if not cleaned:
+            return Response(
+                {"error": "Aucune traduction valide (champs autorisés : vision_markdown, history_markdown)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.SITECONFIG,
+            object_id="",
+            payload={
+                "kind": "translation",
+                "translation_proposal": cleaned,
+            },
+            requested_by=request.user,
+        )
+        return Response({"ok": True, "pending": True}, status=status.HTTP_201_CREATED)

@@ -31,6 +31,24 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
         if not config:
             config = SiteConfiguration.objects.create()
         raw = dict(edit.payload or {})
+        # Traductions multi-langues soumises par le staff (validation admin)
+        if raw.get("kind") == "translation" and isinstance(
+            raw.get("translation_proposal"), dict
+        ):
+            proposal = raw["translation_proposal"]
+            for lang, fields in proposal.items():
+                if lang not in ("en", "es"):
+                    continue
+                if not isinstance(fields, dict):
+                    continue
+                filtered = {
+                    k: v
+                    for k, v in fields.items()
+                    if k in ("vision_markdown", "history_markdown")
+                }
+                if filtered:
+                    _apply_siteconfig_translated_payload(config, filtered, lang)
+            return
         lang = raw.pop("_lang", None) or "fr"
         if lang not in TRANSLATION_LANGS:
             lang = "fr"
