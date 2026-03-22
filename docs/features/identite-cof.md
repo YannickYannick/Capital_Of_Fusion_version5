@@ -26,7 +26,7 @@ Section « Identité COF » du site : pages **Notre vision** et **Notre histoire
 
 - **Notre vision / Notre histoire** : Markdown lu depuis `SiteConfiguration.vision_markdown` / `history_markdown` (langue selon contexte i18n côté API publique). Staff/admin : édition sur la page, enregistrement via `PATCH /api/admin/config/` (paramètre `?lang=` pour la langue cible du patch FR). **Traduction EN/ES** : UI dédiée (cases Auto/Manuel, modale, aperçus) — voir [traduction-identite-cof-admin.md](./traduction-identite-cof-admin.md).
 - **`GET /api/admin/config/`** : retourne `identity_translations` (textes EN/ES déjà enregistrés pour vision et histoire), utilisé comme rappel dans la modale de traduction.
-- **Bulletins** : liste du plus récent au plus ancien ; visiteurs ne voient que les publiés (`is_published=True`). Staff/admin voient tous les bulletins (dont brouillons), peuvent « Créer un bulletin » et « Modifier » chaque entrée. Création/édition : formulaire titre, slug, contenu Markdown, date de publication, case « Publié ».
+- **Bulletins** : liste du plus récent au plus ancien ; visiteurs ne voient que les publiés (`is_published=True`). Staff/admin voient tous les bulletins (dont brouillons), peuvent « Créer un bulletin » et « Modifier » chaque entrée. Création/édition : formulaire titre, slug, contenu Markdown, date de publication, case « Publié ». **Traduction EN/ES** : sur la page « Modifier », section « Traduction » avec cases Auto/Manuel + modale « Traduire » (`BulletinTranslationModal`, champs `title` + `content_markdown`).
 - **Détail bulletin** : page par slug ; staff peut ouvrir un bulletin non publié (appel API admin) et accéder à « Modifier ».
 
 ---

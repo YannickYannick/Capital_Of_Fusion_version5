@@ -2,9 +2,8 @@
 
 /**
  * Wrapper conditionnel selon le type de page (getPageType) :
- * - Accueil / Explore : providers (PlanetsOptions, PlanetMusicOverride) + vidéo principale/cycle (GlobalVideoBackground)
- * - Menu : uniquement cycle vidéo (CycleVideoOnly), pas de contextes Explore
- * - Détail / User : pas de vidéo, pas de contextes Explore
+ * - Accueil / Explore / Menu : providers + GlobalVideoBackground (qualité, voile, ombre, fond noir, son…)
+ * - Détail / User : pas de vidéo de fond
  */
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
@@ -15,7 +14,6 @@ import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
 import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
 import { getPageType } from "@/lib/routeSegments";
 import type { SiteConfigurationApi } from "@/types/config";
-import type { CycleVideoConfig } from "@/components/features/explore/canvas/CycleVideoOnly";
 
 const VideoBackgroundClient = dynamic(
   () =>
@@ -24,23 +22,6 @@ const VideoBackgroundClient = dynamic(
     ),
   { ssr: false }
 );
-
-const CycleVideoOnly = dynamic(
-  () =>
-    import("@/components/features/explore/canvas/CycleVideoOnly").then(
-      (m) => m.CycleVideoOnly
-    ),
-  { ssr: false }
-);
-
-function cycleConfigFromSite(config: SiteConfigurationApi | null): CycleVideoConfig | null {
-  if (!config) return null;
-  return {
-    cycle_video_type: config.cycle_video_type,
-    cycle_video_youtube_id: config.cycle_video_youtube_id,
-    cycle_video_file: config.cycle_video_file,
-  };
-}
 
 export function ClientLayoutWrapper({
   config,
@@ -52,19 +33,19 @@ export function ClientLayoutWrapper({
   const pathname = usePathname();
   const pageType = getPageType(pathname ?? "/");
 
-  const isAccueilOrExplore = pageType === "home" || pageType === "explore";
-  const isMenu = pageType === "menu";
+  /** Même fond vidéo + contrôles (bas droite) que l’accueil : home, explore, et toutes les pages « menu ». */
+  const withVideoBackground =
+    pageType === "home" || pageType === "explore" || pageType === "menu";
 
   const content = (
     <>
       <Navbar />
-      {isAccueilOrExplore && <VideoBackgroundClient config={config} />}
-      {isMenu && <CycleVideoOnly config={cycleConfigFromSite(config)} />}
+      {withVideoBackground && <VideoBackgroundClient config={config} />}
       <MainContent>{children}</MainContent>
     </>
   );
 
-  if (isAccueilOrExplore) {
+  if (withVideoBackground) {
     return (
       <PlanetsOptionsProvider>
         <PlanetMusicOverrideProvider>{content}</PlanetMusicOverrideProvider>

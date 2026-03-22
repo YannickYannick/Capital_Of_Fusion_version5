@@ -381,6 +381,8 @@ class _TranslationAdminMixin:
     # Liste blanche explicite (extensible) des champs traduisibles via popup admin.
     ALLOWED_MODEL_FIELDS = {
         "core.SiteConfiguration": {"vision_markdown", "history_markdown"},
+        "core.Bulletin": {"title", "content_markdown"},
+        "users.User": {"bio"},
     }
 
     def _parse_target(self, request):
@@ -399,6 +401,8 @@ class _TranslationAdminMixin:
         return model_name, field_name
 
     def _resolve_object(self, *, model_name: str, request):
+        import uuid as uuid_mod
+
         app_label, model_label = model_name.split(".", 1)
         Model = apps.get_model(app_label, model_label)
 
@@ -411,6 +415,12 @@ class _TranslationAdminMixin:
                 return obj
         if object_id in (None, ""):
             raise ValueError("object_id est requis pour ce model")
+        if model_name == "core.Bulletin":
+            try:
+                uid = uuid_mod.UUID(str(object_id).strip())
+            except (ValueError, TypeError, AttributeError):
+                raise ValueError("object_id doit être l'UUID du bulletin") from None
+            return get_object_or_404(Model, pk=uid)
         try:
             object_id = int(object_id)
         except (TypeError, ValueError):
@@ -521,12 +531,15 @@ class AdminTranslateApplyAPIView(_TranslationAdminMixin, APIView):
         value = str(value)
 
         setattr(obj, f"{field_name}_{target}", value)
-        obj.save(update_fields=[f"{field_name}_{target}", "updated_at"])
+        uf = [f"{field_name}_{target}"]
+        if hasattr(obj, "updated_at"):
+            uf.append("updated_at")
+        obj.save(update_fields=uf)
 
         return Response(
             {
                 "model": model_name,
-                "object_id": obj.pk,
+                "object_id": str(obj.pk),
                 "field": field_name,
                 "target": target,
                 "saved": True,
@@ -571,6 +584,7 @@ class AdminTranslateSubmitPendingAPIView(_TranslationAdminMixin, APIView):
             )
 
         allowed_fields = self.ALLOWED_MODEL_FIELDS[model_name]
+        allowed_csv = ", ".join(sorted(allowed_fields))
         cleaned: dict = {}
         for lang in ("en", "es"):
             block = proposal.get(lang)
@@ -591,13 +605,46 @@ class AdminTranslateSubmitPendingAPIView(_TranslationAdminMixin, APIView):
 
         if not cleaned:
             return Response(
-                {"error": "Aucune traduction valide (champs autorisés : vision_markdown, history_markdown)."},
+                {"error": f"Aucune traduction valide (champs autorisés pour ce modèle : {allowed_csv})."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        object_id_str = ""
+        ct = PendingContentEdit.ContentType.SITECONFIG
+        if model_name == "core.Bulletin":
+            oid = request.data.get("object_id")
+            if oid in (None, ""):
+                return Response(
+                    {"error": "object_id (UUID du bulletin) est requis pour core.Bulletin"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                bulletin = Bulletin.objects.get(pk=oid)
+            except (Bulletin.DoesNotExist, ValueError, TypeError):
+                return Response({"error": "Bulletin introuvable pour cet object_id"}, status=status.HTTP_400_BAD_REQUEST)
+            object_id_str = bulletin.slug
+            ct = PendingContentEdit.ContentType.BULLETIN
+
+        elif model_name == "users.User":
+            from django.contrib.auth import get_user_model
+
+            User = get_user_model()
+            oid = request.data.get("object_id")
+            if oid in (None, ""):
+                return Response(
+                    {"error": "object_id (identifiant utilisateur) est requis pour users.User"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                u = User.objects.get(pk=int(oid))
+            except (User.DoesNotExist, ValueError, TypeError):
+                return Response({"error": "Utilisateur introuvable pour cet object_id"}, status=status.HTTP_400_BAD_REQUEST)
+            object_id_str = str(u.pk)
+            ct = PendingContentEdit.ContentType.USER_ARTIST_BIO
+
         PendingContentEdit.objects.create(
-            content_type=PendingContentEdit.ContentType.SITECONFIG,
-            object_id="",
+            content_type=ct,
+            object_id=object_id_str,
             payload={
                 "kind": "translation",
                 "translation_proposal": cleaned,

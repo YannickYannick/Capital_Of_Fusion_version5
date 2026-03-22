@@ -1,6 +1,6 @@
-# Feature : Landing — Configuration depuis l’admin
+# Feature : Landing — Textes i18n + fond vidéo global
 
-La première page (landing) est configurable via l’admin Django : textes du hero, libellés et liens des deux boutons CTA, texte de pied de bloc.
+La page d’accueil (`/`) affiche le hero via **next-intl** (fichiers `messages/*.json`, clés `landing.*`). Le fond vidéo et le **voile** (option **A: Voile**) sont gérés par **`GlobalVideoBackground`** (`ExploreVideos.tsx`), comme sur toutes les pages « menu » — pas de second voile local sur l’accueil (aligné avec ex. `/identite-cof/notre-vision`).
 
 ---
 
@@ -8,20 +8,22 @@ La première page (landing) est configurable via l’admin Django : textes du he
 
 | Rôle | Emplacement |
 |------|-------------|
-| Modèle | `backend/apps/core/models.py` — `SiteConfiguration` : `hero_title`, `hero_top_text`, `hero_descr_1`, `hero_descr_2`, `hero_btn_1_text`, `hero_btn_1_url`, `hero_btn_2_text`, `hero_btn_2_url`, `hero_footer_text` |
-| API | `GET /api/config/` — `SiteConfigurationAPIView` ; serializer `SiteConfigurationSerializer` dans `backend/apps/core/serializers.py` |
-| Types frontend | `frontend/src/types/config.ts` — `SiteConfigurationApi` |
-| Page landing | `frontend/src/app/(main)/page.tsx` (metadata) + `frontend/src/app/(main)/LandingPageClient.tsx` (affichage et liens des boutons) |
+| Textes du hero (FR / EN / ES) | `frontend/messages/fr.json`, `en.json`, `es.json` — objet **`landing`** : `badge`, `title`, `subtitle1`, `subtitle2`, `ctaExplore`, `ctaCourses`, `footerLine` |
+| Composant | `frontend/src/app/(main)/LandingPageClient.tsx` — `useTranslations("landing")`, liens `/explore` et `/cours` |
+| Metadata SEO (statique FR) | `frontend/src/app/(main)/page.tsx` |
+| Vidéo + voile + contrôles | `ClientLayoutWrapper` → `VideoBackgroundClient` → `GlobalVideoBackground` (`frontend/src/components/features/explore/canvas/ExploreVideos.tsx`) |
 
 ---
 
-## Champs configurables (admin)
+## Contenu éditorial (landing)
 
-- **hero_top_text** — Texte au-dessus du titre (ex. « Nouvelle Version Immersive »)
-- **hero_title** — Titre principal (ex. « Capital of Fusion »)
-- **hero_descr_1** / **hero_descr_2** — Deux lignes de description
-- **hero_btn_1_text** / **hero_btn_1_url** — Premier bouton (ex. « Commencer l’Expérience » → `/explore`)
-- **hero_btn_2_text** / **hero_btn_2_url** — Second bouton (ex. « Voir les Cours » → `/cours`)
-- **hero_footer_text** — Texte en bas du bloc (ex. « Paris, France • École Nationale de Danse »)
+Pour modifier les textes visibles sur l’accueil : éditer les trois fichiers `messages/{fr,en,es}.json` sous **`landing`**, puis déployer le frontend.
 
-Valeurs par défaut définies sur le modèle ; modifiables dans **Admin Django → Core → Site configurations**.
+**Note :** le modèle Django `SiteConfiguration` peut encore exposer des champs hero (`hero_*`) pour d’autres usages ou l’API ; l’affichage actuel du hero sur Next utilise les **messages i18n**, pas un fetch de ces champs pour le libellé principal.
+
+---
+
+## Fond et voile
+
+- **Voile unique** : calque `bg-black/50` quand l’option **A: Voile** est active (état persisté via `PlanetsOptionsContext` / localStorage).
+- Pas de dégradé supplémentaire spécifique à la landing : même pile visuelle que les autres pages avec vidéo de fond.

@@ -15,6 +15,7 @@ import {
   getEvents,
   getApiBaseUrl,
 } from "@/lib/api";
+import { AdminEditButton } from "@/components/shared/AdminEditButton";
 import type { OrganizationNodeApi } from "@/types/organization";
 import type { CourseListApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
@@ -88,7 +89,12 @@ export default function NoeudProfilPage() {
   const coverUrl = nodeCoverUrl(node);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      <AdminEditButton
+        editUrl={`/organisation/noeuds/${encodeURIComponent(slug)}/edit`}
+        position="top-right"
+        label="Modifier"
+      />
       {/* Hero — style artiste */}
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <Image

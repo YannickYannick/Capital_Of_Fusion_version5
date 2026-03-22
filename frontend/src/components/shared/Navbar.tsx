@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
+import { localizeMenuChildren } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -213,12 +214,22 @@ export function Navbar() {
       label: t("menu.organisation"),
       children: [
         {
+          id: "o-artistes",
+          name: t("menu.ourArtists"),
+          url: "/artistes/annuaire",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
           id: "o1",
           name: t("menu.structure"),
           url: "/organisation/structure/",
           slug: "",
           icon: "",
-          order: 0,
+          order: 1,
           is_active: true,
           children: [],
         },
@@ -228,7 +239,17 @@ export function Navbar() {
           url: "/organisation/poles/",
           slug: "",
           icon: "",
-          order: 0,
+          order: 2,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "o-staff",
+          name: t("menu.ourStaff"),
+          url: "/organisation/staff/",
+          slug: "",
+          icon: "",
+          order: 3,
           is_active: true,
           children: [],
         },
@@ -333,22 +354,22 @@ export function Navbar() {
     const m = menuItems.find((item) => item.slug === "organisation");
     if (!m) return null;
     return {
-      href: m.url || "/",
-      label: m.name,
-      children: m.children ?? [],
+      href: m.url || "/organisation",
+      label: t("menu.organisation"),
+      children: localizeMenuChildren(m.children ?? [], t),
     };
-  }, [menuItems, menuError]);
+  }, [menuItems, menuError, t]);
 
   const autreFromApi = useMemo(() => {
     if (!menuItems?.length || menuError) return null;
     const m = menuItems.find((item) => item.slug === "autre");
     if (!m) return null;
     return {
-      href: m.url || "/",
-      label: m.name,
-      children: m.children ?? [],
+      href: m.url || "#",
+      label: t("menu.other"),
+      children: localizeMenuChildren(m.children ?? [], t),
     };
-  }, [menuItems, menuError]);
+  }, [menuItems, menuError, t]);
 
   const links =
     apiLinks.length > 0

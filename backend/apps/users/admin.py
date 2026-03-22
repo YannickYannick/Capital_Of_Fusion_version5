@@ -19,7 +19,16 @@ class UserAdmin(BaseUserAdmin):
             "fields": ("user_type", "staff_role", "pole"),
         }),
         ("Profil Danse", {
-            "fields": ("phone", "bio", "profile_picture", "dance_level", "is_vibe", "professions"),
+            "fields": (
+                "phone",
+                "bio",
+                "bio_en",
+                "bio_es",
+                "profile_picture",
+                "dance_level",
+                "is_vibe",
+                "professions",
+            ),
         }),
     )
 

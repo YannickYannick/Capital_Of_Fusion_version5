@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { patchSiteConfigHistory } from "@/lib/api";
@@ -18,6 +19,7 @@ interface NotreHistoireClientProps {
 }
 
 export function NotreHistoireClient({ initialHistory }: NotreHistoireClientProps) {
+    const t = useTranslations("pages");
     const { user } = useAuth();
     const router = useRouter();
     const [history, setHistory] = useState(initialHistory);
@@ -98,15 +100,17 @@ export function NotreHistoireClient({ initialHistory }: NotreHistoireClientProps
     return (
         <article className="prose prose-invert prose-lg max-w-none">
             <div className="text-center mb-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Identité COF</p>
+                <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">
+                    {t("identiteHistory.eyebrow")}
+                </p>
                 <h1 className="text-5xl font-black text-white tracking-tight mb-4">
-                    Notre{" "}
+                    {t("identiteHistory.titleBefore")}{" "}
                     <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                        histoire
+                        {t("identiteHistory.titleHighlight")}
                     </span>
                 </h1>
                 <p className="text-white/60 max-w-xl mx-auto">
-                    L’histoire et le parcours de Capital of Fusion.
+                    {t("identiteHistory.subtitle")}
                 </p>
             </div>
 

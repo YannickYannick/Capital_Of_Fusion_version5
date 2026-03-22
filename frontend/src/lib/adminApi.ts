@@ -219,7 +219,7 @@ export async function translateModelsAdmin(payload: {
 
 export interface AdminTranslatePreviewResponse {
     model: string;
-    object_id: number;
+    object_id: number | string;
     field: string;
     target: TranslateTargetLang;
     source: string;
@@ -229,7 +229,7 @@ export interface AdminTranslatePreviewResponse {
 
 export async function previewTranslationAdmin(payload: {
     model: string;
-    object_id?: number;
+    object_id?: number | string;
     field: string;
     target: TranslateTargetLang;
     /** Texte FR du formulaire (même si non encore enregistré en base). */
@@ -246,6 +246,8 @@ export async function previewTranslationAdmin(payload: {
 /** Staff : proposition de traductions en attente validation admin. */
 export async function submitTranslationPending(payload: {
     model: string;
+    /** UUID string pour `core.Bulletin`. */
+    object_id?: string;
     translation_proposal: Partial<
         Record<TranslateTargetLang, Record<string, string>>
     >;
@@ -260,7 +262,7 @@ export async function submitTranslationPending(payload: {
 
 export interface AdminTranslateApplyResponse {
     model: string;
-    object_id: number;
+    object_id: string | number;
     field: string;
     target: TranslateTargetLang;
     saved: boolean;
@@ -268,7 +270,7 @@ export interface AdminTranslateApplyResponse {
 
 export async function applyTranslationAdmin(payload: {
     model: string;
-    object_id?: number;
+    object_id?: number | string;
     field: string;
     target: TranslateTargetLang;
     value: string;

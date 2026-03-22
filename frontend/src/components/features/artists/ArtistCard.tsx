@@ -2,17 +2,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArtistApi } from "@/types/user";
 import { AdminEditButton } from "@/components/shared/AdminEditButton";
+import { getApiBaseUrl } from "@/lib/api";
 
-const DJANGO_ADMIN_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+function resolveArtistPhotoUrl(url: string | null | undefined): string {
+    if (!url) return "/images/placeholder-artist.jpg";
+    if (url.startsWith("http")) return url;
+    const base = getApiBaseUrl().replace(/\/$/, "");
+    return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
+}
 
 export default function ArtistCard({ artist, priority = false }: { artist: ArtistApi; priority?: boolean }) {
-    const photoUrl = artist.profile_picture || "/images/placeholder-artist.jpg";
+    const photoUrl = resolveArtistPhotoUrl(artist.profile_picture);
     const fullName = `${artist.first_name || ""} ${artist.last_name || ""}`.trim() || artist.username;
 
     return (
         <div className="relative group">
             <AdminEditButton
-                djangoAdminUrl={`${DJANGO_ADMIN_BASE}/admin/users/user/${artist.id}/change/`}
+                editUrl={`/artistes/${encodeURIComponent(artist.username)}/edit`}
                 position="top-right"
                 label="Éditer"
                 size="sm"
@@ -26,6 +32,11 @@ export default function ArtistCard({ artist, priority = false }: { artist: Artis
                         className="object-cover transition-transform group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         priority={priority}
+                        unoptimized={
+                            photoUrl.includes("localhost") ||
+                            photoUrl.includes("127.0.0.1") ||
+                            photoUrl.startsWith("/images/")
+                        }
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                     <div className="absolute bottom-4 left-4">

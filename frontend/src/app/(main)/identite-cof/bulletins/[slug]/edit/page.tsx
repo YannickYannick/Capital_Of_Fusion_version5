@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAdminBulletinBySlug, patchBulletin } from "@/lib/api";
+import { TranslationModeCheckboxes } from "@/components/admin/translation/TranslationModeCheckboxes";
+import { BulletinTranslationModal } from "@/components/admin/translation/BulletinTranslationModal";
 
 function slugFromTitle(title: string): string {
   return title
@@ -30,8 +32,13 @@ export default function EditBulletinPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [bulletinId, setBulletinId] = useState<string>("");
+  const [translateAi, setTranslateAi] = useState(false);
+  const [translateManual, setTranslateManual] = useState(false);
+  const [translationModal, setTranslationModal] = useState<"ai" | "manual" | null>(null);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const isAdmin = user?.user_type === "ADMIN";
 
   useEffect(() => {
     if (!slug || !canEdit) {
@@ -40,6 +47,7 @@ export default function EditBulletinPage() {
     }
     getAdminBulletinBySlug(slug)
       .then((b) => {
+        setBulletinId(b.id);
         setTitle(b.title);
         setSlugValue(b.slug);
         setContentMarkdown(b.content_markdown ?? "");
@@ -82,6 +90,23 @@ export default function EditBulletinPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const openTranslate = () => {
+    if (!title.trim() || !contentMarkdown.trim()) {
+      setError("Renseigne le titre et le contenu en français avant de traduire.");
+      return;
+    }
+    if (!translateAi && !translateManual) {
+      setError('Coche « Auto (IA) » ou « Manuel » pour indiquer comment tu veux traduire.');
+      return;
+    }
+    if (!bulletinId) {
+      setError("Identifiant du bulletin manquant — recharge la page.");
+      return;
+    }
+    setError(null);
+    setTranslationModal(translateAi ? "ai" : "manual");
   };
 
   if (!user) {
@@ -154,6 +179,29 @@ export default function EditBulletinPage() {
             className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-purple-500/50 font-mono text-sm"
           />
         </div>
+
+        <div className="rounded-xl border border-purple-500/25 bg-purple-950/20 p-4 space-y-3">
+          <p className="text-sm font-semibold text-purple-200">Traduction (anglais / espagnol)</p>
+          <p className="text-xs text-white/50">
+            Coche un mode puis ouvre la modale — le texte utilisé est celui du titre et du contenu ci-dessous (français).
+          </p>
+          <TranslationModeCheckboxes
+            useAi={translateAi}
+            useManual={translateManual}
+            onChangeAi={setTranslateAi}
+            onChangeManual={setTranslateManual}
+            rowLabel="Ce bulletin"
+          />
+          <button
+            type="button"
+            onClick={openTranslate}
+            disabled={saving || (!translateAi && !translateManual)}
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600/50 to-amber-600/50 text-white hover:from-emerald-500/60 hover:to-amber-500/60 border border-white/20 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold"
+          >
+            Traduire
+          </button>
+        </div>
+
         <div>
           <label className="block text-white/70 text-sm mb-1">Contenu (Markdown)</label>
           <textarea
@@ -201,6 +249,20 @@ export default function EditBulletinPage() {
           </Link>
         </div>
       </form>
+
+      {translationModal && bulletinId && (
+        <BulletinTranslationModal
+          open={!!translationModal}
+          onClose={() => setTranslationModal(null)}
+          bulletinSlug={slug}
+          bulletinId={bulletinId}
+          titleFr={title}
+          contentFr={contentMarkdown}
+          isAdmin={isAdmin}
+          mode={translationModal}
+          onSuccess={() => router.refresh()}
+        />
+      )}
     </div>
   );
 }

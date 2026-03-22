@@ -5,7 +5,11 @@ Appelé lorsqu'un admin approuve la demande.
 from django.utils import timezone
 from django.conf import settings
 
+from django.contrib.auth import get_user_model
+
 from apps.core.models import PendingContentEdit, SiteConfiguration, Bulletin
+
+User = get_user_model()
 
 TRANSLATION_LANGS = frozenset({"fr", "en", "es"})
 
@@ -63,6 +67,18 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
     if ct == PendingContentEdit.ContentType.BULLETIN:
         bulletin = Bulletin.objects.get(slug=oid)
         raw = dict(edit.payload or {})
+        if raw.get("kind") == "translation" and isinstance(raw.get("translation_proposal"), dict):
+            proposal = raw["translation_proposal"]
+            for lang, fields in proposal.items():
+                if lang not in ("en", "es"):
+                    continue
+                if not isinstance(fields, dict):
+                    continue
+                for k in ("title", "content_markdown"):
+                    if k in fields:
+                        setattr(bulletin, f"{k}_{lang}", fields[k])
+            bulletin.save()
+            return
         lang = raw.pop("_lang", None) or "fr"
         if lang not in TRANSLATION_LANGS:
             lang = "fr"
@@ -77,6 +93,21 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
         if "is_published" in raw:
             bulletin.is_published = raw["is_published"]
         bulletin.save()
+        return
+
+    if ct == PendingContentEdit.ContentType.USER_ARTIST_BIO:
+        user = User.objects.get(pk=int(oid))
+        raw = dict(edit.payload or {})
+        if raw.get("kind") == "translation" and isinstance(raw.get("translation_proposal"), dict):
+            proposal = raw["translation_proposal"]
+            for lang, fields in proposal.items():
+                if lang not in ("en", "es"):
+                    continue
+                if not isinstance(fields, dict):
+                    continue
+                if "bio" in fields:
+                    setattr(user, f"bio_{lang}", fields["bio"])
+            user.save()
         return
 
     if ct == PendingContentEdit.ContentType.EVENT:

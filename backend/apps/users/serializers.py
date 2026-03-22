@@ -19,9 +19,17 @@ class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'first_name', 'last_name', 
-            'bio', 'profile_picture', 'professions', 'is_staff_member'
+            'id', 'username', 'first_name', 'last_name',
+            'bio', 'bio_en', 'bio_es', 'profile_picture', 'professions', 'is_staff_member'
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        pic = data.get("profile_picture")
+        if pic and request and not str(pic).startswith("http"):
+            data["profile_picture"] = request.build_absolute_uri(pic)
+        return data
 
 class RegisterSerializer(serializers.ModelSerializer):
     """

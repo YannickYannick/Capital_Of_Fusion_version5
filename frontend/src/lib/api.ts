@@ -7,7 +7,7 @@ import type { MenuItemApi } from "@/types/menu";
 import type { CourseApi, CourseListApi, SchedulePlanningApi, TheoryLessonApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
 import type { OrganizationNodeApi, PoleApi, StaffMemberApi } from "@/types/organization";
-import type { ArtistApi } from "@/types/user";
+import type { ArtistApi, DanceProfessionApi } from "@/types/user";
 import type { SiteConfigurationApi, BulletinApi, BulletinAdminApi } from "@/types/config";
 import type { ProductCategoryApi, ProductApi } from "@/types/shop";
 import type { PractitionerApi, PractitionerListApi, ServiceCategoryApi, CareServiceApi } from "@/types/care";
@@ -659,6 +659,93 @@ export async function getArtistByUsername(username: string): Promise<ArtistApi> 
 
 /** Alias pour la compatibilité avec certaines pages */
 export const getArtistBySlug = getArtistByUsername;
+
+/**
+ * Édition admin d'un artiste (staff/admin).
+ * GET /api/admin/users/artists/<username>/
+ */
+export async function getArtistAdmin(username: string): Promise<{
+  artist: ArtistApi;
+  all_professions: DanceProfessionApi[];
+}> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Artist admin API error: ${res.status}`);
+  return res.json();
+}
+
+/**
+ * PATCH /api/admin/users/artists/<username>/
+ */
+export async function patchArtistAdmin(
+  username: string,
+  payload: {
+    first_name?: string;
+    last_name?: string;
+    bio?: string;
+    bio_en?: string;
+    bio_es?: string;
+    is_staff_member?: boolean;
+    profession_ids?: string[];
+  }
+): Promise<ArtistApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg =
+      data && typeof data === "object" && "error" in data
+        ? String(data.error)
+        : `Erreur ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as ArtistApi;
+}
+
+/**
+ * PATCH /api/admin/organization/nodes/<slug>/ — modifier un nœud (admin direct, staff → file d'attente).
+ */
+export async function patchOrganizationNodeAdmin(
+  slug: string,
+  payload: Record<string, unknown>
+): Promise<import("@/types/organization").OrganizationNodeApi | { pending: true; message: string }> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/organization/nodes/${encodeURIComponent(slug)}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 202) {
+    return data as { pending: true; message: string };
+  }
+  if (!res.ok) {
+    const msg =
+      data && typeof data === "object" && "error" in data
+        ? String(data.error)
+        : `Erreur ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as OrganizationNodeApi;
+}
 
 /** Query params pour la liste des leçons de théorie */
 export interface TheoryQuery {

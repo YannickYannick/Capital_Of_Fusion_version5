@@ -5,7 +5,18 @@ Documentation de référence pour la traduction du site : **frontend** (next-int
 **Tableaux de données (MCP / inventaire)** : dossier [`../mcp-traduction/README.md`](../mcp-traduction/README.md) — champs BDD, pages, vue visiteur FR/EN/ES.
 
 **Branche de travail prévue :** `traduction`  
-**Statut :** spécification et doc — implémentation à faire.
+**Statut :** spécification + implémentation progressive (navbar, landing, namespace `pages` pour titres de pages théorie / identité COF / artistes, etc.).
+
+### Fichiers messages (référence rapide)
+
+| Namespace (racine JSON) | Usage |
+|-------------------------|--------|
+| `navbar` | Menu principal, sélecteur de langue |
+| `landing` | Hero page d’accueil (`/`) |
+| `pages` | Titres / stats / filtres pour hub théorie, Notre vision / histoire, page artistes, métadonnées associées |
+| `artistEdit` / `artistPublic` | Édition et affichage public des bios multilingues |
+
+Locale : cookie **`locale`** (`fr` \| `en` \| `es`), lu dans `frontend/src/i18n/request.ts`.
 
 ---
 

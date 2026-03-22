@@ -29,8 +29,10 @@
       "partnerCourses": "Partner classes",
       "promotionsFestivals": "Festival promotions",
       "organisation": "Organization",
-      "structure": "Structure",
-      "poles": "Poles",
+      "structure": "Our structure",
+      "poles": "Our hubs",
+      "ourArtists": "Our artists",
+      "ourStaff": "Our staff",
       "other": "Other",
       "theory": "Theory",
       "care": "Care",
@@ -46,5 +48,125 @@
     "ctaExplore": "Start the experience",
     "ctaCourses": "View classes",
     "footerLine": "Paris, France • National Dance School"
+  },
+  "artistEdit": {
+    "loginRequired": "Sign in required.",
+    "backToArtists": "← Back to artists",
+    "insufficientRights": "Insufficient permissions.",
+    "loading": "Loading…",
+    "notFoundOrDenied": "Artist not found or access denied.",
+    "backToProfile": "← Back to profile",
+    "title": "Edit artist",
+    "photoHint": "— Profile photo can be changed in Django admin if needed (image file).",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "bio": "Bio",
+    "staffMemberLabel": "Official Team CoF member",
+    "professionsLabel": "Professions / roles",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "profileSaved": "Profile saved.",
+    "saveError": "Error while saving",
+    "profilePhotoAlt": "Profile photo",
+    "bioSectionTitle": "Biography (by language)",
+    "bioFrLabel": "French",
+    "bioEnLabel": "English",
+    "bioEsLabel": "Spanish",
+    "bioFallbackHint": "On the site, if a language is empty, the French version is shown as fallback.",
+    "translationRowLabel": "Biography",
+    "translateNeedFrBio": "Enter the French biography text to translate first.",
+    "translateNeedMode": "Check “Auto (AI)” or “Manual” to choose how you want to translate."
+  },
+  "artistPublic": {
+    "biography": "Biography",
+    "noBio": "No biography available for this artist."
+  },
+  "pages": {
+    "theory": {
+      "eyebrow": "LEARN & UNDERSTAND",
+      "titleBefore": "Dance",
+      "titleHighlight": "Theory",
+      "subtitle": "Rhythm, technique, history and culture — everything you need to know to dance with awareness and sensitivity.",
+      "statsLessons": "Lessons available",
+      "statsCategories": "Categories",
+      "explore": "Explore →",
+      "lessonSingular": "lesson",
+      "lessonPlural": "lessons",
+      "categories": {
+        "rythme": {
+          "label": "Rhythm & Music",
+          "description": "Understand the clave, count the beats and hear the musical structure of bachata."
+        },
+        "technique": {
+          "label": "Technique",
+          "description": "Connection, body waves, posture, lead & follow — movement fundamentals."
+        },
+        "histoire": {
+          "label": "History",
+          "description": "Dominican origins, pioneers and the global evolution of bachata."
+        },
+        "culture": {
+          "label": "Culture",
+          "description": "Social dance etiquette, international community and values of social dance."
+        }
+      },
+      "quick": {
+        "allLessons": { "label": "All lessons", "desc": "Browse the full catalogue" },
+        "progression": { "label": "My progression", "desc": "See my learning path" },
+        "quiz": { "label": "Interactive quiz", "desc": "Test your knowledge" }
+      }
+    },
+    "identiteVision": {
+      "metaTitle": "Our vision | COF Identity",
+      "metaDescription": "Capital of Fusion’s vision — COF Identity.",
+      "eyebrow": "COF Identity",
+      "titleBefore": "Our",
+      "titleHighlight": "vision",
+      "subtitle": "Capital of Fusion’s vision and values.",
+      "editPlaceholder": "## Title\n\nContent...",
+      "previewPlaceholder": "Preview…",
+      "previewHint": "Markdown",
+      "previewError": "Preview unavailable",
+      "saveError": "Could not save the vision.",
+      "saveSuccess": "Vision saved.",
+      "savePending": "Saving…",
+      "saveButton": "Save",
+      "draftHint": "Drafts are saved on the server.",
+      "canEdit": "You can edit this text.",
+      "cannotEdit": "You cannot edit this text."
+    },
+    "identiteHistory": {
+      "metaTitle": "Our story | COF Identity",
+      "metaDescription": "Capital of Fusion’s story — COF Identity.",
+      "eyebrow": "COF Identity",
+      "titleBefore": "Our",
+      "titleHighlight": "story",
+      "subtitle": "The story and journey of Capital of Fusion.",
+      "editPlaceholder": "## Our story\n\n...",
+      "previewPlaceholder": "Preview…",
+      "previewHint": "Markdown",
+      "previewError": "Preview unavailable",
+      "saveError": "Could not save the story.",
+      "saveSuccess": "Story saved.",
+      "savePending": "Saving…",
+      "saveButton": "Save",
+      "draftHint": "Drafts are saved on the server.",
+      "canEdit": "You can edit this text.",
+      "cannotEdit": "You cannot edit this text."
+    },
+    "artists": {
+      "eyebrow": "Our artists",
+      "titleBefore": "Our",
+      "titleHighlight": "Artists",
+      "subtitle": "Discover the talents at the heart of Capital of Fusion. Official members and partner artists.",
+      "filterAll": "All",
+      "filterStaff": "Team CoF",
+      "filterExternal": "External",
+      "errorTitle": "Connection error",
+      "emptyTitle": "EMPTY",
+      "emptySubtitle": "NO ARTIST MATCHES THIS CATEGORY",
+      "filterLabel": "Filter"
+    }
   }
 }

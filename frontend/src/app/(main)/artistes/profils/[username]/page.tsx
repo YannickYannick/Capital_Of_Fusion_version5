@@ -2,13 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getArtistByUsername } from "@/lib/api";
+import { useLocale, useTranslations } from "next-intl";
+import { getArtistByUsername, getApiBaseUrl } from "@/lib/api";
+import { getArtistBioForLocale } from "@/lib/artistBio";
+import { AdminEditButton } from "@/components/shared/AdminEditButton";
 import type { ArtistApi } from "@/types/user";
 import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function ArtistProfilePage() {
+    const locale = useLocale();
+    const tp = useTranslations("artistPublic");
     const { username } = useParams();
     const [artist, setArtist] = useState<ArtistApi | null>(null);
     const [loading, setLoading] = useState(true);
@@ -43,10 +48,17 @@ export default function ArtistProfilePage() {
         );
     }
 
-    const photoUrl = artist.profile_picture || "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop";
+    const rawPic = artist.profile_picture;
+    const photoUrl =
+        rawPic && rawPic.startsWith("http")
+            ? rawPic
+            : rawPic
+              ? `${getApiBaseUrl().replace(/\/$/, "")}${rawPic.startsWith("/") ? "" : "/"}${rawPic}`
+              : "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop";
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-black text-white relative -mt-16">
+            {/* Annule le pt-16 du layout : évite la bande bleue (fond html) sous la navbar transparente */}
             <section className="relative h-[60vh] md:h-[70vh] overflow-hidden">
                 <Image
                     src={photoUrl}
@@ -77,9 +89,9 @@ export default function ArtistProfilePage() {
             <section className="max-w-7xl mx-auto px-8 md:px-16 py-16 grid grid-cols-1 lg:grid-cols-3 gap-16">
                 <div className="lg:col-span-2">
                     <AnimatedDiv animation="fadeIn">
-                        <h2 className="text-xs uppercase tracking-[0.3em] font-black mb-8 text-white/30 italic underline decoration-purple-500/50 decoration-4 underline-offset-8">Biographie</h2>
+                        <h2 className="text-xs uppercase tracking-[0.3em] font-black mb-8 text-white/30 italic underline decoration-purple-500/50 decoration-4 underline-offset-8">{tp("biography")}</h2>
                         <div className="prose prose-invert max-w-none text-lg text-white/70 leading-relaxed font-light">
-                            {artist.bio || "Aucune biographie disponible pour cet artiste."}
+                            {getArtistBioForLocale(artist, locale) || tp("noBio")}
                         </div>
                     </AnimatedDiv>
                 </div>
@@ -89,7 +101,16 @@ export default function ArtistProfilePage() {
                         animation="fadeIn"
                         className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
                     >
-                        <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-8 text-white/30 italic">Details</h3>
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+                            <h3 className="text-xs uppercase tracking-[0.3em] font-black text-white/30 italic shrink-0">
+                                Details
+                            </h3>
+                            <AdminEditButton
+                                editUrl={`/artistes/${encodeURIComponent(artist.username)}/edit`}
+                                position="inline"
+                                label="Modifier"
+                            />
+                        </div>
                         <ul className="space-y-6">
                             <li className="flex justify-between items-center py-2">
                                 <span className="text-white/20 uppercase text-[10px] tracking-widest font-bold">Pseudo</span>

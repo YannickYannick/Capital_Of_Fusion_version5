@@ -63,7 +63,9 @@ class User(AbstractUser):
 
     # ─── Profil danse ─────────────────────────────────────────────────────────
     phone = models.CharField(max_length=50, blank=True)
-    bio = models.TextField(blank=True)
+    bio = models.TextField(blank=True, verbose_name="Biographie (français)")
+    bio_en = models.TextField(blank=True, verbose_name="Biographie (anglais)")
+    bio_es = models.TextField(blank=True, verbose_name="Biographie (espagnol)")
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
     dance_level = models.ForeignKey(
         "core.Level",

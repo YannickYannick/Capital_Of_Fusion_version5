@@ -20,7 +20,12 @@ export interface ArtistApi {
     username: string;
     first_name: string;
     last_name: string;
+    /** Biographie (français) */
     bio: string;
+    /** Biographie anglais */
+    bio_en?: string;
+    /** Biographie espagnol */
+    bio_es?: string;
     profile_picture: string | null;
     /** URL de la photo de profil (alias API / champ backend) */
     profile_image?: string | null;

@@ -13,6 +13,11 @@ export interface BulletinApi {
 /** Information avec champs admin (is_published) pour édition staff */
 export interface BulletinAdminApi extends BulletinApi {
     is_published: boolean;
+    /** Aperçu traductions (GET admin, modeltranslation) */
+    title_en?: string;
+    title_es?: string;
+    content_markdown_en?: string;
+    content_markdown_es?: string;
 }
 
 export interface SiteConfigurationApi {

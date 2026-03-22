@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from apps.core.permissions import IsStaffOrSuperUser
+from apps.core.views import _user_is_admin_direct
 from apps.core.models import PendingContentEdit
 from .models import OrganizationNode, Pole
 from .serializers import OrganizationNodeSerializer, PoleSerializer, StaffMemberSerializer
@@ -101,7 +102,7 @@ class OrganizationNodeAdminDetailAPIView(APIView):
             "planet_color", "orbit_radius", "orbit_speed", "planet_scale",
             "orbit_speed", "planet_type", "visual_source", "is_visible_3d",
         ]
-        if getattr(request.user, "is_superuser", False):
+        if _user_is_admin_direct(request.user):
             for field in editable_fields:
                 if field in request.data:
                     setattr(node, field, request.data[field])

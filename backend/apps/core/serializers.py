@@ -74,7 +74,21 @@ class BulletinSerializer(serializers.ModelSerializer):
 
 
 class BulletinAdminSerializer(serializers.ModelSerializer):
-    """Pour création/édition par staff : inclut is_published."""
+    """Pour création/édition par staff : inclut is_published + colonnes traduites (aperçu modale)."""
+
     class Meta:
         model = Bulletin
-        fields = ("id", "title", "slug", "content_markdown", "published_at", "is_published", "created_at")
+        fields = (
+            "id",
+            "title",
+            "slug",
+            "content_markdown",
+            "published_at",
+            "is_published",
+            "created_at",
+            "title_en",
+            "title_es",
+            "content_markdown_en",
+            "content_markdown_es",
+        )
+        read_only_fields = ("title_en", "title_es", "content_markdown_en", "content_markdown_es")

@@ -12,8 +12,11 @@ from django.contrib.auth import authenticate
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+from apps.core.models import DanceProfession
+from apps.core.permissions import IsStaffOrSuperUser
+
 from .models import User
-from .serializers import ArtistSerializer, RegisterSerializer
+from .serializers import ArtistSerializer, RegisterSerializer, DanceProfessionSerializer
 
 
 class LoginAPIView(APIView):
@@ -192,6 +195,59 @@ class ArtistDetailAPIView(APIView):
                 {"error": "Artiste non trouvé"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+class ArtistAdminDetailAPIView(APIView):
+    """
+    GET /api/admin/users/artists/<username>/ — détail + liste des professions (staff/admin).
+    PATCH — mise à jour : prénom, nom, bio, membre CoF, professions.
+    """
+
+    permission_classes = [IsStaffOrSuperUser]
+
+    def get(self, request, username):
+        artist = User.objects.filter(username=username).first()
+        if not artist:
+            return Response({"error": "Utilisateur introuvable"}, status=status.HTTP_404_NOT_FOUND)
+        profs = DanceProfession.objects.all().order_by("name")
+        return Response(
+            {
+                "artist": ArtistSerializer(artist, context={"request": request}).data,
+                "all_professions": DanceProfessionSerializer(profs, many=True).data,
+            }
+        )
+
+    def patch(self, request, username):
+        artist = User.objects.filter(username=username).first()
+        if not artist:
+            return Response({"error": "Utilisateur introuvable"}, status=status.HTTP_404_NOT_FOUND)
+
+        if "first_name" in request.data:
+            artist.first_name = str(request.data["first_name"] or "")
+        if "last_name" in request.data:
+            artist.last_name = str(request.data["last_name"] or "")
+        if "bio" in request.data:
+            artist.bio = str(request.data["bio"] or "")
+        if "bio_en" in request.data:
+            artist.bio_en = str(request.data["bio_en"] or "")
+        if "bio_es" in request.data:
+            artist.bio_es = str(request.data["bio_es"] or "")
+        if "is_staff_member" in request.data:
+            artist.is_staff_member = bool(request.data["is_staff_member"])
+
+        if "profession_ids" in request.data:
+            raw = request.data["profession_ids"]
+            if isinstance(raw, list):
+                qs = DanceProfession.objects.filter(id__in=raw)
+                artist.professions.set(qs)
+            elif raw is None:
+                artist.professions.clear()
+
+        artist.save()
+        return Response(
+            ArtistSerializer(artist, context={"request": request}).data,
+            status=status.HTTP_200_OK,
+        )
 
 
 class RegisterAPIView(APIView):

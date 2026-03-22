@@ -18,7 +18,7 @@ Document vivant : à adapter selon tes priorités et ton workflow éditorial.
 
 **En résumé** : le **statique** = ce que les développeurs mettent dans les JSON. Le **dynamique** = ce que tu remplis en base (souvent en français d’abord), puis EN/ES via traduction manuelle, commande `translate_models`, ou popup admin Gemini (selon ce qui est branché).
 
-**Exemples actuels de statique** : clés sous `navbar` dans `messages/*.json` (`language`, `mySpace`, `login`, …). Toute nouvelle clé doit exister dans **les trois** fichiers `fr`, `en`, `es` pour éviter les clés manquantes.
+**Exemples actuels de statique** : clés sous `navbar`, `landing`, **`pages`** (titres de pages hub théorie, identité COF, artistes, etc.) dans `messages/*.json`. Toute nouvelle clé doit exister dans **les trois** fichiers `fr`, `en`, `es` pour éviter les clés manquantes.
 
 ---
 

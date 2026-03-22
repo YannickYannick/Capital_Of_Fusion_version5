@@ -26,13 +26,6 @@ export default function LandingPageClient() {
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
-            {opts.showVideoOverlay && (
-                <div
-                    className="absolute inset-0 bg-gradient-to-b from-[#0a0e27] via-[#0a0e27]/60 to-transparent pointer-events-none"
-                    aria-hidden
-                />
-            )}
-
             <section className="relative z-10 max-w-3xl mx-auto text-center">
                 <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
                     {t("badge")}

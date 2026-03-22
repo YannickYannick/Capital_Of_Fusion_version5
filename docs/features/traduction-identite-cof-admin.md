@@ -1,6 +1,6 @@
-# Traduction admin — Identité COF (Notre vision / Notre histoire)
+# Traduction admin — Identité COF (Notre vision / Notre histoire / Bulletins)
 
-> Dernière mise à jour : 2026-03-22 — flux staff/admin pour traduire le Markdown Identité COF (EN/ES) avec aperçus et rappels des versions en ligne.
+> Dernière mise à jour : 2025-03-07 — flux staff/admin pour traduire le Markdown Identité COF et les **bulletins** (titre + contenu EN/ES) avec aperçus, rappels des versions en ligne et schéma Mermaid ci-dessous.
 
 ## Objectif
 
@@ -32,8 +32,48 @@ Implémentation : `backend/apps/core/views.py` (`SiteConfigurationAdminAPIView.g
 | `TranslationModeCheckboxes.tsx` | Cases Auto (IA) / Manuel. |
 | `EditFormActionBar.tsx` | Enregistrer, Annuler, **Traduire**. |
 | `SiteIdentityTranslationModal.tsx` | Choix langues → édition EN/ES ; fetch baselines via `getSiteIdentityTranslationsAdmin()`. |
+| `BulletinTranslationModal.tsx` | Idem pour un bulletin : **titre + contenu** par langue ; `object_id` = UUID du bulletin pour preview/apply/submit-pending. |
 | `TranslationBaselineReminder.tsx` | Aperçu repliable du texte EN/ES **déjà en ligne** au-dessus de chaque textarea. |
 | `frontend/src/lib/adminApi.ts` | `getSiteIdentityTranslationsAdmin()` + preview/apply/submit. |
+
+## Schéma de flux
+
+Vue d’ensemble page → modale → API (lisible dans GitHub / VS Code avec prise en charge Mermaid).
+
+```mermaid
+flowchart LR
+  subgraph page["Page Notre vision / Notre histoire"]
+    TA[Textarea FR]
+    MP[MarkdownPreviewPanel]
+    CB[Cases Auto / Manuel]
+    BT[Bouton Traduire]
+  end
+  subgraph modal["SiteIdentityTranslationModal"]
+    LG[Choix langues EN / ES]
+    GET[GET /api/admin/config/\nidentity_translations]
+    RB[Rappels EN·ES en ligne]
+    TX[Textareas traduction]
+  end
+  subgraph api["API traduction"]
+    PREV[POST translate/preview\nmode IA]
+    APP[POST translate/apply\nadmin]
+    SUB[POST translate/submit-pending\nstaff]
+  end
+  TA --> BT
+  MP --> BT
+  CB --> BT
+  BT --> LG
+  LG --> GET
+  GET --> RB
+  RB --> TX
+  LG -->|IA| PREV
+  PREV --> TX
+  TX --> APP
+  TX --> SUB
+```
+
+- **PREV** : uniquement si le mode choisi sur la page est **Auto (IA)** ; alimente les textareas avec la suggestion (éditable).
+- **APP / SUB** : selon `isAdmin` à l’enregistrement dans la modale.
 
 ## Références croisées
 
