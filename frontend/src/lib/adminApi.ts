@@ -280,3 +280,19 @@ export async function applyTranslationAdmin(payload: {
     });
     return handleResponse(res) as Promise<AdminTranslateApplyResponse>;
 }
+
+/** GET /api/admin/config/ — textes EN/ES déjà enregistrés (Identité COF). */
+export interface SiteIdentityTranslationsPayload {
+    identity_translations: {
+        vision_markdown: { en: string; es: string };
+        history_markdown: { en: string; es: string };
+    };
+}
+
+export async function getSiteIdentityTranslationsAdmin(): Promise<SiteIdentityTranslationsPayload> {
+    const res = await fetch(`${getApiBaseUrl()}/api/admin/config/`, {
+        method: "GET",
+        headers: authHeaders(),
+    });
+    return handleResponse(res) as Promise<SiteIdentityTranslationsPayload>;
+}

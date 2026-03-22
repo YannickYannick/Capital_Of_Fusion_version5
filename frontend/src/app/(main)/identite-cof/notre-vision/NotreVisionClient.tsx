@@ -7,6 +7,8 @@ import { patchSiteConfigVision } from "@/lib/api";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import { EditFormActionBar } from "@/components/admin/translation/EditFormActionBar";
 import { SiteIdentityTranslationModal } from "@/components/admin/translation/SiteIdentityTranslationModal";
+import { TranslationModeCheckboxes } from "@/components/admin/translation/TranslationModeCheckboxes";
+import { MarkdownPreviewPanel } from "@/components/admin/translation/MarkdownPreviewPanel";
 
 const proseClasses =
     "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
@@ -24,7 +26,8 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
     const [saveMessage, setSaveMessage] = useState<string | null>(null);
-    const [includeInTranslation, setIncludeInTranslation] = useState(false);
+    const [translateAi, setTranslateAi] = useState(false);
+    const [translateManual, setTranslateManual] = useState(false);
     const [translationModal, setTranslationModal] = useState<"ai" | "manual" | null>(null);
 
     const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
@@ -41,7 +44,8 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
         setEditValue(vision);
         setSaveError(null);
         setSaveMessage(null);
-        setIncludeInTranslation(false);
+        setTranslateAi(false);
+        setTranslateManual(false);
         setEditing(true);
     };
 
@@ -49,7 +53,8 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
         setEditValue(vision);
         setSaveError(null);
         setSaveMessage(null);
-        setIncludeInTranslation(false);
+        setTranslateAi(false);
+        setTranslateManual(false);
         setEditing(false);
     };
 
@@ -77,13 +82,17 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
         }
     };
 
-    const openTranslate = (mode: "ai" | "manual") => {
+    const openTranslate = () => {
         if (!editValue.trim()) {
             setSaveError("Renseignez d’abord le texte français à traduire.");
             return;
         }
+        if (!translateAi && !translateManual) {
+            setSaveError("Coche « Auto (IA) » ou « Manuel » pour indiquer comment tu veux traduire.");
+            return;
+        }
         setSaveError(null);
-        setTranslationModal(mode);
+        setTranslationModal(translateAi ? "ai" : "manual");
     };
 
     return (
@@ -115,15 +124,6 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
 
             {editing ? (
                 <div className="space-y-3">
-                    <label className="flex items-start gap-3 text-sm text-white/90">
-                        <input
-                            type="checkbox"
-                            checked={includeInTranslation}
-                            onChange={(e) => setIncludeInTranslation(e.target.checked)}
-                            className="mt-1 rounded border-white/30"
-                        />
-                        <span>Inclure ce champ dans la traduction (anglais / espagnol)</span>
-                    </label>
                     <textarea
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
@@ -131,14 +131,25 @@ export function NotreVisionClient({ initialVision }: NotreVisionClientProps) {
                         placeholder="Contenu Markdown ou HTML de la page Notre vision…"
                         disabled={saving}
                     />
+                    <MarkdownPreviewPanel
+                        markdown={editValue}
+                        savedBaseline={vision}
+                        contextLabel="Notre vision"
+                    />
+                    <TranslationModeCheckboxes
+                        useAi={translateAi}
+                        useManual={translateManual}
+                        onChangeAi={setTranslateAi}
+                        onChangeManual={setTranslateManual}
+                        rowLabel="Notre vision"
+                    />
                     {saveError && <p className="text-red-400 text-sm">{saveError}</p>}
                     {saveMessage && <p className="text-green-400 text-sm">{saveMessage}</p>}
                     <EditFormActionBar
                         onSave={handleSave}
                         onCancel={handleCancel}
-                        onTranslateAi={() => openTranslate("ai")}
-                        onTranslateManual={() => openTranslate("manual")}
-                        translateDisabled={!includeInTranslation}
+                        onTranslate={openTranslate}
+                        translateDisabled={!translateAi && !translateManual}
                         saving={saving}
                     />
                 </div>

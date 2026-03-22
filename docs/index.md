@@ -37,6 +37,7 @@
 - [Traduction / i18n](./explication/traduction-i18n.md)
 - [Stratégie traduction (décisions)](./mcp-traduction/strategie-traduction-decisions.md)
 - Dossiers : `docs/features/`, `docs/bmad/`, `docs/mcp-traduction/`, `docs/explication/`
+- [Traduction admin Identité COF](./features/traduction-identite-cof-admin.md) — modale EN/ES, aperçus, `GET /api/admin/config/`
 
 ---
 

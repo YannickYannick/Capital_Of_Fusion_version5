@@ -6,8 +6,7 @@
 interface EditFormActionBarProps {
     onSave: () => void;
     onCancel: () => void;
-    onTranslateAi: () => void;
-    onTranslateManual: () => void;
+    onTranslate: () => void;
     translateDisabled: boolean;
     saving: boolean;
 }
@@ -15,8 +14,7 @@ interface EditFormActionBarProps {
 export function EditFormActionBar({
     onSave,
     onCancel,
-    onTranslateAi,
-    onTranslateManual,
+    onTranslate,
     translateDisabled,
     saving,
 }: EditFormActionBarProps) {
@@ -40,21 +38,16 @@ export function EditFormActionBar({
             </button>
             <button
                 type="button"
-                onClick={onTranslateAi}
+                onClick={onTranslate}
                 disabled={saving || translateDisabled}
-                className="px-4 py-2 rounded-lg bg-emerald-600/30 text-emerald-200 hover:bg-emerald-600/50 border border-emerald-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
-                title={translateDisabled ? "Cochez « Inclure dans la traduction »" : undefined}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600/40 to-amber-600/40 text-white hover:from-emerald-500/50 hover:to-amber-500/50 border border-white/20 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm font-semibold"
+                title={
+                    translateDisabled
+                        ? "Coche Auto (IA) ou Manuel pour ce contenu"
+                        : "Ouvrir la traduction (langues puis textes)"
+                }
             >
-                Traduire (IA)
-            </button>
-            <button
-                type="button"
-                onClick={onTranslateManual}
-                disabled={saving || translateDisabled}
-                className="px-4 py-2 rounded-lg bg-amber-600/25 text-amber-200 hover:bg-amber-600/45 border border-amber-500/35 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
-                title={translateDisabled ? "Cochez « Inclure dans la traduction »" : undefined}
-            >
-                Traduire manuellement
+                Traduire
             </button>
         </div>
     );

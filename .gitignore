@@ -26,3 +26,6 @@ backend/media/
 backend/staticfiles/
 backend/error.txt
 backend/migrate_err.txt
+
+# Logs de debug racine / outils
+debug-*.log

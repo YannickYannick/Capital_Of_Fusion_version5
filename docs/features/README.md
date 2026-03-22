@@ -7,7 +7,8 @@ Documentation par feature : où c’est dans le code, comment ça fonctionne, co
 | Feature | Fichier | Résumé |
 |---------|---------|--------|
 | [Explore — Presets 3D](explore-presets.md) | `explore-presets.md` | Presets sauvegardables (zoom, caméra, options), API `core/presets`, chargement depuis SiteConfiguration |
-| [Identité COF — Notre vision & Bulletins](identite-cof.md) | `identite-cof.md` | Page Notre vision (Markdown config), bulletins d’info ; édition staff depuis le frontend ; API `config`, `identite/bulletins`, `admin/config`, `admin/identite/bulletins` |
+| [Identité COF — Notre vision & Bulletins](identite-cof.md) | `identite-cof.md` | Notre vision / histoire (Markdown), bulletins ; édition staff ; API `config`, `GET/PATCH admin/config`, traductions admin |
+| [Traduction admin Identité COF](traduction-identite-cof-admin.md) | `traduction-identite-cof-admin.md` | Modale EN/ES, aperçus FR + rappels versions en ligne, `getSiteIdentityTranslationsAdmin` |
 | [Organisation — Structure & Nœuds](organisation-noeuds.md) | `organisation-noeuds.md` | Organigramme, annuaire nœuds, fiche par nœud (cours + événements) |
 | [Organisation — Pôles & Staff](organisation-poles-staff.md) | `organisation-poles-staff.md` | Pôles (liste + comptage membres), page Notre Staff (grille, filtre par pôle) |
 | [Nos partenaires](partenaires.md) | `partenaires.md` | Structures, événements et cours partenaires (app `partners`, APIs dédiées, pages type organisation/événements/cours) |

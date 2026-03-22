@@ -5,9 +5,11 @@ import {
     previewTranslationAdmin,
     applyTranslationAdmin,
     submitTranslationPending,
+    getSiteIdentityTranslationsAdmin,
     type TranslateTargetLang,
     type AdminTranslatePreviewResponse,
 } from "@/lib/adminApi";
+import { TranslationBaselineReminder } from "@/components/admin/translation/TranslationBaselineReminder";
 
 const MODEL = "core.SiteConfiguration";
 
@@ -52,6 +54,8 @@ export function SiteIdentityTranslationModal({
         {}
     );
     const [edited, setEdited] = useState<Partial<Record<TranslateTargetLang, string>>>({});
+    const [baselineByLang, setBaselineByLang] = useState<Partial<Record<TranslateTargetLang, string>>>({});
+    const [baselineLoading, setBaselineLoading] = useState(false);
 
     useEffect(() => {
         if (!open) {
@@ -61,6 +65,8 @@ export function SiteIdentityTranslationModal({
             setEs(false);
             setPreviews({});
             setEdited({});
+            setBaselineByLang({});
+            setBaselineLoading(false);
             setError(null);
             setSuccess(null);
             return;
@@ -71,9 +77,33 @@ export function SiteIdentityTranslationModal({
         setEs(false);
         setPreviews({});
         setEdited({});
+        setBaselineByLang({});
+        setBaselineLoading(false);
         setError(null);
         setSuccess(null);
     }, [open, mode, field]);
+
+    /** Textes EN/ES déjà en base (rappel au-dessus de chaque colonne). */
+    useEffect(() => {
+        if (!open || step !== "edit") return;
+        let cancelled = false;
+        setBaselineLoading(true);
+        getSiteIdentityTranslationsAdmin()
+            .then((data) => {
+                if (cancelled) return;
+                const t = data.identity_translations[field];
+                setBaselineByLang({ en: t.en, es: t.es });
+            })
+            .catch(() => {
+                if (!cancelled) setBaselineByLang({});
+            })
+            .finally(() => {
+                if (!cancelled) setBaselineLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [open, step, field]);
 
     const continueFromLang = async () => {
         const t: TranslateTargetLang[] = [];
@@ -242,6 +272,11 @@ export function SiteIdentityTranslationModal({
                                         <h3 className="text-sm font-semibold text-purple-300 uppercase tracking-wider">
                                             {lang === "en" ? "Anglais" : "Espagnol"} ({lang})
                                         </h3>
+                                        <TranslationBaselineReminder
+                                            lang={lang}
+                                            markdown={baselineByLang[lang] ?? ""}
+                                            loading={baselineLoading}
+                                        />
                                         {mode === "ai" && previews[lang] && (
                                             <p className="text-xs text-white/40 line-clamp-2">
                                                 Source FR: {previews[lang]!.source.slice(0, 120)}

@@ -106,9 +106,27 @@ class BulletinDetailAPIView(APIView):
         return Response(serializer.data)
 
 
+def _siteconfig_identity_translations_payload(config: SiteConfiguration) -> dict:
+    """Valeurs EN/ES stockées (modeltranslation) pour la modale de traduction Identité COF."""
+    out = {}
+    for base in ("vision_markdown", "history_markdown"):
+        out[base] = {
+            "en": (getattr(config, f"{base}_en", None) or "") or "",
+            "es": (getattr(config, f"{base}_es", None) or "") or "",
+        }
+    return out
+
+
 class SiteConfigurationAdminAPIView(APIView):
-    """PATCH /api/admin/config/ — vision_markdown, history_markdown. Admin : appliqué direct. Staff : demande en attente."""
+    """GET /api/admin/config/ — traductions identité EN/ES. PATCH — vision_markdown, history_markdown (lang via ?lang=)."""
     permission_classes = [IsStaffOrSuperUser]
+
+    def get(self, request):
+        """Expose les textes EN/ES déjà enregistrés pour Notre vision / Notre histoire (rappel avant traduction)."""
+        config = SiteConfiguration.objects.first()
+        if not config:
+            config = SiteConfiguration.objects.create()
+        return Response({"identity_translations": _siteconfig_identity_translations_payload(config)})
 
     def patch(self, request):
         lang = _request_translation_lang(request)
