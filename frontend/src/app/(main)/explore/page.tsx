@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useState, useCallback, useEffect, useRef, startTransition, useDeferredValue } from "react";
 import { getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
-import { PlanetsOptionsProvider, usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
+import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PlanetOverlay } from "@/components/features/explore/components/PlanetOverlay";
@@ -12,6 +12,7 @@ import { OptionsPanel } from "@/components/features/explore/components/OptionsPa
 import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
 import { DebugPanel } from "@/components/features/explore/components/DebugPanel";
 import { useExplorePerformance } from "@/hooks/useExplorePerformance";
+import { ExploreLoadingModal } from "@/components/features/explore/components/ExploreLoadingModal";
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
 const ExploreScene = dynamic(
@@ -70,7 +71,7 @@ function ExploreSkeleton() {
 
 function ExplorePageInner() {
   const opts = usePlanetsOptions();
-  const { setBatch } = opts;
+  const { setBatch, showExploreLoadingModal, isTransitioningToExplore } = opts;
   const controlsRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const [nodes, setNodes] = useState<OrganizationNodeApi[]>([]);
@@ -133,8 +134,13 @@ function ExplorePageInner() {
       startTransition(() => {
         setNodes(nodesData);
         if (config.explore_config) {
-          const { id, name, created_at, updated_at, ...visualOptions } = config.explore_config as any;
-          setBatch(visualOptions);
+          const raw = config.explore_config as unknown as Record<string, unknown>;
+          const { id, name, created_at, updated_at, ...rest } = raw;
+          // Ne jamais écraser les flags de transition depuis la config DB
+          const visualOptions = { ...rest };
+          delete (visualOptions as Record<string, unknown>)['isTransitioningToExplore'];
+          delete (visualOptions as Record<string, unknown>)['showExploreLoadingModal'];
+          setBatch(visualOptions as Parameters<typeof setBatch>[0]);
         }
       });
     }).catch((e) => {
@@ -144,6 +150,51 @@ function ExplorePageInner() {
     });
     // setBatch uniquement : ne pas mettre perf en deps (objet recréé chaque rendu → boucle de requêtes)
   }, [setBatch]);
+
+  // Réinitialiser les flags de transition si on quitte /explore avant la fin du chargement.
+  // On utilise un ref pour éviter que React Strict Mode (double mount/unmount en dev)
+  // ne réinitialise les flags lors du premier cycle unmount.
+  const isMountedRef = useRef(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      isMountedRef.current = true;
+    }, 50);
+    return () => {
+      clearTimeout(timer);
+      if (isMountedRef.current) {
+        setBatch({ isTransitioningToExplore: false, showExploreLoadingModal: false });
+      }
+    };
+  }, [setBatch]);
+
+  // Fin de transition : scène 3D prête à être montée
+  // On ferme seulement isTransitioningToExplore, mais PAS la modale — l'utilisateur doit cliquer "Compris"
+  useEffect(() => {
+    if (!mountScene) return;
+    setBatch({ isTransitioningToExplore: false });
+  }, [mountScene, setBatch]);
+
+  // Callback pour fermer manuellement la modale (bouton "Compris")
+  const handleDismissModal = useCallback(() => {
+    setBatch({ showExploreLoadingModal: false });
+  }, [setBatch]);
+
+  // Erreur : ne pas laisser la modale bloquer
+  useEffect(() => {
+    if (!showExploreLoadingModal) return;
+    if (error) {
+      setBatch({ isTransitioningToExplore: false, showExploreLoadingModal: false });
+    }
+  }, [showExploreLoadingModal, error, setBatch]);
+
+  // Sécurité : fermer après 45s même si le canvas ne monte pas
+  useEffect(() => {
+    if (!showExploreLoadingModal) return;
+    const id = window.setTimeout(() => {
+      setBatch({ isTransitioningToExplore: false, showExploreLoadingModal: false });
+    }, 45000);
+    return () => window.clearTimeout(id);
+  }, [showExploreLoadingModal, setBatch]);
 
   // Solution 1 + 3: Monter Three.js après le FCP via requestIdleCallback + startTransition
   useEffect(() => {
@@ -220,8 +271,12 @@ function ExplorePageInner() {
     <div className="fixed inset-0 z-10">
       {/* La vidéo est gérée globalement dans layout.tsx (GlobalVideoBackground) */}
 
-      {/* Skeleton de chargement (affiché UNIQUEMENT pendant le chargement des données ET avant le montage de Three.js) */}
-      {!mountScene && (
+      {(showExploreLoadingModal || isTransitioningToExplore) && (
+        <ExploreLoadingModal onDismiss={handleDismissModal} />
+      )}
+
+      {/* Skeleton : masqué pendant la transition depuis l'accueil (vidéo + modale uniquement) */}
+      {!mountScene && !showExploreLoadingModal && !isTransitioningToExplore && (
         <ExploreSkeleton />
       )}
 
@@ -309,14 +364,16 @@ function ExplorePageInner() {
         <DebugPanel controlsRef={controlsRef} cameraRef={cameraRef} />
       )}
 
-      {/* Hint Navigation (bas-gauche, z-20) */}
-      <div className="fixed bottom-8 left-8 z-20 text-white/30 text-xs leading-relaxed select-none pointer-events-none">
-        <p>• Clic gauche + glisser : Rotation</p>
-        <p>• Clic droit + glisser : Panoramique</p>
-        <p>• Molette : Zoom</p>
-        <p>• Clic planète : Figer + Zoomer</p>
-        <p>• Double-clic : Réinitialiser</p>
-      </div>
+      {/* Hint Navigation (bas-gauche) — masquée pendant la transition */}
+      {!showExploreLoadingModal && !isTransitioningToExplore && (
+        <div className="fixed bottom-8 left-8 z-20 text-white/30 text-xs leading-relaxed select-none pointer-events-none">
+          <p>• Clic gauche + glisser : Rotation</p>
+          <p>• Clic droit + glisser : Panoramique</p>
+          <p>• Molette : Zoom</p>
+          <p>• Clic planète : Figer + Zoomer</p>
+          <p>• Double-clic : Réinitialiser</p>
+        </div>
+      )}
 
       {/* Overlay détails planète (z-50) */}
       <PlanetOverlay
@@ -349,9 +406,6 @@ function ExplorePageInner() {
  * Le fond vidéo est géré par le layout parent (z-0).
  */
 export default function ExplorePage() {
-  return (
-    <PlanetsOptionsProvider>
-      <ExplorePageInner />
-    </PlanetsOptionsProvider>
-  );
+  /** Même PlanetsOptionsProvider que le layout (accueil / menu) pour conserver les flags de transition. */
+  return <ExplorePageInner />;
 }

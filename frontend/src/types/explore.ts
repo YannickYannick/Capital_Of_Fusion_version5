@@ -52,6 +52,7 @@ export interface ExplorePresetApi {
     hoverOrbitTransitionSpeed: number;
     hoverPlanetTransitionSpeed: number;
     isTransitioningToExplore: boolean;
+    showExploreLoadingModal?: boolean;
     autoResetCamera: boolean;
     autoResetDelay: number;
 

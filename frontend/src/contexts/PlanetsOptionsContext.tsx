@@ -71,6 +71,8 @@ export interface PlanetsOptionsState {
     videoCycleHidden: number;
     videoTransition: number;
     isTransitioningToExplore: boolean;
+    /** Modale d'aide (touches) pendant le chargement Accueil → Explore ; non persistée en LS */
+    showExploreLoadingModal: boolean;
     showVideoOverlay: boolean;
     enableTextShadow: boolean;
     useBlackBackground: boolean;
@@ -179,6 +181,7 @@ const DEFAULTS: PlanetsOptionsState = {
     videoCycleHidden: 10,
     videoTransition: 1500,
     isTransitioningToExplore: false,
+    showExploreLoadingModal: false,
     showVideoOverlay: false,
     enableTextShadow: false,
     useBlackBackground: false,
@@ -337,6 +340,7 @@ function loadFromLS(): PlanetsOptionsState {
         hoverOrbitTransitionSpeed: lsGet(LS_KEYS.hoverOrbitTransitionSpeed!, DEFAULTS.hoverOrbitTransitionSpeed),
         hoverPlanetTransitionSpeed: lsGet(LS_KEYS.hoverPlanetTransitionSpeed!, DEFAULTS.hoverPlanetTransitionSpeed),
         isTransitioningToExplore: false,
+        showExploreLoadingModal: false,
         autoResetCamera: DEFAULTS.autoResetCamera,
         autoResetDelay: DEFAULTS.autoResetDelay,
         cameraX: lsGet(LS_KEYS.cameraX!, DEFAULTS.cameraX),
@@ -379,7 +383,7 @@ export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
         <K extends keyof PlanetsOptionsState>(key: K, value: PlanetsOptionsState[K]) => {
             setState((prev) => {
                 const next = { ...prev, [key]: value };
-                if (key !== "isTransitioningToExplore") {
+                if (key !== "isTransitioningToExplore" && key !== "showExploreLoadingModal") {
                     const lsKey = LS_KEYS[key];
                     if (lsKey) lsSet(lsKey, value);
                 }
@@ -393,7 +397,7 @@ export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
         setState((prev) => {
             const next = { ...prev, ...values };
             Object.entries(values).forEach(([key, value]) => {
-                if (key !== "isTransitioningToExplore") {
+                if (key !== "isTransitioningToExplore" && key !== "showExploreLoadingModal") {
                     const lsKey = LS_KEYS[key as keyof PlanetsOptionsState];
                     if (lsKey) lsSet(lsKey, value);
                 }

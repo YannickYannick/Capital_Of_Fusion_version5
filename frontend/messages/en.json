@@ -167,6 +167,49 @@
       "emptyTitle": "EMPTY",
       "emptySubtitle": "NO ARTIST MATCHES THIS CATEGORY",
       "filterLabel": "Filter"
+    },
+    "partnerStructures": {
+      "backToPartners": "← Our partners",
+      "eyebrow": "Our partners",
+      "titleBefore": "Partner",
+      "titleHighlight": "organizations",
+      "subtitle": "Discover partner organizations and their classes and events.",
+      "errorTitle": "Connection error",
+      "emptyTitle": "EMPTY",
+      "emptySubtitle": "NO PARTNER ORGANIZATION AVAILABLE YET"
+    },
+    "organisationPoles": {
+      "eyebrow": "Organization",
+      "titleBefore": "Our",
+      "titleHighlight": "Hubs",
+      "subtitle": "The teams that bring Capital of Fusion to life. Member counts are updated automatically.",
+      "errorTitle": "Connection error",
+      "membersSingular": "member",
+      "membersPlural": "members",
+      "emptyTitle": "No hub",
+      "emptySubtitle": "Hubs are configured in the admin."
+    },
+    "organisationStaff": {
+      "eyebrow": "Organization",
+      "titleBefore": "Our",
+      "titleHighlight": "Staff",
+      "subtitle": "The people who keep Capital of Fusion running every day. Filter by hub to discover teams.",
+      "filterLabel": "Filter by hub",
+      "filterAll": "All",
+      "errorTitle": "Connection error",
+      "emptyTitle": "No member",
+      "emptySubtitle": "No staff member matches this filter. Staff accounts are managed in the admin."
     }
+  },
+  "exploreTransition": {
+    "title": "Navigating space",
+    "loadingHint": "Loading the 3D scene and video…",
+    "lineRotate": "Left click + drag: rotate",
+    "linePan": "Right click + drag: pan",
+    "lineZoom": "Scroll wheel: zoom",
+    "lineClick": "Click a planet: lock + zoom",
+    "lineDoubleClick": "Double-click: reset",
+    "dismissButton": "Got it",
+    "nonBlockingHint": "You can use the top menu to go elsewhere."
   }
 }

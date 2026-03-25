@@ -5,6 +5,7 @@
  * Layout : StandardPageShell + StandardPageHero.
  */
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { getPartnerNodesForStructure } from "@/lib/api";
 import type { PartnerNodeApi } from "@/types/partner";
 import { PartnerNodeCard } from "@/components/features/partners/PartnerNodeCard";
@@ -13,6 +14,7 @@ import Link from "next/link";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 
 export default function PartenairesStructuresPage() {
+  const t = useTranslations("pages");
   const [nodes, setNodes] = useState<PartnerNodeApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,20 +42,20 @@ export default function PartenairesStructuresPage() {
             href="/partenaires"
             className="text-white/40 hover:text-white text-sm uppercase tracking-widest font-bold inline-block transition-colors"
           >
-            ← Nos partenaires
+            {t("partnerStructures.backToPartners")}
           </Link>
         </div>
 
         <StandardPageHero
-          eyebrow="Nos partenaires"
-          title="Structures"
-          highlight="partenaires"
-          description="Découvrez les structures partenaires et leurs cours et événements."
+          eyebrow={t("partnerStructures.eyebrow")}
+          title={t("partnerStructures.titleBefore")}
+          highlight={t("partnerStructures.titleHighlight")}
+          description={t("partnerStructures.subtitle")}
         />
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[2rem] text-red-500 text-center">
-            <p className="text-2xl font-black mb-2 uppercase italic tracking-tighter">Erreur de connexion</p>
+            <p className="text-2xl font-black mb-2 uppercase italic tracking-tighter">{t("partnerStructures.errorTitle")}</p>
             <p className="text-sm font-light opacity-60">{error}</p>
           </div>
         ) : (
@@ -72,8 +74,8 @@ export default function PartenairesStructuresPage() {
 
         {!loading && nodes.length === 0 && !error && (
           <div className="text-center py-32 text-white/10 border-2 border-dashed border-white/5 rounded-[3rem]">
-            <p className="text-3xl font-black tracking-widest uppercase italic">VIDE</p>
-            <p className="text-xs mt-4 tracking-[0.3em] font-light">AUCUNE STRUCTURE PARTENAIRE POUR LE MOMENT</p>
+            <p className="text-3xl font-black tracking-widest uppercase italic">{t("partnerStructures.emptyTitle")}</p>
+            <p className="text-xs mt-4 tracking-[0.3em] font-light">{t("partnerStructures.emptySubtitle")}</p>
           </div>
         )}
       </div>

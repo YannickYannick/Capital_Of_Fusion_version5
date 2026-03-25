@@ -167,6 +167,49 @@
       "emptyTitle": "VIDE",
       "emptySubtitle": "AUCUN ARTISTE NE CORRESPOND À CETTE CATÉGORIE",
       "filterLabel": "Filtrer"
+    },
+    "partnerStructures": {
+      "backToPartners": "← Nos partenaires",
+      "eyebrow": "Nos partenaires",
+      "titleBefore": "Structures",
+      "titleHighlight": "partenaires",
+      "subtitle": "Découvrez les structures partenaires et leurs cours et événements.",
+      "errorTitle": "Erreur de connexion",
+      "emptyTitle": "VIDE",
+      "emptySubtitle": "AUCUNE STRUCTURE PARTENAIRE POUR LE MOMENT"
+    },
+    "organisationPoles": {
+      "eyebrow": "Organisation",
+      "titleBefore": "Nos",
+      "titleHighlight": "Pôles",
+      "subtitle": "Les équipes qui font vivre Capital of Fusion. Le nombre de membres est mis à jour automatiquement.",
+      "errorTitle": "Erreur de connexion",
+      "membersSingular": "membre",
+      "membersPlural": "membres",
+      "emptyTitle": "Aucun pôle",
+      "emptySubtitle": "Les pôles sont configurés dans l'admin."
+    },
+    "organisationStaff": {
+      "eyebrow": "Organisation",
+      "titleBefore": "Notre",
+      "titleHighlight": "Staff",
+      "subtitle": "Les personnes qui font vivre Capital of Fusion au quotidien. Filtrez par pôle pour découvrir les équipes.",
+      "filterLabel": "Filtrer par pôle",
+      "filterAll": "Tous",
+      "errorTitle": "Erreur de connexion",
+      "emptyTitle": "Aucun membre",
+      "emptySubtitle": "Aucun membre du staff ne correspond à ce filtre. Les comptes staff sont gérés dans l'admin."
     }
+  },
+  "exploreTransition": {
+    "title": "Navigation dans l'espace",
+    "loadingHint": "Chargement de la scène 3D et de la vidéo…",
+    "lineRotate": "Clic gauche + glisser : rotation",
+    "linePan": "Clic droit + glisser : panoramique",
+    "lineZoom": "Molette : zoom",
+    "lineClick": "Clic sur une planète : figer + zoomer",
+    "lineDoubleClick": "Double-clic : réinitialiser",
+    "dismissButton": "Compris",
+    "nonBlockingHint": "Vous pouvez utiliser le menu du haut pour aller ailleurs."
   }
 }

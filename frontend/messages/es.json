@@ -167,6 +167,49 @@
       "emptyTitle": "VACÍO",
       "emptySubtitle": "NINGÚN ARTISTA COINCIDE CON ESTA CATEGORÍA",
       "filterLabel": "Filtrar"
+    },
+    "partnerStructures": {
+      "backToPartners": "← Nuestros socios",
+      "eyebrow": "Nuestros socios",
+      "titleBefore": "Estructuras",
+      "titleHighlight": "socias",
+      "subtitle": "Descubre las estructuras socias y sus clases y eventos.",
+      "errorTitle": "Error de conexión",
+      "emptyTitle": "VACÍO",
+      "emptySubtitle": "AÚN NO HAY ESTRUCTURAS SOCIAS"
+    },
+    "organisationPoles": {
+      "eyebrow": "Organización",
+      "titleBefore": "Nuestros",
+      "titleHighlight": "Polos",
+      "subtitle": "Los equipos que hacen vivir Capital of Fusion. El número de miembros se actualiza automáticamente.",
+      "errorTitle": "Error de conexión",
+      "membersSingular": "miembro",
+      "membersPlural": "miembros",
+      "emptyTitle": "Sin polos",
+      "emptySubtitle": "Los polos se configuran en el admin."
+    },
+    "organisationStaff": {
+      "eyebrow": "Organización",
+      "titleBefore": "Nuestro",
+      "titleHighlight": "Staff",
+      "subtitle": "Las personas que hacen vivir Capital of Fusion cada día. Filtra por polo para descubrir los equipos.",
+      "filterLabel": "Filtrar por polo",
+      "filterAll": "Todos",
+      "errorTitle": "Error de conexión",
+      "emptyTitle": "Sin miembros",
+      "emptySubtitle": "Ningún miembro del staff coincide con este filtro. Las cuentas staff se gestionan en el admin."
     }
+  },
+  "exploreTransition": {
+    "title": "Navegación en el espacio",
+    "loadingHint": "Cargando la escena 3D y el vídeo…",
+    "lineRotate": "Clic izquierdo + arrastrar: rotar",
+    "linePan": "Clic derecho + arrastrar: panorámica",
+    "lineZoom": "Rueda del ratón: zoom",
+    "lineClick": "Clic en un planeta: fijar + zoom",
+    "lineDoubleClick": "Doble clic: restablecer",
+    "dismissButton": "Entendido",
+    "nonBlockingHint": "Puedes usar el menú superior para ir a otra sección."
   }
 }

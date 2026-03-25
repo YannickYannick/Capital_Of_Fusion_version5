@@ -18,53 +18,52 @@ export default function LandingPageClient() {
     const handleStartPushed = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         setIsTransitioning(true);
-        opts.set("isTransitioningToExplore", true);
-        setTimeout(() => {
+        opts.setBatch({
+            isTransitioningToExplore: true,
+            showExploreLoadingModal: true,
+        });
+        window.setTimeout(() => {
             router.push("/explore");
-        }, 1500);
+        }, 120);
     };
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
-            <section className="relative z-10 max-w-3xl mx-auto text-center">
-                <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
-                    {t("badge")}
-                </p>
-                <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-200 bg-clip-text text-transparent">
-                    {t("title")}
-                </h1>
-                <p className="mt-6 text-lg sm:text-xl text-white/85 leading-relaxed">
-                    {t("subtitle1")}
-                    <br />
-                    {t("subtitle2")}
-                </p>
+            {!isTransitioning ? (
+                <section className="relative z-10 max-w-3xl mx-auto text-center">
+                    <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
+                        {t("badge")}
+                    </p>
+                    <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-200 bg-clip-text text-transparent">
+                        {t("title")}
+                    </h1>
+                    <p className="mt-6 text-lg sm:text-xl text-white/85 leading-relaxed">
+                        {t("subtitle1")}
+                        <br />
+                        {t("subtitle2")}
+                    </p>
 
-                <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                    <a
-                        href="/explore"
-                        onClick={handleStartPushed}
-                        className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition cursor-pointer relative overflow-hidden group"
-                    >
-                        <span className="relative z-10">{t("ctaExplore")}</span>
-                        {isTransitioning && (
-                            <span
-                                className="absolute inset-0 bg-purple-400/30 z-0 w-0 origin-left animate-progress-full"
-                                aria-hidden
-                            />
-                        )}
-                    </a>
-                    <Link
-                        href="/cours"
-                        className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition"
-                    >
-                        {t("ctaCourses")}
-                    </Link>
-                </div>
+                    <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                        <a
+                            href="/explore"
+                            onClick={handleStartPushed}
+                            className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition cursor-pointer relative overflow-hidden group"
+                        >
+                            <span className="relative z-10">{t("ctaExplore")}</span>
+                        </a>
+                        <Link
+                            href="/cours"
+                            className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition"
+                        >
+                            {t("ctaCourses")}
+                        </Link>
+                    </div>
 
-                <p className="mt-8 text-sm text-white/50">
-                    {t("footerLine")}
-                </p>
-            </section>
+                    <p className="mt-8 text-sm text-white/50">
+                        {t("footerLine")}
+                    </p>
+                </section>
+            ) : null}
         </div>
     );
 }
