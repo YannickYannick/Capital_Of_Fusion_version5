@@ -110,6 +110,14 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
             user.save()
         return
 
+    if ct == PendingContentEdit.ContentType.USER_ARTIST_CREATE:
+        from apps.users.serializers import ArtistCreateSerializer
+
+        serializer = ArtistCreateSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return
+
     if ct == PendingContentEdit.ContentType.EVENT:
         from apps.events.models import Event
         from apps.events.serializers import EventWriteSerializer

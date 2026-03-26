@@ -283,6 +283,7 @@ class PendingContentEdit(models.Model):
         SITECONFIG = "siteconfig", "Configuration (Notre vision)"
         BULLETIN = "bulletin", "Bulletin"
         USER_ARTIST_BIO = "user_artist_bio", "Biographie artiste"
+        USER_ARTIST_CREATE = "user_artist_create", "Création artiste"
         EVENT = "event", "Événement"
         COURSE = "course", "Cours"
         THEORY_LESSON = "theory_lesson", "Leçon de théorie"

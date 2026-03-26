@@ -78,11 +78,120 @@
     "translateNeedFrBio": "Enter the French biography text to translate first.",
     "translateNeedMode": "Check “Auto (AI)” or “Manual” to choose how you want to translate."
   },
+  "artistCreate": {
+    "ctaNewArtist": "Add an artist",
+    "loginRequired": "Sign in required.",
+    "insufficientRights": "Insufficient permissions.",
+    "loading": "Loading…",
+    "backToArtists": "← Back to artists",
+    "title": "Add an artist",
+    "adminDirectHint": "You are an admin: the artist will be created immediately.",
+    "staffPendingHint": "You are staff: the creation will be submitted for admin approval.",
+    "username": "Username",
+    "usernamePlaceholder": "e.g. first-last",
+    "usernameHintDefault": "Pick a unique identifier (used in the URL).",
+    "usernameHintValue": "URL: /artistes/profils/{value}",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "bioSectionTitle": "Biography (by language)",
+    "bioFallbackHint": "On the site, if a language is empty, the French version is shown as fallback.",
+    "bioFrLabel": "French",
+    "bioEnLabel": "English",
+    "bioEsLabel": "Spanish",
+    "staffMemberLabel": "Official Team CoF member",
+    "professionsLabel": "Professions / roles",
+    "cancel": "Cancel",
+    "create": "Create",
+    "saving": "Creating…",
+    "createdSuccess": "Artist created.",
+    "createdPending": "Request sent. It will be visible after approval.",
+    "createError": "Error while creating."
+  },
   "artistPublic": {
     "biography": "Biography",
     "noBio": "No biography available for this artist."
   },
   "pages": {
+    "partnerHub": {
+      "metaTitle": "Our partners | Capital of Fusion",
+      "metaDescription": "Partner organizations, events and classes. Capital of Fusion.",
+      "titleBefore": "Our",
+      "titleHighlight": "partners",
+      "subtitle": "Organizations, events and classes offered by our partners.",
+      "cards": {
+        "structures": {
+          "title": "Partner organizations",
+          "desc": "Directory of partner organizations and their offers."
+        },
+        "events": {
+          "title": "Partner events",
+          "desc": "Festivals, parties and workshops from our partners."
+        },
+        "courses": {
+          "title": "Partner classes",
+          "desc": "Classes catalog offered by our partners."
+        }
+      }
+    },
+    "partnerEvents": {
+      "backToPartners": "← Our partners",
+      "eyebrow": "Partners",
+      "titleBefore": "Partner",
+      "titleHighlight": "events",
+      "subtitle": "Festivals, parties and workshops offered by our partner organizations.",
+      "filters": {
+        "typeLabel": "Type",
+        "allTypes": "All types",
+        "upcomingOnly": "Upcoming only"
+      },
+      "types": {
+        "festival": "Festival",
+        "party": "Party",
+        "workshop": "Workshop"
+      },
+      "loading": "Loading…",
+      "empty": "No partner event for now."
+    },
+    "partnerCourses": {
+      "backToPartners": "← Our partners",
+      "eyebrow": "Partners",
+      "titleBefore": "Partner",
+      "titleHighlight": "classes",
+      "subtitle": "Classes catalog offered by our partner organizations. Filter by style or level.",
+      "filters": {
+        "levelLabel": "Level",
+        "styleLabel": "Style",
+        "allLevels": "All levels",
+        "allStyles": "All styles"
+      },
+      "levels": {
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced",
+        "professional": "Professional"
+      },
+      "styles": {
+        "bachata": "Bachata",
+        "salsa": "Salsa",
+        "kizomba": "Kizomba"
+      },
+      "loading": "Loading…",
+      "empty": "No partner class for now."
+    },
+    "promotionsFestivals": {
+      "metaTitle": "Festival promotions | Capital of Fusion",
+      "metaDescription": "Festivals from our partner organizations — promotions and upcoming events.",
+      "backToPartners": "← Our partners",
+      "eyebrow": "Promotions",
+      "titleBefore": "Festival",
+      "titleHighlight": "promotions",
+      "subtitle": "Festivals from our partner organizations — upcoming and ongoing.",
+      "filters": {
+        "upcomingOnly": "Upcoming only"
+      },
+      "loading": "Loading…",
+      "empty": "No partner festival promotion for now."
+    },
     "theory": {
       "eyebrow": "LEARN & UNDERSTAND",
       "titleBefore": "Dance",

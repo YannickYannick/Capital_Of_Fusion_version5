@@ -12,6 +12,7 @@ import { OptionsPanel } from "@/components/features/explore/components/OptionsPa
 import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
 import { DebugPanel } from "@/components/features/explore/components/DebugPanel";
 import { useExplorePerformance } from "@/hooks/useExplorePerformance";
+import { prefetchExploreModules } from "@/hooks/usePrefetchExplore";
 import { ExploreLoadingModal } from "@/components/features/explore/components/ExploreLoadingModal";
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
@@ -29,7 +30,7 @@ const ExploreScene = dynamic(
 
 function ExploreSkeleton() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-20 overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       {/* Soleil central pulsant */}
       <div className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 animate-pulse shadow-lg shadow-amber-500/50" />
       
@@ -196,28 +197,28 @@ function ExplorePageInner() {
     return () => window.clearTimeout(id);
   }, [showExploreLoadingModal, setBatch]);
 
-  // Solution 1 + 3: Monter Three.js après le FCP via requestIdleCallback + startTransition
+  // Monter la scène juste après le prochain paint (double rAF) pour éviter l’attente requestIdleCallback
+  // tout en laissant le navigateur finir la mise en page ; startTransition garde le rendu 3D non-bloquant.
   useEffect(() => {
     if (!loading && !error && nodes.length > 0 && !mountScene) {
-      // Marquer le début de l'init Canvas
       perf.markCanvasInit();
-      
+
       const mount = () => {
-        // Solution 3: Utiliser startTransition pour marquer le montage comme non-urgent
         startTransition(() => {
           setMountScene(true);
-          // Marquer que le Canvas est prêt à être monté
           perf.markCanvasReady();
         });
       };
-      
-      if (typeof requestIdleCallback !== "undefined") {
-        const id = requestIdleCallback(mount, { timeout: 200 });
-        return () => cancelIdleCallback(id);
-      } else {
-        const id = setTimeout(mount, 50);
-        return () => clearTimeout(id);
-      }
+
+      let raf1 = 0;
+      let raf2 = 0;
+      raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(mount);
+      });
+      return () => {
+        cancelAnimationFrame(raf1);
+        cancelAnimationFrame(raf2);
+      };
     }
   }, [loading, error, nodes.length, mountScene, perf]);
 
@@ -275,9 +276,17 @@ function ExplorePageInner() {
         <ExploreLoadingModal onDismiss={handleDismissModal} />
       )}
 
-      {/* Skeleton : masqué pendant la transition depuis l'accueil (vidéo + modale uniquement) */}
-      {!mountScene && !showExploreLoadingModal && !isTransitioningToExplore && (
-        <ExploreSkeleton />
+      {/* Skeleton sous la modale (z-25) : feedback visuel même pendant la transition */}
+      {!mountScene && (
+        <div
+          className={
+            showExploreLoadingModal || isTransitioningToExplore
+              ? "absolute inset-0 z-[12] opacity-35 pointer-events-none transition-opacity duration-300"
+              : "absolute inset-0 z-[12] transition-opacity duration-300"
+          }
+        >
+          <ExploreSkeleton />
+        </div>
       )}
 
       {/* Erreur */}

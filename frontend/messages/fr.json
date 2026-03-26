@@ -78,11 +78,120 @@
     "translateNeedFrBio": "Renseigne d’abord le texte français (biographie) à traduire.",
     "translateNeedMode": "Coche « Auto (IA) » ou « Manuel » pour indiquer comment tu veux traduire."
   },
+  "artistCreate": {
+    "ctaNewArtist": "Ajouter un artiste",
+    "loginRequired": "Connexion requise.",
+    "insufficientRights": "Droits insuffisants.",
+    "loading": "Chargement…",
+    "backToArtists": "← Retour aux artistes",
+    "title": "Ajouter un artiste",
+    "adminDirectHint": "Vous êtes administrateur : l’artiste sera créé immédiatement.",
+    "staffPendingHint": "Vous êtes staff : la création sera soumise à validation d’un administrateur.",
+    "username": "Username",
+    "usernamePlaceholder": "ex: prenom-nom",
+    "usernameHintDefault": "Choisis un identifiant unique (utilisé dans l’URL).",
+    "usernameHintValue": "URL: /artistes/profils/{value}",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "bioSectionTitle": "Biographie (par langue)",
+    "bioFallbackHint": "Sur le site, si une langue n’est pas renseignée, la version française s’affiche en secours.",
+    "bioFrLabel": "Français",
+    "bioEnLabel": "English",
+    "bioEsLabel": "Español",
+    "staffMemberLabel": "Membre officiel Team CoF",
+    "professionsLabel": "Professions / rôles",
+    "cancel": "Annuler",
+    "create": "Créer",
+    "saving": "Création…",
+    "createdSuccess": "Artiste créé.",
+    "createdPending": "Création envoyée. Elle sera visible après approbation.",
+    "createError": "Erreur lors de la création."
+  },
   "artistPublic": {
     "biography": "Biographie",
     "noBio": "Aucune biographie disponible pour cet artiste."
   },
   "pages": {
+    "partnerHub": {
+      "metaTitle": "Nos partenaires | Capital of Fusion",
+      "metaDescription": "Structures, événements et cours de nos partenaires. Capital of Fusion.",
+      "titleBefore": "Nos",
+      "titleHighlight": "partenaires",
+      "subtitle": "Structures, événements et cours proposés par nos partenaires.",
+      "cards": {
+        "structures": {
+          "title": "Structures partenaires",
+          "desc": "Annuaire des structures partenaires et leurs offres."
+        },
+        "events": {
+          "title": "Événements des partenaires",
+          "desc": "Festivals, soirées et ateliers des partenaires."
+        },
+        "courses": {
+          "title": "Cours des partenaires",
+          "desc": "Catalogue de cours proposés par les partenaires."
+        }
+      }
+    },
+    "partnerEvents": {
+      "backToPartners": "← Nos partenaires",
+      "eyebrow": "Partenaires",
+      "titleBefore": "Événements des",
+      "titleHighlight": "partenaires",
+      "subtitle": "Festivals, soirées et ateliers proposés par nos structures partenaires.",
+      "filters": {
+        "typeLabel": "Type",
+        "allTypes": "Tous les types",
+        "upcomingOnly": "À venir uniquement"
+      },
+      "types": {
+        "festival": "Festival",
+        "party": "Soirée",
+        "workshop": "Atelier"
+      },
+      "loading": "Chargement…",
+      "empty": "Aucun événement partenaire pour le moment."
+    },
+    "partnerCourses": {
+      "backToPartners": "← Nos partenaires",
+      "eyebrow": "Partenaires",
+      "titleBefore": "Cours des",
+      "titleHighlight": "partenaires",
+      "subtitle": "Catalogue de cours proposés par nos structures partenaires. Filtrez par style ou niveau.",
+      "filters": {
+        "levelLabel": "Niveau",
+        "styleLabel": "Style",
+        "allLevels": "Tous les niveaux",
+        "allStyles": "Tous les styles"
+      },
+      "levels": {
+        "beginner": "Débutant",
+        "intermediate": "Intermédiaire",
+        "advanced": "Avancé",
+        "professional": "Professionnel"
+      },
+      "styles": {
+        "bachata": "Bachata",
+        "salsa": "Salsa",
+        "kizomba": "Kizomba"
+      },
+      "loading": "Chargement…",
+      "empty": "Aucun cours partenaire pour le moment."
+    },
+    "promotionsFestivals": {
+      "metaTitle": "Promotions festivals | Capital of Fusion",
+      "metaDescription": "Festivals de nos structures partenaires — promotions et événements à venir.",
+      "backToPartners": "← Nos partenaires",
+      "eyebrow": "Promotions",
+      "titleBefore": "Promotions",
+      "titleHighlight": "festivals",
+      "subtitle": "Festivals de nos structures partenaires — à venir et en cours.",
+      "filters": {
+        "upcomingOnly": "À venir uniquement"
+      },
+      "loading": "Chargement…",
+      "empty": "Aucun festival partenaire en promotion pour le moment."
+    },
     "theory": {
       "eyebrow": "APPRENDRE & COMPRENDRE",
       "titleBefore": "Théorie de la",

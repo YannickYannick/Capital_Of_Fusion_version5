@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Layout pour la section Promotions festivals.
  */
-export const metadata: Metadata = {
-  title: "Promotions festivals | Capital of Fusion",
-  description:
-    "Festivals de nos structures partenaires — promotions et événements à venir.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pages");
+  return {
+    title: t("promotionsFestivals.metaTitle"),
+    description: t("promotionsFestivals.metaDescription"),
+  };
+}
 
 export default function PromotionsFestivalsLayout({
   children,

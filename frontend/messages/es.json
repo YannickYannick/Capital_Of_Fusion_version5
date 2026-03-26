@@ -78,11 +78,120 @@
     "translateNeedFrBio": "Indica primero el texto en francés (biografía) a traducir.",
     "translateNeedMode": "Marca « Auto (IA) » o « Manual » para indicar cómo quieres traducir."
   },
+  "artistCreate": {
+    "ctaNewArtist": "Agregar un artista",
+    "loginRequired": "Inicio de sesión obligatorio.",
+    "insufficientRights": "Permisos insuficientes.",
+    "loading": "Cargando…",
+    "backToArtists": "← Volver a artistas",
+    "title": "Agregar un artista",
+    "adminDirectHint": "Eres admin: el artista se creará inmediatamente.",
+    "staffPendingHint": "Eres staff: la creación se enviará para aprobación del admin.",
+    "username": "Username",
+    "usernamePlaceholder": "p. ej. nombre-apellido",
+    "usernameHintDefault": "Elige un identificador único (se usa en la URL).",
+    "usernameHintValue": "URL: /artistes/profils/{value}",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "bioSectionTitle": "Biografía (por idioma)",
+    "bioFallbackHint": "En el sitio, si un idioma está vacío, se muestra la versión en francés.",
+    "bioFrLabel": "Francés",
+    "bioEnLabel": "Inglés",
+    "bioEsLabel": "Español",
+    "staffMemberLabel": "Miembro oficial del Team CoF",
+    "professionsLabel": "Profesiones / roles",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "saving": "Creando…",
+    "createdSuccess": "Artista creado.",
+    "createdPending": "Solicitud enviada. Será visible tras la aprobación.",
+    "createError": "Error al crear."
+  },
   "artistPublic": {
     "biography": "Biografía",
     "noBio": "No hay biografía disponible para este artista."
   },
   "pages": {
+    "partnerHub": {
+      "metaTitle": "Nuestros socios | Capital of Fusion",
+      "metaDescription": "Estructuras, eventos y clases de nuestros socios. Capital of Fusion.",
+      "titleBefore": "Nuestros",
+      "titleHighlight": "socios",
+      "subtitle": "Estructuras, eventos y clases propuestas por nuestros socios.",
+      "cards": {
+        "structures": {
+          "title": "Estructuras socias",
+          "desc": "Directorio de estructuras socias y sus ofertas."
+        },
+        "events": {
+          "title": "Eventos de socios",
+          "desc": "Festivales, fiestas y talleres de nuestros socios."
+        },
+        "courses": {
+          "title": "Clases de socios",
+          "desc": "Catálogo de clases propuestas por los socios."
+        }
+      }
+    },
+    "partnerEvents": {
+      "backToPartners": "← Nuestros socios",
+      "eyebrow": "Socios",
+      "titleBefore": "Eventos de",
+      "titleHighlight": "socios",
+      "subtitle": "Festivales, fiestas y talleres propuestos por nuestras estructuras socias.",
+      "filters": {
+        "typeLabel": "Tipo",
+        "allTypes": "Todos los tipos",
+        "upcomingOnly": "Solo próximos"
+      },
+      "types": {
+        "festival": "Festival",
+        "party": "Fiesta",
+        "workshop": "Taller"
+      },
+      "loading": "Cargando…",
+      "empty": "Por ahora no hay eventos de socios."
+    },
+    "partnerCourses": {
+      "backToPartners": "← Nuestros socios",
+      "eyebrow": "Socios",
+      "titleBefore": "Clases de",
+      "titleHighlight": "socios",
+      "subtitle": "Catálogo de clases propuestas por nuestras estructuras socias. Filtra por estilo o nivel.",
+      "filters": {
+        "levelLabel": "Nivel",
+        "styleLabel": "Estilo",
+        "allLevels": "Todos los niveles",
+        "allStyles": "Todos los estilos"
+      },
+      "levels": {
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado",
+        "professional": "Profesional"
+      },
+      "styles": {
+        "bachata": "Bachata",
+        "salsa": "Salsa",
+        "kizomba": "Kizomba"
+      },
+      "loading": "Cargando…",
+      "empty": "Por ahora no hay clases de socios."
+    },
+    "promotionsFestivals": {
+      "metaTitle": "Promociones de festivales | Capital of Fusion",
+      "metaDescription": "Festivales de nuestras estructuras socias — promociones y eventos próximos.",
+      "backToPartners": "← Nuestros socios",
+      "eyebrow": "Promociones",
+      "titleBefore": "Promociones",
+      "titleHighlight": "festivales",
+      "subtitle": "Festivales de nuestras estructuras socias — próximos y en curso.",
+      "filters": {
+        "upcomingOnly": "Solo próximos"
+      },
+      "loading": "Cargando…",
+      "empty": "Por ahora no hay festivales de socios en promoción."
+    },
     "theory": {
       "eyebrow": "APRENDER & ENTENDER",
       "titleBefore": "Teoría de la",

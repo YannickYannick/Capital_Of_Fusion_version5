@@ -6,30 +6,32 @@
  */
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { getPartnerCourses } from "@/lib/api";
 import type { PartnerCourseApi } from "@/types/partner";
 
-const LEVEL_OPTIONS = [
-  { value: "", label: "Tous les niveaux" },
-  { value: "beginner", label: "Débutant" },
-  { value: "intermediate", label: "Intermédiaire" },
-  { value: "advanced", label: "Avancé" },
-  { value: "professional", label: "Professionnel" },
-];
-
-const STYLE_OPTIONS = [
-  { value: "", label: "Tous les styles" },
-  { value: "bachata", label: "Bachata" },
-  { value: "salsa", label: "Salsa" },
-  { value: "kizomba", label: "Kizomba" },
-];
-
 export default function PartenairesCoursPage() {
+  const t = useTranslations("pages");
   const [courses, setCourses] = useState<PartnerCourseApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState("");
   const [style, setStyle] = useState("");
+
+  const LEVEL_OPTIONS = [
+    { value: "", label: t("partnerCourses.filters.allLevels") },
+    { value: "beginner", label: t("partnerCourses.levels.beginner") },
+    { value: "intermediate", label: t("partnerCourses.levels.intermediate") },
+    { value: "advanced", label: t("partnerCourses.levels.advanced") },
+    { value: "professional", label: t("partnerCourses.levels.professional") },
+  ];
+
+  const STYLE_OPTIONS = [
+    { value: "", label: t("partnerCourses.filters.allStyles") },
+    { value: "bachata", label: t("partnerCourses.styles.bachata") },
+    { value: "salsa", label: t("partnerCourses.styles.salsa") },
+    { value: "kizomba", label: t("partnerCourses.styles.kizomba") },
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -50,20 +52,25 @@ export default function PartenairesCoursPage() {
             href="/partenaires"
             className="text-white/40 hover:text-white text-sm uppercase tracking-widest font-bold mb-6 inline-block transition-colors"
           >
-            ← Nos partenaires
+            {t("partnerCourses.backToPartners")}
           </Link>
-          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Partenaires</p>
+          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">
+            {t("partnerCourses.eyebrow")}
+          </p>
           <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4">
-            Cours des <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">partenaires</span>
+            {t("partnerCourses.titleBefore")}{" "}
+            <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+              {t("partnerCourses.titleHighlight")}
+            </span>
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            Catalogue de cours proposés par nos structures partenaires. Filtrez par style ou niveau.
+            {t("partnerCourses.subtitle")}
           </p>
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-6 bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md max-w-2xl mx-auto mb-12">
           <label className="flex flex-col gap-2 text-sm text-white/80 font-medium flex-1 min-w-[200px]">
-            Niveau
+            {t("partnerCourses.filters.levelLabel")}
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value)}
@@ -75,7 +82,7 @@ export default function PartenairesCoursPage() {
             </select>
           </label>
           <label className="flex flex-col gap-2 text-sm text-white/80 font-medium flex-1 min-w-[200px]">
-            Style
+            {t("partnerCourses.filters.styleLabel")}
             <select
               value={style}
               onChange={(e) => setStyle(e.target.value)}
@@ -91,9 +98,9 @@ export default function PartenairesCoursPage() {
         {error && <p className="mt-4 text-red-400" role="alert">{error}</p>}
 
         {loading ? (
-          <p className="mt-8 text-white/60">Chargement…</p>
+          <p className="mt-8 text-white/60">{t("partnerCourses.loading")}</p>
         ) : courses.length === 0 ? (
-          <p className="mt-8 text-white/60">Aucun cours partenaire pour le moment.</p>
+          <p className="mt-8 text-white/60">{t("partnerCourses.empty")}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 delay-200">
             {courses.map((c) => (
