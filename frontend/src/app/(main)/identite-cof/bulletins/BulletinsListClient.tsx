@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
 import { getBulletins, getAdminBulletins } from "@/lib/api";
 import type { BulletinApi, BulletinAdminApi } from "@/types/config";
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null, locale: string): string {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("fr-FR", {
+  return new Date(dateStr).toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -16,6 +17,8 @@ function formatDate(dateStr: string | null): string {
 }
 
 export function BulletinsListClient() {
+  const t = useTranslations("pages.bulletins");
+  const locale = useLocale();
   const { user } = useAuth();
   const [bulletins, setBulletins] = useState<BulletinApi[] | BulletinAdminApi[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,22 +37,22 @@ export function BulletinsListClient() {
           setBulletins(data);
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Erreur chargement");
+        setError(e instanceof Error ? e.message : t("error"));
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [canEdit]);
+  }, [canEdit, t]);
 
   if (loading) {
     return (
       <div>
         <div className="text-center mb-14">
-          <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Identité COF</p>
-          <h1 className="text-5xl font-black text-white tracking-tight mb-4">Dernières informations</h1>
+          <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">{t("eyebrow")}</p>
+          <h1 className="text-5xl font-black text-white tracking-tight mb-4">{t("title")}</h1>
         </div>
-        <p className="text-white/60 text-sm">Chargement…</p>
+        <p className="text-white/60 text-sm">{t("loading")}</p>
       </div>
     );
   }
@@ -58,7 +61,7 @@ export function BulletinsListClient() {
     return (
       <div>
         <div className="text-center mb-14">
-          <h1 className="text-5xl font-black text-white tracking-tight mb-4">Dernières informations</h1>
+          <h1 className="text-5xl font-black text-white tracking-tight mb-4">{t("title")}</h1>
         </div>
         <p className="text-red-400">{error}</p>
       </div>
@@ -67,34 +70,29 @@ export function BulletinsListClient() {
 
   return (
     <div>
-      {/* Header style aligné formations/contenu */}
       <div className="text-center mb-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">Identité COF</p>
+        <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">{t("eyebrow")}</p>
         <h1 className="text-5xl font-black text-white tracking-tight mb-4">
-          Dernières informations{" "}
+          {t("title")}{" "}
           <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            d&apos;information
+            {t("titleHighlight")}
           </span>
         </h1>
-        <p className="text-white/60 max-w-xl mx-auto mb-6">
-          Les dernières informations sont affichées du plus récent au plus ancien.
-        </p>
+        <p className="text-white/60 max-w-xl mx-auto mb-6">{t("subtitle")}</p>
         {canEdit && (
           <Link
             href="/identite-cof/bulletins/nouveau"
             className="inline-block text-sm px-4 py-2 rounded-xl bg-white/10 border border-white/15 text-white/80 hover:bg-white/20 hover:text-white transition-all duration-200"
           >
-            + Créer un bulletin
+            {t("createButton")}
           </Link>
         )}
       </div>
 
       {bulletins.length === 0 ? (
         <p className="text-white/50 italic text-center animate-in fade-in duration-500">
-          Aucune information pour le moment.
-          {canEdit
-            ? " Cliquez sur « Créer une information » pour en ajouter."
-            : " Les informations peuvent être ajoutées dans l'admin (Dernières informations)."}
+          {t("empty")}{" "}
+          {canEdit ? t("emptyAdmin") : t("emptyPublic")}
         </p>
       ) : (
         <ul className="flex flex-col gap-4 animate-in fade-in duration-500">
@@ -109,10 +107,10 @@ export function BulletinsListClient() {
                       className="text-white/50 text-sm"
                       dateTime={b.published_at ?? b.created_at}
                     >
-                      {formatDate(b.published_at ?? b.created_at)}
+                      {formatDate(b.published_at ?? b.created_at, locale)}
                     </time>
                     {isDraft && (
-                      <span className="ml-2 text-amber-400 text-sm">(Brouillon)</span>
+                      <span className="ml-2 text-amber-400 text-sm">({t("draft")})</span>
                     )}
                   </Link>
                   {canEdit && (
@@ -120,7 +118,7 @@ export function BulletinsListClient() {
                       href={`/identite-cof/bulletins/${b.slug}/edit`}
                       className="shrink-0 px-4 py-2 rounded-xl bg-white/10 border border-white/15 text-white/60 text-sm hover:bg-white/20 hover:text-white transition-all duration-200"
                     >
-                      Modifier
+                      {t("editButton")}
                     </Link>
                   )}
                 </div>

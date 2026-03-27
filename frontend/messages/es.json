@@ -199,6 +199,20 @@
       "errorTitle": "Error de conexión",
       "emptyTitle": "Sin miembros",
       "emptySubtitle": "Ningún miembro del staff coincide con este filtro. Las cuentas staff se gestionan en el admin."
+    },
+    "bulletins": {
+      "eyebrow": "Identidad COF",
+      "title": "Últimas",
+      "titleHighlight": "novedades",
+      "subtitle": "Las últimas novedades se muestran de más reciente a más antigua.",
+      "createButton": "+ Crear un boletín",
+      "editButton": "Editar",
+      "draft": "Borrador",
+      "empty": "Aún no hay novedades.",
+      "emptyAdmin": "Haz clic en «Crear un boletín» para añadir una.",
+      "emptyPublic": "Las novedades pueden añadirse en el admin (Últimas novedades).",
+      "loading": "Cargando…",
+      "error": "Error de carga"
     }
   },
   "exploreTransition": {

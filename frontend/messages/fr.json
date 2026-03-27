@@ -199,6 +199,20 @@
       "errorTitle": "Erreur de connexion",
       "emptyTitle": "Aucun membre",
       "emptySubtitle": "Aucun membre du staff ne correspond à ce filtre. Les comptes staff sont gérés dans l'admin."
+    },
+    "bulletins": {
+      "eyebrow": "Identité COF",
+      "title": "Dernières informations",
+      "titleHighlight": "d'information",
+      "subtitle": "Les dernières informations sont affichées du plus récent au plus ancien.",
+      "createButton": "+ Créer un bulletin",
+      "editButton": "Modifier",
+      "draft": "Brouillon",
+      "empty": "Aucune information pour le moment.",
+      "emptyAdmin": "Cliquez sur « Créer une information » pour en ajouter.",
+      "emptyPublic": "Les informations peuvent être ajoutées dans l'admin (Dernières informations).",
+      "loading": "Chargement…",
+      "error": "Erreur chargement"
     }
   },
   "exploreTransition": {

@@ -199,6 +199,20 @@
       "errorTitle": "Connection error",
       "emptyTitle": "No member",
       "emptySubtitle": "No staff member matches this filter. Staff accounts are managed in the admin."
+    },
+    "bulletins": {
+      "eyebrow": "COF Identity",
+      "title": "Latest",
+      "titleHighlight": "updates",
+      "subtitle": "Latest updates are shown from newest to oldest.",
+      "createButton": "+ Create a bulletin",
+      "editButton": "Edit",
+      "draft": "Draft",
+      "empty": "No updates yet.",
+      "emptyAdmin": "Click \"Create a bulletin\" to add one.",
+      "emptyPublic": "Updates can be added in the admin (Latest updates).",
+      "loading": "Loading…",
+      "error": "Loading error"
     }
   },
   "exploreTransition": {
