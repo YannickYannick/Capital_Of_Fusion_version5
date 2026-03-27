@@ -456,7 +456,7 @@ export function Navbar() {
                 type="button"
                 onClick={() => {
                   document.cookie = `locale=${l}; path=/; max-age=31536000`;
-                  window.location.reload();
+                  router.refresh();
                 }}
                 className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition ${
                   locale === l
