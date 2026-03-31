@@ -133,31 +133,35 @@ function ExplorePageInner() {
 
   useEffect(() => {
     const t0 = performance.now();
-    // Charger les données en parallèle (une seule fois au montage)
-    Promise.all([
-      getOrganizationNodes().then((data) => {
+
+    // Charger les nœuds en priorité — débloque l'apparition des planètes
+    getOrganizationNodes()
+      .then((nodesData) => {
         perf.setNodesApiMs(performance.now() - t0);
-        return data;
-      }),
-      getSiteConfig()
-    ]).then(([nodesData, config]) => {
-      startTransition(() => {
-        setNodes(nodesData);
+        startTransition(() => setNodes(nodesData));
+      })
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "Erreur chargement");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    // Charger la config visuelle en parallèle, sans bloquer les planètes
+    getSiteConfig()
+      .then((config) => {
         if (config.explore_config) {
           const raw = config.explore_config as unknown as Record<string, unknown>;
           const { id, name, created_at, updated_at, ...rest } = raw;
-          // Ne jamais écraser les flags de transition depuis la config DB
           const visualOptions = { ...rest };
           delete (visualOptions as Record<string, unknown>)['isTransitioningToExplore'];
           delete (visualOptions as Record<string, unknown>)['showExploreLoadingModal'];
-          setBatch(visualOptions as Parameters<typeof setBatch>[0]);
+          startTransition(() => setBatch(visualOptions as Parameters<typeof setBatch>[0]));
         }
+      })
+      .catch(() => {
+        // Config visuelle non critique — on ignore l'erreur, les défauts s'appliquent
       });
-    }).catch((e) => {
-      setError(e instanceof Error ? e.message : "Erreur chargement");
-    }).finally(() => {
-      setLoading(false);
-    });
     // setBatch uniquement : ne pas mettre perf en deps (objet recréé chaque rendu → boucle de requêtes)
   }, [setBatch]);
 
