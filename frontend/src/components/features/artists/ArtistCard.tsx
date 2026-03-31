@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { memo } from "react";
 import { ArtistApi } from "@/types/user";
 import { AdminEditButton } from "@/components/shared/AdminEditButton";
 import { getApiBaseUrl } from "@/lib/api";
@@ -11,7 +12,7 @@ function resolveArtistPhotoUrl(url: string | null | undefined): string {
     return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-export default function ArtistCard({ artist, priority = false }: { artist: ArtistApi; priority?: boolean }) {
+const ArtistCard = memo(function ArtistCard({ artist, priority = false }: { artist: ArtistApi; priority?: boolean }) {
     const photoUrl = resolveArtistPhotoUrl(artist.profile_picture);
     const fullName = `${artist.first_name || ""} ${artist.last_name || ""}`.trim() || artist.username;
 
@@ -34,8 +35,7 @@ export default function ArtistCard({ artist, priority = false }: { artist: Artis
                         priority={priority}
                         unoptimized={
                             photoUrl.includes("localhost") ||
-                            photoUrl.includes("127.0.0.1") ||
-                            photoUrl.startsWith("/images/")
+                            photoUrl.includes("127.0.0.1")
                         }
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
@@ -53,4 +53,6 @@ export default function ArtistCard({ artist, priority = false }: { artist: Artis
             </Link>
         </div>
     );
-}
+});
+
+export default ArtistCard;

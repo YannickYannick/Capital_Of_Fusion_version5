@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { getArtists } from "@/lib/api";
 import type { ArtistApi } from "@/types/user";
@@ -13,26 +13,28 @@ const DJANGO_ADMIN_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8
 
 export default function ArtistesPage() {
   const t = useTranslations("pages");
-  const [artists, setArtists] = useState<ArtistApi[]>([]);
+  const [allArtists, setAllArtists] = useState<ArtistApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'staff' | 'others'>('all');
 
   const fetchArtists = useCallback(() => {
     setLoading(true);
-    let staffOnly: boolean | undefined = undefined;
-    if (filter === 'staff') staffOnly = true;
-    if (filter === 'others') staffOnly = false;
-
-    getArtists(staffOnly)
-      .then(setArtists)
+    getArtists()
+      .then(setAllArtists)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [filter]);
+  }, []);
 
   useEffect(() => {
     fetchArtists();
   }, [fetchArtists]);
+
+  const artists = useMemo(() => {
+    if (filter === 'staff') return allArtists.filter((a) => a.is_staff_member);
+    if (filter === 'others') return allArtists.filter((a) => !a.is_staff_member);
+    return allArtists;
+  }, [allArtists, filter]);
 
   if (loading && artists.length === 0) {
     return (

@@ -8,11 +8,21 @@ import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PlanetOverlay } from "@/components/features/explore/components/PlanetOverlay";
-import { OptionsPanel } from "@/components/features/explore/components/OptionsPanel";
-import { GlobalPlanetConfigPanel } from "@/components/features/explore/components/GlobalPlanetConfigPanel";
-import { DebugPanel } from "@/components/features/explore/components/DebugPanel";
 import { useExplorePerformance } from "@/hooks/useExplorePerformance";
 import { ExploreLoadingModal } from "@/components/features/explore/components/ExploreLoadingModal";
+
+const OptionsPanel = dynamic(
+  () => import("@/components/features/explore/components/OptionsPanel").then((m) => ({ default: m.OptionsPanel })),
+  { ssr: false, loading: () => null }
+);
+const GlobalPlanetConfigPanel = dynamic(
+  () => import("@/components/features/explore/components/GlobalPlanetConfigPanel").then((m) => ({ default: m.GlobalPlanetConfigPanel })),
+  { ssr: false, loading: () => null }
+);
+const DebugPanel = dynamic(
+  () => import("@/components/features/explore/components/DebugPanel").then((m) => ({ default: m.DebugPanel })),
+  { ssr: false, loading: () => null }
+);
 
 // Chargement dynamique de ExploreScene (Three.js) sans SSR
 const ExploreScene = dynamic(
