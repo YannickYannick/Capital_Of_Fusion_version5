@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePrefetchExplore } from "@/hooks/usePrefetchExplore";
+import { prefetchOrganizationNodes } from "@/lib/api";
 
 export default function LandingPageClient() {
     const router = useRouter();
@@ -47,6 +48,7 @@ export default function LandingPageClient() {
                         <a
                             href="/explore"
                             onClick={handleStartPushed}
+                            onMouseEnter={prefetchOrganizationNodes}
                             className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition cursor-pointer relative overflow-hidden group"
                         >
                             <span className="relative z-10">{t("ctaExplore")}</span>

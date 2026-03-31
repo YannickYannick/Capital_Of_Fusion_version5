@@ -363,16 +363,36 @@ export async function getEventBySlug(slug: string): Promise<EventApi> {
   return res.json();
 }
 
+// Cache mémoire pour les nœuds (TTL 5 min) — évite un aller-retour Railway à chaque visite
+let _nodesCacheData: import("@/types/organization").OrganizationNodeApi[] | null = null;
+let _nodesCacheTs = 0;
+const NODES_CACHE_TTL = 5 * 60 * 1000;
+
 /**
  * Liste des noeuds d'organisation (Explore 3D). GET /api/organization/nodes/
  */
-export async function getOrganizationNodes(): Promise<OrganizationNodeApi[]> {
+export async function getOrganizationNodes(): Promise<import("@/types/organization").OrganizationNodeApi[]> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/organization/nodes/`, lang);
+
+  if (_nodesCacheData && Date.now() - _nodesCacheTs < NODES_CACHE_TTL) {
+    return _nodesCacheData;
+  }
+
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization nodes API error: ${res.status}`);
-  return res.json();
+  const data = await res.json();
+  _nodesCacheData = data;
+  _nodesCacheTs = Date.now();
+  return data;
+}
+
+/**
+ * Précharge les nœuds en arrière-plan (ex: hover bouton Explore).
+ */
+export function prefetchOrganizationNodes(): void {
+  getOrganizationNodes().catch(() => {});
 }
 
 /**
