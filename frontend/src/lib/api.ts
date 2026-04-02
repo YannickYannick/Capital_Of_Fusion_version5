@@ -736,6 +736,59 @@ export async function patchArtistAdmin(
 }
 
 /**
+ * Création admin d'un artiste (staff/admin).
+ * ADMIN : 201 + ArtistApi. STAFF : 202 + { pending: true, message }.
+ * POST /api/admin/users/artists/
+ */
+export async function createArtistAdmin(payload: {
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  bio?: string;
+  bio_en?: string;
+  bio_es?: string;
+  is_staff_member?: boolean;
+  profession_ids?: string[];
+}): Promise<ArtistApi | { pending: true; message: string }> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/users/artists/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 202) return data as { pending: true; message: string };
+  if (!res.ok) {
+    const msg =
+      data && typeof data === "object" && "error" in data
+        ? String(data.error)
+        : data?.detail || `Erreur ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as ArtistApi;
+}
+
+/**
+ * Liste des professions de danse (pour les formulaires admin).
+ * GET /api/admin/users/artists/professions/
+ */
+export async function getDanceProfessionsAdmin(): Promise<DanceProfessionApi[]> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/users/artists/professions/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Professions API error: ${res.status}`);
+  return res.json();
+}
+
+/**
  * PATCH /api/admin/organization/nodes/<slug>/ — modifier un nœud (admin direct, staff → file d'attente).
  */
 export async function patchOrganizationNodeAdmin(

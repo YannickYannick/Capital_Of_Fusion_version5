@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.organization.models import OrganizationRole
+from apps.core.models import DanceProfession
 
 User = get_user_model()
 
@@ -49,4 +50,48 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
         )
+        return user
+
+
+class ArtistCreateSerializer(serializers.Serializer):
+    """
+    Serializer de création d'artiste (profil public sans credentials).
+    """
+    username = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    bio = serializers.CharField(required=False, allow_blank=True)
+    bio_en = serializers.CharField(required=False, allow_blank=True)
+    bio_es = serializers.CharField(required=False, allow_blank=True)
+    is_staff_member = serializers.BooleanField(required=False, default=False)
+    profession_ids = serializers.ListField(
+        child=serializers.UUIDField(),
+        required=False,
+        allow_empty=True,
+    )
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Ce username existe déjà.")
+        return value
+
+    def create(self, validated_data):
+        profession_ids = validated_data.pop("profession_ids", [])
+        user = User(
+            username=validated_data["username"].strip(),
+            first_name=validated_data.get("first_name", "").strip(),
+            last_name=validated_data.get("last_name", "").strip(),
+            bio=validated_data.get("bio", "").strip(),
+            bio_en=validated_data.get("bio_en", "").strip(),
+            bio_es=validated_data.get("bio_es", "").strip(),
+            is_staff_member=bool(validated_data.get("is_staff_member", False)),
+            user_type=User.UserType.MEMBER,
+            account_status=User.AccountStatus.APPROVED,
+            is_active=True,
+        )
+        user.set_unusable_password()
+        user.save()
+        if profession_ids:
+            professions = DanceProfession.objects.filter(id__in=profession_ids)
+            user.professions.set(professions)
         return user

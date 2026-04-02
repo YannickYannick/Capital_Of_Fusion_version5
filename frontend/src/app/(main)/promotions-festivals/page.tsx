@@ -6,12 +6,15 @@
  */
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { getPartnerEvents } from "@/lib/api";
 import type { PartnerEventApi } from "@/types/partner";
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("fr-FR", {
+  const dateLocale =
+    locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "fr-FR";
+  return d.toLocaleDateString(dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -19,6 +22,8 @@ function formatDate(dateStr: string): string {
 }
 
 export default function PromotionsFestivalsPage() {
+  const t = useTranslations("pages");
+  const locale = useLocale();
   const [events, setEvents] = useState<PartnerEventApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,14 +48,19 @@ export default function PromotionsFestivalsPage() {
             href="/partenaires"
             className="text-white/40 hover:text-white text-sm uppercase tracking-widest font-bold mb-6 inline-block transition-colors"
           >
-            ← Nos partenaires
+            {t("promotionsFestivals.backToPartners")}
           </Link>
-          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Promotions</p>
+          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">
+            {t("promotionsFestivals.eyebrow")}
+          </p>
           <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4">
-            Promotions <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">festivals</span>
+            {t("promotionsFestivals.titleBefore")}{" "}
+            <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+              {t("promotionsFestivals.titleHighlight")}
+            </span>
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            Festivals de nos structures partenaires — à venir et en cours.
+            {t("promotionsFestivals.subtitle")}
           </p>
         </div>
 
@@ -62,16 +72,16 @@ export default function PromotionsFestivalsPage() {
               onChange={(e) => setUpcoming(e.target.checked)}
               className="rounded border-white/30 bg-white/10 text-amber-500 focus:ring-amber-500"
             />
-            À venir uniquement
+            {t("promotionsFestivals.filters.upcomingOnly")}
           </label>
         </div>
 
         {error && <p className="mt-4 text-red-400" role="alert">{error}</p>}
 
         {loading ? (
-          <p className="mt-8 text-white/60">Chargement…</p>
+          <p className="mt-8 text-white/60">{t("promotionsFestivals.loading")}</p>
         ) : events.length === 0 ? (
-          <p className="mt-8 text-white/60">Aucun festival partenaire en promotion pour le moment.</p>
+          <p className="mt-8 text-white/60">{t("promotionsFestivals.empty")}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 delay-200">
             {events.map((ev) => (
@@ -82,10 +92,10 @@ export default function PromotionsFestivalsPage() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    Festival
+                    {t("partnerEvents.types.festival")}
                   </span>
                   <span className="text-xs font-semibold text-white/50 bg-black/30 px-2 py-1 rounded-md text-right">
-                    {formatDate(ev.start_date)}
+                    {formatDate(ev.start_date, locale)}
                   </span>
                 </div>
 

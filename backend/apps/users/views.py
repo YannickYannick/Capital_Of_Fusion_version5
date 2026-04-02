@@ -12,11 +12,16 @@ from django.contrib.auth import authenticate
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
-from apps.core.models import DanceProfession
+from apps.core.models import DanceProfession, PendingContentEdit
 from apps.core.permissions import IsStaffOrSuperUser
 
 from .models import User
-from .serializers import ArtistSerializer, RegisterSerializer, DanceProfessionSerializer
+from .serializers import (
+    ArtistSerializer,
+    RegisterSerializer,
+    DanceProfessionSerializer,
+    ArtistCreateSerializer,
+)
 
 
 class LoginAPIView(APIView):
@@ -248,6 +253,57 @@ class ArtistAdminDetailAPIView(APIView):
             ArtistSerializer(artist, context={"request": request}).data,
             status=status.HTTP_200_OK,
         )
+
+
+class ArtistAdminListCreateAPIView(APIView):
+    """
+    POST /api/admin/users/artists/
+    Création d'un artiste (profil public). ADMIN : direct. STAFF : en attente (PendingContentEdit).
+    """
+    permission_classes = [IsStaffOrSuperUser]
+
+    def post(self, request):
+        serializer = ArtistCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if getattr(request.user, "user_type", None) == "ADMIN" or getattr(request.user, "is_superuser", False):
+            user = serializer.save()
+            return Response(
+                ArtistSerializer(user, context={"request": request}).data,
+                status=status.HTTP_201_CREATED,
+            )
+
+        # JSONField stocke via sérialisation; on s'assure que les UUID sont en string.
+        pending_payload = dict(serializer.validated_data)
+        if "profession_ids" in pending_payload and isinstance(pending_payload["profession_ids"], list):
+            pending_payload["profession_ids"] = [str(v) for v in pending_payload["profession_ids"]]
+
+        PendingContentEdit.objects.create(
+            content_type=PendingContentEdit.ContentType.USER_ARTIST_CREATE,
+            object_id="",
+            payload=pending_payload,
+            requested_by=request.user,
+        )
+        return Response(
+            {
+                "message": "Création enregistrée. Elle sera visible après approbation par un administrateur.",
+                "pending": True,
+            },
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+class DanceProfessionAdminListAPIView(APIView):
+    """
+    GET /api/admin/users/artists/professions/
+    Liste des professions de danse (pour les formulaires admin côté frontend).
+    """
+    permission_classes = [IsStaffOrSuperUser]
+
+    def get(self, request):
+        profs = DanceProfession.objects.all().order_by("name")
+        return Response(DanceProfessionSerializer(profs, many=True).data, status=status.HTTP_200_OK)
 
 
 class RegisterAPIView(APIView):

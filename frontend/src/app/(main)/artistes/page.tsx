@@ -8,11 +8,15 @@ import ArtistCard from "@/components/features/artists/ArtistCard";
 import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 import { AdminToolbar } from "@/components/shared/AdminEditButton";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DJANGO_ADMIN_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ArtistesPage() {
   const t = useTranslations("pages");
+  const tp = useTranslations("artistCreate");
+  const { user } = useAuth();
   const [allArtists, setAllArtists] = useState<ArtistApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +62,18 @@ export default function ArtistesPage() {
           highlight={t("artists.titleHighlight")}
           description={t("artists.subtitle")}
         />
+
+        {(user?.user_type === "STAFF" || user?.user_type === "ADMIN") && (
+          <div className="mb-10 flex justify-center">
+            <Link
+              href="/artistes/nouveau"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-purple-600/90 text-white hover:bg-purple-500 transition shadow-lg shadow-purple-600/20"
+            >
+              <span className="text-lg leading-none">＋</span>
+              {tp("ctaNewArtist")}
+            </Link>
+          </div>
+        )}
 
         <AnimatedDiv
           animation="fadeInUp"

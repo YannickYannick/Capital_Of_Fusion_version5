@@ -56,6 +56,8 @@ from apps.users.views import (
     ArtistListAPIView,
     ArtistDetailAPIView,
     ArtistAdminDetailAPIView,
+    ArtistAdminListCreateAPIView,
+    DanceProfessionAdminListAPIView,
 )
 
 from rest_framework.routers import DefaultRouter
@@ -132,6 +134,8 @@ urlpatterns = [
     path("admin/courses/<slug:slug>/", CourseAdminDetailAPIView.as_view()),
     path("admin/courses/theory/", TheoryLessonAdminAPIView.as_view()),
     path("admin/courses/theory/<slug:slug>/", TheoryLessonAdminDetailAPIView.as_view()),
+    path("admin/users/artists/", ArtistAdminListCreateAPIView.as_view()),
+    path("admin/users/artists/professions/", DanceProfessionAdminListAPIView.as_view()),
     path("admin/users/artists/<str:username>/", ArtistAdminDetailAPIView.as_view()),
     path("admin/organization/nodes/<slug:slug>/", OrganizationNodeAdminDetailAPIView.as_view()),
     path("admin/config/", SiteConfigurationAdminAPIView.as_view()),
