@@ -134,6 +134,7 @@ function PendingStaffSection() {
 // ─── Section Admin ─────────────────────────────────────────────────────────────
 
 function AdminDashboard({ username }: { username: string }) {
+    const apiBase = getApiBaseUrl();
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
@@ -172,8 +173,8 @@ function AdminDashboard({ username }: { username: string }) {
                 <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">Accès rapides</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[
-                        { label: "Admin Django", href: "http://localhost:8000/admin/", icon: "⚙️", desc: "Gérer toutes les données", external: true },
-                        { label: "Utilisateurs", href: "http://localhost:8000/admin/users/user/", icon: "👥", desc: "Gérer les comptes et rôles", external: true },
+                        { label: "Admin Django", href: `${apiBase}/admin/`, icon: "⚙️", desc: "Gérer toutes les données", external: true },
+                        { label: "Utilisateurs", href: `${apiBase}/admin/users/user/`, icon: "👥", desc: "Gérer les comptes et rôles", external: true },
                         { label: "Projets", href: "/projets", icon: "🚀", desc: "Initiatives & Incubation", external: false },
                         { label: "Événements", href: "/evenements", icon: "📅", desc: "Agenda de la communauté", external: false },
                         { label: "Cours", href: "/cours", icon: "🎓", desc: "Formation & Pédagogie", external: false },
@@ -205,6 +206,7 @@ function AdminDashboard({ username }: { username: string }) {
 function StaffDashboard({ username, staffRole }: { username: string; staffRole: StaffRole }) {
     const roleLabel = STAFF_ROLE_LABELS[staffRole] || "Staff";
     const links = STAFF_QUICK_LINKS[staffRole] ?? [];
+    const apiBase = getApiBaseUrl();
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="p-6 rounded-2xl bg-gradient-to-br from-fuchsia-500/10 to-purple-500/10 border border-fuchsia-500/20">
@@ -227,7 +229,7 @@ function StaffDashboard({ username, staffRole }: { username: string; staffRole: 
                         <span className="text-2xl">📝</span>
                         <span className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors">Mes demandes en attente</span>
                     </Link>
-                    <Link href="http://localhost:8000/admin/" target="_blank"
+                    <Link href={`${apiBase}/admin/`} target="_blank"
                         className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all duration-200 group">
                         <span className="text-2xl">⚙️</span>
                         <span className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors">DB menu</span>
