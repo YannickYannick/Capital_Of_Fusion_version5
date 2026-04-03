@@ -1034,6 +1034,24 @@ export async function registerToTrainingSession(slug: string): Promise<TrainingR
 }
 
 // --- EXPLORE PRESETS ---
+
+/** Liste des presets Explore. GET /api/core/presets/ */
+export async function getExplorePresets(): Promise<ExplorePresetApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/core/presets/`);
+  if (!res.ok) throw new Error(`Explore Presets API error: ${res.status}`);
+  return res.json();
+}
+
+/** Détail d'un preset Explore. GET /api/core/presets/<id>/ */
+export async function getExplorePresetById(id: string): Promise<ExplorePresetApi> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`);
+  if (!res.ok) throw new Error(`Explore Preset API error: ${res.status}`);
+  return res.json();
+}
+
+/** Création d'un preset Explore. POST /api/core/presets/ */
 export async function createExplorePreset(data: Partial<ExplorePresetApi>): Promise<ExplorePresetApi> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
@@ -1050,4 +1068,43 @@ export async function createExplorePreset(data: Partial<ExplorePresetApi>): Prom
     throw new Error(errData.detail || `Create Preset error: ${res.status}`);
   }
   return res.json();
+}
+
+/** Mise à jour partielle d'un preset Explore. PATCH /api/core/presets/<id>/ */
+export async function updateExplorePreset(
+  id: string,
+  data: Partial<ExplorePresetApi>
+): Promise<ExplorePresetApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Token ${token}`;
+
+  const res = await fetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || `Update Preset error: ${res.status}`);
+  }
+  return res.json();
+}
+
+/** Suppression d'un preset Explore. DELETE /api/core/presets/<id>/ */
+export async function deleteExplorePreset(id: string): Promise<void> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  const headers: HeadersInit = {};
+  if (token) headers["Authorization"] = `Token ${token}`;
+
+  const res = await fetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`, {
+    method: "DELETE",
+    headers,
+  });
+  if (!res.ok && res.status !== 204) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || `Delete Preset error: ${res.status}`);
+  }
 }

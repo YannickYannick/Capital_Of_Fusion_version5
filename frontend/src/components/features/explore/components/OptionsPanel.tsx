@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import type { PlanetsOptionsState } from "@/contexts/PlanetsOptionsContext";
-import { getSiteConfig, createExplorePreset } from "@/lib/api";
+import { getSiteConfig, createExplorePreset, getExplorePresets, updateExplorePreset, deleteExplorePreset } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import type { ExplorePresetApi } from "@/types/explore";
 
@@ -109,6 +109,120 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
     const [visible, setVisible] = useState(false);
     const opts = usePlanetsOptions();
     const [saving, setSaving] = useState(false);
+    const [presets, setPresets] = useState<ExplorePresetApi[]>([]);
+    const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+    const [loadingPresets, setLoadingPresets] = useState(false);
+
+    // Charger la liste des presets au montage
+    const fetchPresets = useCallback(async () => {
+        setLoadingPresets(true);
+        try {
+            const data = await getExplorePresets();
+            setPresets(data);
+        } catch (err) {
+            console.error("Erreur chargement presets:", err);
+        } finally {
+            setLoadingPresets(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (visible && presets.length === 0) {
+            fetchPresets();
+        }
+    }, [visible, presets.length, fetchPresets]);
+
+    // Appliquer un preset sélectionné
+    const handleLoadPreset = (preset: ExplorePresetApi) => {
+        setSelectedPresetId(preset.id ?? null);
+        // Appliquer toutes les valeurs du preset aux options
+        for (const [key, value] of Object.entries(preset)) {
+            if (
+                key in opts &&
+                typeof (opts as any)[key] !== "function" &&
+                key !== "cameraRef" &&
+                key !== "restartKey" &&
+                key !== "resetKey" &&
+                key !== "id" &&
+                key !== "name" &&
+                key !== "created_at" &&
+                key !== "updated_at"
+            ) {
+                opts.set(key as keyof PlanetsOptionsState, value as any);
+            }
+        }
+        // Appliquer la position de la caméra si présente
+        if (preset.cameraX !== undefined && opts.cameraRef.current) {
+            opts.cameraRef.current.x = preset.cameraX;
+            opts.cameraRef.current.y = preset.cameraY ?? 6.84;
+            opts.cameraRef.current.z = preset.cameraZ ?? 18.79;
+            opts.cameraRef.current.tx = preset.cameraTargetX ?? 0;
+            opts.cameraRef.current.ty = preset.cameraTargetY ?? 0;
+            opts.cameraRef.current.tz = preset.cameraTargetZ ?? 0;
+        }
+    };
+
+    // Mettre à jour le preset sélectionné
+    const handleUpdatePreset = async () => {
+        if (!selectedPresetId) return;
+        const preset = presets.find((p) => p.id === selectedPresetId);
+        if (!preset) return;
+
+        setSaving(true);
+        try {
+            const optionsData: any = {};
+            for (const key in opts) {
+                if (
+                    typeof (opts as any)[key] !== "function" &&
+                    key !== "cameraRef" &&
+                    key !== "restartKey" &&
+                    key !== "resetKey" &&
+                    key !== "name"
+                ) {
+                    const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+                    optionsData[snakeKey] = (opts as any)[key];
+                }
+            }
+            if (opts.cameraRef.current) {
+                optionsData.camera_x = opts.cameraRef.current.x;
+                optionsData.camera_y = opts.cameraRef.current.y;
+                optionsData.camera_z = opts.cameraRef.current.z;
+                optionsData.camera_target_x = opts.cameraRef.current.tx;
+                optionsData.camera_target_y = opts.cameraRef.current.ty;
+                optionsData.camera_target_z = opts.cameraRef.current.tz;
+            }
+
+            await updateExplorePreset(selectedPresetId, optionsData);
+            alert(`Preset "${preset.name}" mis à jour ! ✨`);
+            fetchPresets();
+        } catch (err) {
+            console.error("Erreur mise à jour preset:", err);
+            alert("Erreur lors de la mise à jour : " + (err instanceof Error ? err.message : String(err)));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Supprimer le preset sélectionné
+    const handleDeletePreset = async () => {
+        if (!selectedPresetId) return;
+        const preset = presets.find((p) => p.id === selectedPresetId);
+        if (!preset) return;
+        if (!confirm(`Supprimer le preset "${preset.name}" ?`)) return;
+
+        setSaving(true);
+        try {
+            await deleteExplorePreset(selectedPresetId);
+            setSelectedPresetId(null);
+            alert(`Preset "${preset.name}" supprimé.`);
+            fetchPresets();
+        } catch (err) {
+            console.error("Erreur suppression preset:", err);
+            alert("Erreur lors de la suppression : " + (err instanceof Error ? err.message : String(err)));
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleSavePreset = async () => {
         const name = prompt("Nom du preset :", "Nouveau Preset");
@@ -851,21 +965,89 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                             />
                         </Section>
 
-                        {/* Sauvegarde */}
-                        <div className="mt-4 pt-4 border-t border-white/20">
-                            <button
-                                type="button"
-                                onClick={handleSavePreset}
-                                disabled={saving}
-                                className={`w-full py-3 rounded-xl border border-purple-500/50 text-white font-bold transition-all shadow-lg shadow-purple-900/20 ${saving
-                                    ? "bg-purple-900/40 opacity-50 cursor-wait"
-                                    : "bg-purple-600 hover:bg-purple-500 hover:scale-[1.02] active:scale-[0.98]"
-                                    }`}
-                            >
-                                {saving ? "💾 Sauvegarde en cours..." : "💾 Enregistrer comme Preset"}
-                            </button>
-                            <p className="text-[10px] text-white/40 text-center mt-2 italic">
-                                Ces réglages seront enregistrés dans la base de données.
+                        {/* Gestion des Presets */}
+                        <Section title="Presets">
+                            {/* Sélecteur de preset */}
+                            <div className="flex flex-col gap-2">
+                                <select
+                                    value={selectedPresetId ?? ""}
+                                    onChange={(e) => {
+                                        const id = e.target.value;
+                                        if (!id) {
+                                            setSelectedPresetId(null);
+                                            return;
+                                        }
+                                        const preset = presets.find((p) => p.id === id);
+                                        if (preset) handleLoadPreset(preset);
+                                    }}
+                                    className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white text-xs focus:outline-none focus:border-purple-500/60"
+                                >
+                                    <option value="" className="bg-gray-900">
+                                        {loadingPresets ? "Chargement..." : "— Charger un preset —"}
+                                    </option>
+                                    {presets.map((p) => (
+                                        <option key={p.id} value={p.id} className="bg-gray-900">
+                                            {p.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {/* Boutons d'action */}
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleSavePreset}
+                                        disabled={saving}
+                                        className={`flex-1 py-2 rounded-lg border border-purple-500/50 text-white text-xs font-medium transition-all ${
+                                            saving
+                                                ? "bg-purple-900/40 opacity-50 cursor-wait"
+                                                : "bg-purple-600 hover:bg-purple-500"
+                                        }`}
+                                    >
+                                        {saving ? "..." : "➕ Nouveau"}
+                                    </button>
+                                    {selectedPresetId && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                onClick={handleUpdatePreset}
+                                                disabled={saving}
+                                                className={`flex-1 py-2 rounded-lg border border-emerald-500/50 text-white text-xs font-medium transition-all ${
+                                                    saving
+                                                        ? "bg-emerald-900/40 opacity-50 cursor-wait"
+                                                        : "bg-emerald-600 hover:bg-emerald-500"
+                                                }`}
+                                            >
+                                                {saving ? "..." : "💾 Mettre à jour"}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={handleDeletePreset}
+                                                disabled={saving}
+                                                className={`px-3 py-2 rounded-lg border border-red-500/50 text-white text-xs font-medium transition-all ${
+                                                    saving
+                                                        ? "bg-red-900/40 opacity-50 cursor-wait"
+                                                        : "bg-red-600 hover:bg-red-500"
+                                                }`}
+                                            >
+                                                🗑
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {selectedPresetId && (
+                                    <p className="text-[10px] text-white/40 text-center italic">
+                                        Preset actif : {presets.find((p) => p.id === selectedPresetId)?.name}
+                                    </p>
+                                )}
+                            </div>
+                        </Section>
+
+                        {/* Sauvegarde (ancien bouton conservé en bas pour compatibilité) */}
+                        <div className="mt-2 pt-2 border-t border-white/10">
+                            <p className="text-[10px] text-white/40 text-center italic">
+                                Utilisez « Nouveau » pour créer un preset ou « Mettre à jour » pour sauvegarder les modifications.
                             </p>
                     </div>
                 </aside>
