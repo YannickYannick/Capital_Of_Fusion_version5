@@ -58,6 +58,9 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()
 
 # Fichiers statiques (admin, etc.) : WhiteNoise les sert en prod après collectstatic.
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# Django 5 n’expose plus STATICFILES_STORAGE par défaut ; django-cloudinary-storage (collectstatic)
+# y accède encore → crash au build Railway sans cette ligne. Les statiques restent sur WhiteNoise, pas Cloudinary.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Base de données : DATABASE_URL (Railway/Supabase) prioritaire, sinon DB_* (PostgreSQL), sinon SQLite.
 # On utilise os.environ directement (pas env) pour éviter qu'un .env présent dans l'image n'écrase la valeur Railway.
