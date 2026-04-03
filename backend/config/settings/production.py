@@ -7,18 +7,19 @@ import os
 
 DEBUG = False
 
-# Cloudinary : apps chargés uniquement en prod (évite ImproperlyConfigured en local sans credentials).
+# Cloudinary : uniquement en prod. Ordre imposé par django-cloudinary-storage :
+# cloudinary_storage + cloudinary AVANT django.contrib.staticfiles.
 _apps = list(INSTALLED_APPS)
-_cloudinary_insert = _apps.index("django.contrib.staticfiles") + 1
+_static_i = _apps.index("django.contrib.staticfiles")
 INSTALLED_APPS = (
-    _apps[:_cloudinary_insert]
+    _apps[:_static_i]
     + ["cloudinary_storage", "cloudinary"]
-    + _apps[_cloudinary_insert:]
+    + _apps[_static_i:]
 )
 
-# Credentials : ne jamais mettre des chaînes vides dans CLOUDINARY_STORAGE — sinon cloudinary.config()
-# écrase CLOUDINARY_URL et les uploads échouent silencieusement.
-# Soit les 3 variables Railway, soit une seule CLOUDINARY_URL=cloudinary://key:secret@cloud_name
+# Railway : définir les 3 variables (recommandé) :
+# CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+# Sinon CLOUDINARY_URL seule (CLOUDINARY_STORAGE vide → le SDK lit l’URL).
 _cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()
 _api_key = os.environ.get("CLOUDINARY_API_KEY", "").strip()
 _api_secret = os.environ.get("CLOUDINARY_API_SECRET", "").strip()
