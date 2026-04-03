@@ -8,6 +8,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from apps.core.permissions import IsStaffOrSuperUser
 from apps.core.views import _user_is_admin_direct
 from apps.core.models import PendingContentEdit
@@ -21,17 +22,33 @@ from .serializers import (
 
 User = get_user_model()
 
+# Clés de cache pour l'API nœuds (TTL 10 min, invalidées à chaque save/delete)
+NODES_LIGHT_CACHE_KEY = "org_nodes_light"
+NODES_STRUCTURE_CACHE_KEY = "org_nodes_structure"
+NODES_CACHE_TIMEOUT = 10 * 60  # 10 minutes
+
+
+def invalidate_nodes_cache():
+    """Supprime les caches list nodes (appelé par signal post_save/post_delete)."""
+    cache.delete(NODES_LIGHT_CACHE_KEY)
+    cache.delete(NODES_STRUCTURE_CACHE_KEY)
 
 
 class OrganizationNodeListAPIView(APIView):
     """
     GET /api/organization/nodes/
-    Par défaut : noeuds visibles en 3D (is_visible_3d=True), avec node_events.
-    GET /api/organization/nodes/?for_structure=1 : tous les noeuds (pour l’organigramme), avec parent_slug.
+    Par défaut : noeuds visibles en 3D (is_visible_3d=True), avec node_events — cache 10 min.
+    GET /api/organization/nodes/?for_structure=1 : tous les noeuds (organigramme), cache 10 min.
     """
 
     def get(self, request):
         for_structure = request.query_params.get("for_structure") in ("1", "true")
+        cache_key = NODES_STRUCTURE_CACHE_KEY if for_structure else NODES_LIGHT_CACHE_KEY
+
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
         if for_structure:
             qs = (
                 OrganizationNode.objects.all()
@@ -60,7 +77,9 @@ class OrganizationNodeListAPIView(APIView):
             serializer_class = OrganizationNodeLightSerializer
 
         serializer = serializer_class(qs, many=True, context={"request": request})
-        return Response(serializer.data)
+        data = serializer.data
+        cache.set(cache_key, data, NODES_CACHE_TIMEOUT)
+        return Response(data)
 
 
 class PoleListAPIView(APIView):
@@ -128,6 +147,7 @@ class OrganizationNodeAdminDetailAPIView(APIView):
                 if field in request.data:
                     setattr(node, field, request.data[field])
             node.save()
+            invalidate_nodes_cache()
             serializer = OrganizationNodeSerializer(node, context={'request': request})
             return Response(serializer.data)
         payload = {k: v for k, v in request.data.items() if k in editable_fields}

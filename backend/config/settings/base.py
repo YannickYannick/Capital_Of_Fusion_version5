@@ -132,3 +132,12 @@ CORS_ALLOW_CREDENTIALS = True
 # Autoriser l'iframe pour le dashboard frontend
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 SILENCED_SYSTEM_CHECKS = ['security.W019'] # Optionnel si on veut éviter l'alerte sur SAMEORIGIN
+
+# Cache en mémoire locale (LocMem) — simple, pas de dépendance externe.
+# Suffisant pour Railway (unique instance) ; pour multi-instances, passer à Redis.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}
