@@ -735,18 +735,16 @@ export async function patchArtistAdmin(
   return data as ArtistApi;
 }
 
-/**
- * Upload profile picture pour un artiste (via FormData/multipart).
- */
-export async function uploadArtistProfilePicture(
+async function uploadArtistImageField(
   username: string,
-  file: File
+  file: File,
+  field: "profile_picture" | "cover_image"
 ): Promise<ArtistApi> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
   const formData = new FormData();
-  formData.append("profile_picture", file);
+  formData.append(field, file);
   const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
     method: "PATCH",
     headers: {
@@ -763,6 +761,16 @@ export async function uploadArtistProfilePicture(
     throw new Error(detail ? `${baseMsg} — ${detail}` : baseMsg);
   }
   return data as ArtistApi;
+}
+
+/** Upload photo de profil (Cloudinary en prod). */
+export function uploadArtistProfilePicture(username: string, file: File): Promise<ArtistApi> {
+  return uploadArtistImageField(username, file, "profile_picture");
+}
+
+/** Upload image de couverture du profil public (Cloudinary en prod). */
+export function uploadArtistCoverImage(username: string, file: File): Promise<ArtistApi> {
+  return uploadArtistImageField(username, file, "cover_image");
 }
 
 /**

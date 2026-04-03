@@ -292,6 +292,8 @@ class ArtistAdminDetailAPIView(APIView):
 
         if "profile_picture" in request.FILES:
             artist.profile_picture = request.FILES["profile_picture"]
+        if "cover_image" in request.FILES:
+            artist.cover_image = request.FILES["cover_image"]
 
         try:
             artist.save()

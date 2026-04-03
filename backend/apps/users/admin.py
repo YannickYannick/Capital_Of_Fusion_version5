@@ -25,6 +25,7 @@ class UserAdmin(BaseUserAdmin):
                 "bio_en",
                 "bio_es",
                 "profile_picture",
+                "cover_image",
                 "dance_level",
                 "is_vibe",
                 "professions",

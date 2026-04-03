@@ -80,7 +80,14 @@
     "changePhoto": "Changer",
     "clickToChangePhoto": "Cliquez sur l'image pour modifier la photo de profil",
     "photoSaved": "Photo mise à jour.",
-    "photoUploadError": "Erreur lors de l'upload de la photo"
+    "photoUploadError": "Erreur lors de l'upload de la photo",
+    "coverSectionLabel": "Bannière du profil public",
+    "profilePhotoSectionLabel": "Photo de profil",
+    "coverPhotoAlt": "Image de couverture du profil",
+    "changeCoverPhoto": "Changer la bannière",
+    "coverFormatHint": "Paysage recommandé",
+    "clickToChangeCover": "Survolez la bannière pour la remplacer (stockage cloud)",
+    "coverSaved": "Bannière mise à jour."
   },
   "artistCreate": {
     "ctaNewArtist": "Ajouter un artiste",

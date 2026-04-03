@@ -27,6 +27,8 @@ export interface ArtistApi {
     /** Biographie espagnol */
     bio_es?: string;
     profile_picture: string | null;
+    /** Bannière du profil public (Cloudinary / média) */
+    cover_image?: string | null;
     /** URL de la photo de profil (alias API / champ backend) */
     profile_image?: string | null;
     /** Nom d’affichage (optionnel, sinon first_name + last_name) */

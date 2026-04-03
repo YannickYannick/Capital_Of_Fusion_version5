@@ -80,7 +80,14 @@
     "changePhoto": "Cambiar",
     "clickToChangePhoto": "Haz clic en la imagen para cambiar la foto de perfil",
     "photoSaved": "Foto actualizada.",
-    "photoUploadError": "Error al subir la foto"
+    "photoUploadError": "Error al subir la foto",
+    "coverSectionLabel": "Banner del perfil público",
+    "profilePhotoSectionLabel": "Foto de perfil",
+    "coverPhotoAlt": "Imagen de portada del perfil",
+    "changeCoverPhoto": "Cambiar banner",
+    "coverFormatHint": "Recomendado horizontal",
+    "clickToChangeCover": "Pasa el cursor sobre el banner para sustituirlo (almacenamiento en la nube)",
+    "coverSaved": "Banner actualizado."
   },
   "artistCreate": {
     "ctaNewArtist": "Agregar un artista",

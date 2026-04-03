@@ -5,7 +5,13 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
-import { getArtistAdmin, patchArtistAdmin, uploadArtistProfilePicture, getApiBaseUrl } from "@/lib/api";
+import {
+  getArtistAdmin,
+  patchArtistAdmin,
+  uploadArtistProfilePicture,
+  uploadArtistCoverImage,
+  getApiBaseUrl,
+} from "@/lib/api";
 import type { ArtistApi, DanceProfessionApi } from "@/types/user";
 import { EditFormActionBar } from "@/components/admin/translation/EditFormActionBar";
 import { TranslationModeCheckboxes } from "@/components/admin/translation/TranslationModeCheckboxes";
@@ -54,6 +60,7 @@ export default function EditArtistPage() {
   const [translateManual, setTranslateManual] = useState(false);
   const [translationModal, setTranslationModal] = useState<"ai" | "manual" | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
   const isAdmin = user?.user_type === "ADMIN";
@@ -162,6 +169,23 @@ export default function EditArtistPage() {
     }
   };
 
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !username) return;
+    setUploadingCover(true);
+    setError(null);
+    try {
+      const updated = await uploadArtistCoverImage(username, file);
+      setArtist(updated);
+      setSuccessMessage(t("coverSaved"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("photoUploadError"));
+    } finally {
+      setUploadingCover(false);
+      e.target.value = "";
+    }
+  };
+
   if (!user) {
     return (
       <PageShell className="text-center">
@@ -233,7 +257,42 @@ export default function EditArtistPage() {
       </header>
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl md:p-10">
+        <div className="mb-8 space-y-3 border-b border-white/10 pb-8">
+          <p className="text-center text-xs font-medium uppercase tracking-widest text-white/35">
+            {t("coverSectionLabel")}
+          </p>
+          <div className="relative group mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 aspect-[21/9] bg-gradient-to-br from-purple-900/40 to-black">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoUrl(artist.cover_image)}
+              alt={t("coverPhotoAlt")}
+              className="h-full w-full object-cover transition-opacity group-hover:opacity-80"
+            />
+            <label className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/55 opacity-0 transition-opacity group-hover:opacity-100">
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handleCoverUpload}
+                disabled={uploadingCover}
+              />
+              {uploadingCover ? (
+                <div className="h-8 w-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span className="text-sm font-semibold text-white">{t("changeCoverPhoto")}</span>
+                  <span className="mt-1 text-[10px] uppercase tracking-widest text-white/60">
+                    {t("coverFormatHint")}
+                  </span>
+                </>
+              )}
+            </label>
+          </div>
+          <p className="text-center text-xs text-white/40">{t("clickToChangeCover")}</p>
+        </div>
+
         <div className="mb-8 flex flex-col items-center gap-4 border-b border-white/10 pb-8">
+          <p className="text-xs font-medium uppercase tracking-widest text-white/35">{t("profilePhotoSectionLabel")}</p>
           <div className="relative group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

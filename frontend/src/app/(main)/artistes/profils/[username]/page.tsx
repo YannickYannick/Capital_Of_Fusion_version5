@@ -48,13 +48,17 @@ export default function ArtistProfilePage() {
         );
     }
 
-    const rawPic = artist.profile_picture;
+    const base = getApiBaseUrl().replace(/\/$/, "");
+    const resolveMedia = (raw: string | null | undefined) => {
+        if (!raw) return null;
+        if (raw.startsWith("http")) return raw;
+        return `${base}${raw.startsWith("/") ? "" : "/"}${raw}`;
+    };
+    const fallbackHero = "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop";
     const photoUrl =
-        rawPic && rawPic.startsWith("http")
-            ? rawPic
-            : rawPic
-              ? `${getApiBaseUrl().replace(/\/$/, "")}${rawPic.startsWith("/") ? "" : "/"}${rawPic}`
-              : "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop";
+        resolveMedia(artist.cover_image) ??
+        resolveMedia(artist.profile_picture) ??
+        fallbackHero;
 
     return (
         <div className="min-h-screen bg-black text-white relative -mt-16">

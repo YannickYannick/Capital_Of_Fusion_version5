@@ -67,6 +67,12 @@ class User(AbstractUser):
     bio_en = models.TextField(blank=True, verbose_name="Biographie (anglais)")
     bio_es = models.TextField(blank=True, verbose_name="Biographie (espagnol)")
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
+    cover_image = models.ImageField(
+        upload_to="profiles/covers/",
+        null=True,
+        blank=True,
+        verbose_name="Image de couverture (profil public)",
+    )
     dance_level = models.ForeignKey(
         "core.Level",
         on_delete=models.SET_NULL,

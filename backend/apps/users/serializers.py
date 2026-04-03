@@ -21,15 +21,16 @@ class ArtistSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'first_name', 'last_name',
-            'bio', 'bio_en', 'bio_es', 'profile_picture', 'professions', 'is_staff_member'
+            'bio', 'bio_en', 'bio_es', 'profile_picture', 'cover_image', 'professions', 'is_staff_member'
         ]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         request = self.context.get("request")
-        pic = data.get("profile_picture")
-        if pic and request and not str(pic).startswith("http"):
-            data["profile_picture"] = request.build_absolute_uri(pic)
+        for key in ("profile_picture", "cover_image"):
+            val = data.get(key)
+            if val and request and not str(val).startswith("http"):
+                data[key] = request.build_absolute_uri(val)
         return data
 
 class RegisterSerializer(serializers.ModelSerializer):
