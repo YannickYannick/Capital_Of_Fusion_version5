@@ -756,11 +756,11 @@ export async function uploadArtistProfilePicture(
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg =
-      data && typeof data === "object" && "error" in data
-        ? String(data.error)
-        : `Erreur ${res.status}`;
-    throw new Error(msg);
+    const d = data as Record<string, unknown>;
+    const baseMsg =
+      d && typeof d === "object" && "error" in d ? String(d.error) : `Erreur ${res.status}`;
+    const detail = d && typeof d.detail === "string" ? d.detail : "";
+    throw new Error(detail ? `${baseMsg} — ${detail}` : baseMsg);
   }
   return data as ArtistApi;
 }

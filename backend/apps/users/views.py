@@ -1,13 +1,17 @@
 """
 Vues API Users — auth (login/logout, Google OAuth), utilisateur courant, et inscription.
 """
+import logging
 import os
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from django.contrib.auth import authenticate
+
+logger = logging.getLogger(__name__)
 
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -246,6 +250,7 @@ class ArtistAdminDetailAPIView(APIView):
     """
 
     permission_classes = [IsStaffOrSuperUser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get(self, request, username):
         artist = User.objects.filter(username=username).first()
@@ -288,7 +293,18 @@ class ArtistAdminDetailAPIView(APIView):
         if "profile_picture" in request.FILES:
             artist.profile_picture = request.FILES["profile_picture"]
 
-        artist.save()
+        try:
+            artist.save()
+        except Exception as e:
+            logger.exception("ArtistAdminDetailAPIView.patch save failed")
+            return Response(
+                {
+                    "error": "Échec de l'enregistrement (upload ou stockage).",
+                    "detail": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         invalidate_artists_cache()
         return Response(
             ArtistSerializer(artist, context={"request": request}).data,

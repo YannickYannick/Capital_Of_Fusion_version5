@@ -7,7 +7,30 @@ import os
 
 DEBUG = False
 
-# Cloudinary pour le stockage des fichiers media (images, etc.)
+# Cloudinary : apps chargés uniquement en prod (évite ImproperlyConfigured en local sans credentials).
+_apps = list(INSTALLED_APPS)
+_cloudinary_insert = _apps.index("django.contrib.staticfiles") + 1
+INSTALLED_APPS = (
+    _apps[:_cloudinary_insert]
+    + ["cloudinary_storage", "cloudinary"]
+    + _apps[_cloudinary_insert:]
+)
+
+# Credentials : ne jamais mettre des chaînes vides dans CLOUDINARY_STORAGE — sinon cloudinary.config()
+# écrase CLOUDINARY_URL et les uploads échouent silencieusement.
+# Soit les 3 variables Railway, soit une seule CLOUDINARY_URL=cloudinary://key:secret@cloud_name
+_cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()
+_api_key = os.environ.get("CLOUDINARY_API_KEY", "").strip()
+_api_secret = os.environ.get("CLOUDINARY_API_SECRET", "").strip()
+if _cloud_name and _api_key and _api_secret:
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": _cloud_name,
+        "API_KEY": _api_key,
+        "API_SECRET": _api_secret,
+    }
+else:
+    CLOUDINARY_STORAGE = {}
+
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
