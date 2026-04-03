@@ -77,6 +77,41 @@ fetch('http://localhost:8000/api/organization/nodes/')
 - Pour aller plus loin : alléger le premier frame 3D (moins d’objets visibles au démarrage, LOD, etc.) ou déplacer du travail hors du main thread si possible (très dépendant de Three/R3F).
 
 ### 7. **Google Ads bloqués (ERR_BLOCKED_BY_CLIENT)**
+
+---
+
+## Nouvelle optimisation : payload léger pour /explore
+
+### 1. Endpoint list allégé
+
+- **Backend** :
+  - Ajout de `OrganizationNodeLightSerializer` (26 champs vs 35) qui exclut les champs lourds d’overlay : `description`, `content`, `cta_text`, `cta_url`, `video_url`, `music_type`, `music_youtube_url`, `music_file`.
+  - `GET /api/organization/nodes/` (sans `?for_structure`) utilise ce serializer + `.defer()` sur ces 8 colonnes → moins d’E/S disque et moins de JSON renvoyé.
+  - `GET /api/organization/nodes/?for_structure=1` reste inchangé (organigramme : serializer complet).
+
+- **Frontend** :
+  - Les champs lourds deviennent **optionnels** dans `OrganizationNodeApi` (`description?`, `content?`, `cta_text?`, `cta_url?`, `video_url?`, `music_type?`, `music_youtube_url?`, `music_file?`).
+
+### 2. Overlay "progressif" sur /explore
+
+- **Page `/explore`** :
+  - `getOrganizationNodes()` consomme désormais la réponse **light** (par défaut).
+  - Lorsqu’on ouvre l’overlay (`handleOpenOverlay`) :
+    1. On affiche immédiatement l’overlay avec les données légères (nom, image, accroche courte, type, événements).
+    2. En parallèle, on fetch le détail complet via `getOrganizationNodeBySlug(slug)`.
+    3. Dès que la réponse arrive, on remplace le noeud actuel par la version complète (overlay + liste `nodes`).
+
+- **Effet UX** :
+  - L’ouverture de l’overlay reste **instantanée**.
+  - Les gros contenus (description longue, markdown, musique) arrivent en **lazy** quelques centaines de ms plus tard, sans bloquer la première frame 3D.
+
+### 3. Impact attendu (ordre de grandeur)
+
+|                     | Avant (payload complet) | Après (payload light + overlay async) |
+|---------------------|-------------------------|----------------------------------------|
+| `GET /nodes/`       | ~17 s                   | ~1–2 s                                 |
+| Page Load → 1ʳᵉ frame | ~17 s                   | ~2 s                                   |
+| Ouverture overlay   | instantané              | instantané + enrichissement progressif |
 - Lié à un **bloqueur de pub** (ex. AdBlock). Pas un bug de l’app ; aucun changement à faire si tu ne dépends pas des ads.
 
 ---

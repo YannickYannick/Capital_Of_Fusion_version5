@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useCallback, useEffect, useRef, startTransition, useDeferredValue } from "react";
-import { getOrganizationNodes, getSiteConfig } from "@/lib/api";
+import { getOrganizationNodeBySlug, getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
@@ -254,9 +254,27 @@ function ExplorePageInner() {
     });
   }, []);
 
-  const handleOpenOverlay = useCallback((node: OrganizationNodeApi) => {
-    setOverlayNode(node);
-  }, []);
+  const handleOpenOverlay = useCallback(
+    async (node: OrganizationNodeApi) => {
+      // Ouvrir immédiatement avec les données légères
+      setOverlayNode(node);
+
+      try {
+        const full = await getOrganizationNodeBySlug(node.slug);
+        // Mettre à jour l'overlay uniquement si on est toujours sur le même noeud
+        setOverlayNode((current) => (current && current.id === node.id ? full : current));
+        // Mettre à jour la liste des noeuds pour refléter les changements (musique, contenu, etc.)
+        setNodes((prev) => prev.map((n) => (n.id === full.id ? full : n)));
+      } catch (e) {
+        // En cas d'erreur réseau, on garde au moins la version légère
+        if (process.env.NODE_ENV !== "production") {
+          // eslint-disable-next-line no-console
+          console.warn("[Explore] Échec du chargement détaillé du noeud", node.slug, e);
+        }
+      }
+    },
+    []
+  );
 
   const handleCloseOverlay = useCallback(() => {
     setOverlayNode(null);

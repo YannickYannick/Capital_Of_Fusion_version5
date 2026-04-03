@@ -20,13 +20,13 @@ export interface OrganizationNodeApi {
   type: string;
   /** Slug du noeud parent (null pour la racine). Utilisé pour l’organigramme. */
   parent_slug?: string | null;
-  description: string;
+  description?: string;
   short_description: string;
-  cta_text: string;
-  cta_url: string;
-  video_url: string;
+  cta_text?: string;
+  cta_url?: string;
+  video_url?: string;
   cover_image: string | null;
-  content: string;
+  content?: string;
   visual_source: string;
   planet_type: string;
   model_3d: string;
@@ -47,9 +47,9 @@ export interface OrganizationNodeApi {
   is_visible_3d: boolean;
   node_events: NodeEventApi[];
   /** Musique de fond (overlay) — configurable en admin uniquement */
-  music_type: "" | "youtube" | "file";
-  music_youtube_url: string;
-  music_file: string | null;
+  music_type?: "" | "youtube" | "file";
+  music_youtube_url?: string;
+  music_file?: string | null;
 }
 
 /**

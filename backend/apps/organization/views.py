@@ -12,7 +12,12 @@ from apps.core.permissions import IsStaffOrSuperUser
 from apps.core.views import _user_is_admin_direct
 from apps.core.models import PendingContentEdit
 from .models import OrganizationNode, Pole
-from .serializers import OrganizationNodeSerializer, PoleSerializer, StaffMemberSerializer
+from .serializers import (
+    OrganizationNodeSerializer,
+    OrganizationNodeLightSerializer,
+    PoleSerializer,
+    StaffMemberSerializer,
+)
 
 User = get_user_model()
 
@@ -34,11 +39,27 @@ class OrganizationNodeListAPIView(APIView):
                 .prefetch_related("node_events")
                 .order_by("created_at")
             )
+            serializer_class = OrganizationNodeSerializer
         else:
-            qs = OrganizationNode.objects.filter(
-                is_visible_3d=True
-            ).prefetch_related("node_events").order_by("created_at")
-        serializer = OrganizationNodeSerializer(qs, many=True, context={"request": request})
+            qs = (
+                OrganizationNode.objects.filter(is_visible_3d=True)
+                .select_related("parent")
+                .prefetch_related("node_events")
+                .defer(
+                    "description",
+                    "content",
+                    "cta_text",
+                    "cta_url",
+                    "video_url",
+                    "music_type",
+                    "music_youtube_url",
+                    "music_file",
+                )
+                .order_by("created_at")
+            )
+            serializer_class = OrganizationNodeLightSerializer
+
+        serializer = serializer_class(qs, many=True, context={"request": request})
         return Response(serializer.data)
 
 

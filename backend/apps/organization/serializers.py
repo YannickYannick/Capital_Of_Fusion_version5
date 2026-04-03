@@ -109,3 +109,47 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
 
     def get_parent_slug(self, obj):
         return obj.parent.slug if obj.parent else None
+
+
+class OrganizationNodeLightSerializer(serializers.ModelSerializer):
+    """
+    Version allégée pour /explore : uniquement les champs nécessaires au canvas 3D
+    + node_events pour les compteurs, sans les gros champs texte/médias d'overlay.
+    """
+
+    node_events = NodeEventSerializer(many=True, read_only=True)
+    parent_slug = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrganizationNode
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "type",
+            "parent_slug",
+            "short_description",
+            "cover_image",
+            "visual_source",
+            "planet_type",
+            "model_3d",
+            "planet_texture",
+            "planet_color",
+            "orbit_radius",
+            "orbit_speed",
+            "planet_scale",
+            "rotation_speed",
+            "orbit_phase",
+            "orbit_position_y",
+            "orbit_shape",
+            "orbit_roundness",
+            "entry_start_x",
+            "entry_start_y",
+            "entry_start_z",
+            "entry_speed",
+            "is_visible_3d",
+            "node_events",
+        )
+
+    def get_parent_slug(self, obj):
+        return obj.parent.slug if obj.parent else None
