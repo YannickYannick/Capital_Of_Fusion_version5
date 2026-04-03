@@ -7,6 +7,9 @@ import os
 
 DEBUG = False
 
+# Cloudinary pour le stockage des fichiers media (images, etc.)
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
 _default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app"
 ALLOWED_HOSTS = [
