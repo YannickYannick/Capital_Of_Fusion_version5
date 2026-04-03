@@ -57,7 +57,7 @@
     "notFoundOrDenied": "Artist not found or access denied.",
     "backToProfile": "← Back to profile",
     "title": "Edit artist",
-    "photoHint": "— Profile photo can be changed in Django admin if needed (image file).",
+    "photoHint": "",
     "firstName": "First name",
     "lastName": "Last name",
     "bio": "Bio",
@@ -76,7 +76,11 @@
     "bioFallbackHint": "On the site, if a language is empty, the French version is shown as fallback.",
     "translationRowLabel": "Biography",
     "translateNeedFrBio": "Enter the French biography text to translate first.",
-    "translateNeedMode": "Check “Auto (AI)” or “Manual” to choose how you want to translate."
+    "translateNeedMode": "Check “Auto (AI)” or “Manual” to choose how you want to translate.",
+    "changePhoto": "Change",
+    "clickToChangePhoto": "Click on the image to change the profile photo",
+    "photoSaved": "Photo updated.",
+    "photoUploadError": "Error uploading photo"
   },
   "artistCreate": {
     "ctaNewArtist": "Add an artist",
@@ -221,9 +225,18 @@
         }
       },
       "quick": {
-        "allLessons": { "label": "All lessons", "desc": "Browse the full catalogue" },
-        "progression": { "label": "My progression", "desc": "See my learning path" },
-        "quiz": { "label": "Interactive quiz", "desc": "Test your knowledge" }
+        "allLessons": {
+          "label": "All lessons",
+          "desc": "Browse the full catalogue"
+        },
+        "progression": {
+          "label": "My progression",
+          "desc": "See my learning path"
+        },
+        "quiz": {
+          "label": "Interactive quiz",
+          "desc": "Test your knowledge"
+        }
       }
     },
     "identiteVision": {

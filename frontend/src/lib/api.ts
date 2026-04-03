@@ -736,6 +736,36 @@ export async function patchArtistAdmin(
 }
 
 /**
+ * Upload profile picture pour un artiste (via FormData/multipart).
+ */
+export async function uploadArtistProfilePicture(
+  username: string,
+  file: File
+): Promise<ArtistApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const formData = new FormData();
+  formData.append("profile_picture", file);
+  const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg =
+      data && typeof data === "object" && "error" in data
+        ? String(data.error)
+        : `Erreur ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as ArtistApi;
+}
+
+/**
  * Création admin d'un artiste (staff/admin).
  * ADMIN : 201 + ArtistApi. STAFF : 202 + { pending: true, message }.
  * POST /api/admin/users/artists/

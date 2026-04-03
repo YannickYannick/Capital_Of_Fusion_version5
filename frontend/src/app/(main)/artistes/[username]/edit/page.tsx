@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
-import { getArtistAdmin, patchArtistAdmin, getApiBaseUrl } from "@/lib/api";
+import { getArtistAdmin, patchArtistAdmin, uploadArtistProfilePicture, getApiBaseUrl } from "@/lib/api";
 import type { ArtistApi, DanceProfessionApi } from "@/types/user";
 import { EditFormActionBar } from "@/components/admin/translation/EditFormActionBar";
 import { TranslationModeCheckboxes } from "@/components/admin/translation/TranslationModeCheckboxes";
@@ -53,6 +53,7 @@ export default function EditArtistPage() {
   const [translateAi, setTranslateAi] = useState(false);
   const [translateManual, setTranslateManual] = useState(false);
   const [translationModal, setTranslationModal] = useState<"ai" | "manual" | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
   const isAdmin = user?.user_type === "ADMIN";
@@ -144,6 +145,23 @@ export default function EditArtistPage() {
     setTranslationModal(translateAi ? "ai" : "manual");
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !username) return;
+    setUploadingPhoto(true);
+    setError(null);
+    try {
+      const updated = await uploadArtistProfilePicture(username, file);
+      setArtist(updated);
+      setSuccessMessage(t("photoSaved"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("photoUploadError"));
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = "";
+    }
+  };
+
   if (!user) {
     return (
       <PageShell className="text-center">
@@ -210,18 +228,42 @@ export default function EditArtistPage() {
         </Link>
         <h1 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl">{t("title")}</h1>
         <p className="mx-auto max-w-xl text-sm leading-relaxed text-white/45">
-          <span className="font-mono text-purple-400/90">@{artist.username}</span> {t("photoHint")}
+          <span className="font-mono text-purple-400/90">@{artist.username}</span>
         </p>
       </header>
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl md:p-10">
-        <div className="mb-8 flex flex-col items-center gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-center sm:justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photoUrl(artist.profile_picture)}
-            alt={t("profilePhotoAlt")}
-            className="h-28 w-28 flex-shrink-0 rounded-2xl border border-white/10 object-cover shadow-lg"
-          />
+        <div className="mb-8 flex flex-col items-center gap-4 border-b border-white/10 pb-8">
+          <div className="relative group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoUrl(artist.profile_picture)}
+              alt={t("profilePhotoAlt")}
+              className="h-32 w-32 flex-shrink-0 rounded-2xl border border-white/10 object-cover shadow-lg transition-opacity group-hover:opacity-70"
+            />
+            <label
+              className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handlePhotoUpload}
+                disabled={uploadingPhoto}
+              />
+              {uploadingPhoto ? (
+                <div className="h-6 w-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <svg className="h-6 w-6 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-xs font-medium text-white">{t("changePhoto")}</span>
+                </>
+              )}
+            </label>
+          </div>
+          <p className="text-xs text-white/40">{t("clickToChangePhoto")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 text-left">

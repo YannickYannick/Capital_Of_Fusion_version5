@@ -57,7 +57,7 @@
     "notFoundOrDenied": "Artista no encontrado o acceso denegado.",
     "backToProfile": "← Volver al perfil",
     "title": "Editar artista",
-    "photoHint": "— La foto de perfil se puede cambiar en el admin de Django si hace falta (archivo de imagen).",
+    "photoHint": "",
     "firstName": "Nombre",
     "lastName": "Apellido",
     "bio": "Biografía",
@@ -76,7 +76,11 @@
     "bioFallbackHint": "En el sitio, si un idioma está vacío, se muestra la versión en francés.",
     "translationRowLabel": "Biografía",
     "translateNeedFrBio": "Indica primero el texto en francés (biografía) a traducir.",
-    "translateNeedMode": "Marca « Auto (IA) » o « Manual » para indicar cómo quieres traducir."
+    "translateNeedMode": "Marca « Auto (IA) » o « Manual » para indicar cómo quieres traducir.",
+    "changePhoto": "Cambiar",
+    "clickToChangePhoto": "Haz clic en la imagen para cambiar la foto de perfil",
+    "photoSaved": "Foto actualizada.",
+    "photoUploadError": "Error al subir la foto"
   },
   "artistCreate": {
     "ctaNewArtist": "Agregar un artista",
@@ -221,9 +225,18 @@
         }
       },
       "quick": {
-        "allLessons": { "label": "Todas las lecciones", "desc": "Explorar el catálogo completo" },
-        "progression": { "label": "Mi progresión", "desc": "Ver mi recorrido" },
-        "quiz": { "label": "Quiz interactivo", "desc": "Poner a prueba mis conocimientos" }
+        "allLessons": {
+          "label": "Todas las lecciones",
+          "desc": "Explorar el catálogo completo"
+        },
+        "progression": {
+          "label": "Mi progresión",
+          "desc": "Ver mi recorrido"
+        },
+        "quiz": {
+          "label": "Quiz interactivo",
+          "desc": "Poner a prueba mis conocimientos"
+        }
       }
     },
     "identiteVision": {
