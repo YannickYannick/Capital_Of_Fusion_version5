@@ -30,3 +30,6 @@ backend/migrate_err.txt
 
 # Logs de debug racine / outils
 debug-*.log
+
+# Pipeline modèles 3D Adobe — extraction zip (régénérable, trop lourd pour le dépôt)
+frontend/public/models/**/.tmp-extract/
