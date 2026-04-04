@@ -290,7 +290,7 @@ class ArtistAdminDetailAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        return Response(
+        return json_response_no_store(
             ArtistSerializer(artist, context={"request": request}).data,
             status=status.HTTP_200_OK,
         )

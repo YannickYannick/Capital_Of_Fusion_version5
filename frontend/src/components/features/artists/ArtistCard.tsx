@@ -46,7 +46,7 @@ const ArtistCard = memo(function ArtistCard({ artist, priority = false }: { arti
                             {fullName}
                         </h3>
                         <div className="flex flex-wrap gap-1 mt-1">
-                            {artist.professions.slice(0, 2).map(p => (
+                            {(artist.professions ?? []).slice(0, 2).map(p => (
                                 <span key={p.id} className="text-[10px] text-purple-400/80 font-black uppercase tracking-widest">{p.name}</span>
                             ))}
                         </div>
