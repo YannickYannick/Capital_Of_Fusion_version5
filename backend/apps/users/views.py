@@ -269,17 +269,11 @@ class ArtistAdminDetailAPIView(APIView):
 
         if "profile_picture" in request.FILES:
             artist.profile_picture = request.FILES["profile_picture"]
-            logger.info(f"[UPLOAD] profile_picture assigned: {artist.profile_picture.name}")
         if "cover_image" in request.FILES:
             artist.cover_image = request.FILES["cover_image"]
-            logger.info(f"[UPLOAD] cover_image assigned: {artist.cover_image.name}")
 
         try:
             artist.save()
-            # Log storage info after save
-            if artist.profile_picture:
-                storage_class = artist.profile_picture.storage.__class__.__name__
-                logger.info(f"[UPLOAD] profile_picture after save: {artist.profile_picture.name}, storage: {storage_class}")
         except Exception as e:
             logger.exception("ArtistAdminDetailAPIView.patch save failed")
             return Response(
