@@ -7,6 +7,7 @@ import { getApiBaseUrl } from "@/lib/api";
 
 function resolveArtistPhotoUrl(url: string | null | undefined): string {
     if (!url) return "/images/placeholder-artist.jpg";
+    if (url.startsWith("//")) return `https:${url}`;
     if (url.startsWith("http")) return url;
     const base = getApiBaseUrl().replace(/\/$/, "");
     return `${base}${url.startsWith("/") ? "" : "/"}${url}`;

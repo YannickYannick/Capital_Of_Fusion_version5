@@ -47,21 +47,24 @@ class ArtistSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         request = self.context.get("request")
         for key in ("profile_picture", "cover_image"):
-            # Accès direct au champ pour éviter la transformation Django du ImageField
             field_file = getattr(instance, key, None)
             if not field_file:
                 data[key] = None
                 continue
-            # .name contient le chemin brut stocké en base (ou l'URL Cloudinary)
-            raw_value = field_file.name if hasattr(field_file, "name") else str(field_file)
-            if raw_value.startswith("http://") or raw_value.startswith("https://"):
-                # Déjà une URL complète (Cloudinary), on la retourne telle quelle
-                data[key] = raw_value
+            # Toujours passer par .url : avec MediaCloudinaryStorage c’est l’URL https complète ;
+            # avec .name seul on obtient souvent « media/Artistes/… » et préfixer /media/ donne
+            # /media/media/… → 404 sur Railway.
+            try:
+                url = field_file.url
+            except ValueError:
+                data[key] = None
+                continue
+            if url.startswith("http://") or url.startswith("https://"):
+                data[key] = _https_media_url(url, request)
             elif request:
-                # Chemin local, on construit l'URL absolue
-                data[key] = _https_media_url(request.build_absolute_uri(f"/media/{raw_value}"), request)
+                data[key] = _https_media_url(request.build_absolute_uri(url), request)
             else:
-                data[key] = f"/media/{raw_value}"
+                data[key] = url
         return data
 
 class RegisterSerializer(serializers.ModelSerializer):
