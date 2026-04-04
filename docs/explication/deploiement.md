@@ -2,6 +2,8 @@
 
 **Objectif :** déployer le frontend (Next.js) sur Vercel et le backend (Django + PostgreSQL) sur **Railway** (recommandé) ou **Render**, puis connecter les deux. Un seul hébergeur backend suffit.
 
+**Médias (Cloudinary), collectstatic et images Next.js :** guide dédié [Déploiement — médias et statiques](../deploiement-medias-et-statiques.md) (variables Railway, pièges 502, `remotePatterns` Vercel).
+
 ---
 
 ## Prérequis
@@ -208,4 +210,4 @@ Cela signifie que les dépendances ne sont pas installées dans l’environnemen
 
 ---
 
-*Dernière mise à jour : 2025-02-09*
+*Dernière mise à jour : 2026-04-04*
