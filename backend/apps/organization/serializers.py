@@ -3,6 +3,9 @@ Serializers Organization — Pole, OrganizationNode (paramètres 3D) + NodeEvent
 """
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+
+from apps.users.image_field_api_url import serialize_image_field_for_api
+
 from .models import OrganizationNode, NodeEvent, Pole
 
 User = get_user_model()
@@ -31,9 +34,9 @@ class StaffMemberSerializer(serializers.Serializer):
     bio = serializers.CharField(read_only=True, allow_blank=True)
 
     def get_profile_picture(self, obj):
-        if obj.profile_picture:
-            return obj.profile_picture.url
-        return None
+        return serialize_image_field_for_api(
+            obj.profile_picture, self.context.get("request")
+        )
 
     def get_staff_role_display(self, obj):
         return obj.get_staff_role_display() if getattr(obj, "staff_role", None) else ""

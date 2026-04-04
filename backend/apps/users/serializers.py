@@ -1,44 +1,12 @@
-from urllib.parse import urlparse
-
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.organization.models import OrganizationRole
 from apps.core.models import DanceProfession
 
+from apps.users.image_field_api_url import serialize_image_field_for_api
+
 User = get_user_model()
 
-
-def _strip_embedded_absolute_url(url: str) -> str:
-    """
-    Si l’ImageField contient déjà une URL absolue, django-cloudinary-storage peut
-    générer .../upload/.../media/https://... (URL collée comme public_id).
-    On réextrait l’URL interne pour éviter des liens 404.
-    """
-    if not url:
-        return url
-    s = str(url)
-    for marker in ("/media/https://", "/media/http://"):
-        if marker in s:
-            rest = s.split(marker, 1)[1]
-            return ("https://" if "https://" in marker else "http://") + rest
-    return s
-
-
-def _https_media_url(url: str, request) -> str:
-    """Évite le mixed content : URLs API médias toujours en https pour notre hôte / Railway."""
-    if not url or not str(url).startswith("http://"):
-        return url
-    s = str(url)
-    try:
-        host = urlparse(s).netloc
-    except ValueError:
-        return url
-    req_host = (request.get_host() if request else "") or ""
-    if req_host and host == req_host.split(":")[0]:
-        return "https://" + s[7:]
-    if host.endswith(".up.railway.app") or host.endswith(".railway.app"):
-        return "https://" + s[7:]
-    return url
 
 class DanceProfessionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,32 +31,9 @@ class ArtistSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         request = self.context.get("request")
         for key in ("profile_picture", "cover_image"):
-            field_file = getattr(instance, key, None)
-            if not field_file:
-                data[key] = None
-                continue
-            raw_name = (field_file.name if hasattr(field_file, "name") else "") or ""
-            # Valeur déjà une URL complète en base (migrations / anciens enregistrements) :
-            # ne pas utiliser field_file.url qui la re-préfixe en « .../media/https://... ».
-            if raw_name.startswith("http://") or raw_name.startswith("https://"):
-                url = _strip_embedded_absolute_url(raw_name)
-                data[key] = _https_media_url(url, request)
-                continue
-            if raw_name.startswith("//"):
-                data[key] = _strip_embedded_absolute_url("https:" + raw_name)
-                continue
-            try:
-                url = field_file.url
-            except ValueError:
-                data[key] = None
-                continue
-            url = _strip_embedded_absolute_url(url)
-            if url.startswith("http://") or url.startswith("https://"):
-                data[key] = _https_media_url(url, request)
-            elif request:
-                data[key] = _https_media_url(request.build_absolute_uri(url), request)
-            else:
-                data[key] = url
+            data[key] = serialize_image_field_for_api(
+                getattr(instance, key, None), request
+            )
         return data
 
 class RegisterSerializer(serializers.ModelSerializer):
