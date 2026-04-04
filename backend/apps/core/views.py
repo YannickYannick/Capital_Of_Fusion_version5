@@ -69,7 +69,15 @@ def health_check(request):
     """
     GET /api/health/ — ne touche pas à la DB. Pour vérifier que Django répond (diagnostic déploiement).
     """
-    return JsonResponse({"status": "ok"})
+    # Debug Cloudinary config
+    cloudinary_storage = getattr(settings, "CLOUDINARY_STORAGE", {})
+    default_storage = getattr(settings, "DEFAULT_FILE_STORAGE", "non défini")
+    return JsonResponse({
+        "status": "ok",
+        "cloudinary_configured": bool(cloudinary_storage.get("CLOUD_NAME")),
+        "cloudinary_cloud_name": cloudinary_storage.get("CLOUD_NAME", "")[:20] if cloudinary_storage.get("CLOUD_NAME") else None,
+        "default_file_storage": default_storage,
+    })
 
 
 class MenuItemListAPIView(APIView):
