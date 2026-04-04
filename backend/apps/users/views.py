@@ -17,6 +17,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 from apps.core.models import DanceProfession, PendingContentEdit
+from apps.core.api_response import json_response_no_store
 from apps.core.permissions import IsStaffOrSuperUser
 
 from .models import User
@@ -192,7 +193,7 @@ class ArtistListAPIView(APIView):
             artists = artists.filter(is_staff_member=False)
 
         serializer = ArtistSerializer(artists, many=True, context={'request': request})
-        return Response(serializer.data)
+        return json_response_no_store(serializer.data)
 
 
 class ArtistDetailAPIView(APIView):
@@ -233,7 +234,7 @@ class ArtistAdminDetailAPIView(APIView):
         if not artist:
             return Response({"error": "Utilisateur introuvable"}, status=status.HTTP_404_NOT_FOUND)
         profs = DanceProfession.objects.all().order_by("name")
-        return Response(
+        return json_response_no_store(
             {
                 "artist": ArtistSerializer(artist, context={"request": request}).data,
                 "all_professions": DanceProfessionSerializer(profs, many=True).data,

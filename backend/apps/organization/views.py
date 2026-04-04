@@ -3,6 +3,8 @@ Vues API Organization — liste des noeuds (Explore 3D) ; détail par slug.
 Vues admin — modifier les noeuds d'organisation (staff ou superuser).
 """
 from rest_framework.views import APIView
+
+from apps.core.api_response import json_response_no_store
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -108,7 +110,7 @@ class StaffListAPIView(APIView):
         if pole_slug:
             qs = qs.filter(pole__slug=pole_slug)
         serializer = StaffMemberSerializer(qs, many=True, context={"request": request})
-        return Response(serializer.data)
+        return json_response_no_store(serializer.data)
 
 
 class OrganizationNodeDetailAPIView(APIView):
