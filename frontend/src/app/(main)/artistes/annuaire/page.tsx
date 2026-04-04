@@ -2,6 +2,8 @@ import { getArtists } from "@/lib/api";
 import type { ArtistApi } from "@/types/user";
 import ArtistCard from "@/components/features/artists/ArtistCard";
 
+export const dynamic = "force-dynamic";
+
 export default async function AnnuairePage() {
     let artists: ArtistApi[] = [];
     try { artists = await getArtists(); } catch (error) { console.error(error); }

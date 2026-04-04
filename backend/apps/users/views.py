@@ -170,29 +170,14 @@ class ArtistListAPIView(APIView):
     """
     GET /api/users/artists/
     Liste publique des artistes (utilisateurs ayant des professions).
-    Cache mémoire 5 min, invalidé par signal post_save/post_delete sur User.
+    Pas de cache ici : LocMemCache + plusieurs workers Gunicorn faisait servir
+    d'anciennes URLs (ex. /media/media/...) après upload tant qu'un worker
+    n'avait pas été invalidé.
     """
     permission_classes = [AllowAny]
 
-    CACHE_KEY_ALL = "artists_list_all"
-    CACHE_KEY_STAFF = "artists_list_staff"
-    CACHE_KEY_EXTERNAL = "artists_list_external"
-    CACHE_TIMEOUT = 5 * 60  # 5 minutes
-
     def get(self, request):
-        from django.core.cache import cache
-
         staff_only = request.query_params.get('staff_only')
-        if staff_only == 'true':
-            cache_key = self.CACHE_KEY_STAFF
-        elif staff_only == 'false':
-            cache_key = self.CACHE_KEY_EXTERNAL
-        else:
-            cache_key = self.CACHE_KEY_ALL
-
-        cached = cache.get(cache_key)
-        if cached is not None:
-            return Response(cached)
 
         artists = (
             User.objects.filter(professions__isnull=False)
@@ -207,16 +192,7 @@ class ArtistListAPIView(APIView):
             artists = artists.filter(is_staff_member=False)
 
         serializer = ArtistSerializer(artists, many=True, context={'request': request})
-        data = serializer.data
-        cache.set(cache_key, data, self.CACHE_TIMEOUT)
-        return Response(data)
-
-def invalidate_artists_cache():
-    """Supprime les caches de la liste artistes."""
-    from django.core.cache import cache
-    cache.delete(ArtistListAPIView.CACHE_KEY_ALL)
-    cache.delete(ArtistListAPIView.CACHE_KEY_STAFF)
-    cache.delete(ArtistListAPIView.CACHE_KEY_EXTERNAL)
+        return Response(serializer.data)
 
 
 class ArtistDetailAPIView(APIView):
@@ -313,7 +289,6 @@ class ArtistAdminDetailAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        invalidate_artists_cache()
         return Response(
             ArtistSerializer(artist, context={"request": request}).data,
             status=status.HTTP_200_OK,

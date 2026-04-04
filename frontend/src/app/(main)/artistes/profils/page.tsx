@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getArtists } from "@/lib/api";
 import type { ArtistApi } from "@/types/user";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function ProfilsPage() {
   const artists = await getArtists().catch(() => [] as ArtistApi[]);

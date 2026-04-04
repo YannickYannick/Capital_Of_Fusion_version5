@@ -768,7 +768,7 @@ export async function getArtists(staffOnly?: boolean): Promise<ArtistApi[]> {
   if (staffOnly !== undefined) {
     url += `?staff_only=${staffOnly}`;
   }
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Artists API error: ${res.status}`);
   return res.json();
 }
@@ -778,7 +778,9 @@ export async function getArtists(staffOnly?: boolean): Promise<ArtistApi[]> {
  */
 export async function getArtistByUsername(username: string): Promise<ArtistApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/users/artists/${encodeURIComponent(username)}/`);
+  const res = await fetch(`${base}/api/users/artists/${encodeURIComponent(username)}/`, {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error(`Artist API error: ${res.status}`);
   return res.json();
 }
