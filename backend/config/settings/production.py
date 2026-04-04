@@ -38,14 +38,26 @@ else:
     CLOUDINARY_STORAGE = {}
 
 # Django 4.2+ : STORAGES remplace DEFAULT_FILE_STORAGE et STATICFILES_STORAGE
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# Cloudinary pour les médias uniquement si les credentials sont présents
+if _cloud_name and _api_key and _api_secret:
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+else:
+    # Fallback : stockage local (ne marche pas bien sur Railway car éphémère)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
 _default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app"
