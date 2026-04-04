@@ -59,6 +59,10 @@ else:
         },
     }
 
+# Compatibilité django-cloudinary-storage (obsolète, utilise encore STATICFILES_STORAGE)
+# Ce package n'est pas compatible Django 5+ sans ce hack
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
 _default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app"
 ALLOWED_HOSTS = [
