@@ -4,19 +4,24 @@
  * Liste des cours des partenaires — style cours.
  * GET /api/partners/courses/
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { getPartnerCourses } from "@/lib/api";
 import type { PartnerCourseApi } from "@/types/partner";
+import { PartnerQuickAddModal } from "@/components/features/partners/PartnerQuickAddModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PartenairesCoursPage() {
   const t = useTranslations("pages");
+  const { user } = useAuth();
   const [courses, setCourses] = useState<PartnerCourseApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState("");
   const [style, setStyle] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
 
   const LEVEL_OPTIONS = [
     { value: "", label: t("partnerCourses.filters.allLevels") },
@@ -33,7 +38,7 @@ export default function PartenairesCoursPage() {
     { value: "kizomba", label: t("partnerCourses.styles.kizomba") },
   ];
 
-  useEffect(() => {
+  const fetchCourses = useCallback(() => {
     setLoading(true);
     getPartnerCourses({
       level: level || undefined,
@@ -43,6 +48,10 @@ export default function PartenairesCoursPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Erreur"))
       .finally(() => setLoading(false));
   }, [level, style]);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
 
   return (
     <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
@@ -67,6 +76,25 @@ export default function PartenairesCoursPage() {
             {t("partnerCourses.subtitle")}
           </p>
         </div>
+
+        {isStaff && (
+          <div className="mb-8 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/15 px-6 py-3 text-sm font-bold text-amber-200 hover:bg-amber-500/25 transition"
+            >
+              {t("partnerCourses.addButton")}
+            </button>
+          </div>
+        )}
+
+        <PartnerQuickAddModal
+          mode="course"
+          open={addOpen}
+          onClose={() => setAddOpen(false)}
+          onCreated={fetchCourses}
+        />
 
         <div className="mt-6 flex flex-wrap justify-center gap-6 bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md max-w-2xl mx-auto mb-12">
           <label className="flex flex-col gap-2 text-sm text-white/80 font-medium flex-1 min-w-[200px]">

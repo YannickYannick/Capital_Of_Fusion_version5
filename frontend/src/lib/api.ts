@@ -14,7 +14,13 @@ import type { PractitionerApi, PractitionerListApi, ServiceCategoryApi, CareServ
 import type { ProjectCategoryApi, ProjectApi } from "@/types/projects";
 import type { SubscriptionPassApi, TrainingSessionApi, TrainingRegistrationApi } from "@/types/trainings";
 import type { ExplorePresetApi } from "@/types/explore";
-import type { PartnerNodeApi, PartnerEventApi, PartnerCourseApi } from "@/types/partner";
+import type {
+  PartnerNodeApi,
+  PartnerEventApi,
+  PartnerCourseApi,
+  PartnerMinimalApi,
+  PartnerCourseMetaApi,
+} from "@/types/partner";
 
 /**
  * Retourne l'URL de base de l'API (sans slash final).
@@ -548,6 +554,106 @@ export async function getPartnerCourseBySlug(slug: string): Promise<PartnerCours
   const res = await fetch(`${base}/api/partners/courses/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Partner course API error: ${res.status}`);
   return res.json();
+}
+
+/** GET /api/admin/partners/ — staff */
+export async function getAdminPartners(): Promise<PartnerMinimalApi[]> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Admin partners API error: ${res.status}`);
+  return res.json();
+}
+
+/** POST /api/admin/partners/ */
+export async function createAdminPartner(data: {
+  name: string;
+  slug: string;
+  description?: string;
+}): Promise<PartnerMinimalApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(typeof body === "object" && body && Object.keys(body).length ? JSON.stringify(body) : `Erreur ${res.status}`);
+  return body as PartnerMinimalApi;
+}
+
+/** GET /api/admin/partners/course-meta/ */
+export async function getPartnerCourseMeta(): Promise<PartnerCourseMetaApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/course-meta/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Partner course meta API error: ${res.status}`);
+  return res.json();
+}
+
+/** POST /api/admin/partners/nodes/ */
+export async function createPartnerNodeAdmin(payload: Record<string, unknown>): Promise<PartnerNodeApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/nodes/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerNodeApi;
+}
+
+/** POST /api/admin/partners/events/ */
+export async function createPartnerEventAdmin(payload: Record<string, unknown>): Promise<PartnerEventApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/events/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerEventApi;
+}
+
+/** POST /api/admin/partners/courses/ */
+export async function createPartnerCourseAdmin(payload: Record<string, unknown>): Promise<PartnerCourseApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/courses/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerCourseApi;
 }
 
 /**

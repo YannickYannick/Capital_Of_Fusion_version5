@@ -4,11 +4,13 @@
  * Liste des événements des partenaires — style evenements/festivals.
  * GET /api/partners/events/
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { getPartnerEvents } from "@/lib/api";
 import type { PartnerEventApi } from "@/types/partner";
+import { PartnerQuickAddModal } from "@/components/features/partners/PartnerQuickAddModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 function formatDate(dateStr: string, locale: string): string {
   const d = new Date(dateStr);
@@ -24,11 +26,14 @@ function formatDate(dateStr: string, locale: string): string {
 export default function PartenairesEvenementsPage() {
   const t = useTranslations("pages");
   const locale = useLocale();
+  const { user } = useAuth();
   const [events, setEvents] = useState<PartnerEventApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [type, setType] = useState("");
   const [upcoming, setUpcoming] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
 
   const TYPE_OPTIONS = [
     { value: "", label: t("partnerEvents.filters.allTypes") },
@@ -43,7 +48,7 @@ export default function PartenairesEvenementsPage() {
     WORKSHOP: t("partnerEvents.types.workshop"),
   };
 
-  useEffect(() => {
+  const fetchEvents = useCallback(() => {
     setLoading(true);
     getPartnerEvents({
       type: type || undefined,
@@ -53,6 +58,10 @@ export default function PartenairesEvenementsPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Erreur"))
       .finally(() => setLoading(false));
   }, [type, upcoming]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   return (
     <div className="min-h-screen pt-64 pb-20 px-4 md:px-8">
@@ -77,6 +86,25 @@ export default function PartenairesEvenementsPage() {
             {t("partnerEvents.subtitle")}
           </p>
         </div>
+
+        {isStaff && (
+          <div className="mb-8 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/15 px-6 py-3 text-sm font-bold text-amber-200 hover:bg-amber-500/25 transition"
+            >
+              {t("partnerEvents.addButton")}
+            </button>
+          </div>
+        )}
+
+        <PartnerQuickAddModal
+          mode="event"
+          open={addOpen}
+          onClose={() => setAddOpen(false)}
+          onCreated={fetchEvents}
+        />
 
         <div className="mt-6 flex flex-wrap justify-center items-center gap-6 bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md max-w-2xl mx-auto mb-12">
           <label className="flex flex-col gap-2 text-sm text-white/80 font-medium flex-1 min-w-[200px]">

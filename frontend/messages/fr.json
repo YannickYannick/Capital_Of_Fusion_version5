@@ -161,7 +161,8 @@
         "workshop": "Atelier"
       },
       "loading": "Chargement…",
-      "empty": "Aucun événement partenaire pour le moment."
+      "empty": "Aucun événement partenaire pour le moment.",
+      "addButton": "+ Événement"
     },
     "partnerCourses": {
       "backToPartners": "← Nos partenaires",
@@ -187,7 +188,8 @@
         "kizomba": "Kizomba"
       },
       "loading": "Chargement…",
-      "empty": "Aucun cours partenaire pour le moment."
+      "empty": "Aucun cours partenaire pour le moment.",
+      "addButton": "+ Cours"
     },
     "promotionsFestivals": {
       "metaTitle": "Promotions festivals | Capital of Fusion",
@@ -201,7 +203,49 @@
         "upcomingOnly": "À venir uniquement"
       },
       "loading": "Chargement…",
-      "empty": "Aucun festival partenaire en promotion pour le moment."
+      "empty": "Aucun festival partenaire en promotion pour le moment.",
+      "addButton": "+ Festival"
+    },
+    "partnerForms": {
+      "titleStructure": "Nouvelle structure partenaire",
+      "titleEvent": "Nouvel événement partenaire",
+      "titleCourse": "Nouveau cours partenaire",
+      "titleFestival": "Nouveau festival",
+      "partner": "Partenaire",
+      "selectPartner": "— Choisir un partenaire —",
+      "noPartners": "Aucun partenaire. Créez-en un ci-dessous.",
+      "newPartnerName": "Nom du partenaire",
+      "newPartnerSlug": "Slug URL (ex. mon-ecole)",
+      "newPartnerDesc": "Description (optionnel)",
+      "createPartner": "Créer le partenaire",
+      "creatingPartner": "Création…",
+      "name": "Nom",
+      "slug": "Slug (identifiant URL, laissé vide = dérivé du nom)",
+      "nodeType": "Type de nœud",
+      "typeRoot": "Racine",
+      "typeBranch": "Branche",
+      "typeEventNode": "Nœud « événement » (structure)",
+      "parentNode": "Structure parente (optionnel)",
+      "linkedStructure": "Structure liée (optionnel)",
+      "none": "— Aucune —",
+      "eventType": "Type d'événement",
+      "typeFestival": "Festival",
+      "typeParty": "Soirée",
+      "typeWorkshop": "Atelier",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "location": "Lieu",
+      "description": "Description",
+      "style": "Style de danse",
+      "level": "Niveau",
+      "active": "Cours visible",
+      "submit": "Créer",
+      "cancel": "Annuler",
+      "creating": "Enregistrement…",
+      "errorPartnerRequired": "Veuillez sélectionner ou créer un partenaire.",
+      "errorPartnerFields": "Indiquez le nom et le slug du nouveau partenaire.",
+      "errorDates": "Les dates de début et de fin sont obligatoires.",
+      "errorStyleLevel": "Choisissez un style et un niveau."
     },
     "theory": {
       "eyebrow": "APPRENDRE & COMPRENDRE",
@@ -305,7 +349,8 @@
       "subtitle": "Découvrez les structures partenaires et leurs cours et événements.",
       "errorTitle": "Erreur de connexion",
       "emptyTitle": "VIDE",
-      "emptySubtitle": "AUCUNE STRUCTURE PARTENAIRE POUR LE MOMENT"
+      "emptySubtitle": "AUCUNE STRUCTURE PARTENAIRE POUR LE MOMENT",
+      "addButton": "+ Structure"
     },
     "organisationPoles": {
       "eyebrow": "Organisation",

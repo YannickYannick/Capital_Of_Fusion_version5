@@ -10,7 +10,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "**.railway.app",
+        hostname: "*.railway.app",
+      },
+      {
+        protocol: "https",
+        hostname: "*.up.railway.app",
+      },
+      {
+        protocol: "https",
+        hostname: "capitaloffusionversion5-production.up.railway.app",
       },
       {
         protocol: "https",

@@ -161,7 +161,8 @@
         "workshop": "Workshop"
       },
       "loading": "Loading…",
-      "empty": "No partner event for now."
+      "empty": "No partner event for now.",
+      "addButton": "+ Event"
     },
     "partnerCourses": {
       "backToPartners": "← Our partners",
@@ -187,7 +188,8 @@
         "kizomba": "Kizomba"
       },
       "loading": "Loading…",
-      "empty": "No partner class for now."
+      "empty": "No partner class for now.",
+      "addButton": "+ Class"
     },
     "promotionsFestivals": {
       "metaTitle": "Festival promotions | Capital of Fusion",
@@ -201,7 +203,49 @@
         "upcomingOnly": "Upcoming only"
       },
       "loading": "Loading…",
-      "empty": "No partner festival promotion for now."
+      "empty": "No partner festival promotion for now.",
+      "addButton": "+ Festival"
+    },
+    "partnerForms": {
+      "titleStructure": "New partner organization",
+      "titleEvent": "New partner event",
+      "titleCourse": "New partner class",
+      "titleFestival": "New festival",
+      "partner": "Partner",
+      "selectPartner": "— Select a partner —",
+      "noPartners": "No partner yet. Create one below.",
+      "newPartnerName": "Partner name",
+      "newPartnerSlug": "URL slug (e.g. my-school)",
+      "newPartnerDesc": "Description (optional)",
+      "createPartner": "Create partner",
+      "creatingPartner": "Creating…",
+      "name": "Name",
+      "slug": "Slug (URL id; leave empty to derive from name)",
+      "nodeType": "Node type",
+      "typeRoot": "Root",
+      "typeBranch": "Branch",
+      "typeEventNode": "“Event” node (structure)",
+      "parentNode": "Parent organization (optional)",
+      "linkedStructure": "Linked organization (optional)",
+      "none": "— None —",
+      "eventType": "Event type",
+      "typeFestival": "Festival",
+      "typeParty": "Party",
+      "typeWorkshop": "Workshop",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "location": "Location",
+      "description": "Description",
+      "style": "Dance style",
+      "level": "Level",
+      "active": "Class visible",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "creating": "Saving…",
+      "errorPartnerRequired": "Please select or create a partner.",
+      "errorPartnerFields": "Enter the new partner name and slug.",
+      "errorDates": "Start and end dates are required.",
+      "errorStyleLevel": "Choose a style and a level."
     },
     "theory": {
       "eyebrow": "LEARN & UNDERSTAND",
@@ -305,7 +349,8 @@
       "subtitle": "Discover partner organizations and their classes and events.",
       "errorTitle": "Connection error",
       "emptyTitle": "EMPTY",
-      "emptySubtitle": "NO PARTNER ORGANIZATION AVAILABLE YET"
+      "emptySubtitle": "NO PARTNER ORGANIZATION AVAILABLE YET",
+      "addButton": "+ Organization"
     },
     "organisationPoles": {
       "eyebrow": "Organization",

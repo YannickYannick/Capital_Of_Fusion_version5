@@ -161,7 +161,8 @@
         "workshop": "Taller"
       },
       "loading": "Cargando…",
-      "empty": "Por ahora no hay eventos de socios."
+      "empty": "Por ahora no hay eventos de socios.",
+      "addButton": "+ Evento"
     },
     "partnerCourses": {
       "backToPartners": "← Nuestros socios",
@@ -187,7 +188,8 @@
         "kizomba": "Kizomba"
       },
       "loading": "Cargando…",
-      "empty": "Por ahora no hay clases de socios."
+      "empty": "Por ahora no hay clases de socios.",
+      "addButton": "+ Clase"
     },
     "promotionsFestivals": {
       "metaTitle": "Promociones de festivales | Capital of Fusion",
@@ -201,7 +203,49 @@
         "upcomingOnly": "Solo próximos"
       },
       "loading": "Cargando…",
-      "empty": "Por ahora no hay festivales de socios en promoción."
+      "empty": "Por ahora no hay festivales de socios en promoción.",
+      "addButton": "+ Festival"
+    },
+    "partnerForms": {
+      "titleStructure": "Nueva estructura socia",
+      "titleEvent": "Nuevo evento de socio",
+      "titleCourse": "Nueva clase de socio",
+      "titleFestival": "Nuevo festival",
+      "partner": "Socio",
+      "selectPartner": "— Elegir un socio —",
+      "noPartners": "Aún no hay socios. Crea uno abajo.",
+      "newPartnerName": "Nombre del socio",
+      "newPartnerSlug": "Slug URL (ej. mi-escuela)",
+      "newPartnerDesc": "Descripción (opcional)",
+      "createPartner": "Crear socio",
+      "creatingPartner": "Creando…",
+      "name": "Nombre",
+      "slug": "Slug (id URL; vacío = derivado del nombre)",
+      "nodeType": "Tipo de nodo",
+      "typeRoot": "Raíz",
+      "typeBranch": "Rama",
+      "typeEventNode": "Nodo « evento » (estructura)",
+      "parentNode": "Estructura padre (opcional)",
+      "linkedStructure": "Estructura vinculada (opcional)",
+      "none": "— Ninguna —",
+      "eventType": "Tipo de evento",
+      "typeFestival": "Festival",
+      "typeParty": "Fiesta",
+      "typeWorkshop": "Taller",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "location": "Lugar",
+      "description": "Descripción",
+      "style": "Estilo de baile",
+      "level": "Nivel",
+      "active": "Clase visible",
+      "submit": "Crear",
+      "cancel": "Cancelar",
+      "creating": "Guardando…",
+      "errorPartnerRequired": "Selecciona o crea un socio.",
+      "errorPartnerFields": "Indica el nombre y el slug del nuevo socio.",
+      "errorDates": "Las fechas de inicio y fin son obligatorias.",
+      "errorStyleLevel": "Elige un estilo y un nivel."
     },
     "theory": {
       "eyebrow": "APRENDER & ENTENDER",
@@ -305,7 +349,8 @@
       "subtitle": "Descubre las estructuras socias y sus clases y eventos.",
       "errorTitle": "Error de conexión",
       "emptyTitle": "VACÍO",
-      "emptySubtitle": "AÚN NO HAY ESTRUCTURAS SOCIAS"
+      "emptySubtitle": "AÚN NO HAY ESTRUCTURAS SOCIAS",
+      "addButton": "+ Estructura"
     },
     "organisationPoles": {
       "eyebrow": "Organización",

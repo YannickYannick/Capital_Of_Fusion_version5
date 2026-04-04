@@ -4,27 +4,38 @@
  * Page Structures partenaires — annuaire des noeuds partenaires (GET /api/partners/nodes/?for_structure=1).
  * Layout : StandardPageShell + StandardPageHero.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getPartnerNodesForStructure } from "@/lib/api";
 import type { PartnerNodeApi } from "@/types/partner";
 import { PartnerNodeCard } from "@/components/features/partners/PartnerNodeCard";
+import { PartnerQuickAddModal } from "@/components/features/partners/PartnerQuickAddModal";
 import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Link from "next/link";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PartenairesStructuresPage() {
   const t = useTranslations("pages");
+  const { user } = useAuth();
   const [nodes, setNodes] = useState<PartnerNodeApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchNodes = useCallback(() => {
+    setLoading(true);
     getPartnerNodesForStructure()
       .then(setNodes)
       .catch((err) => setError(err instanceof Error ? err.message : "Erreur"))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchNodes();
+  }, [fetchNodes]);
+
+  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
 
   if (loading && nodes.length === 0) {
     return (
@@ -51,6 +62,25 @@ export default function PartenairesStructuresPage() {
           title={t("partnerStructures.titleBefore")}
           highlight={t("partnerStructures.titleHighlight")}
           description={t("partnerStructures.subtitle")}
+        />
+
+        {isStaff && (
+          <div className="mb-8 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/15 px-6 py-3 text-sm font-bold text-amber-200 hover:bg-amber-500/25 transition"
+            >
+              {t("partnerStructures.addButton")}
+            </button>
+          </div>
+        )}
+
+        <PartnerQuickAddModal
+          mode="structure"
+          open={addOpen}
+          onClose={() => setAddOpen(false)}
+          onCreated={fetchNodes}
         />
 
         {error ? (

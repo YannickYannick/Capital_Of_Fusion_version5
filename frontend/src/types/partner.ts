@@ -43,6 +43,19 @@ export interface PartnerScheduleApi {
   location_name: string;
 }
 
+/** Liste admin — GET /api/admin/partners/ */
+export interface PartnerMinimalApi {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+/** GET /api/admin/partners/course-meta/ */
+export interface PartnerCourseMetaApi {
+  styles: { id: string; name: string; slug: string }[];
+  levels: { id: string; name: string; slug: string }[];
+}
+
 export interface PartnerCourseApi {
   id: string;
   name: string;

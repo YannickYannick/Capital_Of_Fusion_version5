@@ -46,6 +46,13 @@ from apps.partners.views import (
     PartnerCourseListAPIView,
     PartnerCourseDetailAPIView,
 )
+from apps.partners.admin_views import (
+    PartnerAdminListCreateAPIView,
+    PartnerCourseMetaAPIView,
+    PartnerNodeAdminCreateAPIView,
+    PartnerEventAdminCreateAPIView,
+    PartnerCourseAdminCreateAPIView,
+)
 from apps.users.views import (
     LoginAPIView,
     GoogleLoginAPIView,
@@ -147,6 +154,11 @@ urlpatterns = [
     path("admin/identite/bulletins/<slug:slug>/", BulletinAdminDetailAPIView.as_view()),
     path("admin/pending-edits/", PendingContentEditListAPIView.as_view()),
     path("admin/pending-edits/<int:pk>/", PendingContentEditDetailAPIView.as_view()),
+    path("admin/partners/", PartnerAdminListCreateAPIView.as_view()),
+    path("admin/partners/course-meta/", PartnerCourseMetaAPIView.as_view()),
+    path("admin/partners/nodes/", PartnerNodeAdminCreateAPIView.as_view()),
+    path("admin/partners/events/", PartnerEventAdminCreateAPIView.as_view()),
+    path("admin/partners/courses/", PartnerCourseAdminCreateAPIView.as_view()),
 ]
 
 urlpatterns += router.urls
