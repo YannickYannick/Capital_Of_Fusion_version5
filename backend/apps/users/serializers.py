@@ -8,6 +8,22 @@ from apps.core.models import DanceProfession
 User = get_user_model()
 
 
+def _strip_embedded_absolute_url(url: str) -> str:
+    """
+    Si l’ImageField contient déjà une URL absolue, django-cloudinary-storage peut
+    générer .../upload/.../media/https://... (URL collée comme public_id).
+    On réextrait l’URL interne pour éviter des liens 404.
+    """
+    if not url:
+        return url
+    s = str(url)
+    for marker in ("/media/https://", "/media/http://"):
+        if marker in s:
+            rest = s.split(marker, 1)[1]
+            return ("https://" if "https://" in marker else "http://") + rest
+    return s
+
+
 def _https_media_url(url: str, request) -> str:
     """Évite le mixed content : URLs API médias toujours en https pour notre hôte / Railway."""
     if not url or not str(url).startswith("http://"):
@@ -51,14 +67,22 @@ class ArtistSerializer(serializers.ModelSerializer):
             if not field_file:
                 data[key] = None
                 continue
-            # Toujours passer par .url : avec MediaCloudinaryStorage c’est l’URL https complète ;
-            # avec .name seul on obtient souvent « media/Artistes/… » et préfixer /media/ donne
-            # /media/media/… → 404 sur Railway.
+            raw_name = (field_file.name if hasattr(field_file, "name") else "") or ""
+            # Valeur déjà une URL complète en base (migrations / anciens enregistrements) :
+            # ne pas utiliser field_file.url qui la re-préfixe en « .../media/https://... ».
+            if raw_name.startswith("http://") or raw_name.startswith("https://"):
+                url = _strip_embedded_absolute_url(raw_name)
+                data[key] = _https_media_url(url, request)
+                continue
+            if raw_name.startswith("//"):
+                data[key] = _strip_embedded_absolute_url("https:" + raw_name)
+                continue
             try:
                 url = field_file.url
             except ValueError:
                 data[key] = None
                 continue
+            url = _strip_embedded_absolute_url(url)
             if url.startswith("http://") or url.startswith("https://"):
                 data[key] = _https_media_url(url, request)
             elif request:
