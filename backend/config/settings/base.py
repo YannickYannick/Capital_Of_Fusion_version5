@@ -18,6 +18,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-secret-key-change-in-producti
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
 INSTALLED_APPS = [
+    # Doit rester en tête : fournit collectstatic Django standard et écrase
+    # cloudinary_storage (sinon copy_file ne copie rien si STATICFILES_STORAGE != StaticCloudinaryStorage).
+    "apps.collectstatic_std",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
