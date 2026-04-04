@@ -1,9 +1,28 @@
+from urllib.parse import urlparse
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from apps.organization.models import OrganizationRole
 from apps.core.models import DanceProfession
 
 User = get_user_model()
+
+
+def _https_media_url(url: str, request) -> str:
+    """Évite le mixed content : URLs API médias toujours en https pour notre hôte / Railway."""
+    if not url or not str(url).startswith("http://"):
+        return url
+    s = str(url)
+    try:
+        host = urlparse(s).netloc
+    except ValueError:
+        return url
+    req_host = (request.get_host() if request else "") or ""
+    if req_host and host == req_host.split(":")[0]:
+        return "https://" + s[7:]
+    if host.endswith(".up.railway.app") or host.endswith(".railway.app"):
+        return "https://" + s[7:]
+    return url
 
 class DanceProfessionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,8 +48,12 @@ class ArtistSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         for key in ("profile_picture", "cover_image"):
             val = data.get(key)
-            if val and request and not str(val).startswith("http"):
-                data[key] = request.build_absolute_uri(val)
+            if not val:
+                continue
+            s = str(val)
+            if request and not s.startswith("http"):
+                val = request.build_absolute_uri(val)
+            data[key] = _https_media_url(val, request)
         return data
 
 class RegisterSerializer(serializers.ModelSerializer):

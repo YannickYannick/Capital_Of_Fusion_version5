@@ -7,6 +7,11 @@ import os
 
 DEBUG = False
 
+# Railway : le client parle en HTTPS, Gunicorn reçoit souvent du HTTP. Sans cela,
+# request.build_absolute_uri() et les URLs médias sortent en http:// → mixed content sur Vercel.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
 # Cloudinary : uniquement en prod. Ordre imposé par django-cloudinary-storage :
 # cloudinary_storage + cloudinary AVANT django.contrib.staticfiles.
 _apps = list(INSTALLED_APPS)
