@@ -45,7 +45,9 @@ if _cloud_name and _api_key and _api_secret:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            # CompressedStaticFilesStorage au lieu de CompressedManifestStaticFilesStorage
+            # pour éviter les erreurs de références CSS manquantes
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
 else:
@@ -55,13 +57,13 @@ else:
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
 
 # Compatibilité django-cloudinary-storage (obsolète, utilise encore STATICFILES_STORAGE)
 # Ce package n'est pas compatible Django 5+ sans ce hack
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
 _default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app"
