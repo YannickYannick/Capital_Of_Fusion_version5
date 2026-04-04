@@ -51,6 +51,7 @@ export default function ArtistProfilePage() {
     const base = getApiBaseUrl().replace(/\/$/, "");
     const resolveMedia = (raw: string | null | undefined) => {
         if (!raw) return null;
+        if (raw.startsWith("//")) return `https:${raw}`;
         if (raw.startsWith("http")) return raw;
         return `${base}${raw.startsWith("/") ? "" : "/"}${raw}`;
     };

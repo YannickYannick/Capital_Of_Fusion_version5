@@ -800,6 +800,7 @@ export async function getArtistAdmin(username: string): Promise<{
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
   const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+    cache: "no-store",
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Artist admin API error: ${res.status}`);

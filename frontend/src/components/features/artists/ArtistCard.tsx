@@ -36,7 +36,8 @@ const ArtistCard = memo(function ArtistCard({ artist, priority = false }: { arti
                         priority={priority}
                         unoptimized={
                             photoUrl.includes("localhost") ||
-                            photoUrl.includes("127.0.0.1")
+                            photoUrl.includes("127.0.0.1") ||
+                            photoUrl.includes("res.cloudinary.com")
                         }
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />

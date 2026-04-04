@@ -19,6 +19,7 @@ import { ArtistBioTranslationModal } from "@/components/admin/translation/Artist
 
 function photoUrl(pic: string | null | undefined): string {
   if (!pic) return "/images/placeholder-artist.jpg";
+  if (pic.startsWith("//")) return `https:${pic}`;
   if (pic.startsWith("http")) return pic;
   const base = getApiBaseUrl().replace(/\/$/, "");
   return `${base}${pic.startsWith("/") ? "" : "/"}${pic}`;
