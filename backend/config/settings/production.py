@@ -24,7 +24,7 @@ INSTALLED_APPS = (
 
 # Railway : définir les 3 variables (recommandé) :
 # CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
-# Sinon CLOUDINARY_URL seule (CLOUDINARY_STORAGE vide → le SDK lit l’URL).
+# Sinon CLOUDINARY_URL seule (CLOUDINARY_STORAGE vide → le SDK lit l'URL).
 _cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()
 _api_key = os.environ.get("CLOUDINARY_API_KEY", "").strip()
 _api_secret = os.environ.get("CLOUDINARY_API_SECRET", "").strip()
@@ -37,7 +37,15 @@ if _cloud_name and _api_key and _api_secret:
 else:
     CLOUDINARY_STORAGE = {}
 
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+# Django 4.2+ : STORAGES remplace DEFAULT_FILE_STORAGE et STATICFILES_STORAGE
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
 _default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app"
@@ -63,9 +71,6 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()
 
 # Fichiers statiques (admin, etc.) : WhiteNoise les sert en prod après collectstatic.
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# Django 5 n’expose plus STATICFILES_STORAGE par défaut ; django-cloudinary-storage (collectstatic)
-# y accède encore → crash au build Railway sans cette ligne. Les statiques restent sur WhiteNoise, pas Cloudinary.
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Base de données : DATABASE_URL (Railway/Supabase) prioritaire, sinon DB_* (PostgreSQL), sinon SQLite.
 # On utilise os.environ directement (pas env) pour éviter qu'un .env présent dans l'image n'écrase la valeur Railway.

@@ -24,4 +24,12 @@ if _cn and _key and _secret:
         "API_KEY": _key,
         "API_SECRET": _secret,
     }
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    # Django 4.2+ : STORAGES remplace DEFAULT_FILE_STORAGE
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
