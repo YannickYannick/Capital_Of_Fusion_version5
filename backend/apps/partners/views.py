@@ -1,11 +1,15 @@
 """
 Vues API Partners — liste et détail des structures, événements et cours partenaires.
 """
+from django.contrib.auth import get_user_model
+from django.db.models import Prefetch
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import PartnerNode, PartnerEvent, PartnerCourse
+
+User = get_user_model()
 from .serializers import (
     PartnerNodeSerializer,
     PartnerEventSerializer,
@@ -22,7 +26,12 @@ class PartnerNodeListAPIView(APIView):
 
     def get(self, request):
         for_structure = request.query_params.get("for_structure") in ("1", "true")
-        qs = PartnerNode.objects.all().select_related("parent", "partner")
+        qs = PartnerNode.objects.all().select_related("parent", "partner").prefetch_related(
+            Prefetch(
+                "linked_artists",
+                queryset=User.objects.order_by("first_name", "last_name", "username"),
+            )
+        )
         if for_structure:
             qs = qs.order_by("created_at")
         else:
@@ -39,7 +48,12 @@ class PartnerNodeDetailAPIView(APIView):
 
     def get(self, request, slug):
         node = get_object_or_404(
-            PartnerNode.objects.select_related("partner", "parent"),
+            PartnerNode.objects.select_related("partner", "parent").prefetch_related(
+                Prefetch(
+                    "linked_artists",
+                    queryset=User.objects.order_by("first_name", "last_name", "username"),
+                )
+            ),
             slug=slug,
         )
         serializer = PartnerNodeSerializer(node, context={"request": request})
@@ -93,7 +107,7 @@ class PartnerCourseListAPIView(APIView):
     def get(self, request):
         qs = PartnerCourse.objects.filter(is_active=True).select_related(
             "style", "level", "node", "partner"
-        ).prefetch_related("schedules")
+        ).prefetch_related("schedules", "schedules__level")
         style = request.query_params.get("style")
         if style:
             qs = qs.filter(style__slug=style)
@@ -116,7 +130,7 @@ class PartnerCourseDetailAPIView(APIView):
     def get(self, request, slug):
         course = get_object_or_404(
             PartnerCourse.objects.select_related("style", "level", "node", "partner").prefetch_related(
-                "schedules"
+                "schedules", "schedules__level"
             ),
             slug=slug,
             is_active=True,

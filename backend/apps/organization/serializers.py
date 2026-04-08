@@ -84,7 +84,9 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
             "cta_text",
             "cta_url",
             "video_url",
+            "profile_image",
             "cover_image",
+            "external_links",
             "content",
             "music_type",
             "music_youtube_url",
@@ -113,6 +115,16 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
     def get_parent_slug(self, obj):
         return obj.parent.slug if obj.parent else None
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        # Aligner avec les serializers "partners" : exposer des URLs absolues pour les fichiers (ImageField/FileField)
+        for key in ("profile_image", "cover_image", "music_file", "model_3d", "planet_texture"):
+            data[key] = serialize_image_field_for_api(
+                getattr(instance, key, None), request
+            )
+        return data
+
 
 class OrganizationNodeLightSerializer(serializers.ModelSerializer):
     """
@@ -132,6 +144,7 @@ class OrganizationNodeLightSerializer(serializers.ModelSerializer):
             "type",
             "parent_slug",
             "short_description",
+            "profile_image",
             "cover_image",
             "visual_source",
             "planet_type",
@@ -156,3 +169,13 @@ class OrganizationNodeLightSerializer(serializers.ModelSerializer):
 
     def get_parent_slug(self, obj):
         return obj.parent.slug if obj.parent else None
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        # Même logique URL absolue que le serializer complet
+        for key in ("profile_image", "cover_image", "model_3d", "planet_texture"):
+            data[key] = serialize_image_field_for_api(
+                getattr(instance, key, None), request
+            )
+        return data

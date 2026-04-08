@@ -328,9 +328,11 @@ function ExplorePageInner() {
         </div>
       )}
 
-      {/* Canvas 3D - z-0 pour rester sous les panneaux (Options, Debug, etc.) */}
+      {/* Canvas 3D - z-0 pour rester sous les panneaux. pointer-events désactivés quand config planètes ouverte pour ne pas voler les clics (WebGL au-dessus en hit-test). */}
       {mountScene && !error && visibleNodes.length > 0 && (
-        <div className="absolute inset-0 z-0">
+        <div
+          className={`absolute inset-0 z-0 ${planetConfigOpen ? "pointer-events-none" : ""}`}
+        >
           <ExploreScene
           nodes={visibleNodes}
           onOpenOverlay={handleOpenOverlay}
@@ -397,7 +399,6 @@ function ExplorePageInner() {
           isOpen={planetConfigOpen}
           onClose={() => setPlanetConfigOpen(false)}
           onSaved={handleSaved}
-          apiBaseUrl={apiBaseUrl}
         />
       )}
 

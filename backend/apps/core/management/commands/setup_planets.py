@@ -16,10 +16,12 @@ class Command(BaseCommand):
         Level.objects.get_or_create(slug="intermediate", defaults={"name": "Intermédiaire", "order": 2})
         Level.objects.get_or_create(slug="advanced", defaults={"name": "Avancé", "order": 3})
 
-        # 3. Métiers
-        prof, _ = DanceProfession.objects.get_or_create(slug="professeur", defaults={"name": "Professeur"})
-        dj, _ = DanceProfession.objects.get_or_create(slug="dj", defaults={"name": "DJ"})
+        # 3. Métiers (cumulables sur un même profil annuaire)
+        DanceProfession.objects.get_or_create(slug="professeur", defaults={"name": "Professeur"})
+        DanceProfession.objects.get_or_create(slug="dj", defaults={"name": "DJ"})
         DanceProfession.objects.get_or_create(slug="organisateur", defaults={"name": "Organisateur"})
+        DanceProfession.objects.get_or_create(slug="danseur", defaults={"name": "Danseur"})
+        DanceProfession.objects.get_or_create(slug="cameraman", defaults={"name": "Cameraman"})
 
         # 4. Planètes (OrganizationNodes)
         # Paris

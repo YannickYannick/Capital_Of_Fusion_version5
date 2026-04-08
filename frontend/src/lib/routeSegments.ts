@@ -60,3 +60,16 @@ export function getPageType(pathname: string): PageType {
   if (isDetailPage(pathname)) return "detail";
   return "menu";
 }
+
+/**
+ * Fiche ou édition d’une structure partenaire : même fond vidéo global que le menu
+ * (`GlobalVideoBackground` + `PlanetMusicOverride`) pour pouvoir jouer une musique dédiée.
+ * La liste seule `/partenaires/structures` reste sans ce fond (type menu… détail non match).
+ */
+export function isPartnerStructureVideoBackgroundPath(pathname: string): boolean {
+  const p = pathname.replace(/\/$/, "") || "/";
+  const prefix = "/partenaires/structures/";
+  if (!p.startsWith(prefix)) return false;
+  const rest = p.slice(prefix.length);
+  return rest.length > 0;
+}

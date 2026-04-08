@@ -10,6 +10,7 @@ import { getMenuItems } from "@/lib/api";
 import { localizeMenuChildren } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { ArtistProfileNavbarDock } from "@/components/shared/ArtistProfileNavbarDock";
 
 function normPath(u: string): string {
   return (u || "").replace(/\/$/, "") || "/";
@@ -194,6 +195,16 @@ export function Navbar() {
           id: "pcours",
           name: t("menu.partnerCourses"),
           url: "/partenaires/cours",
+          slug: "",
+          icon: "",
+          order: 0,
+          is_active: true,
+          children: [],
+        },
+        {
+          id: "partists",
+          name: t("menu.partnerArtistsDirectory"),
+          url: "/artistes",
           slug: "",
           icon: "",
           order: 0,
@@ -512,6 +523,7 @@ export function Navbar() {
           />
         </div>
       </nav>
+      <ArtistProfileNavbarDock />
     </header>
   );
 }

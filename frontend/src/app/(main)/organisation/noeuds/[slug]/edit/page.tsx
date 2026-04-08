@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { getOrganizationNodeBySlug, patchOrganizationNodeAdmin } from "@/lib/api";
+import { ProfileLinksFormFields } from "@/components/shared/ProfileLinksFormFields";
 import type { OrganizationNodeApi } from "@/types/organization";
+import {
+  profileLinksFromApi,
+  profileLinksToFormState,
+  formStateToProfilePayload,
+  type ProfileLinksFormState,
+} from "@/types/profileLinks";
 
 export default function EditOrganizationNodePage() {
   const params = useParams();
@@ -30,8 +37,14 @@ export default function EditOrganizationNodePage() {
   const [orbitRadius, setOrbitRadius] = useState("");
   const [orbitSpeed, setOrbitSpeed] = useState("");
   const [planetScale, setPlanetScale] = useState("");
+  const [linkForm, setLinkForm] = useState<ProfileLinksFormState>(() =>
+    profileLinksToFormState(profileLinksFromApi(undefined))
+  );
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const isAdmin = user?.user_type === "ADMIN";
 
   useEffect(() => {
     if (!slug) return;
@@ -51,6 +64,7 @@ export default function EditOrganizationNodePage() {
         setOrbitRadius(n.orbit_radius != null ? String(n.orbit_radius) : "");
         setOrbitSpeed(n.orbit_speed != null ? String(n.orbit_speed) : "");
         setPlanetScale(n.planet_scale != null ? String(n.planet_scale) : "");
+        setLinkForm(profileLinksToFormState(profileLinksFromApi(n.external_links)));
       })
       .catch(() => setError("Nœud introuvable."))
       .finally(() => setLoading(false));
@@ -63,22 +77,47 @@ export default function EditOrganizationNodePage() {
     setError(null);
     setSuccessMessage(null);
     try {
-      const payload: Record<string, unknown> = {
-        name: name.trim(),
-        short_description: shortDescription.trim(),
-        description: description.trim(),
-        content: content.trim(),
-        cta_text: ctaText.trim(),
-        cta_url: ctaUrl.trim(),
-        video_url: videoUrl.trim(),
-        is_visible_3d: isVisible3d,
-        planet_color: planetColor.trim(),
-      };
-      if (orbitRadius.trim() !== "") payload.orbit_radius = Number(orbitRadius);
-      if (orbitSpeed.trim() !== "") payload.orbit_speed = Number(orbitSpeed);
-      if (planetScale.trim() !== "") payload.planet_scale = Number(planetScale);
+      const extPayload = formStateToProfilePayload(linkForm);
+      const useMultipart =
+        isAdmin && (profileFile !== null || coverFile !== null);
 
-      const result = await patchOrganizationNodeAdmin(slug, payload);
+      let result: Awaited<ReturnType<typeof patchOrganizationNodeAdmin>>;
+      if (useMultipart) {
+        const fd = new FormData();
+        fd.append("name", name.trim());
+        fd.append("short_description", shortDescription.trim());
+        fd.append("description", description.trim());
+        fd.append("content", content.trim());
+        fd.append("cta_text", ctaText.trim());
+        fd.append("cta_url", ctaUrl.trim());
+        fd.append("video_url", videoUrl.trim());
+        fd.append("is_visible_3d", isVisible3d ? "true" : "false");
+        fd.append("planet_color", planetColor.trim());
+        if (orbitRadius.trim() !== "") fd.append("orbit_radius", orbitRadius.trim());
+        if (orbitSpeed.trim() !== "") fd.append("orbit_speed", orbitSpeed.trim());
+        if (planetScale.trim() !== "") fd.append("planet_scale", planetScale.trim());
+        fd.append("external_links", JSON.stringify(extPayload));
+        if (profileFile) fd.append("profile_image", profileFile);
+        if (coverFile) fd.append("cover_image", coverFile);
+        result = await patchOrganizationNodeAdmin(slug, fd);
+      } else {
+        const payload: Record<string, unknown> = {
+          name: name.trim(),
+          short_description: shortDescription.trim(),
+          description: description.trim(),
+          content: content.trim(),
+          cta_text: ctaText.trim(),
+          cta_url: ctaUrl.trim(),
+          video_url: videoUrl.trim(),
+          is_visible_3d: isVisible3d,
+          planet_color: planetColor.trim(),
+          external_links: extPayload,
+        };
+        if (orbitRadius.trim() !== "") payload.orbit_radius = Number(orbitRadius);
+        if (orbitSpeed.trim() !== "") payload.orbit_speed = Number(orbitSpeed);
+        if (planetScale.trim() !== "") payload.planet_scale = Number(planetScale);
+        result = await patchOrganizationNodeAdmin(slug, payload);
+      }
       if (result && typeof result === "object" && "pending" in result && result.pending) {
         setSuccessMessage(
           result.message ||
@@ -87,6 +126,8 @@ export default function EditOrganizationNodePage() {
         return;
       }
       setSuccessMessage("Enregistré.");
+      setProfileFile(null);
+      setCoverFile(null);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'enregistrement");
@@ -149,11 +190,39 @@ export default function EditOrganizationNodePage() {
         Slug URL : <span className="font-mono text-white/70">{slug}</span> (non modifiable ici)
       </p>
       <p className="text-white/40 text-xs mb-6">
-        Image de couverture et fichiers 3D : utilise l’admin Django si besoin. Ici : textes et paramètres
-        principaux.
+        Liens et textes : ci-dessous. Photos : administrateur uniquement (fichiers ci-dessous) ; sinon passer par
+        l’admin Django. Fichiers 3D : admin Django.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {isAdmin && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-white/10 rounded-xl p-4">
+            <div>
+              <label className="block text-white/70 text-sm mb-1">Photo de profil</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setProfileFile(e.target.files?.[0] ?? null)}
+                className="w-full text-sm text-white/80"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 text-sm mb-1">Image de couverture</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
+                className="w-full text-sm text-white/80"
+              />
+            </div>
+          </div>
+        )}
+
+        <ProfileLinksFormFields
+          value={linkForm}
+          onChange={setLinkForm}
+          inputClass="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-purple-500/50 text-sm"
+        />
         <div>
           <label className="block text-white/70 text-sm mb-1">Nom affiché</label>
           <input

@@ -4,6 +4,7 @@ from apps.organization.models import OrganizationRole
 from apps.core.models import DanceProfession
 
 from apps.users.image_field_api_url import serialize_image_field_for_api
+from apps.core.profile_external_links import normalize_external_links
 
 User = get_user_model()
 
@@ -19,13 +20,36 @@ class ArtistSerializer(serializers.ModelSerializer):
     Serializer pour l'affichage public d'un artiste.
     """
     professions = DanceProfessionSerializer(many=True, read_only=True)
+    linked_partner_structures = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'first_name', 'last_name',
-            'bio', 'bio_en', 'bio_es', 'profile_picture', 'cover_image', 'professions', 'is_staff_member'
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "bio",
+            "bio_en",
+            "bio_es",
+            "profile_picture",
+            "cover_image",
+            "professions",
+            "is_staff_member",
+            "external_links",
+            "linked_partner_structures",
         ]
+
+    def get_linked_partner_structures(self, obj):
+        cache = getattr(obj, "_prefetched_objects_cache", None) or {}
+        if "linked_partner_structures" in cache:
+            nodes = list(cache["linked_partner_structures"])
+            nodes.sort(key=lambda n: (n.name or "").lower())
+        else:
+            nodes = list(obj.linked_partner_structures.all().order_by("name"))
+        return [{"name": n.name, "slug": n.slug} for n in nodes]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -34,6 +58,9 @@ class ArtistSerializer(serializers.ModelSerializer):
             data[key] = serialize_image_field_for_api(
                 getattr(instance, key, None), request
             )
+        data["external_links"] = normalize_external_links(
+            getattr(instance, "external_links", None) or {}
+        )
         return data
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -9,8 +9,13 @@ import {
 } from "react";
 
 /**
- * Override de la musique de fond quand une planète avec musique est sélectionnée sur /explore.
- * Remplace la vidéo d'accueil par la musique de la planète (YouTube ou fichier).
+ * Override de la musique de fond quand une planète avec musique est sélectionnée sur /explore,
+ * ou une fiche structure partenaire avec musique dédiée.
+ * Remplace le son des vidéos d'accueil (YouTube / MP4 du site).
+ *
+ * `youtubeAmbientSuspended` : lorsque pertinent, garde les vidéos d'accueil muettes ; levée sur `/`
+ * et `/explore`. La musique d'une fiche structure peut persister sur d'autres routes tant que
+ * le fond vidéo global est monté ; l'accueil et Explore réinitialisent l'override.
  */
 export type PlanetMusicOverride =
   | { type: "youtube"; youtubeUrl: string }
@@ -20,6 +25,8 @@ export type PlanetMusicOverride =
 interface PlanetMusicOverrideContextValue {
   override: PlanetMusicOverride;
   setOverride: (value: PlanetMusicOverride) => void;
+  youtubeAmbientSuspended: boolean;
+  setYoutubeAmbientSuspended: (value: boolean) => void;
 }
 
 const PlanetMusicOverrideContext =
@@ -27,12 +34,23 @@ const PlanetMusicOverrideContext =
 
 export function PlanetMusicOverrideProvider({ children }: { children: ReactNode }) {
   const [override, setOverrideState] = useState<PlanetMusicOverride>(null);
+  const [youtubeAmbientSuspended, setYoutubeAmbientSuspendedState] = useState(false);
   const setOverride = useCallback((value: PlanetMusicOverride) => {
     setOverrideState(value);
   }, []);
+  const setYoutubeAmbientSuspended = useCallback((value: boolean) => {
+    setYoutubeAmbientSuspendedState(value);
+  }, []);
 
   return (
-    <PlanetMusicOverrideContext.Provider value={{ override, setOverride }}>
+    <PlanetMusicOverrideContext.Provider
+      value={{
+        override,
+        setOverride,
+        youtubeAmbientSuspended,
+        setYoutubeAmbientSuspended,
+      }}
+    >
       {children}
     </PlanetMusicOverrideContext.Provider>
   );
@@ -41,6 +59,8 @@ export function PlanetMusicOverrideProvider({ children }: { children: ReactNode 
 const FALLBACK_MUSIC_OVERRIDE: PlanetMusicOverrideContextValue = {
   override: null,
   setOverride: () => {},
+  youtubeAmbientSuspended: false,
+  setYoutubeAmbientSuspended: () => {},
 };
 
 export function usePlanetMusicOverride(): PlanetMusicOverrideContextValue {

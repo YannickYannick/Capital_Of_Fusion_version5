@@ -20,6 +20,7 @@ import type {
   PartnerCourseApi,
   PartnerMinimalApi,
   PartnerCourseMetaApi,
+  PartnerBrandAdminApi,
 } from "@/types/partner";
 
 /**
@@ -499,7 +500,9 @@ export async function getPartnerNodesForStructure(): Promise<PartnerNodeApi[]> {
  */
 export async function getPartnerNodeBySlug(slug: string): Promise<PartnerNodeApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/nodes/${encodeURIComponent(slug)}/`);
+  const res = await fetch(`${base}/api/partners/nodes/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error(`Partner node API error: ${res.status}`);
   return res.json();
 }
@@ -525,7 +528,9 @@ export async function getPartnerEvents(params?: PartnerEventsQuery): Promise<Par
  */
 export async function getPartnerEventBySlug(slug: string): Promise<PartnerEventApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/events/${encodeURIComponent(slug)}/`);
+  const res = await fetch(`${base}/api/partners/events/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error(`Partner event API error: ${res.status}`);
   return res.json();
 }
@@ -551,7 +556,9 @@ export async function getPartnerCourses(params?: PartnerCoursesQuery): Promise<P
  */
 export async function getPartnerCourseBySlug(slug: string): Promise<PartnerCourseApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/courses/${encodeURIComponent(slug)}/`);
+  const res = await fetch(`${base}/api/partners/courses/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error(`Partner course API error: ${res.status}`);
   return res.json();
 }
@@ -600,6 +607,34 @@ export async function getPartnerCourseMeta(): Promise<PartnerCourseMetaApi> {
   });
   if (!res.ok) throw new Error(`Partner course meta API error: ${res.status}`);
   return res.json();
+}
+
+/** GET /api/admin/partners/nodes/<slug>/ */
+export async function getPartnerNodeAdmin(slug: string): Promise<PartnerNodeApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/nodes/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Partner node admin API error: ${res.status}`);
+  return res.json() as Promise<PartnerNodeApi>;
+}
+
+/** PATCH /api/admin/partners/nodes/<slug>/ — multipart (textes + images + external_links JSON string). */
+export async function patchPartnerNodeAdmin(slug: string, formData: FormData): Promise<PartnerNodeApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/nodes/${encodeURIComponent(slug)}/`, {
+    method: "PATCH",
+    headers: { Authorization: `Token ${token}` },
+    body: formData,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerNodeApi;
 }
 
 /** POST /api/admin/partners/nodes/ */
@@ -654,6 +689,90 @@ export async function createPartnerCourseAdmin(payload: Record<string, unknown>)
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(JSON.stringify(body));
   return body as PartnerCourseApi;
+}
+
+/** GET /api/admin/partners/events/<slug>/ */
+export async function getPartnerEventAdmin(slug: string): Promise<PartnerEventApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/events/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Partner event admin API error: ${res.status}`);
+  return res.json() as Promise<PartnerEventApi>;
+}
+
+/** PATCH /api/admin/partners/events/<slug>/ — multipart. */
+export async function patchPartnerEventAdmin(slug: string, formData: FormData): Promise<PartnerEventApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/events/${encodeURIComponent(slug)}/`, {
+    method: "PATCH",
+    headers: { Authorization: `Token ${token}` },
+    body: formData,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerEventApi;
+}
+
+/** GET /api/admin/partners/courses/<slug>/ */
+export async function getPartnerCourseAdmin(slug: string): Promise<PartnerCourseApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/courses/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Partner course admin API error: ${res.status}`);
+  return res.json() as Promise<PartnerCourseApi>;
+}
+
+/** PATCH /api/admin/partners/courses/<slug>/ — multipart. */
+export async function patchPartnerCourseAdmin(slug: string, formData: FormData): Promise<PartnerCourseApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/courses/${encodeURIComponent(slug)}/`, {
+    method: "PATCH",
+    headers: { Authorization: `Token ${token}` },
+    body: formData,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerCourseApi;
+}
+
+/** GET /api/admin/partners/brands/<slug>/ */
+export async function getPartnerBrandAdmin(slug: string): Promise<PartnerBrandAdminApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/brands/${encodeURIComponent(slug)}/`, {
+    cache: "no-store",
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!res.ok) throw new Error(`Partner brand admin API error: ${res.status}`);
+  return res.json() as Promise<PartnerBrandAdminApi>;
+}
+
+/** PATCH /api/admin/partners/brands/<slug>/ — multipart (logo optionnel). */
+export async function patchPartnerBrandAdmin(slug: string, formData: FormData): Promise<PartnerBrandAdminApi> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const res = await fetch(`${base}/api/admin/partners/brands/${encodeURIComponent(slug)}/`, {
+    method: "PATCH",
+    headers: { Authorization: `Token ${token}` },
+    body: formData,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(JSON.stringify(body));
+  return body as PartnerBrandAdminApi;
 }
 
 /**
@@ -818,8 +937,12 @@ export async function patchArtistAdmin(
     bio?: string;
     bio_en?: string;
     bio_es?: string;
+    phone?: string;
     is_staff_member?: boolean;
     profession_ids?: string[];
+    /** Slugs des fiches /partenaires/structures/<slug> liées à cet artiste (remplace la liste). */
+    linked_partner_structure_slugs?: string[];
+    external_links?: import("@/types/profileLinks").ProfileExternalLinks;
   }
 ): Promise<ArtistApi> {
   const base = getApiBaseUrl();
@@ -835,11 +958,16 @@ export async function patchArtistAdmin(
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    const d = data as Record<string, unknown>;
+    const extra =
+      typeof d.linked_partner_structure_slugs === "string"
+        ? d.linked_partner_structure_slugs
+        : "";
     const msg =
-      data && typeof data === "object" && "error" in data
-        ? String(data.error)
+      d && typeof d === "object" && "error" in d
+        ? String(d.error)
         : `Erreur ${res.status}`;
-    throw new Error(msg);
+    throw new Error(extra ? `${msg} — ${extra}` : msg);
   }
   return data as ArtistApi;
 }
@@ -940,18 +1068,21 @@ export async function getDanceProfessionsAdmin(): Promise<DanceProfessionApi[]> 
  */
 export async function patchOrganizationNodeAdmin(
   slug: string,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown> | FormData
 ): Promise<import("@/types/organization").OrganizationNodeApi | { pending: true; message: string }> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
+  const isForm = typeof FormData !== "undefined" && payload instanceof FormData;
   const res = await fetch(`${base}/api/admin/organization/nodes/${encodeURIComponent(slug)}/`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-    body: JSON.stringify(payload),
+    headers: isForm
+      ? { Authorization: `Token ${token}` }
+      : {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+    body: isForm ? payload : JSON.stringify(payload),
   });
   const data = await res.json().catch(() => ({}));
   if (res.status === 202) {

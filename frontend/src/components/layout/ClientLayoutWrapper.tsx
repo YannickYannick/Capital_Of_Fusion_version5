@@ -12,7 +12,7 @@ import { Navbar } from "@/components/shared/Navbar";
 import { MainContent } from "@/components/shared/MainContent";
 import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
 import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
-import { getPageType } from "@/lib/routeSegments";
+import { getPageType, isPartnerStructureVideoBackgroundPath } from "@/lib/routeSegments";
 import type { SiteConfigurationApi } from "@/types/config";
 
 const VideoBackgroundClient = dynamic(
@@ -33,9 +33,12 @@ export function ClientLayoutWrapper({
   const pathname = usePathname();
   const pageType = getPageType(pathname ?? "/");
 
-  /** Même fond vidéo + contrôles (bas droite) que l’accueil : home, explore, et toutes les pages « menu ». */
+  /** Même fond vidéo + contrôles (bas droite) que l’accueil : home, explore, menu, et fiche/édit structure partenaire (musique dédiée). */
   const withVideoBackground =
-    pageType === "home" || pageType === "explore" || pageType === "menu";
+    pageType === "home" ||
+    pageType === "explore" ||
+    pageType === "menu" ||
+    isPartnerStructureVideoBackgroundPath(pathname ?? "/");
 
   const content = (
     <>

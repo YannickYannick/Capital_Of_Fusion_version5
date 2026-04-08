@@ -3,8 +3,10 @@ Vues API Organization — liste des noeuds (Explore 3D) ; détail par slug.
 Vues admin — modifier les noeuds d'organisation (staff ou superuser).
 """
 from rest_framework.views import APIView
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 
 from apps.core.api_response import json_response_no_store
+from apps.core.profile_external_links import parse_external_links_param
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -130,29 +132,109 @@ class OrganizationNodeDetailAPIView(APIView):
 
 # ─── Admin views ──────────────────────────────────────────────────────────────
 
+def _org_node_plain_data(request):
+    """Champs texte / JSON du PATCH (sans fichiers)."""
+    out = {}
+    for key in request.data:
+        val = request.data.get(key)
+        if hasattr(val, "read"):
+            continue
+        out[key] = val
+    return out
+
+
 class OrganizationNodeAdminDetailAPIView(APIView):
     """
     PATCH /api/admin/organization/nodes/<slug>/ → modifier un noeud. Admin : direct. Staff : en attente.
+    JSON ou multipart (profile_image, cover_image).
     """
     permission_classes = [IsStaffOrSuperUser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def patch(self, request, slug):
         node = get_object_or_404(OrganizationNode, slug=slug)
-        editable_fields = [
-            "name", "description", "short_description", "content",
-            "cta_text", "cta_url", "cover_image", "video_url",
-            "planet_color", "orbit_radius", "orbit_speed", "planet_scale",
-            "orbit_speed", "planet_type", "visual_source", "is_visible_3d",
-        ]
-        if _user_is_admin_direct(request.user):
-            for field in editable_fields:
-                if field in request.data:
-                    setattr(node, field, request.data[field])
+        plain = _org_node_plain_data(request)
+        text_fields = (
+            "name",
+            "description",
+            "short_description",
+            "content",
+            "cta_text",
+            "cta_url",
+            "video_url",
+            "planet_color",
+            "planet_type",
+            "visual_source",
+            "orbit_shape",
+        )
+        float_fields = (
+            "orbit_radius",
+            "orbit_speed",
+            "planet_scale",
+            "orbit_position_y",
+            "orbit_roundness",
+        )
+        bool_fields = ("is_visible_3d",)
+
+        def build_payload_dict(for_pending: bool):
+            payload = {}
+            for f in text_fields:
+                if f in plain:
+                    payload[f] = plain[f]
+            for f in float_fields:
+                if f in plain:
+                    try:
+                        payload[f] = float(plain[f])
+                    except (TypeError, ValueError):
+                        pass
+            for f in bool_fields:
+                if f in plain:
+                    v = plain[f]
+                    payload[f] = v in (True, "true", "1", "on", 1)
+            if "external_links" in plain:
+                pl = parse_external_links_param(plain["external_links"])
+                if pl is not None:
+                    payload["external_links"] = pl
+            if not for_pending and _user_is_admin_direct(request.user):
+                # fichiers résolus ailleurs
+                pass
+            return payload
+
+        is_admin = _user_is_admin_direct(request.user)
+
+        if is_admin:
+            for f in text_fields:
+                if f in plain:
+                    setattr(node, f, str(plain[f] or ""))
+            for f in float_fields:
+                if f in plain:
+                    try:
+                        setattr(node, f, float(plain[f]))
+                    except (TypeError, ValueError):
+                        pass
+            for f in bool_fields:
+                if f in plain:
+                    v = plain[f]
+                    setattr(node, f, v in (True, "true", "1", "on", 1))
+            if "external_links" in plain:
+                pl = parse_external_links_param(plain["external_links"])
+                if pl is not None:
+                    node.external_links = pl
+            if "profile_image" in request.FILES:
+                node.profile_image = request.FILES["profile_image"]
+            if "cover_image" in request.FILES:
+                node.cover_image = request.FILES["cover_image"]
             node.save()
             invalidate_nodes_cache()
-            serializer = OrganizationNodeSerializer(node, context={'request': request})
+            serializer = OrganizationNodeSerializer(node, context={"request": request})
             return Response(serializer.data)
-        payload = {k: v for k, v in request.data.items() if k in editable_fields}
+
+        payload = build_payload_dict(for_pending=True)
+        if not payload:
+            return Response(
+                {"error": "Aucun champ modifiable (les images nécessitent un administrateur)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         PendingContentEdit.objects.create(
             content_type=PendingContentEdit.ContentType.ORGANIZATION_NODE,
             object_id=slug,
@@ -160,6 +242,9 @@ class OrganizationNodeAdminDetailAPIView(APIView):
             requested_by=request.user,
         )
         return Response(
-            {"message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.", "pending": True},
+            {
+                "message": "Modification enregistrée. Elle sera visible après approbation par un administrateur.",
+                "pending": True,
+            },
             status=status.HTTP_202_ACCEPTED,
         )

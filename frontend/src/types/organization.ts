@@ -2,6 +2,8 @@
  * Types pour les noeuds d'organisation (Explore 3D).
  * API GET /api/organization/nodes/ et /api/organization/nodes/<slug>/
  */
+
+import type { ProfileExternalLinks } from "./profileLinks";
 export interface NodeEventApi {
   id: string;
   title: string;
@@ -25,12 +27,14 @@ export interface OrganizationNodeApi {
   cta_text?: string;
   cta_url?: string;
   video_url?: string;
+  profile_image?: string | null;
   cover_image: string | null;
+  external_links?: ProfileExternalLinks;
   content?: string;
   visual_source: string;
   planet_type: string;
-  model_3d: string;
-  planet_texture: string;
+  model_3d: string | null;
+  planet_texture: string | null;
   planet_color: string;
   orbit_radius: number | null;
   orbit_speed: number | null;

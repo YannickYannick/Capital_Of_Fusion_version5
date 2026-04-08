@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from apps.core.models import PendingContentEdit, SiteConfiguration, Bulletin
+from apps.core.profile_external_links import normalize_external_links
 
 User = get_user_model()
 
@@ -152,10 +153,14 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
             "name", "description", "short_description", "content",
             "cta_text", "cta_url", "cover_image", "video_url",
             "planet_color", "orbit_radius", "orbit_speed", "planet_scale",
-            "planet_type", "visual_source", "is_visible_3d",
+            "planet_type", "visual_source", "is_visible_3d", "external_links",
         ]
         for field in editable:
-            if field in payload:
+            if field not in payload:
+                continue
+            if field == "external_links":
+                node.external_links = normalize_external_links(payload[field])
+            else:
                 setattr(node, field, payload[field])
         node.save()
         return

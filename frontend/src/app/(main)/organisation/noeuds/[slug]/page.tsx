@@ -16,6 +16,8 @@ import {
   getApiBaseUrl,
 } from "@/lib/api";
 import { AdminEditButton } from "@/components/shared/AdminEditButton";
+import { ProfileLinksDisplay } from "@/components/shared/ProfileLinksDisplay";
+import { profileLinksFromApi } from "@/types/profileLinks";
 import type { OrganizationNodeApi } from "@/types/organization";
 import type { CourseListApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
@@ -34,6 +36,13 @@ function nodeCoverUrl(node: OrganizationNodeApi): string {
   if (cover.startsWith("http")) return cover;
   const base = getApiBaseUrl();
   return `${base}${cover.startsWith("/") ? "" : "/"}${cover}`;
+}
+
+function nodeProfileUrl(profile: string | null | undefined): string | null {
+  if (!profile) return null;
+  if (profile.startsWith("http")) return profile;
+  const base = getApiBaseUrl();
+  return `${base}${profile.startsWith("/") ? "" : "/"}${profile}`;
 }
 
 export default function NoeudProfilPage() {
@@ -87,12 +96,13 @@ export default function NoeudProfilPage() {
   }
 
   const coverUrl = nodeCoverUrl(node);
+  const profileResolved = nodeProfileUrl(node.profile_image);
 
   return (
     <div className="min-h-screen bg-black text-white relative">
       <AdminEditButton
         editUrl={`/organisation/noeuds/${encodeURIComponent(slug)}/edit`}
-        position="top-right"
+        position="fixed-below-nav"
         label="Modifier"
       />
       {/* Hero — style artiste */}
@@ -107,6 +117,23 @@ export default function NoeudProfilPage() {
           unoptimized={coverUrl.startsWith("http") && !coverUrl.includes("localhost")}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+
+        {profileResolved && (
+          <div className="absolute bottom-28 left-8 md:left-16 z-10">
+            <div className="relative h-24 w-24 md:h-28 md:w-28 rounded-full border-4 border-purple-500/60 shadow-xl overflow-hidden bg-black/40">
+              <Image
+                src={profileResolved}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="112px"
+                unoptimized={
+                  profileResolved.startsWith("http") && !profileResolved.includes("localhost")
+                }
+              />
+            </div>
+          </div>
+        )}
 
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 max-w-7xl mx-auto">
           <AnimatedDiv animation="fadeInUp">
@@ -147,6 +174,8 @@ export default function NoeudProfilPage() {
         </div>
 
         <div className="space-y-12">
+          <ProfileLinksDisplay links={profileLinksFromApi(node.external_links)} accent="purple" />
+
           {/* Cours */}
           <AnimatedDiv
             animation="fadeIn"

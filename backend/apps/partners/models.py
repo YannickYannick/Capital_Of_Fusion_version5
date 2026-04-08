@@ -2,8 +2,11 @@
 Modèles Partners — Partner, PartnerNode (structure comme OrganizationNode),
 PartnerEvent (comme Event), PartnerCourse (comme Course), PartnerSchedule.
 """
+from django.conf import settings
 from django.db import models
 from apps.core.models import BaseModel
+
+from .storage import PartnerBackgroundMusicStorage
 
 
 class Partner(BaseModel):
@@ -60,16 +63,49 @@ class PartnerNode(BaseModel):
         max_length=20, choices=NodeType.choices, default=NodeType.BRANCH
     )
     description = models.TextField(blank=True)
+    profile_image = models.ImageField(
+        upload_to="partners/nodes/profiles/",
+        blank=True,
+        null=True,
+        verbose_name="Photo de profil",
+    )
     cover_image = models.ImageField(
         upload_to="partners/nodes/covers/",
         blank=True,
         null=True,
         verbose_name="Image de couverture",
     )
+    external_links = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Liens & contact",
+        help_text="Instagram (max 3), sites web (max 3), Facebook, contact.",
+    )
     short_description = models.CharField(max_length=300, blank=True)
     content = models.TextField(blank=True, verbose_name="Contenu détaillé")
     cta_text = models.CharField(max_length=50, blank=True, default="En savoir plus")
     cta_url = models.CharField(max_length=200, blank=True)
+    background_music = models.FileField(
+        upload_to="partners/nodes/music/",
+        storage=PartnerBackgroundMusicStorage(),
+        blank=True,
+        null=True,
+        verbose_name="Musique de fond (fichier)",
+        help_text="MP3, OGG, etc. Si une URL YouTube est aussi renseignée, c’est YouTube qui est joué en priorité.",
+    )
+    background_music_youtube_url = models.URLField(
+        max_length=512,
+        blank=True,
+        verbose_name="Musique de fond (YouTube)",
+        help_text="Lien watch ou youtu.be ; la piste joue à la place du son des vidéos d’accueil sur la fiche structure.",
+    )
+    linked_artists = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="linked_partner_structures",
+        blank=True,
+        verbose_name="Artistes associés",
+        help_text="Profils annuaire (utilisateurs avec au moins une profession danse).",
+    )
 
     class Meta:
         verbose_name = "Structure partenaire"
@@ -108,9 +144,29 @@ class PartnerEvent(BaseModel):
     slug = models.SlugField(max_length=255)
     type = models.CharField(max_length=20, choices=EventType.choices)
     description = models.TextField(blank=True)
+    external_links = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Liens & contact",
+        help_text="Instagram (max 3), sites web (max 3), Facebook, contact.",
+    )
     start_date = models.DateField()
     end_date = models.DateField()
     location_name = models.CharField(max_length=255, blank=True)
+    profile_image = models.ImageField(
+        upload_to="partners/events/profiles/",
+        blank=True,
+        null=True,
+        max_length=500,
+        verbose_name="Photo de profil",
+    )
+    cover_image = models.ImageField(
+        upload_to="partners/events/covers/",
+        blank=True,
+        null=True,
+        max_length=500,
+        verbose_name="Image de couverture",
+    )
     image = models.ImageField(upload_to="partners/events/", null=True, blank=True)
 
     class Meta:
@@ -144,6 +200,13 @@ class PartnerCourse(BaseModel):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
     description = models.TextField(blank=True)
+    location_name = models.CharField(max_length=255, blank=True, verbose_name="Lieu (texte)")
+    external_links = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Liens & contact",
+        help_text="Instagram (max 3), sites web (max 3), Facebook, contact.",
+    )
     style = models.ForeignKey(
         "core.DanceStyle",
         on_delete=models.CASCADE,
@@ -192,6 +255,14 @@ class PartnerSchedule(BaseModel):
     start_time = models.TimeField()
     end_time = models.TimeField()
     location_name = models.CharField(max_length=255, blank=True)
+    level = models.ForeignKey(
+        "core.Level",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="partner_schedules",
+        verbose_name="Niveau (créneau)",
+    )
 
     class Meta:
         verbose_name = "Horaire partenaire"

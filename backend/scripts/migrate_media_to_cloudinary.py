@@ -126,7 +126,7 @@ def migrate_partner_images(dry_run: bool = False):
 
     models_fields = [
         (Partner, ["logo"]),
-        (PartnerNode, ["cover_image"]),
+        (PartnerNode, ["profile_image", "cover_image"]),
         (PartnerEvent, ["image"]),
         (PartnerCourse, ["image"]),
     ]
