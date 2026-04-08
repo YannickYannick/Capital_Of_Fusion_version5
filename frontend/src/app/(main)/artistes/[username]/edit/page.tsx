@@ -5,14 +5,24 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
+import { isStaffOrSuperuser } from "@/lib/staffAccess";
 import {
   getArtistAdmin,
   patchArtistAdmin,
   uploadArtistProfilePicture,
   uploadArtistCoverImage,
   getApiBaseUrl,
+  getPartnerNodes,
 } from "@/lib/api";
+import type { PartnerNodeApi } from "@/types/partner";
+import { ProfileLinksFormFields } from "@/components/shared/ProfileLinksFormFields";
 import type { ArtistApi, DanceProfessionApi } from "@/types/user";
+import {
+  profileLinksFromApi,
+  profileLinksToFormState,
+  formStateToProfilePayload,
+  type ProfileLinksFormState,
+} from "@/types/profileLinks";
 import { EditFormActionBar } from "@/components/admin/translation/EditFormActionBar";
 import { TranslationModeCheckboxes } from "@/components/admin/translation/TranslationModeCheckboxes";
 import { ArtistBioTranslationModal } from "@/components/admin/translation/ArtistBioTranslationModal";
@@ -62,8 +72,13 @@ export default function EditArtistPage() {
   const [translationModal, setTranslationModal] = useState<"ai" | "manual" | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [linkForm, setLinkForm] = useState<ProfileLinksFormState>(() =>
+    profileLinksToFormState(profileLinksFromApi(undefined))
+  );
+  const [partnerStructures, setPartnerStructures] = useState<PartnerNodeApi[]>([]);
+  const [selectedStructureSlugs, setSelectedStructureSlugs] = useState<Set<string>>(new Set());
 
-  const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const canEdit = isStaffOrSuperuser(user);
   const isAdmin = user?.user_type === "ADMIN";
 
   useEffect(() => {
@@ -82,6 +97,10 @@ export default function EditArtistPage() {
         setBioEs(a.bio_es ?? "");
         setIsStaffMember(!!a.is_staff_member);
         setSelectedProfessionIds(new Set(a.professions.map((p) => p.id)));
+        const links = profileLinksFromApi(a.external_links);
+        if (!links.contact.phone && a.phone) links.contact.phone = a.phone;
+        if (!links.contact.email && a.email) links.contact.email = a.email;
+        setLinkForm(profileLinksToFormState(links));
       })
       .catch(() => setError(t("notFoundOrDenied")))
       .finally(() => setLoading(false));
@@ -108,24 +127,40 @@ export default function EditArtistPage() {
     });
   };
 
+  const toggleStructureSlug = (slug: string) => {
+    setSelectedStructureSlugs((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
+
   const saveArtist = async () => {
     if (!canEdit || !username) return;
     setSaving(true);
     setError(null);
     setSuccessMessage(null);
     try {
+      const ext = formStateToProfilePayload(linkForm);
       const updated = await patchArtistAdmin(username, {
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         bio: bio.trim(),
         bio_en: bioEn.trim(),
         bio_es: bioEs.trim(),
+        phone: ext.contact.phone,
         is_staff_member: isStaffMember,
         profession_ids: Array.from(selectedProfessionIds),
+        linked_partner_structure_slugs: Array.from(selectedStructureSlugs),
+        external_links: ext,
       });
       setArtist(updated);
       setBioEn(updated.bio_en ?? "");
       setBioEs(updated.bio_es ?? "");
+      setSelectedStructureSlugs(
+        new Set((updated.linked_partner_structures ?? []).map((s) => s.slug))
+      );
       setSuccessMessage(t("profileSaved"));
       router.refresh();
     } catch (e) {
@@ -419,7 +454,8 @@ export default function EditArtistPage() {
           </div>
 
           <div>
-            <p className="mb-3 text-sm text-white/70">{t("professionsLabel")}</p>
+            <p className="mb-1 text-sm text-white/70">{t("professionsLabel")}</p>
+            <p className="mb-3 text-xs text-white/45 leading-relaxed">{t("professionsMultiHint")}</p>
             <div className="flex flex-wrap gap-2">
               {allProfessions.map((p) => (
                 <label
@@ -441,6 +477,41 @@ export default function EditArtistPage() {
               ))}
             </div>
           </div>
+
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 md:p-6">
+            <h3 className="text-sm font-semibold tracking-wide text-white">{t("partnerStructuresLabel")}</h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-white/45">{t("partnerStructuresHint")}</p>
+            <div className="mt-4 max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-black/20 p-2">
+              {partnerStructures.length === 0 ? (
+                <p className="px-2 py-4 text-sm text-white/40">{t("structuresLoading")}</p>
+              ) : (
+                partnerStructures.map((node) => {
+                  const checked = selectedStructureSlugs.has(node.slug);
+                  return (
+                    <label
+                      key={node.slug}
+                      className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2.5 text-sm hover:bg-white/5"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleStructureSlug(node.slug)}
+                        className="h-4 w-4 shrink-0 rounded border-white/20 text-amber-500 focus:ring-amber-500/40"
+                      />
+                      <span className="font-medium text-white/90">{node.name}</span>
+                      <span className="ml-auto truncate font-mono text-[10px] text-white/35">{node.slug}</span>
+                    </label>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          <ProfileLinksFormFields
+            value={linkForm}
+            onChange={setLinkForm}
+            inputClass="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/30"
+          />
 
           {error && (
             <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</p>

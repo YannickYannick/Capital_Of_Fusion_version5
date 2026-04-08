@@ -27,6 +27,7 @@
       "partnerStructures": "Estructuras socias",
       "partnerEvents": "Eventos de socios",
       "partnerCourses": "Clases de socios",
+      "partnerArtistsDirectory": "Perfiles de artistas",
       "promotionsFestivals": "Promociones festivales",
       "organisation": "Organización",
       "structure": "Nuestra estructura",
@@ -41,7 +42,7 @@
     }
   },
   "landing": {
-    "badge": "Nueva versión inmersiva",
+    "badge": "Únete al movimiento",
     "title": "Capital of Fusion",
     "subtitle1": "Descubre el universo de la bachata como nunca.",
     "subtitle2": "Una experiencia interactiva en 3D en el corazón del baile.",
@@ -63,6 +64,7 @@
     "bio": "Biografía",
     "staffMemberLabel": "Miembro oficial del Team CoF",
     "professionsLabel": "Profesiones / roles",
+    "professionsMultiHint": "Puedes combinar varios oficios (p. ej. Bailarín + DJ + Profesor).",
     "save": "Guardar",
     "saving": "Guardando…",
     "cancel": "Cancelar",
@@ -87,7 +89,10 @@
     "changeCoverPhoto": "Cambiar banner",
     "coverFormatHint": "Recomendado horizontal",
     "clickToChangeCover": "Pasa el cursor sobre el banner para sustituirlo (almacenamiento en la nube)",
-    "coverSaved": "Banner actualizado."
+    "coverSaved": "Banner actualizado.",
+    "partnerStructuresLabel": "Estructuras asociadas",
+    "partnerStructuresHint": "Marca las fichas de estructura donde debe aparecer este artista (equivalente a editar cada estructura).",
+    "structuresLoading": "Cargando estructuras…"
   },
   "artistCreate": {
     "ctaNewArtist": "Agregar un artista",
@@ -111,6 +116,7 @@
     "bioEsLabel": "Español",
     "staffMemberLabel": "Miembro oficial del Team CoF",
     "professionsLabel": "Profesiones / roles",
+    "professionsMultiHint": "Puedes combinar varios oficios (p. ej. Bailarín + DJ + Profesor).",
     "cancel": "Cancelar",
     "create": "Crear",
     "saving": "Creando…",
@@ -120,7 +126,13 @@
   },
   "artistPublic": {
     "biography": "Biografía",
-    "noBio": "No hay biografía disponible para este artista."
+    "noBio": "No hay biografía disponible para este artista.",
+    "dockAriaLabel": "Estructuras asociadas y enlaces de este artista",
+    "dockStructures": "Estructuras",
+    "dockInstagram": "Instagram",
+    "dockInstagramProfile": "Instagram {n}",
+    "dockWebsites": "Sitios",
+    "dockWebsiteN": "Sitio {n}"
   },
   "pages": {
     "partnerHub": {
@@ -142,7 +154,8 @@
           "title": "Clases de socios",
           "desc": "Catálogo de clases propuestas por los socios."
         }
-      }
+      },
+      "staffBrandsLink": "Marcas de socios (admin)"
     },
     "partnerEvents": {
       "backToPartners": "← Nuestros socios",
@@ -162,7 +175,8 @@
       },
       "loading": "Cargando…",
       "empty": "Por ahora no hay eventos de socios.",
-      "addButton": "+ Evento"
+      "addButton": "+ Evento",
+      "editCard": "Editar"
     },
     "partnerCourses": {
       "backToPartners": "← Nuestros socios",
@@ -189,7 +203,8 @@
       },
       "loading": "Cargando…",
       "empty": "Por ahora no hay clases de socios.",
-      "addButton": "+ Clase"
+      "addButton": "+ Clase",
+      "editCard": "Editar"
     },
     "promotionsFestivals": {
       "metaTitle": "Promociones de festivales | Capital of Fusion",
@@ -205,6 +220,14 @@
       "loading": "Cargando…",
       "empty": "Por ahora no hay festivales de socios en promoción.",
       "addButton": "+ Festival"
+    },
+    "partnerBrands": {
+      "backToPartners": "← Nuestros socios",
+      "title": "Marcas de socios",
+      "subtitle": "Edita nombre, slug, descripción y logo de cada entidad socio.",
+      "loading": "Cargando…",
+      "empty": "Aún no hay marcas de socios.",
+      "edit": "Editar"
     },
     "partnerForms": {
       "titleStructure": "Nueva estructura socia",

@@ -27,6 +27,7 @@
       "partnerStructures": "Partner organizations",
       "partnerEvents": "Partner events",
       "partnerCourses": "Partner classes",
+      "partnerArtistsDirectory": "Artist profiles",
       "promotionsFestivals": "Festival promotions",
       "organisation": "Organization",
       "structure": "Our structure",
@@ -41,7 +42,7 @@
     }
   },
   "landing": {
-    "badge": "New immersive experience",
+    "badge": "Join the movement",
     "title": "Capital of Fusion",
     "subtitle1": "Discover the world of Bachata like never before.",
     "subtitle2": "An interactive 3D experience at the heart of dance.",
@@ -63,6 +64,7 @@
     "bio": "Bio",
     "staffMemberLabel": "Official Team CoF member",
     "professionsLabel": "Professions / roles",
+    "professionsMultiHint": "You can combine several roles (e.g. Dancer + DJ + Teacher).",
     "save": "Save",
     "saving": "Saving…",
     "cancel": "Cancel",
@@ -87,7 +89,10 @@
     "changeCoverPhoto": "Change banner",
     "coverFormatHint": "Landscape recommended",
     "clickToChangeCover": "Hover the banner to replace it (cloud storage)",
-    "coverSaved": "Banner updated."
+    "coverSaved": "Banner updated.",
+    "partnerStructuresLabel": "Partner structures",
+    "partnerStructuresHint": "Select structure pages where this artist appears (same as editing each structure’s linked artists).",
+    "structuresLoading": "Loading structures…"
   },
   "artistCreate": {
     "ctaNewArtist": "Add an artist",
@@ -111,6 +116,7 @@
     "bioEsLabel": "Spanish",
     "staffMemberLabel": "Official Team CoF member",
     "professionsLabel": "Professions / roles",
+    "professionsMultiHint": "You can combine several roles (e.g. Dancer + DJ + Teacher).",
     "cancel": "Cancel",
     "create": "Create",
     "saving": "Creating…",
@@ -120,7 +126,13 @@
   },
   "artistPublic": {
     "biography": "Biography",
-    "noBio": "No biography available for this artist."
+    "noBio": "No biography available for this artist.",
+    "dockAriaLabel": "This artist’s partner structures and links",
+    "dockStructures": "Structures",
+    "dockInstagram": "Instagram",
+    "dockInstagramProfile": "Instagram {n}",
+    "dockWebsites": "Websites",
+    "dockWebsiteN": "Site {n}"
   },
   "pages": {
     "partnerHub": {
@@ -142,7 +154,8 @@
           "title": "Partner classes",
           "desc": "Classes catalog offered by our partners."
         }
-      }
+      },
+      "staffBrandsLink": "Partner brands (admin)"
     },
     "partnerEvents": {
       "backToPartners": "← Our partners",
@@ -162,7 +175,8 @@
       },
       "loading": "Loading…",
       "empty": "No partner event for now.",
-      "addButton": "+ Event"
+      "addButton": "+ Event",
+      "editCard": "Edit"
     },
     "partnerCourses": {
       "backToPartners": "← Our partners",
@@ -189,7 +203,8 @@
       },
       "loading": "Loading…",
       "empty": "No partner class for now.",
-      "addButton": "+ Class"
+      "addButton": "+ Class",
+      "editCard": "Edit"
     },
     "promotionsFestivals": {
       "metaTitle": "Festival promotions | Capital of Fusion",
@@ -205,6 +220,14 @@
       "loading": "Loading…",
       "empty": "No partner festival promotion for now.",
       "addButton": "+ Festival"
+    },
+    "partnerBrands": {
+      "backToPartners": "← Our partners",
+      "title": "Partner brands",
+      "subtitle": "Edit name, slug, description and logo for each partner entity.",
+      "loading": "Loading…",
+      "empty": "No partner brand yet.",
+      "edit": "Edit"
     },
     "partnerForms": {
       "titleStructure": "New partner organization",

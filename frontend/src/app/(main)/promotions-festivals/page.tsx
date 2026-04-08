@@ -11,6 +11,7 @@ import { getPartnerEvents } from "@/lib/api";
 import type { PartnerEventApi } from "@/types/partner";
 import { PartnerQuickAddModal } from "@/components/features/partners/PartnerQuickAddModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { isStaffOrSuperuser } from "@/lib/staffAccess";
 
 function formatDate(dateStr: string, locale: string): string {
   const d = new Date(dateStr);
@@ -32,7 +33,7 @@ export default function PromotionsFestivalsPage() {
   const [error, setError] = useState<string | null>(null);
   const [upcoming, setUpcoming] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
-  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const isStaff = isStaffOrSuperuser(user);
 
   const fetchFestivals = useCallback(() => {
     setLoading(true);

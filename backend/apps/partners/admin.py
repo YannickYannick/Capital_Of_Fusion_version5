@@ -16,6 +16,7 @@ class PartnerNodeAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name", "short_description")
     raw_id_fields = ("parent", "partner")
+    filter_horizontal = ("linked_artists",)
 
 
 @admin.register(PartnerEvent)

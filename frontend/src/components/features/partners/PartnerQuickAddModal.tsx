@@ -68,6 +68,7 @@ export function PartnerQuickAddModal({ mode, open, onClose, onCreated }: Partner
   const [newPartnerSlug, setNewPartnerSlug] = useState("");
   const [newPartnerDesc, setNewPartnerDesc] = useState("");
   const [creatingPartner, setCreatingPartner] = useState(false);
+  const [showCreatePartnerForm, setShowCreatePartnerForm] = useState(false);
 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -90,6 +91,7 @@ export function PartnerQuickAddModal({ mode, open, onClose, onCreated }: Partner
     setNewPartnerName("");
     setNewPartnerSlug("");
     setNewPartnerDesc("");
+    setShowCreatePartnerForm(false);
     setName("");
     setSlug("");
     setNodeType("BRANCH");
@@ -168,6 +170,7 @@ export function PartnerQuickAddModal({ mode, open, onClose, onCreated }: Partner
       setNewPartnerName("");
       setNewPartnerSlug("");
       setNewPartnerDesc("");
+      setShowCreatePartnerForm(false);
     } catch (e) {
       setFormError(formatApiError(e instanceof Error ? e.message : String(e)));
     } finally {
@@ -301,7 +304,7 @@ export function PartnerQuickAddModal({ mode, open, onClose, onCreated }: Partner
             </select>
           </label>
 
-          {partners.length === 0 && !loadError && (
+          {((partners.length === 0 && !loadError) || showCreatePartnerForm) && (
             <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-3">
               <p className="text-xs text-white/60">{t("noPartners")}</p>
               <input
@@ -330,7 +333,32 @@ export function PartnerQuickAddModal({ mode, open, onClose, onCreated }: Partner
               >
                 {creatingPartner ? t("creatingPartner") : t("createPartner")}
               </button>
+              {partners.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowCreatePartnerForm(false)}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10"
+                >
+                  {t("cancel")}
+                </button>
+              )}
             </div>
+          )}
+
+          {partners.length > 0 && !loadError && (
+            <button
+              type="button"
+              onClick={() => {
+                setNewPartnerName("");
+                setNewPartnerSlug("");
+                setNewPartnerDesc("");
+                setFormError(null);
+                setShowCreatePartnerForm(true);
+              }}
+              className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10"
+            >
+              + {t("createPartner")}
+            </button>
           )}
 
           <label className="block space-y-1">

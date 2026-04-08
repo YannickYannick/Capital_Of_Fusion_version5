@@ -11,6 +11,15 @@ import { getPartnerEvents } from "@/lib/api";
 import type { PartnerEventApi } from "@/types/partner";
 import { PartnerQuickAddModal } from "@/components/features/partners/PartnerQuickAddModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { isStaffOrSuperuser } from "@/lib/staffAccess";
+
+function eventMediaUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  if (raw.startsWith("http")) return raw;
+  const base =
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+  return `${base}${raw.startsWith("/") ? "" : "/"}${raw}`;
+}
 
 function formatDate(dateStr: string, locale: string): string {
   const d = new Date(dateStr);
@@ -33,7 +42,7 @@ export default function PartenairesEvenementsPage() {
   const [type, setType] = useState("");
   const [upcoming, setUpcoming] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
-  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const isStaff = isStaffOrSuperuser(user);
 
   const TYPE_OPTIONS = [
     { value: "", label: t("partnerEvents.filters.allTypes") },
@@ -139,28 +148,57 @@ export default function PartenairesEvenementsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 delay-200">
             {events.map((ev) => (
-              <Link
+              <div
                 key={ev.id}
-                href={`/partenaires/evenements/${ev.slug}`}
-                className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 block"
+                className="relative flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    {typeLabel[ev.type] ?? ev.type}
-                  </span>
-                  <span className="text-xs font-semibold text-white/50 bg-black/30 px-2 py-1 rounded-md text-right">
-                    {formatDate(ev.start_date, locale)}
-                  </span>
-                </div>
-
-                <h2 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors w-11/12">{ev.name}</h2>
-
-                {(ev.location_name || ev.node_name) && (
-                  <p className="mt-auto pt-4 flex items-center gap-2 text-sm text-white/50 border-t border-white/5">
-                    <span>📍</span> {[ev.location_name, ev.node_name].filter(Boolean).join(" · ")}
-                  </p>
+                {isStaff && (
+                  <Link
+                    href={`/partenaires/evenements/${encodeURIComponent(ev.slug)}/edit`}
+                    className="absolute top-4 right-4 z-20 text-[10px] font-bold uppercase tracking-wide text-amber-300 hover:text-white px-2 py-1 rounded-md bg-black/50 border border-amber-500/40"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t("partnerEvents.editCard")}
+                  </Link>
                 )}
-              </Link>
+                <Link href={`/partenaires/evenements/${ev.slug}`} className="flex flex-col h-full flex-1 min-h-0">
+                  <div className="flex justify-between items-start mb-4 pr-14">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {typeLabel[ev.type] ?? ev.type}
+                    </span>
+                    <span className="text-xs font-semibold text-white/50 bg-black/30 px-2 py-1 rounded-md text-right shrink-0">
+                      {formatDate(ev.start_date, locale)}
+                    </span>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors w-11/12">{ev.name}</h2>
+
+                  {(() => {
+                    const cover = eventMediaUrl(ev.cover_image);
+                    const fallback = eventMediaUrl(ev.image);
+                    const img = cover || fallback;
+                    if (!img) return null;
+                    return (
+                      <div className="mt-3 rounded-xl overflow-hidden aspect-video bg-white/5 border border-white/10">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    );
+                  })()}
+
+                  <div className="mt-4 pt-4 border-t border-white/5 text-sm text-white/50 space-y-1">
+                    <p className="font-semibold text-white/60">
+                      {formatDate(ev.start_date, locale)}
+                      {ev.start_date !== ev.end_date ? ` → ${formatDate(ev.end_date, locale)}` : ""}
+                    </p>
+                    {(ev.location_name || ev.node_name) && (
+                      <p className="flex items-center gap-2">
+                        <span>📍</span> {[ev.location_name, ev.node_name].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         )}

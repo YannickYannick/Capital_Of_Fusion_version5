@@ -89,13 +89,19 @@ function main() {
       const objFile = path.basename(objFull);
       const objStem = path.basename(objFile, ".obj");
       const glbName = `${zipStem}_${objStem}.glb`;
-      const glbFull = path.join(outDir, glbName);
+      const glbFull = path.resolve(outDir, glbName);
+      const obj2gltfCli = path.join(
+        process.cwd(),
+        "node_modules",
+        "obj2gltf",
+        "bin",
+        "obj2gltf.js"
+      );
 
       console.log(`  [obj2gltf] ${objFile} → ${glbName}`);
-      const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
       const conv = spawnSync(
-        npxCmd,
-        ["--yes", "obj2gltf", "-i", objFile, "-o", glbFull],
+        process.execPath,
+        [obj2gltfCli, "-i", objFile, "-o", glbFull],
         { cwd: objDir, stdio: "inherit" }
       );
       if (conv.status !== 0) {

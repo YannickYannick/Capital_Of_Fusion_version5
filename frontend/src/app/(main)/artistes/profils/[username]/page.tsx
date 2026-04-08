@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { getArtistByUsername, getApiBaseUrl } from "@/lib/api";
 import { getArtistBioForLocale } from "@/lib/artistBio";
 import { AdminEditButton } from "@/components/shared/AdminEditButton";
+import { ProfileLinksDisplay } from "@/components/shared/ProfileLinksDisplay";
+import { profileLinksFromApi } from "@/types/profileLinks";
 import type { ArtistApi } from "@/types/user";
 import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Image from "next/image";
@@ -56,10 +58,12 @@ export default function ArtistProfilePage() {
         return `${base}${raw.startsWith("/") ? "" : "/"}${raw}`;
     };
     const fallbackHero = "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop";
-    const photoUrl =
-        resolveMedia(artist.cover_image) ??
-        resolveMedia(artist.profile_picture) ??
-        fallbackHero;
+    const coverResolved = resolveMedia(artist.cover_image);
+    const profileResolved = resolveMedia(artist.profile_picture);
+    const photoUrl = coverResolved ?? profileResolved ?? fallbackHero;
+    const linksMerged = profileLinksFromApi(artist.external_links);
+    if (!linksMerged.contact.email && artist.email) linksMerged.contact.email = artist.email;
+    if (!linksMerged.contact.phone && artist.phone) linksMerged.contact.phone = artist.phone;
 
     return (
         <div className="min-h-screen bg-black text-white relative -mt-16">
@@ -74,6 +78,21 @@ export default function ArtistProfilePage() {
                     unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+                {coverResolved && profileResolved && (
+                    <div className="absolute bottom-28 left-8 md:left-16 z-10">
+                        <div className="relative h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-purple-500/50 shadow-xl overflow-hidden bg-black/40">
+                            <Image
+                                src={profileResolved}
+                                alt=""
+                                fill
+                                className="object-cover"
+                                sizes="128px"
+                                unoptimized
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 max-w-7xl mx-auto">
                     <AnimatedDiv animation="fadeInUp">
@@ -102,6 +121,31 @@ export default function ArtistProfilePage() {
                 </div>
 
                 <div className="space-y-8">
+                    <ProfileLinksDisplay links={linksMerged} accent="purple" />
+
+                    {(artist.linked_partner_structures?.length ?? 0) > 0 && (
+                        <AnimatedDiv
+                            animation="fadeIn"
+                            className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
+                        >
+                            <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-6 text-white/30 italic">
+                                Structures partenaires
+                            </h3>
+                            <ul className="space-y-3">
+                                {artist.linked_partner_structures!.map((s) => (
+                                    <li key={s.slug}>
+                                        <Link
+                                            href={`/partenaires/structures/${encodeURIComponent(s.slug)}`}
+                                            className="block py-3 px-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/40 transition-all font-semibold text-white hover:text-purple-300"
+                                        >
+                                            {s.name}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </AnimatedDiv>
+                    )}
+
                     <AnimatedDiv
                         animation="fadeIn"
                         className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"

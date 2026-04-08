@@ -24,6 +24,9 @@ export interface AuthUser {
     user_type: UserType;
     staff_role: StaffRole;
     is_vibe: boolean;
+    /** Aligné sur Django — voir /api/auth/me/ */
+    is_staff?: boolean;
+    is_superuser?: boolean;
 }
 
 interface AuthContextValue {

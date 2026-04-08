@@ -252,7 +252,8 @@ export default function NewArtistPage() {
           </div>
 
           <div>
-            <p className="mb-3 text-sm text-white/70">{t("professionsLabel")}</p>
+            <p className="mb-1 text-sm text-white/70">{t("professionsLabel")}</p>
+            <p className="mb-3 text-xs text-white/45 leading-relaxed">{t("professionsMultiHint")}</p>
             <div className="flex flex-wrap gap-2">
               {allProfessions.map((p) => (
                 <label

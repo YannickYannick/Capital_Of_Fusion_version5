@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { OrganizationNodeApi } from "@/types/organization";
+import { patchOrganizationNodeAdmin } from "@/lib/api";
 
 interface LocalNodeChanges {
     orbit_radius?: number;
@@ -18,7 +20,6 @@ interface GlobalPlanetConfigPanelProps {
     isOpen: boolean;
     onClose: () => void;
     onSaved: () => void;
-    apiBaseUrl: string;
 }
 
 function NodeRow({
@@ -186,7 +187,6 @@ export function GlobalPlanetConfigPanel({
     isOpen,
     onClose,
     onSaved,
-    apiBaseUrl,
 }: GlobalPlanetConfigPanelProps) {
     const [allChanges, setAllChanges] = useState<Record<string, LocalNodeChanges>>({});
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
@@ -211,14 +211,10 @@ export function GlobalPlanetConfigPanel({
         setSaveStatus("saving");
         try {
             await Promise.all(
-                changedNodes.map(([nodeId, changes]) => {
+                changedNodes.map(async ([nodeId, changes]) => {
                     const node = nodes.find((n) => n.id === nodeId);
-                    if (!node) return Promise.resolve();
-                    return fetch(`${apiBaseUrl}/api/organization/nodes/${node.slug}/`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(changes),
-                    });
+                    if (!node) return;
+                    await patchOrganizationNodeAdmin(node.slug, changes);
                 })
             );
             setSaveStatus("success");
@@ -229,10 +225,15 @@ export function GlobalPlanetConfigPanel({
         } finally {
             setTimeout(() => setSaveStatus("idle"), 3000);
         }
-    }, [allChanges, nodes, apiBaseUrl, onSaved]);
+    }, [allChanges, nodes, onSaved]);
 
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(isOpen);
+    const [portalReady, setPortalReady] = useState(false);
+
+    useEffect(() => {
+        setPortalReady(true);
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -245,19 +246,23 @@ export function GlobalPlanetConfigPanel({
         }
     }, [isOpen, shouldRender]);
 
-    if (!shouldRender) return null;
+    if (!shouldRender || !portalReady) return null;
 
-    return (
+    /**
+     * Portail vers document.body : sinon le panneau reste sous la navbar (z-50) et sous les contrôles vidéo (z-50),
+     * car tout Explore est dans un conteneur z-10 — les 1–2 premières lignes et le bas étaient non cliquables.
+     * top-56 = sous le header large (h-56) ; bottom-24 = au-dessus des boutons qualité vidéo (bas-droite).
+     */
+    return createPortal(
         <>
-            {/* Backdrop */}
             <div
-                className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm ${isClosing ? "animate-fadeOut" : "animate-fadeIn"}`}
+                className={`fixed inset-0 z-[199] bg-black/40 backdrop-blur-sm ${isClosing ? "animate-fadeOut" : "animate-fadeIn"}`}
                 onClick={onClose}
+                aria-hidden
             />
 
-            {/* Panneau */}
             <aside
-                className={`fixed top-0 right-0 bottom-0 z-50 w-full max-w-[600px] bg-black/90 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
+                className={`fixed top-56 right-0 bottom-24 z-[200] w-full max-w-[600px] bg-black/90 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col pointer-events-auto rounded-tl-2xl rounded-bl-2xl overflow-hidden ${isClosing ? "animate-slideOutRight" : "animate-slideInRight"}`}
             >
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 flex-shrink-0">
@@ -320,6 +325,7 @@ export function GlobalPlanetConfigPanel({
                             </button>
                         </div>
                     </aside>
-                </>
+                </>,
+        document.body
     );
 }

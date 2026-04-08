@@ -49,8 +49,12 @@ from apps.partners.views import (
 from apps.partners.admin_views import (
     PartnerAdminListCreateAPIView,
     PartnerCourseMetaAPIView,
+    PartnerNodeAdminDetailAPIView,
     PartnerNodeAdminCreateAPIView,
+    PartnerBrandAdminDetailAPIView,
+    PartnerEventAdminDetailAPIView,
     PartnerEventAdminCreateAPIView,
+    PartnerCourseAdminDetailAPIView,
     PartnerCourseAdminCreateAPIView,
 )
 from apps.users.views import (
@@ -156,8 +160,12 @@ urlpatterns = [
     path("admin/pending-edits/<int:pk>/", PendingContentEditDetailAPIView.as_view()),
     path("admin/partners/", PartnerAdminListCreateAPIView.as_view()),
     path("admin/partners/course-meta/", PartnerCourseMetaAPIView.as_view()),
+    path("admin/partners/brands/<slug:slug>/", PartnerBrandAdminDetailAPIView.as_view()),
+    path("admin/partners/nodes/<slug:slug>/", PartnerNodeAdminDetailAPIView.as_view()),
     path("admin/partners/nodes/", PartnerNodeAdminCreateAPIView.as_view()),
+    path("admin/partners/events/<slug:slug>/", PartnerEventAdminDetailAPIView.as_view()),
     path("admin/partners/events/", PartnerEventAdminCreateAPIView.as_view()),
+    path("admin/partners/courses/<slug:slug>/", PartnerCourseAdminDetailAPIView.as_view()),
     path("admin/partners/courses/", PartnerCourseAdminCreateAPIView.as_view()),
 ]
 

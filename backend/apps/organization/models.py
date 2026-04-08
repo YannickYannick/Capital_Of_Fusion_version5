@@ -53,12 +53,25 @@ class OrganizationNode(BaseModel):
     video_url = models.URLField(blank=True)
     description = models.TextField(blank=True)
     # Champs pour l'overlay central
+    profile_image = models.ImageField(
+        upload_to="nodes/profiles/",
+        blank=True,
+        null=True,
+        verbose_name="Photo de profil",
+        help_text="Avatar affiché sur la fiche publique du nœud",
+    )
     cover_image = models.ImageField(
         upload_to='nodes/covers/',
         blank=True,
         null=True,
         verbose_name="Image de couverture",
         help_text="Image principale affichée dans l'overlay (format 16:9 recommandé)"
+    )
+    external_links = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Liens & contact",
+        help_text="Instagram (max 3), sites web (max 3), Facebook, contact.",
     )
     short_description = models.CharField(
         max_length=300,

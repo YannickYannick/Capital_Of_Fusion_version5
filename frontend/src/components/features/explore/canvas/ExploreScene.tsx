@@ -115,6 +115,82 @@ export function getDynamicOrbitParams(
   return { r, y };
 }
 
+/**
+ * Distance horizontale max (dans XZ) depuis l'origine jusqu'à une orbite :
+ * cercle → r ; squircle → max sur un tour (coins plus loin que r).
+ * + marge pour le mesh des planètes. Utilisé pour le disque « zone » et le test de survol.
+ */
+function computeCircumOrbitRadius(
+  orbitNodes: OrganizationNodeApi[],
+  verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere",
+  autoDistributeOrbits: boolean,
+  orbitSpacing: number,
+  verticalHomogeneousBase: number,
+  verticalHomogeneousStep: number,
+  verticalJupiterAmplitude: number,
+  verticalSphereRadius: number,
+  globalShapeOverride: boolean,
+  globalShape: "circle" | "squircle",
+  globalRoundness: number,
+  globalPlanetScale: number
+): number {
+  const n = orbitNodes.length;
+  if (n === 0) return 0;
+
+  if (verticalMode === "sphere") {
+    let maxPlanet = 0;
+    for (const node of orbitNodes) {
+      maxPlanet = Math.max(maxPlanet, (node.planet_scale ?? 0.8) * globalPlanetScale);
+    }
+    return verticalSphereRadius + maxPlanet + 2;
+  }
+
+  let maxExtent = 0;
+  for (let i = 0; i < n; i++) {
+    const node = orbitNodes[i];
+    const { r } = getDynamicOrbitParams(
+      node,
+      i,
+      n,
+      autoDistributeOrbits,
+      verticalMode,
+      orbitSpacing,
+      verticalHomogeneousBase,
+      verticalHomogeneousStep,
+      verticalJupiterAmplitude,
+      verticalSphereRadius
+    );
+    const shape = globalShapeOverride
+      ? globalShape
+      : ((node.orbit_shape as "circle" | "squircle") || "circle");
+    const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
+    if (shape === "circle") {
+      maxExtent = Math.max(maxExtent, r);
+    } else {
+      for (let seg = 0; seg <= 64; seg++) {
+        const t = seg / 64;
+        const [x, z] = getSquirclePosition(t, r, roundness);
+        maxExtent = Math.max(maxExtent, Math.hypot(x, z));
+      }
+    }
+  }
+
+  const maxPlanetR = Math.max(
+    ...orbitNodes.map((node) => (node.planet_scale ?? 0.8) * globalPlanetScale),
+    0.4 * globalPlanetScale
+  );
+  return maxExtent + maxPlanetR + 3;
+}
+
+/** Intersection du rayon avec le plan y = planeY (repère monde). */
+function rayIntersectPlaneY(ray: THREE.Ray, planeY: number): THREE.Vector3 | null {
+  const dy = ray.direction.y;
+  if (Math.abs(dy) < 1e-9) return null;
+  const t = (planeY - ray.origin.y) / dy;
+  if (t < 0) return null;
+  return new THREE.Vector3().copy(ray.origin).addScaledVector(ray.direction, t);
+}
+
 // ─────────────────────────────────────────────────────────
 //  Fonctions de trajectoire d'entrée
 // ─────────────────────────────────────────────────────────
@@ -332,7 +408,10 @@ const OrbitRing = memo(function OrbitRing({
   );
 });
 
-/** Anneau affiché quand la souris est dans la zone où les planètes ralentissent (survol). Couleur et opacité configurables via admin. */
+/**
+ * Zone de ralentissement : disque + anneau, circonscrit les orbites (rayon = orbitZoneRadiusRef).
+ * depthTest désactivé pour rester visible au-dessus du fond vidéo / du terrain.
+ */
 function OrbitZoneIndicator({
   inOrbitZoneRef,
   orbitZoneRadiusRef,
@@ -346,24 +425,60 @@ function OrbitZoneIndicator({
   color: string;
   opacity: number;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const fillRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
   const colorObj = hexToColor(color);
+  const baseFillOpacity = Math.max(0.12, opacity * 0.5);
+  const hoverFillOpacity = Math.max(0.22, opacity * 0.85);
+  const baseRingOpacity = Math.min(1, Math.max(0.35, opacity * 1.1));
+  const hoverRingOpacity = Math.min(1, Math.max(0.55, opacity * 1.35));
   useFrame(() => {
-    if (!meshRef.current || !show) return;
-    meshRef.current.visible = inOrbitZoneRef.current && orbitZoneRadiusRef.current > 0;
-    meshRef.current.scale.setScalar(orbitZoneRadiusRef.current);
+    if (!show) {
+      if (fillRef.current) fillRef.current.visible = false;
+      if (ringRef.current) ringRef.current.visible = false;
+      return;
+    }
+    const R = orbitZoneRadiusRef.current;
+    const vis = R > 0;
+    const hover = inOrbitZoneRef.current;
+    if (fillRef.current) {
+      fillRef.current.visible = vis;
+      fillRef.current.scale.setScalar(R);
+      const mat = fillRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = hover ? hoverFillOpacity : baseFillOpacity;
+    }
+    if (ringRef.current) {
+      ringRef.current.visible = vis;
+      ringRef.current.scale.setScalar(R);
+      const mat = ringRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = hover ? hoverRingOpacity : baseRingOpacity;
+    }
   });
   return (
-    <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} visible={false} renderOrder={1}>
-      <ringGeometry args={[0.92, 1, 64]} />
-      <meshBasicMaterial
-        transparent
-        opacity={opacity}
-        color={colorObj}
-        side={THREE.DoubleSide}
-        depthWrite={false}
-      />
-    </mesh>
+    <group position={[0, 0.04, 0]}>
+      <mesh ref={fillRef} rotation={[-Math.PI / 2, 0, 0]} visible={false} renderOrder={1000}>
+        <circleGeometry args={[1, 96]} />
+        <meshBasicMaterial
+          transparent
+          opacity={baseFillOpacity}
+          color={colorObj}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </mesh>
+      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} visible={false} renderOrder={1001}>
+        <ringGeometry args={[0.92, 1, 64]} />
+        <meshBasicMaterial
+          transparent
+          opacity={baseRingOpacity}
+          color={colorObj}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </mesh>
+    </group>
   );
 }
 
@@ -756,8 +871,8 @@ function Planet({
         scale={displayScale}
         color={color}
         visualSource={visualSource as "preset" | "glb" | "gif"}
-        modelUrl={node.model_3d}
-        textureUrl={node.planet_texture}
+        modelUrl={node.model_3d ?? undefined}
+        textureUrl={node.planet_texture ?? undefined}
       />
 
       {/* Glow effect au hover/sélection */}
@@ -879,16 +994,20 @@ function Sun({
   showTextShadow,
   inOrbitZoneRef,
 }: SunProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const spinRef = useRef<THREE.Group>(null);
   const color = hexToColor(node.planet_color || "#fbbf24");
   const scale = Math.max(node.planet_scale ?? 1.2, 1) * globalPlanetScale;
+  const displayScale = isHovered || isSelected ? scale * 1.1 : scale;
+  const visualSource = (node.visual_source || "preset") as "preset" | "glb" | "gif";
+  const planetType = (node.planet_type || "glass") as PlanetType;
+  const useFileVisual =
+    (visualSource === "glb" && !!node.model_3d) ||
+    (visualSource === "gif" && !!node.planet_texture);
 
   useFrame((_, delta) => {
-    if (!meshRef.current || frozen) return;
-    meshRef.current.rotation.y += delta * 0.15 * speedMultiplierRef.current;
+    if (!spinRef.current || frozen) return;
+    spinRef.current.rotation.y += delta * 0.15 * speedMultiplierRef.current;
   });
-
-  const displayScale = isHovered || isSelected ? scale * 1.1 : scale;
 
   return (
     <group
@@ -898,21 +1017,35 @@ function Sun({
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; onHover(true); }}
       onPointerOut={() => { document.body.style.cursor = "default"; onHover(false); }}
     >
-      <mesh ref={meshRef} scale={displayScale}>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.7}
-          roughness={0.3}
-          metalness={0.1}
-        />
-      </mesh>
-      {/* Halo lumineux */}
-      <mesh scale={displayScale * 1.4}>
-        <sphereGeometry args={[1, 16, 16]} />
-        <meshBasicMaterial color={color} transparent opacity={0.06} />
-      </mesh>
+      <group ref={spinRef}>
+        {useFileVisual ? (
+          <DynamicPlanet
+            type={planetType}
+            scale={displayScale}
+            color={color}
+            visualSource={visualSource}
+            modelUrl={node.model_3d ?? undefined}
+            textureUrl={node.planet_texture ?? undefined}
+          />
+        ) : (
+          <>
+            <mesh scale={displayScale}>
+              <sphereGeometry args={[1, 32, 32]} />
+              <meshStandardMaterial
+                color={color}
+                emissive={color}
+                emissiveIntensity={0.7}
+                roughness={0.3}
+                metalness={0.1}
+              />
+            </mesh>
+            <mesh scale={displayScale * 1.4}>
+              <sphereGeometry args={[1, 16, 16]} />
+              <meshBasicMaterial color={color} transparent opacity={0.06} />
+            </mesh>
+          </>
+        )}
+      </group>
       <LabelSprite
         text={node.name}
         offsetY={displayScale + 1.5}
@@ -1327,42 +1460,46 @@ function SceneContent({
 
     let inOrbitZone = false;
 
-    // Déterminer la distance max (rayon + marge)
-    let maxR = 0;
-    if (orbitNodes.length > 0) {
-      maxR = getDynamicOrbitParams(orbitNodes[orbitNodes.length - 1], orbitNodes.length - 1, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius).r;
-    }
+    const orbitZoneRadius = computeCircumOrbitRadius(
+      orbitNodes,
+      verticalMode,
+      autoDistributeOrbits,
+      orbitSpacing,
+      verticalHomogeneousBase,
+      verticalHomogeneousStep,
+      verticalJupiterAmplitude,
+      verticalSphereRadius,
+      globalShapeOverride,
+      globalShape,
+      globalRoundness,
+      globalPlanetScale
+    );
 
-    const orbitZoneRadius = maxR + 5;
-
-    // Le centre du système est à [0,0,0]. 
-    // On trouve approximativement la distance la plus courte entre le rayon (écran) et l'origine (système central)
-    const distanceToOrigin = ray.distanceToPoint(new THREE.Vector3(0, 0, 0));
-
-    // Si le pointeur vise à l'intérieur du disque global d'orbites
-    if (distanceToOrigin <= orbitZoneRadius && distanceToOrigin >= 0.1) {
-      // On vérifie que la hauteur du rayon (Y) lorsqu'il "croise" l'orbite 
-      // est à l'intérieur de l'amplitude verticale maximale des planètes
-
-      // Calcul de l'amplitude max Y
-      let maxY = 5; // valeur par défaut minimale
-      if (verticalMode === "homogeneous") {
-        const step = verticalHomogeneousStep / Math.max(1, Math.floor(orbitNodes.length / 2));
-        maxY = (step * Math.floor(orbitNodes.length / 2) + verticalHomogeneousBase);
-      } else if (verticalMode === "jupiter") {
-        maxY = verticalJupiterAmplitude;
-      } else if (verticalMode === "manual") {
-        maxY = Math.max(...orbitNodes.map(n => Math.abs(n.orbit_position_y || 0)), 5);
-      }
-
-      // Le point le plus proche entre le rayon et l'axe (0,y,0)
-      // Pour simplifier, on trouve le point du rayon le plus près de l'origine
-      const pointCible = new THREE.Vector3();
-      ray.closestPointToPoint(new THREE.Vector3(0, 0, 0), pointCible);
-
-      // On se donne une large marge verticale tolérée (hauteur des orbites + 30 visuellement)
-      if (Math.abs(pointCible.y) <= maxY + 15) {
+    // Zone = disque horizontal (y=0) : intersection souris / plan, distance XZ depuis l'origine
+    const hitPlane = rayIntersectPlaneY(ray, 0);
+    if (hitPlane && orbitZoneRadius > 0) {
+      const d = Math.hypot(hitPlane.x, hitPlane.z);
+      if (d <= orbitZoneRadius && d >= 0.05) {
         inOrbitZone = true;
+      }
+    } else if (orbitZoneRadius > 0) {
+      // Rayon quasi parallèle au sol : repli sur la distance minimale rayon ↔ axe Y
+      const distanceToOrigin = ray.distanceToPoint(new THREE.Vector3(0, 0, 0));
+      if (distanceToOrigin <= orbitZoneRadius && distanceToOrigin >= 0.1) {
+        let maxY = 5;
+        if (verticalMode === "homogeneous") {
+          const step = verticalHomogeneousStep / Math.max(1, Math.floor(orbitNodes.length / 2));
+          maxY = step * Math.floor(orbitNodes.length / 2) + verticalHomogeneousBase;
+        } else if (verticalMode === "jupiter") {
+          maxY = verticalJupiterAmplitude;
+        } else if (verticalMode === "manual" && orbitNodes.length > 0) {
+          maxY = Math.max(...orbitNodes.map((n) => Math.abs(n.orbit_position_y || 0)), 5);
+        }
+        const pointCible = new THREE.Vector3();
+        ray.closestPointToPoint(new THREE.Vector3(0, 0, 0), pointCible);
+        if (Math.abs(pointCible.y) <= maxY + 15) {
+          inOrbitZone = true;
+        }
       }
     }
 
@@ -1427,7 +1564,7 @@ function SceneContent({
           onClick={() => onPlanetClick(rootNode)}
           onDoubleClick={() => {
             if (rootNode.cta_url) router.push(rootNode.cta_url);
-            else router.push(`/${rootNode.slug}`);
+            else router.push(`/organisation/noeuds/${encodeURIComponent(rootNode.slug)}`);
           }}
           isSelected={selectedId === rootNode.id}
           isHovered={hoveredId === rootNode.id}
@@ -1478,7 +1615,7 @@ function SceneContent({
             onClick={() => onPlanetClick(node)}
             onDoubleClick={() => {
               if (node.cta_url) router.push(node.cta_url);
-              else router.push(`/${node.slug}`);
+              else router.push(`/organisation/noeuds/${encodeURIComponent(node.slug)}`);
             }}
             onHover={(v) => setHoveredId(v ? node.id : null)}
             isHovered={hoveredId === node.id}

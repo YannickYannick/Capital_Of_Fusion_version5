@@ -15,6 +15,7 @@ Section **Nos partenaires** : structures partenaires (annuaire type nœuds d’o
 | Serializers | `backend/apps/partners/serializers.py` — PartnerNodeSerializer, PartnerEventSerializer, PartnerCourseSerializer |
 | Vues | `backend/apps/partners/views.py` — listes et détails par slug |
 | Frontend pages | `partenaires/layout.tsx`, `partenaires/page.tsx` (hub), `partenaires/structures/`, `partenaires/evenements/`, `partenaires/cours/` (listes + [slug] détail) |
+| Musique fiche structure | [partenaires-structure-musique-fond.md](partenaires-structure-musique-fond.md) — override audio vs YouTube du site, suspension jusqu’à accueil / Explore |
 | Composants | `PartnerNodeCard.tsx` (carte structure → `/partenaires/structures/[slug]`) |
 | API client | `frontend/src/lib/api.ts` — getPartnerNodes, getPartnerNodesForStructure, getPartnerNodeBySlug, getPartnerEvents, getPartnerEventBySlug, getPartnerCourses, getPartnerCourseBySlug |
 | Types | `frontend/src/types/partner.ts` — PartnerNodeApi, PartnerEventApi, PartnerCourseApi, PartnerScheduleApi |

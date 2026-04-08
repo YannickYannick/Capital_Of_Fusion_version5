@@ -11,6 +11,7 @@ import { getPartnerCourses } from "@/lib/api";
 import type { PartnerCourseApi } from "@/types/partner";
 import { PartnerQuickAddModal } from "@/components/features/partners/PartnerQuickAddModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { isStaffOrSuperuser } from "@/lib/staffAccess";
 
 export default function PartenairesCoursPage() {
   const t = useTranslations("pages");
@@ -21,7 +22,7 @@ export default function PartenairesCoursPage() {
   const [level, setLevel] = useState("");
   const [style, setStyle] = useState("");
   const [addOpen, setAddOpen] = useState(false);
-  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const isStaff = isStaffOrSuperuser(user);
 
   const LEVEL_OPTIONS = [
     { value: "", label: t("partnerCourses.filters.allLevels") },
@@ -132,28 +133,38 @@ export default function PartenairesCoursPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 delay-200">
             {courses.map((c) => (
-              <Link
+              <div
                 key={c.id}
-                href={`/partenaires/cours/${c.slug}`}
-                className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 block"
+                className="relative flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    {c.style_name}
-                  </span>
-                  <span className="text-xs font-semibold text-white/50 bg-black/30 px-2 py-1 rounded-md">
-                    {c.level_name}
-                  </span>
-                </div>
-
-                <h2 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors w-11/12">{c.name}</h2>
-
-                {(c.node_name || c.partner_name) && (
-                  <p className="mt-auto pt-4 flex items-center gap-2 text-sm text-white/50 border-t border-white/5">
-                    <span>📍</span> {[c.node_name, c.partner_name].filter(Boolean).join(" · ")}
-                  </p>
+                {isStaff && (
+                  <Link
+                    href={`/partenaires/cours/${encodeURIComponent(c.slug)}/edit`}
+                    className="absolute top-4 right-4 z-20 text-[10px] font-bold uppercase tracking-wide text-amber-300 hover:text-white px-2 py-1 rounded-md bg-black/50 border border-amber-500/40"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t("partnerCourses.editCard")}
+                  </Link>
                 )}
-              </Link>
+                <Link href={`/partenaires/cours/${c.slug}`} className="flex flex-col h-full flex-1 min-h-0">
+                  <div className="flex justify-between items-start mb-4 pr-14">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {c.style_name}
+                    </span>
+                    <span className="text-xs font-semibold text-white/50 bg-black/30 px-2 py-1 rounded-md shrink-0">
+                      {c.level_name}
+                    </span>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors w-11/12">{c.name}</h2>
+
+                  {(c.node_name || c.partner_name) && (
+                    <p className="mt-auto pt-4 flex items-center gap-2 text-sm text-white/50 border-t border-white/5">
+                      <span>📍</span> {[c.node_name, c.partner_name].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
+                </Link>
+              </div>
             ))}
           </div>
         )}

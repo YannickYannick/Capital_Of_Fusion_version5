@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { isStaffOrSuperuser } from "@/lib/staffAccess";
 import Link from "next/link";
 
 interface AdminEditButtonProps {
@@ -10,8 +11,12 @@ interface AdminEditButtonProps {
   djangoAdminUrl?: string;
   /** Callback pour ouvrir un modal d'édition inline */
   onEdit?: () => void;
-  /** Position du bouton */
-  position?: "top-right" | "bottom-right" | "inline";
+  /**
+   * Position du bouton.
+   * `fixed-below-nav` : fixed sous la navbar — à utiliser quand un hero plein écran suit
+   * (sinon `top-right` en absolute peut être entièrement recouvert par la section suivante).
+   */
+  position?: "top-right" | "bottom-right" | "inline" | "fixed-below-nav";
   /** Label personnalisé */
   label?: string;
   /** Taille du bouton */
@@ -32,15 +37,16 @@ export function AdminEditButton({
 }: AdminEditButtonProps) {
   const { user } = useAuth();
 
-  // Ne rien afficher si pas connecté ou pas admin/staff
-  if (!user || (user.user_type !== "ADMIN" && user.user_type !== "STAFF")) {
+  if (!isStaffOrSuperuser(user)) {
     return null;
   }
 
   const positionClasses = {
-    "top-right": "absolute top-3 right-3 z-10",
-    "bottom-right": "absolute bottom-3 right-3 z-10",
+    "top-right": "absolute top-3 right-3 z-[100]",
+    "bottom-right": "absolute bottom-3 right-3 z-[100]",
     inline: "",
+    "fixed-below-nav":
+      "fixed top-24 right-4 z-[200] md:top-28 md:right-6",
   };
 
   const sizeClasses = {
@@ -116,7 +122,7 @@ export function AdminToolbar({
 }) {
   const { user } = useAuth();
 
-  if (!user || (user.user_type !== "ADMIN" && user.user_type !== "STAFF")) {
+  if (!isStaffOrSuperuser(user)) {
     return null;
   }
 

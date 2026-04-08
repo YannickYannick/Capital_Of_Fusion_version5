@@ -14,6 +14,7 @@ import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import Link from "next/link";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 import { useAuth } from "@/contexts/AuthContext";
+import { isStaffOrSuperuser } from "@/lib/staffAccess";
 
 export default function PartenairesStructuresPage() {
   const t = useTranslations("pages");
@@ -35,7 +36,7 @@ export default function PartenairesStructuresPage() {
     fetchNodes();
   }, [fetchNodes]);
 
-  const isStaff = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
+  const isStaff = isStaffOrSuperuser(user);
 
   if (loading && nodes.length === 0) {
     return (

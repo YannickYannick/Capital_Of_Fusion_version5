@@ -12,6 +12,7 @@ Documentation par feature : où c’est dans le code, comment ça fonctionne, co
 | [Organisation — Structure & Nœuds](organisation-noeuds.md) | `organisation-noeuds.md` | Organigramme, annuaire nœuds, fiche par nœud (cours + événements) |
 | [Organisation — Pôles & Staff](organisation-poles-staff.md) | `organisation-poles-staff.md` | Pôles (liste + comptage membres), page Notre Staff (grille, filtre par pôle) |
 | [Nos partenaires](partenaires.md) | `partenaires.md` | Structures, événements et cours partenaires (app `partners`, APIs dédiées, pages type organisation/événements/cours) |
+| [Partenaires — musique fiche structure](partenaires-structure-musique-fond.md) | `partenaires-structure-musique-fond.md` | Musique dédiée sur `/partenaires/structures/[slug]`, priorité sur le son YouTube du site, reprise seulement sur `/` ou `/explore` |
 | [Médias artistes & images API](medias-artistes-et-images-api.md) | `medias-artistes-et-images-api.md` | Profils / couvertures : sérialisation API, Cloudinary, Next `Image`, checklist après changement |
 | [Landing — i18n + fond vidéo](landing-config.md) | `landing-config.md` | Hero via `messages` (`landing.*`), fond/voile via `GlobalVideoBackground` |
 | [Navbar & Dashboard](navbar-dashboard.md) | `navbar-dashboard.md` | Logo, avatar connecté, lien DB menu (admins), dashboard sans iframes |

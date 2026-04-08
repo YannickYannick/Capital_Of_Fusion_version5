@@ -17,8 +17,10 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 from apps.core.models import DanceProfession, PendingContentEdit
+from apps.partners.models import PartnerNode
 from apps.core.api_response import json_response_no_store
 from apps.core.permissions import IsStaffOrSuperUser
+from apps.core.profile_external_links import normalize_external_links, parse_external_links_param
 
 from .models import User
 from .serializers import (
@@ -165,6 +167,8 @@ class MeAPIView(APIView):
             "user_type": getattr(user, "user_type", "MEMBER"),
             "staff_role": getattr(user, "staff_role", "") or "",
             "account_status": getattr(user, "account_status", "APPROVED"),
+            "is_staff": bool(getattr(user, "is_staff", False)),
+            "is_superuser": bool(getattr(user, "is_superuser", False)),
         })
 
 class ArtistListAPIView(APIView):
@@ -184,7 +188,7 @@ class ArtistListAPIView(APIView):
             User.objects.filter(professions__isnull=False)
             .distinct()
             .select_related("dance_level")
-            .prefetch_related("professions")
+            .prefetch_related("professions", "linked_partner_structures")
         )
 
         if staff_only == 'true':
@@ -207,7 +211,7 @@ class ArtistDetailAPIView(APIView):
         artist = (
             User.objects.filter(username=username, professions__isnull=False)
             .select_related("dance_level")
-            .prefetch_related("professions")
+            .prefetch_related("professions", "linked_partner_structures")
             .first()
         )
         if artist:
@@ -230,7 +234,11 @@ class ArtistAdminDetailAPIView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get(self, request, username):
-        artist = User.objects.filter(username=username).first()
+        artist = (
+            User.objects.filter(username=username)
+            .prefetch_related("linked_partner_structures")
+            .first()
+        )
         if not artist:
             return Response({"error": "Utilisateur introuvable"}, status=status.HTTP_404_NOT_FOUND)
         profs = DanceProfession.objects.all().order_by("name")
@@ -258,6 +266,16 @@ class ArtistAdminDetailAPIView(APIView):
             artist.bio_es = str(request.data["bio_es"] or "")
         if "is_staff_member" in request.data:
             artist.is_staff_member = bool(request.data["is_staff_member"])
+        if "phone" in request.data:
+            artist.phone = str(request.data["phone"] or "")
+        if "external_links" in request.data:
+            raw = request.data["external_links"]
+            if isinstance(raw, dict):
+                artist.external_links = normalize_external_links(raw)
+            else:
+                pl = parse_external_links_param(raw)
+                if pl is not None:
+                    artist.external_links = pl
 
         if "profession_ids" in request.data:
             raw = request.data["profession_ids"]
@@ -266,6 +284,35 @@ class ArtistAdminDetailAPIView(APIView):
                 artist.professions.set(qs)
             elif raw is None:
                 artist.professions.clear()
+
+        linked_slugs = request.data.get("linked_partner_structure_slugs", None)
+        if linked_slugs is not None:
+            if not isinstance(linked_slugs, list):
+                return Response(
+                    {"linked_partner_structure_slugs": "Attendu : une liste de slugs."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            unique_slugs: list[str] = []
+            seen: set[str] = set()
+            for item in linked_slugs:
+                s = str(item or "").strip()
+                if not s or s in seen:
+                    continue
+                seen.add(s)
+                unique_slugs.append(s)
+            nodes = list(PartnerNode.objects.filter(slug__in=unique_slugs).order_by("name"))
+            found_slugs = {n.slug for n in nodes}
+            if len(found_slugs) != len(unique_slugs):
+                missing = [s for s in unique_slugs if s not in found_slugs]
+                return Response(
+                    {
+                        "linked_partner_structure_slugs": (
+                            "Slug(s) de structure inconnus : " + ", ".join(missing)
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            artist.linked_partner_structures.set(nodes)
 
         if "profile_picture" in request.FILES:
             artist.profile_picture = request.FILES["profile_picture"]
@@ -284,6 +331,11 @@ class ArtistAdminDetailAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+        artist = (
+            User.objects.filter(pk=artist.pk)
+            .prefetch_related("linked_partner_structures", "professions")
+            .first()
+        )
         return json_response_no_store(
             ArtistSerializer(artist, context={"request": request}).data,
             status=status.HTTP_200_OK,

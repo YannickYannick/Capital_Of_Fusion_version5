@@ -77,6 +77,12 @@ export interface PlanetsOptionsState {
     enableTextShadow: boolean;
     useBlackBackground: boolean;
     disableYouTubeIframes: boolean;
+    /**
+     * `site` : son uniquement des vidéos configurées (accueil + cycle), ignore les musiques
+     * planètes Explore et structures partenaires.
+     * `context` : comportement classique — les overrides (planètes / partenaires) remplacent l’ambiance.
+     */
+    backgroundMusicMode: "site" | "context";
     showEntryTrajectory: boolean;
     // ── Nouveaux Modes ──
     verticalMode: "manual" | "homogeneous" | "jupiter" | "sphere";
@@ -186,6 +192,7 @@ const DEFAULTS: PlanetsOptionsState = {
     enableTextShadow: false,
     useBlackBackground: false,
     disableYouTubeIframes: false,
+    backgroundMusicMode: "context",
     showEntryTrajectory: false,
     verticalMode: "manual",
     autoDistributeOrbits: false,
@@ -251,6 +258,7 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     enableTextShadow: "video_enableTextShadow",
     useBlackBackground: "video_useBlackBackground",
     disableYouTubeIframes: "video_disableYouTubeIframes",
+    backgroundMusicMode: "video_backgroundMusicMode",
     showEntryTrajectory: "planets_showEntryTrajectory",
     verticalMode: "planets_verticalMode",
     autoDistributeOrbits: "planets_autoDistributeOrbits",
@@ -328,6 +336,10 @@ function loadFromLS(): PlanetsOptionsState {
         enableTextShadow: lsGet(LS_KEYS.enableTextShadow!, DEFAULTS.enableTextShadow),
         useBlackBackground: lsGet(LS_KEYS.useBlackBackground!, DEFAULTS.useBlackBackground),
         disableYouTubeIframes: lsGet(LS_KEYS.disableYouTubeIframes!, DEFAULTS.disableYouTubeIframes),
+        backgroundMusicMode: (() => {
+            const v = lsGet(LS_KEYS.backgroundMusicMode!, DEFAULTS.backgroundMusicMode);
+            return v === "site" || v === "context" ? v : DEFAULTS.backgroundMusicMode;
+        })(),
         showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
         verticalMode: lsGet(LS_KEYS.verticalMode!, DEFAULTS.verticalMode),
         autoDistributeOrbits: lsGet(LS_KEYS.autoDistributeOrbits!, DEFAULTS.autoDistributeOrbits),

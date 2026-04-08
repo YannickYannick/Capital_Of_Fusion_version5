@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { PartnerHubStaffLinks } from "@/components/features/partners/PartnerHubStaffLinks";
 
 /**
  * Page Nos partenaires — hub vers Structures, Événements et Cours partenaires.
@@ -14,9 +15,10 @@ export default async function PartenairesPage() {
             {t("partnerHub.titleBefore")}{" "}
             <span className="text-amber-500">{t("partnerHub.titleHighlight")}</span>
           </h1>
-          <p className="text-white/60 max-w-xl mx-auto mb-12">
+          <p className="text-white/60 max-w-xl mx-auto mb-6">
             {t("partnerHub.subtitle")}
           </p>
+          <PartnerHubStaffLinks />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <Link

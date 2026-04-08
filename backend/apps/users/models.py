@@ -97,6 +97,12 @@ class User(AbstractUser):
         related_name="users",
         blank=True,
     )
+    external_links = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Liens & contact (réseaux)",
+        help_text="Instagram (max 3), sites web (max 3), Facebook, contact.",
+    )
 
     class Meta:
         verbose_name = "Utilisateur"

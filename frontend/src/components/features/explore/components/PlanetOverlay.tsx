@@ -228,7 +228,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                       </a>
                     ) : (
                       <Link
-                        href={`/${node.slug}`}
+                        href={`/organisation/noeuds/${encodeURIComponent(node.slug)}`}
                         className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold transition-all hover:scale-[1.02] shadow-[0_0_20px_-5px_rgba(168,85,247,0.4)] border border-purple-400/30"
                         onClick={onClose}
                       >

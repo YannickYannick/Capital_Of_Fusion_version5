@@ -2,6 +2,8 @@
  * Types pour les utilisateurs et artistes.
  */
 
+import type { ProfileExternalLinks } from "./profileLinks";
+
 export interface DanceProfessionApi {
     id: string;
     name: string;
@@ -20,6 +22,8 @@ export interface ArtistApi {
     username: string;
     first_name: string;
     last_name: string;
+    email?: string;
+    phone?: string;
     /** Biographie (français) */
     bio: string;
     /** Biographie anglais */
@@ -39,4 +43,7 @@ export interface ArtistApi {
     dance_level: LevelPublicApi | null;
     is_staff_member: boolean;
     is_vibe: boolean;
+    external_links?: ProfileExternalLinks;
+    /** Structures partenaires liées à ce profil (M2M). */
+    linked_partner_structures?: { name: string; slug: string }[];
 }

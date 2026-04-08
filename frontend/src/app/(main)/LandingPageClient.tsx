@@ -54,10 +54,10 @@ export default function LandingPageClient() {
                             <span className="relative z-10">{t("ctaExplore")}</span>
                         </a>
                         <Link
-                            href="/cours"
+                            href="http://localhost:3001/organisation/noeuds/paris-bachata-festival"
                             className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition"
                         >
-                            {t("ctaCourses")}
+                            Paris Bachata Festival
                         </Link>
                     </div>
 
