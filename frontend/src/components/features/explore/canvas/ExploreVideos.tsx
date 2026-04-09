@@ -29,8 +29,18 @@ function getYoutubeVideoId(url: string): string | null {
     return m ? m[1] : null;
 }
 
+/** Qualité YT pour fond plein écran : sur les pages menu (ex. /promotions-festivals), éviter 1080p (CPU + réseau). */
+const YT_QUALITY_HERO = "hd1080";
+const YT_QUALITY_AMBIENT_MENU = "large";
+
 // Hook helper pour YT avec marqueurs de performance
-function useYTPlayer(videoId: string, ready: boolean, active: boolean, label: string) {
+function useYTPlayer(
+    videoId: string,
+    ready: boolean,
+    active: boolean,
+    label: string,
+    playbackQuality: string
+) {
     const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<YTPlayer | null>(null);
 
@@ -52,14 +62,14 @@ function useYTPlayer(videoId: string, ready: boolean, active: boolean, label: st
             height: 1080,
             playerVars: {
                 autoplay: 1, mute: 1, loop: 1, playlist: videoId,
-                controls: 0, rel: 0, playsinline: 1, vq: 'hd1080',
+                controls: 0, rel: 0, playsinline: 1, vq: playbackQuality,
                 origin: typeof window !== "undefined" ? window.location.origin : "",
             },
             events: {
                 onReady: (e: { target: YTPlayer }) => {
                     playerRef.current = e.target;
                     e.target.mute();
-                    try { e.target.setPlaybackQuality("hd1080"); } catch (err) { }
+                    try { e.target.setPlaybackQuality(playbackQuality); } catch (err) { }
 
                     // Marqueur: player prêt + mesure depuis l'API prête
                     if (typeof performance !== "undefined") {
@@ -91,7 +101,7 @@ function useYTPlayer(videoId: string, ready: boolean, active: boolean, label: st
                 },
                 onStateChange: (e: { target: YTPlayer; data: number }) => {
                     if (e.data === 1) {
-                        try { e.target.setPlaybackQuality("hd1080"); } catch (err) { }
+                        try { e.target.setPlaybackQuality(playbackQuality); } catch (err) { }
                     }
                 }
             }
@@ -100,7 +110,7 @@ function useYTPlayer(videoId: string, ready: boolean, active: boolean, label: st
             if (playerRef.current?.destroy) playerRef.current.destroy();
             playerRef.current = null;
         };
-    }, [ready, videoId, active]);
+    }, [ready, videoId, active, playbackQuality]);
 
     return { containerRef, playerRef };
 }
@@ -109,6 +119,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const pathname = usePathname();
     const isHome = pathname === "/";
     const isExplore = pathname === "/explore";
+    /** Accueil + Explore : 1080p. Autres pages (dont /promotions-festivals) : 480p — même rendu visuel derrière le flou, beaucoup moins lourd. */
+    const bgYoutubeQuality = isHome || isExplore ? YT_QUALITY_HERO : YT_QUALITY_AMBIENT_MENU;
     const opts = usePlanetsOptions();
     const {
         override: planetMusicOverride,
@@ -126,8 +138,12 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const [cyclePlayerAllowed, setCyclePlayerAllowed] = useState(false);
     const [cycleOpacity, setCycleOpacity] = useState(0);
     const [scale, setScale] = useState(1);
-    const [quality, setQuality] = useState("hd1080");
+    const [quality, setQuality] = useState(bgYoutubeQuality);
     const [muted, setMuted] = useState(true);
+
+    useEffect(() => {
+        setQuality(bgYoutubeQuality);
+    }, [bgYoutubeQuality]);
 
     const mainType = config?.main_video_type || 'youtube';
     const cycleType = config?.cycle_video_type || 'youtube';
@@ -151,13 +167,15 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         mainYTId,
         apiReady && ytEnabled,
         mainType === 'youtube' && !effectiveOverride && ytEnabled,
-        "main"
+        "main",
+        bgYoutubeQuality
     );
     const cycleYT = useYTPlayer(
         cycleYTId,
         apiReady && ytEnabled,
         cycleType === 'youtube' && !effectiveOverride && ytEnabled && cyclePlayerAllowed,
-        "cycle"
+        "cycle",
+        bgYoutubeQuality
     );
 
     const overrideYTId = effectiveOverride?.type === "youtube" && effectiveOverride?.youtubeUrl
@@ -167,7 +185,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         overrideYTId || "jfKfPfyJRdk",
         apiReady && ytEnabled,
         !!overrideYTId && ytEnabled,
-        "override"
+        "override",
+        YT_QUALITY_HERO
     );
 
     const mainNativeRef = useRef<HTMLVideoElement>(null);
