@@ -16,8 +16,6 @@ import {
  * `youtubeAmbientSuspended` : lorsque pertinent, garde les vidéos d'accueil muettes ; levée sur `/`
  * et `/explore`. La musique d'une fiche structure peut persister sur d'autres routes tant que
  * le fond vidéo global est monté ; l'accueil et Explore réinitialisent l'override.
- * En mode musique **site** (`backgroundMusicMode`), voir `docs/features/musique-fond-mode-accueil.md` :
- * pas d'override effectif ; bande-son = `main_video` partout sauf comportement cycle sur `/explore`.
  */
 export type PlanetMusicOverride =
   | { type: "youtube"; youtubeUrl: string }

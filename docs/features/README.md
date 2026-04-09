@@ -15,7 +15,7 @@ Documentation par feature : où c’est dans le code, comment ça fonctionne, co
 | [Partenaires — musique fiche structure](partenaires-structure-musique-fond.md) | `partenaires-structure-musique-fond.md` | Musique dédiée sur `/partenaires/structures/[slug]`, priorité sur le son YouTube du site, reprise seulement sur `/` ou `/explore` |
 | [Médias artistes & images API](medias-artistes-et-images-api.md) | `medias-artistes-et-images-api.md` | Profils / couvertures : sérialisation API, Cloudinary, Next `Image`, checklist après changement |
 | [Landing — i18n + fond vidéo](landing-config.md) | `landing-config.md` | Hero via `messages` (`landing.*`), fond/voile via `GlobalVideoBackground` |
-| [Musique fond — mode Accueil (site)](musique-fond-mode-accueil.md) | `musique-fond-mode-accueil.md` | `main_video` seule sur tout le site en mode 🏠 ; exception `/explore` |
+| [Vidéo de fond — routes & mode Accueil](video-background-routes.md) | `video-background-routes.md` | Quelles pages montent la vidéo ; mode `site` vs `context` ; fiches détail en mode Accueil |
 | [Navbar & Dashboard](navbar-dashboard.md) | `navbar-dashboard.md` | Logo, avatar connecté, lien DB menu (admins), dashboard sans iframes |
 | **i18n / traduction** | [../explication/traduction-i18n.md](../explication/traduction-i18n.md) | Multilingue FR/EN/ES, next-intl + modeltranslation + Gemini ; spec complète dans explication |
 

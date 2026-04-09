@@ -5,8 +5,8 @@ import { getSiteConfig } from "@/lib/api";
 
 /**
  * Layout (main) — partagé par toutes les pages publiques.
- * Vidéo et contextes Explore (PlanetsOptions, PlanetMusicOverride) sont chargés
- * conditionnellement via ClientLayoutWrapper (accueil, explore, menu : vidéo + contrôles ; détail / user : sans).
+ * ClientLayoutWrapper fournit PlanetsOptions + PlanetMusicOverride partout ; la vidéo de fond
+ * dépend de la route et du mode musique (voir docs/features/video-background-routes.md).
  */
 export default async function MainLayout({
   children,

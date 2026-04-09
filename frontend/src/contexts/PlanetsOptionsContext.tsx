@@ -78,9 +78,9 @@ export interface PlanetsOptionsState {
     useBlackBackground: boolean;
     disableYouTubeIframes: boolean;
     /**
-     * `site` : musique d’accueil = `main_video` seule sur tout le site (sauf `/explore` où le cycle
-     * peut alterner) ; ignore les overrides planètes / partenaires.
-     * `context` : musiques dédiées possibles (planètes, fiches structure) ; pages menu utilisent aussi `cycle_video`.
+     * `site` : son uniquement des vidéos configurées (accueil + cycle), ignore les musiques
+     * planètes Explore et structures partenaires.
+     * `context` : comportement classique — les overrides (planètes / partenaires) remplacent l’ambiance.
      */
     backgroundMusicMode: "site" | "context";
     showEntryTrajectory: boolean;

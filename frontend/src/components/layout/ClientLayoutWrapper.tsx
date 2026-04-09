@@ -1,18 +1,24 @@
 "use client";
 
 /**
- * Wrapper conditionnel selon le type de page (getPageType) :
- * - Accueil / Explore / Menu : providers + GlobalVideoBackground (qualité, voile, ombre, fond noir, son…)
- * - Détail / User : pas de vidéo de fond
+ * Layout principal : PlanetsOptions + PlanetMusicOverride sur tout le site (main),
+ * vidéo de fond selon la route et le mode musique (voir docs/features/video-background-routes.md).
  */
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/shared/Navbar";
 import { MainContent } from "@/components/shared/MainContent";
-import { PlanetsOptionsProvider } from "@/contexts/PlanetsOptionsContext";
+import {
+  PlanetsOptionsProvider,
+  usePlanetsOptions,
+} from "@/contexts/PlanetsOptionsContext";
 import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
-import { getPageType, isPartnerStructureVideoBackgroundPath } from "@/lib/routeSegments";
+import {
+  getPageType,
+  isPartnerStructureVideoBackgroundPath,
+  isUserPage,
+} from "@/lib/routeSegments";
 import type { SiteConfigurationApi } from "@/types/config";
 
 const VideoBackgroundClient = dynamic(
@@ -23,6 +29,37 @@ const VideoBackgroundClient = dynamic(
   { ssr: false }
 );
 
+function MainChrome({
+  config,
+  children,
+}: {
+  config: SiteConfigurationApi | null;
+  children: ReactNode;
+}) {
+  const pathname = usePathname() ?? "/";
+  const pageType = getPageType(pathname);
+  const user = isUserPage(pathname);
+  const opts = usePlanetsOptions();
+
+  const baseVideo =
+    pageType === "home" ||
+    pageType === "explore" ||
+    pageType === "menu" ||
+    isPartnerStructureVideoBackgroundPath(pathname);
+
+  const showVideo =
+    baseVideo ||
+    (!user && pageType === "detail" && opts.backgroundMusicMode === "site");
+
+  return (
+    <>
+      <Navbar />
+      {showVideo && <VideoBackgroundClient config={config} />}
+      <MainContent>{children}</MainContent>
+    </>
+  );
+}
+
 export function ClientLayoutWrapper({
   config,
   children,
@@ -30,31 +67,11 @@ export function ClientLayoutWrapper({
   config: SiteConfigurationApi | null;
   children: ReactNode;
 }) {
-  const pathname = usePathname();
-  const pageType = getPageType(pathname ?? "/");
-
-  /** Même fond vidéo + contrôles (bas droite) que l’accueil : home, explore, menu, et fiche/édit structure partenaire (musique dédiée). */
-  const withVideoBackground =
-    pageType === "home" ||
-    pageType === "explore" ||
-    pageType === "menu" ||
-    isPartnerStructureVideoBackgroundPath(pathname ?? "/");
-
-  const content = (
-    <>
-      <Navbar />
-      {withVideoBackground && <VideoBackgroundClient config={config} />}
-      <MainContent>{children}</MainContent>
-    </>
+  return (
+    <PlanetsOptionsProvider>
+      <PlanetMusicOverrideProvider>
+        <MainChrome config={config}>{children}</MainChrome>
+      </PlanetMusicOverrideProvider>
+    </PlanetsOptionsProvider>
   );
-
-  if (withVideoBackground) {
-    return (
-      <PlanetsOptionsProvider>
-        <PlanetMusicOverrideProvider>{content}</PlanetMusicOverrideProvider>
-      </PlanetsOptionsProvider>
-    );
-  }
-
-  return content;
 }
