@@ -2,9 +2,12 @@
 
 /**
  * Vidéo de fond globale (YouTube ou MP4) :
- * - Page d'accueil (/) : main_video.
- * - Autres pages menu (hors /dashboard, /login, /register) : cycle_video (explore).
- * - Contrôles : qualité, mute, voile. Override possible depuis Explore (musique planète).
+ * - Page d'accueil (/) : main_video uniquement (cycle masqué).
+ * - Mode musique 🏠 Accueil (`backgroundMusicMode === "site"`) : comme l’accueil sur toutes les
+ *   pages sauf `/explore` — seule `main_video` (son + image), pas de `cycle_video`.
+ * - Mode 🤝 Dédiées (`context`) : pages menu = cycle visible ; overrides planète / partenaire possibles.
+ * - `/explore` : alternance main/cycle si option cycle activée (les deux modes).
+ * - Contrôles : qualité, mute, voile.
  */
 import { useEffect, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
@@ -129,9 +132,15 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         setOverride: setPlanetMusicOverride,
     } = usePlanetMusicOverride();
 
-    /** En mode `site`, on ignore les musiques planètes / partenaires (son = vidéos accueil + cycle uniquement). */
+    /** En mode `site`, on ignore les musiques planètes / partenaires. */
     const effectiveOverride =
         opts.backgroundMusicMode === "context" ? planetMusicOverride : null;
+
+    /**
+     * Mode Accueil hors /explore : même bande-son que la page d’accueil (main_video seule).
+     * Sur /explore on garde le cycle (alternance) pour l’immersif Explore.
+     */
+    const siteMainOnlySound = opts.backgroundMusicMode === "site" && !isExplore;
 
     const [apiReady, setApiReady] = useState(false);
     /** Délai avant de créer le player "cycle" pour étaler la charge (perf: évite 2 iframes lourds en même temps) */
@@ -173,7 +182,11 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const cycleYT = useYTPlayer(
         cycleYTId,
         apiReady && ytEnabled,
-        cycleType === 'youtube' && !effectiveOverride && ytEnabled && cyclePlayerAllowed,
+        cycleType === 'youtube' &&
+            !effectiveOverride &&
+            ytEnabled &&
+            cyclePlayerAllowed &&
+            !siteMainOnlySound,
         "cycle",
         bgYoutubeQuality
     );
@@ -204,12 +217,13 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         document.head.appendChild(tag);
     }, [effectiveOverride, mainType, cycleType]);
 
-    // Autoriser le player "cycle" après un délai pour étaler la charge (perf)
+    // Autoriser le player "cycle" après un délai pour étaler la charge (perf) — inutile si mode site hors explore
     useEffect(() => {
         if (!apiReady || !ytEnabled || cycleType !== 'youtube') return;
+        if (siteMainOnlySound) return;
         const t = setTimeout(() => setCyclePlayerAllowed(true), 1200);
         return () => clearTimeout(t);
-    }, [apiReady, ytEnabled, cycleType]);
+    }, [apiReady, ytEnabled, cycleType, siteMainOnlySound]);
 
     // Accueil : musique structure/partenaire persistante doit s’arrêter (retour hub).
     useEffect(() => {
@@ -356,7 +370,13 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             setCycleOpacity(0);
             return;
         }
-        
+
+        // Mode 🏠 Accueil : comme l’accueil partout sauf /explore (une seule piste = main_video)
+        if (opts.backgroundMusicMode === "site" && !isExplore) {
+            setCycleOpacity(0);
+            return;
+        }
+
         // Sur toutes les autres pages (menu) : cycle_video visible
         // Si enableVideoCycle est désactivé, afficher cycle en continu
         if (!opts.enableVideoCycle) {
@@ -385,7 +405,15 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         
         // Autres pages menu : cycle_video toujours visible
         setCycleOpacity(1);
-    }, [opts.enableVideoCycle, opts.videoCycleVisible, opts.videoCycleHidden, isExplore, isHome, opts.isTransitioningToExplore]);
+    }, [
+        opts.enableVideoCycle,
+        opts.videoCycleVisible,
+        opts.videoCycleHidden,
+        opts.backgroundMusicMode,
+        isExplore,
+        isHome,
+        opts.isTransitioningToExplore,
+    ]);
 
     // Routes exclues de la vidéo de fond (admin, authentification)
     const excludedRoutes = ["/dashboard", "/login", "/register"];
@@ -447,15 +475,16 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 )}
             </div>
 
-            {/* Vidéo cycle (masquée si option C active ou YouTube disabled) */}
+            {/* Vidéo cycle (masquée si option C active ou YouTube disabled ; non montée en mode site hors /explore) */}
             <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: showBlackBg ? 0 : (effectiveOverride ? 0 : cycleOpacity), filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
-                {cycleType === 'youtube' ? (
-                    <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
-                ) : (
-                    cycleMp4Url && (
-                        <video ref={cycleNativeRef} src={cycleMp4Url} autoPlay loop muted playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
-                    )
-                )}
+                {!siteMainOnlySound &&
+                    (cycleType === 'youtube' ? (
+                        <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
+                    ) : (
+                        cycleMp4Url && (
+                            <video ref={cycleNativeRef} src={cycleMp4Url} autoPlay loop muted playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
+                        )
+                    ))}
             </div>
 
             {/* Musique de fond planète / partenaire (override effectif) — prend le pas sur la vidéo d'accueil */}
@@ -534,7 +563,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         type="button"
                         onClick={() => opts.set("backgroundMusicMode", "site")}
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.backgroundMusicMode === "site" ? "bg-amber-500 border-amber-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Son uniquement des vidéos du site (page d’accueil + cycle), sans musiques planètes ni partenaires"
+                        title="Musique d’accueil (main_video) sur tout le site sauf /explore ; pas de musiques planètes ni partenaires"
                     >
                         🏠 Accueil
                     </button>
