@@ -47,7 +47,11 @@ function useYTPlayer(
     const playerRef = useRef<YTPlayer | null>(null);
     const preferUnmutedRef = useRef(preferUnmuted);
     preferUnmutedRef.current = preferUnmuted;
+    const playbackQualityRef = useRef(playbackQuality);
+    playbackQualityRef.current = playbackQuality;
 
+    // Recréer le player seulement si l’API / la vidéo / l’activation changent — pas si la qualité change
+    // (sinon accueil ↔ menu relance la piste depuis le début).
     useEffect(() => {
         if (!active || !ready || !containerRef.current || !videoId) return;
 
@@ -72,7 +76,7 @@ function useYTPlayer(
                 controls: 0,
                 rel: 0,
                 playsinline: 1,
-                vq: playbackQuality,
+                vq: playbackQualityRef.current,
                 origin: typeof window !== "undefined" ? window.location.origin : "",
             },
             events: {
@@ -87,7 +91,7 @@ function useYTPlayer(
                     } catch {
                         /* ignore */
                     }
-                    try { e.target.setPlaybackQuality(playbackQuality); } catch (err) { }
+                    try { e.target.setPlaybackQuality(playbackQualityRef.current); } catch (err) { }
 
                     // Marqueur: player prêt + mesure depuis l'API prête
                     if (typeof performance !== "undefined") {
@@ -119,7 +123,7 @@ function useYTPlayer(
                 },
                 onStateChange: (e: { target: YTPlayer; data: number }) => {
                     if (e.data === 1) {
-                        try { e.target.setPlaybackQuality(playbackQuality); } catch (err) { }
+                        try { e.target.setPlaybackQuality(playbackQualityRef.current); } catch (err) { }
                     }
                 }
             }
@@ -128,7 +132,17 @@ function useYTPlayer(
             if (playerRef.current?.destroy) playerRef.current.destroy();
             playerRef.current = null;
         };
-    }, [ready, videoId, active, playbackQuality]);
+    }, [ready, videoId, active]);
+
+    useEffect(() => {
+        const p = playerRef.current;
+        if (!p) return;
+        try {
+            (p as { setPlaybackQuality?: (q: string) => void }).setPlaybackQuality?.(playbackQuality);
+        } catch {
+            /* ignore */
+        }
+    }, [playbackQuality]);
 
     return { containerRef, playerRef };
 }
