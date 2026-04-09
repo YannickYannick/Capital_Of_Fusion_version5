@@ -39,10 +39,14 @@ function useYTPlayer(
     ready: boolean,
     active: boolean,
     label: string,
-    playbackQuality: string
+    playbackQuality: string,
+    /** Si true, le player démarre non muet (reprend le choix utilisateur après recréation du player, ex. changement de route / qualité). */
+    preferUnmuted: boolean
 ) {
     const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<YTPlayer | null>(null);
+    const preferUnmutedRef = useRef(preferUnmuted);
+    preferUnmutedRef.current = preferUnmuted;
 
     useEffect(() => {
         if (!active || !ready || !containerRef.current || !videoId) return;
@@ -61,14 +65,28 @@ function useYTPlayer(
             width: 1920,
             height: 1080,
             playerVars: {
-                autoplay: 1, mute: 1, loop: 1, playlist: videoId,
-                controls: 0, rel: 0, playsinline: 1, vq: playbackQuality,
+                autoplay: 1,
+                mute: preferUnmutedRef.current ? 0 : 1,
+                loop: 1,
+                playlist: videoId,
+                controls: 0,
+                rel: 0,
+                playsinline: 1,
+                vq: playbackQuality,
                 origin: typeof window !== "undefined" ? window.location.origin : "",
             },
             events: {
                 onReady: (e: { target: YTPlayer }) => {
                     playerRef.current = e.target;
-                    e.target.mute();
+                    try {
+                        if (preferUnmutedRef.current) {
+                            e.target.unMute();
+                        } else {
+                            e.target.mute();
+                        }
+                    } catch {
+                        /* ignore */
+                    }
                     try { e.target.setPlaybackQuality(playbackQuality); } catch (err) { }
 
                     // Marqueur: player prêt + mesure depuis l'API prête
@@ -163,19 +181,23 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     // Don't create YT players if iframes are disabled
     const ytEnabled = !opts.disableYouTubeIframes;
+    const preferUnmuted = !muted;
+
     const mainYT = useYTPlayer(
         mainYTId,
         apiReady && ytEnabled,
         mainType === 'youtube' && !effectiveOverride && ytEnabled,
         "main",
-        bgYoutubeQuality
+        bgYoutubeQuality,
+        preferUnmuted
     );
     const cycleYT = useYTPlayer(
         cycleYTId,
         apiReady && ytEnabled,
         cycleType === 'youtube' && !effectiveOverride && ytEnabled && cyclePlayerAllowed,
         "cycle",
-        bgYoutubeQuality
+        bgYoutubeQuality,
+        preferUnmuted
     );
 
     const overrideYTId = effectiveOverride?.type === "youtube" && effectiveOverride?.youtubeUrl
@@ -186,7 +208,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         apiReady && ytEnabled,
         !!overrideYTId && ytEnabled,
         "override",
-        YT_QUALITY_HERO
+        YT_QUALITY_HERO,
+        preferUnmuted
     );
 
     const mainNativeRef = useRef<HTMLVideoElement>(null);
@@ -442,7 +465,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                     <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
                     mainMp4Url && (
-                        <video ref={mainNativeRef} src={mainMp4Url} autoPlay loop muted playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
+                        <video ref={mainNativeRef} src={mainMp4Url} autoPlay loop muted={muted} playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
                     )
                 )}
             </div>
@@ -453,7 +476,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                     <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
                     cycleMp4Url && (
-                        <video ref={cycleNativeRef} src={cycleMp4Url} autoPlay loop muted playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
+                        <video ref={cycleNativeRef} src={cycleMp4Url} autoPlay loop muted={muted} playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
                     )
                 )}
             </div>
