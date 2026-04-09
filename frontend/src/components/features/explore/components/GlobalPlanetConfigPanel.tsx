@@ -13,6 +13,8 @@ interface LocalNodeChanges {
     orbit_roundness?: number;
     orbit_position_y?: number;
     is_visible_3d?: boolean;
+    /** Permet le passage à patchOrganizationNodeAdmin(payload: Record<string, unknown>) */
+    [key: string]: number | string | boolean | undefined;
 }
 
 interface GlobalPlanetConfigPanelProps {
