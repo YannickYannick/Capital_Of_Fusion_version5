@@ -29,7 +29,7 @@ function getYoutubeVideoId(url: string): string | null {
     return m ? m[1] : null;
 }
 
-/** Qualité YT pour fond plein écran : sur les pages menu (ex. /promotions-festivals), éviter 1080p (CPU + réseau). */
+/** Valeur initiale suggérée selon la route (premier rendu seulement) ; ensuite la qualité reste « collante » pour ne pas relancer le buffer au changement de page. */
 const YT_QUALITY_HERO = "hd1080";
 const YT_QUALITY_AMBIENT_MENU = "large";
 
@@ -134,16 +134,6 @@ function useYTPlayer(
         };
     }, [ready, videoId, active]);
 
-    useEffect(() => {
-        const p = playerRef.current;
-        if (!p) return;
-        try {
-            (p as { setPlaybackQuality?: (q: string) => void }).setPlaybackQuality?.(playbackQuality);
-        } catch {
-            /* ignore */
-        }
-    }, [playbackQuality]);
-
     return { containerRef, playerRef };
 }
 
@@ -170,12 +160,9 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const [cyclePlayerAllowed, setCyclePlayerAllowed] = useState(false);
     const [cycleOpacity, setCycleOpacity] = useState(0);
     const [scale, setScale] = useState(1);
+    /** Qualité des players : init selon la route, puis inchangée au navigate (évite setPlaybackQuality à chaque / ↔ menu). Ajustement via les boutons 360p–1080p. */
     const [quality, setQuality] = useState(bgYoutubeQuality);
     const [muted, setMuted] = useState(true);
-
-    useEffect(() => {
-        setQuality(bgYoutubeQuality);
-    }, [bgYoutubeQuality]);
 
     const mainType = config?.main_video_type || 'youtube';
     const cycleType = config?.cycle_video_type || 'youtube';
@@ -202,7 +189,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         apiReady && ytEnabled,
         mainType === 'youtube' && !effectiveOverride && ytEnabled,
         "main",
-        bgYoutubeQuality,
+        quality,
         preferUnmuted
     );
     const cycleYT = useYTPlayer(
@@ -210,7 +197,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         apiReady && ytEnabled,
         cycleType === 'youtube' && !effectiveOverride && ytEnabled && cyclePlayerAllowed,
         "cycle",
-        bgYoutubeQuality,
+        quality,
         preferUnmuted
     );
 

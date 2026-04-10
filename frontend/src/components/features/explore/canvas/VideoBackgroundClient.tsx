@@ -2,9 +2,9 @@
 
 /**
  * Wrapper client pour GlobalVideoBackground.
- * Sur la page d'accueil (/), on diffère le montage de ~400 ms pour prioriser le premier affichage.
+ * Délai ~400 ms uniquement au premier chargement sur `/` ; après une visite hors accueil, retour sur `/` sans démontage (lecture continue).
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { SiteConfigurationApi } from "@/types/config";
@@ -22,10 +22,16 @@ const DEFER_HOME_MS = 400;
 export function VideoBackgroundClient({ config }: { config: SiteConfigurationApi | null }) {
     const pathname = usePathname();
     const isHome = pathname === "/";
+    const hasVisitedNonHomeRef = useRef(false);
     const [ready, setReady] = useState(() => !isHome);
 
     useEffect(() => {
         if (!isHome) {
+            hasVisitedNonHomeRef.current = true;
+            setReady(true);
+            return;
+        }
+        if (hasVisitedNonHomeRef.current) {
             setReady(true);
             return;
         }
