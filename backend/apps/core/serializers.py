@@ -2,7 +2,7 @@
 Serializers Core — MenuItem récursif (parent → children) pour l’API menu.
 """
 from rest_framework import serializers
-from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin, PendingContentEdit
+from .models import MenuItem, SiteConfiguration, SiteVideoAmbience, ExplorePreset, Bulletin, PendingContentEdit
 
 
 class PendingContentEditSerializer(serializers.ModelSerializer):
@@ -34,8 +34,24 @@ class ExplorePresetSerializer(serializers.ModelSerializer):
             new_data[camel_key] = value
         return new_data
 
+class SiteVideoAmbienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteVideoAmbience
+        fields = (
+            "grayscale_video",
+            "show_video_overlay",
+            "enable_text_shadow",
+            "use_black_background",
+            "disable_youtube_iframes",
+            "background_music_mode",
+            "default_youtube_quality",
+        )
+
+
 class SiteConfigurationSerializer(serializers.ModelSerializer):
     explore_config = serializers.SerializerMethodField()
+    video_ambience = serializers.SerializerMethodField()
+
     class Meta:
         model = SiteConfiguration
         fields = [
@@ -44,9 +60,14 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
             "main_video_type", "main_video_youtube_id", "main_video_file",
             "cycle_video_type", "cycle_video_youtube_id", "cycle_video_file",
             "explore_config",
+            "video_ambience",
         ]
+
     def get_explore_config(self, obj):
         return ExplorePresetSerializer(obj.active_explore_preset).data if obj.active_explore_preset else None
+
+    def get_video_ambience(self, obj):
+        return SiteVideoAmbienceSerializer(SiteVideoAmbience.get_solo()).data
 
 
 class MenuItemSerializer(serializers.ModelSerializer):

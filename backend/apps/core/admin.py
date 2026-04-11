@@ -1,5 +1,15 @@
 from django.contrib import admin
-from .models import DanceStyle, Level, DanceProfession, SiteConfiguration, MenuItem, ExplorePreset, Bulletin, PendingContentEdit
+from .models import (
+    DanceStyle,
+    Level,
+    DanceProfession,
+    SiteConfiguration,
+    SiteVideoAmbience,
+    MenuItem,
+    ExplorePreset,
+    Bulletin,
+    PendingContentEdit,
+)
 
 
 @admin.register(DanceStyle)
@@ -134,6 +144,51 @@ class ExplorePresetAdmin(admin.ModelAdmin):
             {"fields": ("oscillation_amplitude", "oscillation_frequency")},
         ),
     )
+
+@admin.register(SiteVideoAmbience)
+class SiteVideoAmbienceAdmin(admin.ModelAdmin):
+    """Singleton : une seule entrée pour tout le site."""
+
+    list_display = (
+        "__str__",
+        "background_music_mode",
+        "default_youtube_quality",
+        "use_black_background",
+        "disable_youtube_iframes",
+        "updated_at",
+    )
+
+    fieldsets = (
+        (
+            "Vidéo de fond",
+            {
+                "fields": (
+                    "grayscale_video",
+                    "show_video_overlay",
+                    "use_black_background",
+                    "disable_youtube_iframes",
+                    "default_youtube_quality",
+                ),
+                "description": "Ces réglages s’appliquent à tous les visiteurs. Les boutons équivalents dans le site ne sont visibles que pour les comptes admin.",
+            },
+        ),
+        (
+            "Texte & musique",
+            {
+                "fields": (
+                    "enable_text_shadow",
+                    "background_music_mode",
+                )
+            },
+        ),
+    )
+
+    def has_add_permission(self, request):
+        return not SiteVideoAmbience.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(SiteConfiguration)
 class SiteConfigurationAdmin(admin.ModelAdmin):

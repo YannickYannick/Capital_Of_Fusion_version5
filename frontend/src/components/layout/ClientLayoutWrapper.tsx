@@ -5,6 +5,7 @@
  * vidéo de fond selon la route et le mode musique (voir docs/features/video-background-routes.md).
  */
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/shared/Navbar";
@@ -69,8 +70,13 @@ export function ClientLayoutWrapper({
   config: SiteConfigurationApi | null;
   children: ReactNode;
 }) {
+  const videoAmbience = useMemo(
+    () => config?.video_ambience ?? null,
+    // Évite de réinitialiser tout le contexte si l’objet est recréé avec les mêmes valeurs
+    [config ? JSON.stringify(config.video_ambience) : ""]
+  );
   return (
-    <PlanetsOptionsProvider>
+    <PlanetsOptionsProvider videoAmbience={videoAmbience}>
       <PlanetMusicOverrideProvider>
         <MainChrome config={config}>{children}</MainChrome>
       </PlanetMusicOverrideProvider>

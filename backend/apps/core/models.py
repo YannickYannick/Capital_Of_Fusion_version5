@@ -169,6 +169,86 @@ class ExplorePreset(BaseModel):
         verbose_name_plural = "Presets Explore 3D"
     def __str__(self): return self.name
 
+
+class SiteVideoAmbience(models.Model):
+    """
+    Paramètres d'affichage du fond vidéo / texte pour tout le site public (singleton pk=1).
+    Éditables dans l'admin Django ; le front ne propose les contrôles correspondants qu'aux admins.
+    """
+
+    class MusicMode(models.TextChoices):
+        SITE = "site", "Accueil (vidéos du site uniquement)"
+        CONTEXT = "context", "Dédiées (musiques planètes / partenaires)"
+
+    class YoutubeQuality(models.TextChoices):
+        MEDIUM = "medium", "360p"
+        LARGE = "large", "480p"
+        HD720 = "hd720", "720p"
+        HD1080 = "hd1080", "1080p"
+
+    grayscale_video = models.BooleanField(
+        default=False,
+        verbose_name="Vidéo en niveaux de gris",
+    )
+    show_video_overlay = models.BooleanField(
+        default=False,
+        verbose_name="Voile sombre sur la vidéo (option A)",
+    )
+    enable_text_shadow = models.BooleanField(
+        default=False,
+        verbose_name="Ombre sur les textes (option B)",
+    )
+    use_black_background = models.BooleanField(
+        default=False,
+        verbose_name="Fond noir à la place de la vidéo (option C)",
+    )
+    disable_youtube_iframes = models.BooleanField(
+        default=False,
+        verbose_name="Désactiver les iframes YouTube (perf / test)",
+    )
+    background_music_mode = models.CharField(
+        max_length=20,
+        choices=MusicMode.choices,
+        default=MusicMode.CONTEXT,
+        verbose_name="Mode musique de fond",
+    )
+    default_youtube_quality = models.CharField(
+        max_length=20,
+        choices=YoutubeQuality.choices,
+        default=YoutubeQuality.LARGE,
+        verbose_name="Qualité YouTube par défaut",
+        help_text="Qualité initiale du lecteur principal (les visiteurs n’ont pas les boutons de réglage).",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Ambiance vidéo & texte (site public)"
+        verbose_name_plural = "Ambiance vidéo & texte (site public)"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return "Ambiance vidéo (site public)"
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                "grayscale_video": False,
+                "show_video_overlay": False,
+                "enable_text_shadow": False,
+                "use_black_background": False,
+                "disable_youtube_iframes": False,
+                "background_music_mode": cls.MusicMode.CONTEXT,
+                "default_youtube_quality": cls.YoutubeQuality.LARGE,
+            },
+        )
+        return obj
+
+
 class SiteConfiguration(models.Model):
     site_name = models.CharField(max_length=255, blank=True)
     hero_title = models.CharField(max_length=255, blank=True, default="Capital of Fusion")

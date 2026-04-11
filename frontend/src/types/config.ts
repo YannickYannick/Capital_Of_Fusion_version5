@@ -1,5 +1,16 @@
 import { ExplorePresetApi } from "./explore";
 
+/** Paramètres d’ambiance vidéo / texte (admin Django → GET /api/config/) */
+export interface SiteVideoAmbienceApi {
+  grayscale_video: boolean;
+  show_video_overlay: boolean;
+  enable_text_shadow: boolean;
+  use_black_background: boolean;
+  disable_youtube_iframes: boolean;
+  background_music_mode: "site" | "context";
+  default_youtube_quality: "medium" | "large" | "hd720" | "hd1080";
+}
+
 /** Dernière information (Identité COF → Dernières informations) */
 export interface BulletinApi {
     id: string;
@@ -35,4 +46,6 @@ export interface SiteConfigurationApi {
     cycle_video_youtube_id: string;
     cycle_video_file: string | null;
     explore_config?: ExplorePresetApi | null;
+    /** Singleton édité dans l’admin Django (core → Ambiance vidéo & texte) */
+    video_ambience?: SiteVideoAmbienceApi;
 }

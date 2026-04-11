@@ -27,6 +27,30 @@ function hexToColor(hex: string): THREE.Color {
   return new THREE.Color(h || "#a855f7");
 }
 
+/** Téléphone / tablette tactile : libellés planètes plus grands et lisibles. */
+function useCompactPlanetLabels(): boolean {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const read = () => {
+      if (typeof window === "undefined") return false;
+      const narrow = window.matchMedia("(max-width: 768px)").matches;
+      const coarse = window.matchMedia("(pointer: coarse)").matches;
+      return narrow || coarse;
+    };
+    setCompact(read());
+    const mqNarrow = window.matchMedia("(max-width: 768px)");
+    const mqCoarse = window.matchMedia("(pointer: coarse)");
+    const onChange = () => setCompact(mqNarrow.matches || mqCoarse.matches);
+    mqNarrow.addEventListener("change", onChange);
+    mqCoarse.addEventListener("change", onChange);
+    return () => {
+      mqNarrow.removeEventListener("change", onChange);
+      mqCoarse.removeEventListener("change", onChange);
+    };
+  }, []);
+  return compact;
+}
+
 /** Calcule la position d'une squircle (carré-cercle) */
 function getSquirclePosition(
   t: number,
@@ -114,6 +138,9 @@ export function getDynamicOrbitParams(
   }
   return { r, y };
 }
+
+/** Multiplicateur max appliqué aux planètes sur la plus grande orbite (compense la perspective). */
+const REMOTE_ORBIT_SCALE_MAX = 1.38;
 
 /**
  * Distance horizontale max (dans XZ) depuis l'origine jusqu'à une orbite :
@@ -554,6 +581,8 @@ interface PlanetProps {
   showTextShadow?: boolean;
   /** Ref pour afficher le label seulement quand le curseur est dans la zone des orbites (ou planète survolée/sélectionnée) */
   inOrbitZoneRef?: React.MutableRefObject<boolean>;
+  /** 0 = orbite la plus proche du centre, 1 = la plus éloignée — sert à agrandir légèrement l’arrière-plan */
+  orbitDepthBlend: number;
 }
 
 function Planet({
@@ -604,6 +633,7 @@ function Planet({
   onTrajectoryFrame,
   showTextShadow,
   inOrbitZoneRef,
+  orbitDepthBlend,
 }: PlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const startTime = useRef<number | null>(null);       // temps (ms) après délai
@@ -636,7 +666,8 @@ function Planet({
     entryFinalSpeed.current = 0;
   }, [restartKey, node.orbit_phase, index]);
 
-  const scale = (node.planet_scale ?? 0.6) * globalPlanetScale;
+  const perspectiveBoost = THREE.MathUtils.lerp(1, REMOTE_ORBIT_SCALE_MAX, orbitDepthBlend);
+  const scale = (node.planet_scale ?? 0.6) * globalPlanetScale * perspectiveBoost;
   const color = hexToColor(node.planet_color || "#a855f7");
 
   const { targetOrbitPos, targetOrbitPhase, fanStartPos } = useMemo(() => {
@@ -918,37 +949,61 @@ function LabelSprite({
   isSelected?: boolean;
 }) {
   const spriteRef = useRef<THREE.Sprite>(null);
+  const isCompact = useCompactPlanetLabels();
+
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
-    canvas.width = 256;
-    canvas.height = 64;
+    const w = isCompact ? 640 : 384;
+    const h = isCompact ? 144 : 80;
+    canvas.width = w;
+    canvas.height = h;
     const ctx = canvas.getContext("2d")!;
-    ctx.clearRect(0, 0, 256, 64);
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 22px Inter, sans-serif";
+    ctx.clearRect(0, 0, w, h);
+    const fontSize = isCompact ? 36 : 24;
+    ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    const cx = w / 2;
+    const cy = h / 2;
+    const strokeW = isCompact ? 5 : 3;
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.strokeStyle = "rgba(0,0,0,0.92)";
+    ctx.lineWidth = strokeW;
+    ctx.strokeText(text, cx, cy);
+    ctx.fillStyle = "#ffffff";
     if (showTextShadow) {
       ctx.shadowColor = "rgba(0,0,0,0.85)";
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = isCompact ? 12 : 8;
+      ctx.shadowOffsetX = isCompact ? 3 : 2;
+      ctx.shadowOffsetY = isCompact ? 3 : 2;
     }
-    ctx.fillText(text, 128, 32);
+    ctx.fillText(text, cx, cy);
     if (showTextShadow) {
       ctx.shadowColor = "transparent";
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
     }
-    return new THREE.CanvasTexture(canvas);
-  }, [text, showTextShadow]);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+    return tex;
+  }, [text, showTextShadow, isCompact]);
+
+  useEffect(() => {
+    return () => {
+      texture.dispose();
+    };
+  }, [texture]);
 
   useFrame(({ camera }) => {
     if (!spriteRef.current) return;
     const dist = camera.position.length();
     const s = Math.max(0.5, dist * 0.12);
-    spriteRef.current.scale.set(s * 1.8, s * 0.45, 1);
+    const boost = isCompact ? 1.9 : 1;
+    spriteRef.current.scale.set(s * 1.8 * boost, s * 0.45 * boost, 1);
     if (inOrbitZoneRef) {
       spriteRef.current.visible = inOrbitZoneRef.current || isHovered || isSelected;
     }
@@ -1517,6 +1572,40 @@ function SceneContent({
   const selectedNode = orbitNodes.find(n => n.id === selectedId) ?? (rootNode?.id === selectedId ? rootNode : null);
   const selectedScale = selectedNode?.planet_scale ?? 0.6;
 
+  const orbitDepthBlendsByIndex = useMemo(() => {
+    const n = orbitNodes.length;
+    if (n === 0) return [];
+    const radii: number[] = [];
+    for (let i = 0; i < n; i++) {
+      const { r } = getDynamicOrbitParams(
+        orbitNodes[i],
+        i,
+        n,
+        autoDistributeOrbits,
+        verticalMode,
+        orbitSpacing,
+        verticalHomogeneousBase,
+        verticalHomogeneousStep,
+        verticalJupiterAmplitude,
+        verticalSphereRadius
+      );
+      radii.push(r);
+    }
+    const rMin = Math.min(...radii);
+    const rMax = Math.max(...radii);
+    const span = rMax - rMin;
+    return radii.map((r) => (span < 1e-6 ? 0 : (r - rMin) / span));
+  }, [
+    orbitNodes,
+    autoDistributeOrbits,
+    verticalMode,
+    orbitSpacing,
+    verticalHomogeneousBase,
+    verticalHomogeneousStep,
+    verticalJupiterAmplitude,
+    verticalSphereRadius,
+  ]);
+
   return (
     <>
       {/* Détecteur de première frame (performance monitoring) */}
@@ -1632,6 +1721,7 @@ function SceneContent({
             onTrajectoryFrame={handleTrajectoryFrame}
             showTextShadow={opts.enableTextShadow}
             inOrbitZoneRef={inOrbitZoneRef}
+            orbitDepthBlend={orbitDepthBlendsByIndex[i] ?? 0}
           />
         );
       })}

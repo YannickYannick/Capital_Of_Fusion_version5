@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * Vidéo de fond globale (YouTube ou MP4) :
- * - Page d'accueil (/) : main_video.
- * - Autres pages menu (hors /dashboard, /login, /register) : cycle_video (explore).
- * - Contrôles : qualité, mute, voile. Override possible depuis Explore (musique planète).
+ * Vidéo de fond globale (YouTube ou MP4) : **main_video** sur toutes les routes où le fond est actif.
+ * La seconde piste « cycle » configurée en admin n’est plus affichée (un seul lecteur = visuel cohérent + moins de charge).
+ * Contrôles : qualité, mute, voile. Override possible depuis Explore (musique planète).
  */
 import { useEffect, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 import { isOrganizationNodeVideoBackgroundPath } from "@/lib/routeSegments";
 import type { SiteConfigurationApi } from "@/types/config";
@@ -21,8 +21,13 @@ const QUALITY_OPTIONS = [
     { value: "hd1080", label: "1080p" },
 ] as const;
 
+type YoutubeQualitySetting = (typeof QUALITY_OPTIONS)[number]["value"];
+
+const ADMIN_DEFAULT_QUALITIES = new Set<string>(
+    QUALITY_OPTIONS.map((o) => o.value)
+);
+
 const DEFAULT_VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
-const DEFAULT_VIDEO_CYCLE = process.env.NEXT_PUBLIC_YOUTUBE_CYCLE_VIDEO_ID || "eZhq_RMYRKQ";
 
 function getYoutubeVideoId(url: string): string | null {
     if (!url) return null;
@@ -145,6 +150,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     /** Accueil + Explore : 1080p. Autres pages (dont /promotions-festivals) : 480p — même rendu visuel derrière le flou, beaucoup moins lourd. */
     const bgYoutubeQuality = isHome || isExplore ? YT_QUALITY_HERO : YT_QUALITY_AMBIENT_MENU;
     const opts = usePlanetsOptions();
+    const { user } = useAuth();
+    const isAdmin = user?.user_type === "ADMIN";
     const {
         override: planetMusicOverride,
         youtubeAmbientSuspended,
@@ -152,24 +159,25 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         setOverride: setPlanetMusicOverride,
     } = usePlanetMusicOverride();
 
-    /** En mode `site`, on ignore les musiques planètes / partenaires (son = vidéos accueil + cycle uniquement). */
+    /** En mode `site`, on ignore les musiques planètes / partenaires (son = vidéo principale uniquement). */
     const effectiveOverride =
         opts.backgroundMusicMode === "context" ? planetMusicOverride : null;
 
     const [apiReady, setApiReady] = useState(false);
-    /** Délai avant de créer le player "cycle" pour étaler la charge (perf: évite 2 iframes lourds en même temps) */
-    const [cyclePlayerAllowed, setCyclePlayerAllowed] = useState(false);
-    const [cycleOpacity, setCycleOpacity] = useState(0);
     const [scale, setScale] = useState(1);
-    /** Qualité des players : init selon la route, puis inchangée au navigate (évite setPlaybackQuality à chaque / ↔ menu). Ajustement via les boutons 360p–1080p. */
-    const [quality, setQuality] = useState(bgYoutubeQuality);
+    /** Qualité : défaut depuis l’admin Django si défini, sinon selon la route ; inchangée au navigate. */
+    const adminDefaultQ = config?.video_ambience?.default_youtube_quality;
+    const [quality, setQuality] = useState<YoutubeQualitySetting>(() => {
+        if (adminDefaultQ && ADMIN_DEFAULT_QUALITIES.has(adminDefaultQ)) {
+            return adminDefaultQ as YoutubeQualitySetting;
+        }
+        return bgYoutubeQuality as YoutubeQualitySetting;
+    });
     const [muted, setMuted] = useState(true);
 
     const mainType = config?.main_video_type || 'youtube';
-    const cycleType = config?.cycle_video_type || 'youtube';
 
     const mainYTId = config?.main_video_youtube_id || DEFAULT_VIDEO_MAIN;
-    const cycleYTId = config?.cycle_video_youtube_id || DEFAULT_VIDEO_CYCLE;
 
     const formatUrl = (path?: string | null) => {
         if (!path) return null;
@@ -179,7 +187,6 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     };
 
     const mainMp4Url = formatUrl(config?.main_video_file);
-    const cycleMp4Url = formatUrl(config?.cycle_video_file);
 
     // Don't create YT players if iframes are disabled
     const ytEnabled = !opts.disableYouTubeIframes;
@@ -190,14 +197,6 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         apiReady && ytEnabled,
         mainType === 'youtube' && !effectiveOverride && ytEnabled,
         "main",
-        quality,
-        preferUnmuted
-    );
-    const cycleYT = useYTPlayer(
-        cycleYTId,
-        apiReady && ytEnabled,
-        cycleType === 'youtube' && !effectiveOverride && ytEnabled && cyclePlayerAllowed,
-        "cycle",
         quality,
         preferUnmuted
     );
@@ -215,26 +214,17 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     );
 
     const mainNativeRef = useRef<HTMLVideoElement>(null);
-    const cycleNativeRef = useRef<HTMLVideoElement>(null);
     const overrideNativeRef = useRef<HTMLVideoElement>(null);
 
-    // Quand override (effectif) YouTube est actif, garder l'API YT chargée si besoin
+    // Quand override (effectif) YouTube est actif, charger l’API si la vidéo principale ne l’a pas déjà fait (ex. main en MP4).
     useEffect(() => {
         if (effectiveOverride?.type !== "youtube" || !effectiveOverride?.youtubeUrl) return;
-        if (mainType !== 'youtube' && cycleType !== 'youtube' && !window.YT?.Player) return;
         if (typeof window === "undefined") return;
         if (document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) return;
         const tag = document.createElement("script");
         tag.src = "https://www.youtube.com/iframe_api";
         document.head.appendChild(tag);
-    }, [effectiveOverride, mainType, cycleType]);
-
-    // Autoriser le player "cycle" après un délai pour étaler la charge (perf)
-    useEffect(() => {
-        if (!apiReady || !ytEnabled || cycleType !== 'youtube') return;
-        const t = setTimeout(() => setCyclePlayerAllowed(true), 1200);
-        return () => clearTimeout(t);
-    }, [apiReady, ytEnabled, cycleType]);
+    }, [effectiveOverride]);
 
     // Accueil : musique structure/partenaire persistante doit s’arrêter (retour hub).
     useEffect(() => {
@@ -255,20 +245,16 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         }
     }, [isHome, isExplore, opts.backgroundMusicMode, pathname, setYoutubeAmbientSuspended]);
 
-    // Mute main/cycle quand override effectif (planète / partenaire) OU suspension post-fiche partenaire
+    // Mute main quand override effectif (planète / partenaire) OU suspension post-fiche partenaire
     useEffect(() => {
         if (effectiveOverride) {
             if (mainYT.playerRef.current) mainYT.playerRef.current.mute();
-            if (cycleYT.playerRef.current) cycleYT.playerRef.current.mute();
             if (mainNativeRef.current) mainNativeRef.current.muted = true;
-            if (cycleNativeRef.current) cycleNativeRef.current.muted = true;
             return;
         }
         if (youtubeAmbientSuspended) {
             if (mainYT.playerRef.current) mainYT.playerRef.current.mute();
-            if (cycleYT.playerRef.current) cycleYT.playerRef.current.mute();
             if (mainNativeRef.current) mainNativeRef.current.muted = true;
-            if (cycleNativeRef.current) cycleNativeRef.current.muted = true;
             setMuted(true);
         }
     }, [effectiveOverride, youtubeAmbientSuspended, apiReady]);
@@ -285,7 +271,9 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     // Skip loading entirely if YouTube iframes are disabled
     useEffect(() => {
         if (opts.disableYouTubeIframes) return;
-        if (mainType !== 'youtube' && cycleType !== 'youtube') return;
+        const needsYtForOverride =
+            effectiveOverride?.type === "youtube" && !!effectiveOverride.youtubeUrl;
+        if (mainType !== "youtube" && !needsYtForOverride) return;
         if (typeof window === "undefined") return;
 
         // Si l'API est déjà dispo
@@ -371,51 +359,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             clearTimeout(deferTimer);
             cleanupInterval?.();
         };
-    }, [mainType, cycleType, opts.disableYouTubeIframes]);
-
-    // Visibilité du cycle
-    useEffect(() => {
-        // Transition vers explore depuis home
-        if (opts.isTransitioningToExplore) {
-            setCycleOpacity(1);
-            return;
-        }
-        
-        // Sur la page d'accueil : main_video uniquement (cycle masqué)
-        if (isHome) {
-            setCycleOpacity(0);
-            return;
-        }
-        
-        // Sur toutes les autres pages (menu) : cycle_video visible
-        // Si enableVideoCycle est désactivé, afficher cycle en continu
-        if (!opts.enableVideoCycle) {
-            setCycleOpacity(1);
-            return;
-        }
-        
-        // Si enableVideoCycle est actif et on est sur /explore : cycle alterne
-        if (isExplore) {
-            let timer: ReturnType<typeof setTimeout>;
-            const visibleMs = opts.videoCycleVisible * 1000;
-            const hiddenMs = opts.videoCycleHidden * 1000;
-
-            function showCycle() {
-                setCycleOpacity(1);
-                timer = setTimeout(hideCycle, visibleMs);
-            }
-            function hideCycle() {
-                setCycleOpacity(0);
-                timer = setTimeout(showCycle, hiddenMs);
-            }
-
-            showCycle();
-            return () => clearTimeout(timer);
-        }
-        
-        // Autres pages menu : cycle_video toujours visible
-        setCycleOpacity(1);
-    }, [opts.enableVideoCycle, opts.videoCycleVisible, opts.videoCycleHidden, isExplore, isHome, opts.isTransitioningToExplore]);
+    }, [mainType, opts.disableYouTubeIframes, effectiveOverride]);
 
     // Routes exclues de la vidéo de fond (admin, authentification)
     const excludedRoutes = ["/dashboard", "/login", "/register"];
@@ -443,15 +387,12 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             }
         } else {
             if (mainYT.playerRef.current) newMute ? mainYT.playerRef.current.mute() : mainYT.playerRef.current.unMute();
-            if (cycleYT.playerRef.current) newMute ? cycleYT.playerRef.current.mute() : cycleYT.playerRef.current.unMute();
             if (mainNativeRef.current) mainNativeRef.current.muted = newMute;
-            if (cycleNativeRef.current) cycleNativeRef.current.muted = newMute;
         }
     };
 
-    const handleQuality = (q: string) => {
+    const handleQuality = (q: YoutubeQualitySetting) => {
         if (mainYT.playerRef.current) (mainYT.playerRef.current as any).setPlaybackQuality(q);
-        if (cycleYT.playerRef.current) (cycleYT.playerRef.current as any).setPlaybackQuality(q);
         setQuality(q);
     };
 
@@ -473,17 +414,6 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 ) : (
                     mainMp4Url && (
                         <video ref={mainNativeRef} src={mainMp4Url} autoPlay loop muted={muted} playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
-                    )
-                )}
-            </div>
-
-            {/* Vidéo cycle (masquée si option C active ou YouTube disabled) */}
-            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ opacity: showBlackBg ? 0 : (effectiveOverride ? 0 : cycleOpacity), filter: grayscale, transition: `opacity ${opts.videoTransition}ms ease, filter 0.5s` }}>
-                {cycleType === 'youtube' ? (
-                    <div ref={cycleYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
-                ) : (
-                    cycleMp4Url && (
-                        <video ref={cycleNativeRef} src={cycleMp4Url} autoPlay loop muted={muted} playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
                     )
                 )}
             </div>
@@ -515,8 +445,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             )}
 
             <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-                {/* Contrôles de qualité vidéo */}
-                {(mainType === 'youtube' || cycleType === 'youtube') && (
+                {isAdmin && mainType === "youtube" && (
                     <div className="flex rounded-lg overflow-hidden border border-white/20 bg-black/60 backdrop-blur-sm">
                         {QUALITY_OPTIONS.map(({ value, label }) => (
                             <button key={value} type="button" onClick={() => handleQuality(value)} className={`px-3 py-2 text-xs font-medium transition ${quality === value ? "bg-purple-500 text-white" : "text-white/90 hover:bg-white/10"}`}>
@@ -525,8 +454,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         ))}
                     </div>
                 )}
-                
-                {/* Contrôles de contraste (A, B, C) */}
+
+                {isAdmin && (
                 <div className="flex flex-wrap justify-end gap-1 max-w-xs">
                     <button 
                         type="button" 
@@ -577,8 +506,9 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         🤝 Dédiées
                     </button>
                 </div>
+                )}
 
-                {/* Contrôle son */}
+                {/* Contrôle son — visible pour tous les visiteurs */}
                 <button type="button" onClick={handleMute} className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2">
                     {muted ? "🔇 Activer le son" : "🔊 Son activé"}
                 </button>

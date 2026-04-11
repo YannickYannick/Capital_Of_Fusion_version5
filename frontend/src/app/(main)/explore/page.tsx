@@ -406,17 +406,6 @@ function ExplorePageInner() {
         <DebugPanel controlsRef={controlsRef} cameraRef={cameraRef} />
       )}
 
-      {/* Hint Navigation (bas-gauche) — masquée pendant la transition */}
-      {!showExploreLoadingModal && !isTransitioningToExplore && (
-        <div className="fixed bottom-8 left-8 z-20 text-white/30 text-xs leading-relaxed select-none pointer-events-none">
-          <p>• Clic gauche + glisser : Rotation</p>
-          <p>• Clic droit + glisser : Panoramique</p>
-          <p>• Molette : Zoom</p>
-          <p>• Clic planète : Figer + Zoomer</p>
-          <p>• Double-clic : Réinitialiser</p>
-        </div>
-      )}
-
       {/* Overlay détails planète (z-50) */}
       <PlanetOverlay
         node={overlayNode}

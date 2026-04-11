@@ -9,6 +9,7 @@ import {
     useRef,
     type ReactNode,
 } from "react";
+import type { SiteVideoAmbienceApi } from "@/types/config";
 
 // ─────────────────────────────────────────────────────────
 //  Types
@@ -249,16 +250,10 @@ const LS_KEYS: Partial<Record<keyof PlanetsOptionsState, string>> = {
     orbitEasing: "planets_orbitEasing",
     orbitalRampDuration: "planets_orbitalRampDuration_v3",
     globalOrbitSpeed: "planets_globalOrbitSpeed",
-    grayscaleVideo: "planets_grayscaleVideo",
     enableVideoCycle: "planets_enableVideoCycle",
     videoCycleVisible: "video_cycleVisible",
     videoCycleHidden: "video_cycleHidden",
     videoTransition: "video_transitionDuration",
-    showVideoOverlay: "video_showOverlay",
-    enableTextShadow: "video_enableTextShadow",
-    useBlackBackground: "video_useBlackBackground",
-    disableYouTubeIframes: "video_disableYouTubeIframes",
-    backgroundMusicMode: "video_backgroundMusicMode",
     showEntryTrajectory: "planets_showEntryTrajectory",
     verticalMode: "planets_verticalMode",
     autoDistributeOrbits: "planets_autoDistributeOrbits",
@@ -296,6 +291,28 @@ function lsSet(key: string, value: unknown) {
     localStorage.setItem(key, JSON.stringify(value));
 }
 
+/** Fusion des réglages « ambiance vidéo / texte » depuis l’API (admin Django), prioritaires sur le localStorage. */
+function applyVideoAmbienceFromServer(
+    state: PlanetsOptionsState,
+    videoAmbience: SiteVideoAmbienceApi | null
+): PlanetsOptionsState {
+    if (!videoAmbience) return state;
+    const mode =
+        videoAmbience.background_music_mode === "site" ||
+        videoAmbience.background_music_mode === "context"
+            ? videoAmbience.background_music_mode
+            : DEFAULTS.backgroundMusicMode;
+    return {
+        ...state,
+        grayscaleVideo: videoAmbience.grayscale_video,
+        showVideoOverlay: videoAmbience.show_video_overlay,
+        enableTextShadow: videoAmbience.enable_text_shadow,
+        useBlackBackground: videoAmbience.use_black_background,
+        disableYouTubeIframes: videoAmbience.disable_youtube_iframes,
+        backgroundMusicMode: mode,
+    };
+}
+
 function loadFromLS(): PlanetsOptionsState {
     return {
         showOrbits: lsGet(LS_KEYS.showOrbits!, DEFAULTS.showOrbits),
@@ -327,19 +344,16 @@ function loadFromLS(): PlanetsOptionsState {
         orbitEasing: lsGet(LS_KEYS.orbitEasing!, DEFAULTS.orbitEasing),
         orbitalRampDuration: lsGet(LS_KEYS.orbitalRampDuration!, DEFAULTS.orbitalRampDuration),
         globalOrbitSpeed: lsGet(LS_KEYS.globalOrbitSpeed!, DEFAULTS.globalOrbitSpeed),
-        grayscaleVideo: lsGet(LS_KEYS.grayscaleVideo!, DEFAULTS.grayscaleVideo),
+        grayscaleVideo: DEFAULTS.grayscaleVideo,
         enableVideoCycle: lsGet(LS_KEYS.enableVideoCycle!, DEFAULTS.enableVideoCycle),
         videoCycleVisible: lsGet(LS_KEYS.videoCycleVisible!, DEFAULTS.videoCycleVisible),
         videoCycleHidden: lsGet(LS_KEYS.videoCycleHidden!, DEFAULTS.videoCycleHidden),
         videoTransition: lsGet(LS_KEYS.videoTransition!, DEFAULTS.videoTransition),
-        showVideoOverlay: lsGet(LS_KEYS.showVideoOverlay!, DEFAULTS.showVideoOverlay),
-        enableTextShadow: lsGet(LS_KEYS.enableTextShadow!, DEFAULTS.enableTextShadow),
-        useBlackBackground: lsGet(LS_KEYS.useBlackBackground!, DEFAULTS.useBlackBackground),
-        disableYouTubeIframes: lsGet(LS_KEYS.disableYouTubeIframes!, DEFAULTS.disableYouTubeIframes),
-        backgroundMusicMode: (() => {
-            const v = lsGet(LS_KEYS.backgroundMusicMode!, DEFAULTS.backgroundMusicMode);
-            return v === "site" || v === "context" ? v : DEFAULTS.backgroundMusicMode;
-        })(),
+        showVideoOverlay: DEFAULTS.showVideoOverlay,
+        enableTextShadow: DEFAULTS.enableTextShadow,
+        useBlackBackground: DEFAULTS.useBlackBackground,
+        disableYouTubeIframes: DEFAULTS.disableYouTubeIframes,
+        backgroundMusicMode: DEFAULTS.backgroundMusicMode,
         showEntryTrajectory: lsGet(LS_KEYS.showEntryTrajectory!, DEFAULTS.showEntryTrajectory),
         verticalMode: lsGet(LS_KEYS.verticalMode!, DEFAULTS.verticalMode),
         autoDistributeOrbits: lsGet(LS_KEYS.autoDistributeOrbits!, DEFAULTS.autoDistributeOrbits),
@@ -380,16 +394,27 @@ const FALLBACK_CAMERA_REF: React.RefObject<{ x: number; y: number; z: number; tx
     current: { x: 0, y: 6.84, z: 18.79, tx: 0, ty: 0, tz: 0 },
 };
 
-export function PlanetsOptionsProvider({ children }: { children: ReactNode }) {
-    const [state, setState] = useState<PlanetsOptionsState>(DEFAULTS);
+export function PlanetsOptionsProvider({
+    children,
+    videoAmbience = null,
+}: {
+    children: ReactNode;
+    videoAmbience?: SiteVideoAmbienceApi | null;
+}) {
+    const [state, setState] = useState<PlanetsOptionsState>(() => {
+        if (typeof window === "undefined") {
+            return applyVideoAmbienceFromServer(DEFAULTS, videoAmbience);
+        }
+        return applyVideoAmbienceFromServer(loadFromLS(), videoAmbience);
+    });
     const [restartKey, setRestartKey] = useState(0);
     const [resetKey, setResetKey] = useState(0);
     const cameraRef = useRef({ x: 0, y: 6.84, z: 18.79, tx: 0, ty: 0, tz: 0 });
 
-    // Hydrate depuis localStorage côté client (safe SSR)
+    // Hydrate : localStorage (planètes / caméra) + ambiance vidéo depuis le serveur
     useEffect(() => {
-        setState(loadFromLS());
-    }, []);
+        setState(applyVideoAmbienceFromServer(loadFromLS(), videoAmbience));
+    }, [videoAmbience]);
 
     const set = useCallback(
         <K extends keyof PlanetsOptionsState>(key: K, value: PlanetsOptionsState[K]) => {

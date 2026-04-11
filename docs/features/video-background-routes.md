@@ -44,20 +44,21 @@ En mode **Dédiées**, les autres fiches **detail** (artistes, shop, cours slug,
 
 Dans `GlobalVideoBackground`, la suspension `youtubeAmbientSuspended` est levée sur `/`, `/explore`, sur les fiches nœud organisation, **et** lorsque `backgroundMusicMode === "site"`, pour que l’ambiance YouTube reste utilisable sur les routes où le player est monté.
 
-## Main vs cycle (deux lecteurs)
+## Fond vidéo (main uniquement)
 
-- **`main_video`** et **`cycle_video`** sont deux instances YouTube (ou MP4) distinctes. Sur `/`, le cycle est en général masqué (opacité) et la couche visible correspond surtout à **main** ; sur les autres pages menu, **cycle** domine visuellement. Ce ne sont pas la même URL / le même flux : une bascule de page peut donner l’impression d’un « autre » fond même si les deux tournent en parallèle.
+- Seule **`main_video`** (YouTube ou fichier) est affichée en arrière-plan global. La config admin **`cycle_video`** n’est plus montée dans `GlobalVideoBackground` (un seul lecteur, même visuel sur toutes les routes où le fond est actif, moins d’iframes).
+- Les options Planètes « vidéo en fondue / continue » (`enableVideoCycle`, durées) ne pilotent plus ce fond global ; elles peuvent encore concerner d’autres écrans Explore si présents.
 
 ## Lecture continue (pas de redémarrage intempestif)
 
 Objectifs techniques :
 
-1. **Ne pas recréer** les iframes YouTube quand seule la route change (qualité gérée sans `setPlaybackQuality` automatique à chaque navigation) : l’état **qualité** des players est initialisé selon la première page visitée, puis reste **stable** jusqu’à ce que l’utilisateur utilise les boutons 360p–1080p. Cela évite les appels API YouTube qui peuvent rebuffer au passage accueil ↔ menu.
+1. **Ne pas recréer** l’iframe YouTube **main** quand seule la route change (qualité gérée sans `setPlaybackQuality` automatique à chaque navigation) : l’état **qualité** est initialisé selon la première page visitée, puis reste **stable** jusqu’aux boutons 360p–1080p.
 2. **`VideoBackgroundClient`** : délai d’environ 400 ms **uniquement** si le tout premier chargement est sur `/`. Dès qu’une page **hors** `/` a été visitée, un retour sur l’accueil en navigation SPA monte tout de suite `GlobalVideoBackground` (pas de `null` intermédiaire qui démonterait les players).
 
 ## Fichiers de référence
 
 - [`frontend/src/components/layout/ClientLayoutWrapper.tsx`](../../frontend/src/components/layout/ClientLayoutWrapper.tsx) — `MainChrome`, `showVideo`
 - [`frontend/src/lib/routeSegments.ts`](../../frontend/src/lib/routeSegments.ts) — `getPageType`, `isDetailPage`, `isUserPage`, `isPartnerStructureVideoBackgroundPath`, `isOrganizationNodeVideoBackgroundPath`
-- [`frontend/src/components/features/explore/canvas/ExploreVideos.tsx`](../../frontend/src/components/features/explore/canvas/ExploreVideos.tsx) — `effectiveOverride`, boutons Accueil / Dédiées, suspension ambiant, qualité « collante », players main/cycle
+- [`frontend/src/components/features/explore/canvas/ExploreVideos.tsx`](../../frontend/src/components/features/explore/canvas/ExploreVideos.tsx) — `effectiveOverride`, boutons Accueil / Dédiées, suspension ambiant, qualité « collante », player `main` uniquement
 - [`frontend/src/components/features/explore/canvas/VideoBackgroundClient.tsx`](../../frontend/src/components/features/explore/canvas/VideoBackgroundClient.tsx) — délai accueil cold start vs retour SPA
