@@ -134,8 +134,55 @@ export default function NoeudProfilPage() {
         position="fixed-below-nav"
         label="Modifier"
       />
-      {/* Hero — style artiste */}
-      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+
+      {/* Mobile : bandeaux noirs uniquement (pas de hero plein écran — évite chevauchement logo / titre) */}
+      <section className="md:hidden bg-black border-b border-white/[0.07]">
+        <div className="max-w-7xl mx-auto px-5 pt-5 pb-8">
+          <AnimatedDiv animation="fadeInUp">
+            <span className="inline-block px-3 py-1 bg-purple-600/90 text-[10px] uppercase tracking-widest font-black rounded-full border border-purple-500/40 text-white mb-4">
+              {node.type === "ROOT" ? "Racine" : node.type === "BRANCH" ? "Branche" : "Événement"}
+            </span>
+            <div className="flex flex-row gap-4 items-start">
+              {profileResolved && (
+                <div className="relative h-20 w-20 shrink-0 rounded-full border-2 border-purple-500/60 overflow-hidden bg-zinc-900 shadow-lg">
+                  <Image
+                    src={profileResolved}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                    unoptimized={
+                      profileResolved.startsWith("http") && !profileResolved.includes("localhost")
+                    }
+                  />
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <h1 className="text-[1.65rem] leading-[1.15] font-black italic tracking-tighter">
+                  <span className="text-purple-500">{node.name}</span>
+                </h1>
+              </div>
+            </div>
+            <div className="mt-5 relative w-full aspect-[16/10] max-h-[220px] rounded-2xl overflow-hidden border border-white/10 bg-zinc-950">
+              <Image
+                src={coverUrl}
+                alt={node.name}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority
+                unoptimized={coverUrl.startsWith("http") && !coverUrl.includes("localhost")}
+              />
+            </div>
+            {node.short_description && (
+              <p className="mt-5 text-[15px] leading-relaxed text-white/80">{node.short_description}</p>
+            )}
+          </AnimatedDiv>
+        </div>
+      </section>
+
+      {/* Desktop : hero image pleine largeur */}
+      <section className="hidden md:block relative h-[60vh] overflow-hidden">
         <Image
           src={coverUrl}
           alt={node.name}
@@ -148,8 +195,8 @@ export default function NoeudProfilPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
         {profileResolved && (
-          <div className="absolute bottom-28 left-8 md:left-16 z-10">
-            <div className="relative h-24 w-24 md:h-28 md:w-28 rounded-full border-4 border-purple-500/60 shadow-xl overflow-hidden bg-black/40">
+          <div className="absolute bottom-28 left-8 lg:left-16 z-10">
+            <div className="relative h-24 w-24 lg:h-28 lg:w-28 rounded-full border-4 border-purple-500/60 shadow-xl overflow-hidden bg-black/40">
               <Image
                 src={profileResolved}
                 alt=""
@@ -164,12 +211,12 @@ export default function NoeudProfilPage() {
           </div>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 max-w-7xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-16 max-w-7xl mx-auto">
           <AnimatedDiv animation="fadeInUp">
             <span className="inline-block px-3 py-1 bg-purple-600/80 backdrop-blur-md text-[10px] uppercase tracking-widest font-black rounded-full border border-purple-500/30 text-white mb-4">
               {node.type === "ROOT" ? "Racine" : node.type === "BRANCH" ? "Branche" : "Événement"}
             </span>
-            <h1 className="text-5xl md:text-8xl font-black italic tracking-tighter mb-2">
+            <h1 className="text-5xl lg:text-8xl font-black italic tracking-tighter mb-2">
               <span className="text-purple-500">{node.name}</span>
             </h1>
             {node.short_description && (
@@ -180,7 +227,7 @@ export default function NoeudProfilPage() {
       </section>
 
       {/* Contenu + colonne Cours / Événements */}
-      <section className="max-w-7xl mx-auto px-8 md:px-16 py-16 grid grid-cols-1 lg:grid-cols-3 gap-16">
+      <section className="max-w-7xl mx-auto px-5 md:px-16 py-10 md:py-16 grid grid-cols-1 lg:grid-cols-3 gap-10 md:gap-16 border-t border-white/[0.07] md:border-t-0 bg-black">
         <div className="lg:col-span-2">
           {(node.description || node.content) && (
             <AnimatedDiv animation="fadeIn">
@@ -292,7 +339,7 @@ export default function NoeudProfilPage() {
       </section>
 
       {/* CTA Explore 3D */}
-      <section className="max-w-7xl mx-auto px-8 md:px-16 pb-16">
+      <section className="max-w-7xl mx-auto px-5 md:px-16 pb-10 md:pb-16 border-t border-white/[0.07] md:border-t-0 bg-black pt-10 md:pt-0">
         <Link
           href={`/explore?node=${encodeURIComponent(node.slug)}`}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm uppercase tracking-widest transition-all border border-purple-500/30"
@@ -301,7 +348,7 @@ export default function NoeudProfilPage() {
         </Link>
       </section>
 
-      <div className="max-w-7xl mx-auto px-8 md:px-16 pb-16">
+      <div className="max-w-7xl mx-auto px-5 md:px-16 pb-12 md:pb-16 bg-black">
         <Link
           href="/organisation/noeuds"
           className="text-white/20 hover:text-white transition-all flex items-center gap-3 group text-[10px] uppercase font-black tracking-widest"

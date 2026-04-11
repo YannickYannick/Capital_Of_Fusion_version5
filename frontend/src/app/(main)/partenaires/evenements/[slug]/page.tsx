@@ -59,7 +59,7 @@ export default async function PartenaireEvenementDetailPage({ params }: PageProp
   const profileUrl = partnerMediaUrl(event.profile_image);
 
   return (
-    <div className="min-h-screen bg-black text-white relative -mt-16">
+    <div className="min-h-screen bg-black text-white relative">
       <PartnerDetailEditWrapper editUrl={`/partenaires/evenements/${encodeURIComponent(slug)}/edit`}>
         <div className="absolute top-20 md:top-24 left-0 right-0 z-[90] px-4 md:px-8 pointer-events-none">
           <div className="max-w-7xl mx-auto pointer-events-auto">

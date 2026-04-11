@@ -28,7 +28,10 @@ export default function LandingPageClient() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-6 py-16 relative">
+        <div
+          className="flex flex-col items-center justify-center px-6 py-16 relative"
+          style={{ minHeight: "calc(100vh - var(--app-header-height, 4rem))" }}
+        >
             {!isTransitioning ? (
                 <section className="relative z-10 max-w-3xl mx-auto text-center">
                     <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">

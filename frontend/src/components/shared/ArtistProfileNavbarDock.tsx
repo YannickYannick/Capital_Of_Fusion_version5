@@ -56,7 +56,7 @@ export function ArtistProfileNavbarDock() {
 
   return (
     <div
-      className="border-t border-white/10 bg-black/80 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
+      className="border-t border-white/10 bg-black shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
       aria-label={t("dockAriaLabel")}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] sm:text-xs">

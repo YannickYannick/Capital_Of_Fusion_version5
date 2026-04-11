@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MobileNav } from "./MobileNav";
@@ -49,7 +49,7 @@ type NavLink = {
 };
 
 /**
- * Navbar — transparente en haut, bg-black/80 backdrop-blur au scroll.
+ * Navbar — bandeau noir fixe, hauteur stable (pas de changement au scroll).
  * Menu piloté par l'API GET /api/menu/items/ (admin Django).
  * Fallback liens statiques si l'API est indisponible.
  * Libellés injectés via next-intl (`navbar.menu.*`).
@@ -59,14 +59,25 @@ export function Navbar() {
   const locale = useLocale();
   const t = useTranslations("navbar");
   const { user, loading, logout } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItemApi[] | null>(null);
   const [menuError, setMenuError] = useState(false);
+  const headerRef = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const apply = () => {
+      document.documentElement.style.setProperty(
+        "--app-header-height",
+        `${el.offsetHeight}px`,
+      );
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -398,24 +409,23 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-black/80 backdrop-blur-md" : "bg-transparent"
-      }`}
+      ref={headerRef}
+      className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-white/[0.08]"
     >
       <nav
-        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${scrolled ? "h-20" : "h-56"} flex items-center justify-between`}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 xl:h-20 flex items-center justify-between"
         aria-label={t("ariaMainNav")}
       >
         <Link
           href="/"
-          className="hover:scale-105 transition transform origin-left whitespace-nowrap flex-shrink-0"
+          className="hover:scale-105 transition-transform origin-left whitespace-nowrap flex-shrink-0"
         >
           <Image
             src="/logo.png"
             alt={t("logoAlt")}
             width={600}
             height={200}
-            className={`transition-all duration-300 ${scrolled ? "h-16" : "h-48"} w-auto object-contain`}
+            className="h-10 xl:h-14 w-auto object-contain"
             priority
           />
         </Link>

@@ -11,7 +11,10 @@ export function MainContent({ children }: MainContentProps) {
   const opts = usePlanetsOptions();
   
   return (
-    <main className={`pt-16 ${opts.enableTextShadow ? "text-shadow-contrast" : ""}`}>
+    <main
+      className={opts.enableTextShadow ? "text-shadow-contrast" : ""}
+      style={{ paddingTop: "var(--app-header-height, 4rem)" }}
+    >
       {children}
     </main>
   );

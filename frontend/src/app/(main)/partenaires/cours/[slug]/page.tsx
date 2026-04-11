@@ -76,7 +76,7 @@ export default async function PartenaireCoursDetailPage({ params }: PageProps) {
     descTrim.toLowerCase() === course.name.toLowerCase();
 
   return (
-    <div className="min-h-screen bg-black text-white relative -mt-16">
+    <div className="min-h-screen bg-black text-white relative">
       <PartnerDetailEditWrapper editUrl={`/partenaires/cours/${encodeURIComponent(slug)}/edit`}>
         {/* Retour : fixed sous la navbar, à droite (évite le logo) et sous le bouton Modifier staff */}
         <div className="fixed top-36 md:top-40 right-4 md:right-8 z-[95] pointer-events-none">

@@ -656,6 +656,19 @@ function Planet({
   const hasDelayPassed = useRef(false);
   const entryTParam = useRef<number>(0);               // paramètre t [0..1] pour les trajectoires
 
+  /** Mobile (< md) : pas d'oscillation verticale quand une planète est sélectionnée. */
+  const skipVerticalOscillationRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => {
+      skipVerticalOscillationRef.current = mq.matches;
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   // Réinitialiser l'animation d'entrée au restart
   useEffect(() => {
     stateRef.current = {
@@ -855,8 +868,14 @@ function Planet({
     // revient toujours sur l'orbite sans springForce explicite
     const newPos = nominalPos.clone().add(s.vel);
 
-    // Oscillation verticale (sinus) des autres planètes quand une planète est sélectionnée (sauf la planète au centre)
-    if (otherPlanetSelected && !isSelected && oscillationAmplitude > 0 && oscillationFrequency > 0) {
+    // Oscillation verticale (sinus) des autres planètes quand une planète est sélectionnée (désactivée en mobile)
+    if (
+      otherPlanetSelected &&
+      !isSelected &&
+      oscillationAmplitude > 0 &&
+      oscillationFrequency > 0 &&
+      !skipVerticalOscillationRef.current
+    ) {
       newPos.y += oscillationAmplitude * Math.sin(2 * Math.PI * oscillationFrequency * state.clock.elapsedTime);
     }
 

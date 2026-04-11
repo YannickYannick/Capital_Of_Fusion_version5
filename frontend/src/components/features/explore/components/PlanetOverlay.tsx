@@ -153,7 +153,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
             <button
               type="button"
               onClick={handleClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition text-lg"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 bg-black/45 text-3xl font-light leading-none text-white shadow-md transition hover:bg-black/65 active:scale-95 md:h-11 md:w-11 md:text-2xl"
               aria-label="Fermer"
             >
               ×

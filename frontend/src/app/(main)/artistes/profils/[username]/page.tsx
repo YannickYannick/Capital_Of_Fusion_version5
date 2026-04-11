@@ -66,8 +66,8 @@ export default function ArtistProfilePage() {
     if (!linksMerged.contact.phone && artist.phone) linksMerged.contact.phone = artist.phone;
 
     return (
-        <div className="min-h-screen bg-black text-white relative -mt-16">
-            {/* Annule le pt-16 du layout : évite la bande bleue (fond html) sous la navbar transparente */}
+        <div className="min-h-screen bg-black text-white relative">
+            {/* Contenu sous le bandeau noir fixe (MainContent pt-16 / xl:pt-20) */}
             <section className="relative h-[60vh] md:h-[70vh] overflow-hidden">
                 <Image
                     src={photoUrl}
