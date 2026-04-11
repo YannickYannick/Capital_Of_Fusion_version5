@@ -142,6 +142,12 @@ export function getDynamicOrbitParams(
 /** Multiplicateur max appliqué aux planètes sur la plus grande orbite (compense la perspective). */
 const REMOTE_ORBIT_SCALE_MAX = 1.38;
 
+/** Distance caméra–libellé de référence (monde) pour l’échelle des titres sur mobile. */
+const LABEL_DISTANCE_REF = 13;
+const LABEL_DISTANCE_BOOST_MAX_COMPACT = 2.9;
+
+const _labelWorldScratch = new THREE.Vector3();
+
 /**
  * Distance horizontale max (dans XZ) depuis l'origine jusqu'à une orbite :
  * cercle → r ; squircle → max sur un tour (coins plus loin que r).
@@ -1002,8 +1008,20 @@ function LabelSprite({
     if (!spriteRef.current) return;
     const dist = camera.position.length();
     const s = Math.max(0.5, dist * 0.12);
-    const boost = isCompact ? 1.9 : 1;
-    spriteRef.current.scale.set(s * 1.8 * boost, s * 0.45 * boost, 1);
+    const layoutBoost = isCompact ? 1.9 : 1;
+    /** Sur smartphone : grossir les libellés des planètes éloignées (sinon la perspective les écrase). */
+    let distanceBoost = 1;
+    if (isCompact) {
+      spriteRef.current.getWorldPosition(_labelWorldScratch);
+      const dCam = _labelWorldScratch.distanceTo(camera.position);
+      distanceBoost = THREE.MathUtils.clamp(
+        dCam / LABEL_DISTANCE_REF,
+        1,
+        LABEL_DISTANCE_BOOST_MAX_COMPACT
+      );
+    }
+    const total = layoutBoost * distanceBoost;
+    spriteRef.current.scale.set(s * 1.8 * total, s * 0.45 * total, 1);
     if (inOrbitZoneRef) {
       spriteRef.current.visible = inOrbitZoneRef.current || isHovered || isSelected;
     }
