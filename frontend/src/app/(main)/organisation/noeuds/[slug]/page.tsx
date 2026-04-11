@@ -51,28 +51,57 @@ export default function NoeudProfilPage() {
   const [node, setNode] = useState<OrganizationNodeApi | null>(null);
   const [courses, setCourses] = useState<CourseListApi[]>([]);
   const [events, setEvents] = useState<EventApi[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [nodeLoading, setNodeLoading] = useState(true);
+  const [listsLoading, setListsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /** Nœud d’abord (hero + contenu), cours/événements ensuite — évite d’attendre 3 requêtes pour le premier rendu. */
   useEffect(() => {
     if (!slug) return;
-    setLoading(true);
+    let cancelled = false;
+    setNode(null);
+    setCourses([]);
+    setEvents([]);
+    setNodeLoading(true);
     setError(null);
-    Promise.all([
-      getOrganizationNodeBySlug(slug),
-      getCourses({ node: slug }),
-      getEvents({ node: slug }),
-    ])
-      .then(([n, c, e]) => {
-        setNode(n);
-        setCourses(c);
-        setEvents(e);
+    getOrganizationNodeBySlug(slug)
+      .then((n) => {
+        if (!cancelled) setNode(n);
       })
-      .catch(() => setError("Nœud introuvable"))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!cancelled) setError("Nœud introuvable");
+      })
+      .finally(() => {
+        if (!cancelled) setNodeLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
-  if (loading) {
+  useEffect(() => {
+    if (!slug || !node) return;
+    let cancelled = false;
+    setListsLoading(true);
+    Promise.all([getCourses({ node: slug }), getEvents({ node: slug })])
+      .then(([c, e]) => {
+        if (!cancelled) {
+          setCourses(c);
+          setEvents(e);
+        }
+      })
+      .catch(() => {
+        /* listes secondaires : la fiche reste affichée */
+      })
+      .finally(() => {
+        if (!cancelled) setListsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, node]);
+
+  if (nodeLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -182,9 +211,11 @@ export default function NoeudProfilPage() {
             className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
           >
             <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-6 text-white/30 italic">
-              Cours ({courses.length})
+              Cours ({listsLoading ? "…" : courses.length})
             </h3>
-            {courses.length === 0 ? (
+            {listsLoading && courses.length === 0 ? (
+              <p className="text-white/40 text-sm animate-pulse">Chargement des cours…</p>
+            ) : courses.length === 0 ? (
               <p className="text-white/40 text-sm">Aucun cours pour ce nœud.</p>
             ) : (
               <ul className="space-y-4">
@@ -222,9 +253,11 @@ export default function NoeudProfilPage() {
             className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 backdrop-blur-3xl"
           >
             <h3 className="text-xs uppercase tracking-[0.3em] font-black mb-6 text-white/30 italic">
-              Événements ({events.length})
+              Événements ({listsLoading ? "…" : events.length})
             </h3>
-            {events.length === 0 ? (
+            {listsLoading && events.length === 0 ? (
+              <p className="text-white/40 text-sm animate-pulse">Chargement des événements…</p>
+            ) : events.length === 0 ? (
               <p className="text-white/40 text-sm">Aucun événement pour ce nœud.</p>
             ) : (
               <ul className="space-y-4">

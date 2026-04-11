@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { usePathname } from "next/navigation";
+import { isOrganizationNodeVideoBackgroundPath } from "@/lib/routeSegments";
 import type { SiteConfigurationApi } from "@/types/config";
 import type { YTPlayer } from "@/types/youtube.d";
 
@@ -242,12 +243,17 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         }
     }, [isHome, setPlanetMusicOverride]);
 
-    // Accueil / explore / mode Accueil (site) : lever la suspension du son ambiant partout où le player tourne
+    // Accueil / explore / mode Accueil (site) / fiche nœud org : lever la suspension du son ambiant partout où le player tourne
     useEffect(() => {
-        if (isHome || isExplore || opts.backgroundMusicMode === "site") {
+        if (
+            isHome ||
+            isExplore ||
+            opts.backgroundMusicMode === "site" ||
+            isOrganizationNodeVideoBackgroundPath(pathname)
+        ) {
             setYoutubeAmbientSuspended(false);
         }
-    }, [isHome, isExplore, opts.backgroundMusicMode, setYoutubeAmbientSuspended]);
+    }, [isHome, isExplore, opts.backgroundMusicMode, pathname, setYoutubeAmbientSuspended]);
 
     // Mute main/cycle quand override effectif (planète / partenaire) OU suspension post-fiche partenaire
     useEffect(() => {

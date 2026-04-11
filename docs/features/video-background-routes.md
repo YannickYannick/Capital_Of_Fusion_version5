@@ -23,14 +23,17 @@ La fonction [`getPageType`](../../frontend/src/lib/routeSegments.ts) et les help
 | `detail` | fiches avec slug : `/organisation/noeuds/[slug]`, `/artistes/profils/[username]`, `/shop/...`, bulletins avec slug, `/cours/[slug]`, `/partenaires/evenements/[slug]`, etc. | préfixes dans `DETAIL_PATH_PATTERNS` |
 | `menu` | tout le reste (listes, hubs, `/identite-cof/notre-vision`, `/promotions-festivals`, …) | |
 
-Exception : `/partenaires/structures/[slug]` est à la fois une route **detail** et une route où la vidéo globale est **toujours** activée (musique de structure possible), via `isPartnerStructureVideoBackgroundPath`.
+Exceptions (fiches « hub » avec ambiance comme le menu) :
+
+- `/partenaires/structures/[slug]` : vidéo globale **toujours** activée via `isPartnerStructureVideoBackgroundPath`.
+- `/organisation/noeuds/[slug]` : idem via `isOrganizationNodeVideoBackgroundPath` (la liste `/organisation/noeuds` reste sans fond vidéo).
 
 ## Quand la vidéo est affichée
 
-1. **Toujours** sur : `home`, `explore`, `menu`, et fiche structure partenaire (`/partenaires/structures/[slug]`).
-2. **En plus**, sur les pages **`detail`** (hors `user`) lorsque l’utilisateur a choisi le mode **Accueil** dans l’overlay vidéo : `backgroundMusicMode === "site"`.
+1. **Toujours** sur : `home`, `explore`, `menu`, fiche structure partenaire (`/partenaires/structures/[slug]`), et fiche nœud organisation (`/organisation/noeuds/[slug]`).
+2. **En plus**, sur les **autres** pages **`detail`** (hors `user`) lorsque l’utilisateur a choisi le mode **Accueil** : `backgroundMusicMode === "site"`.
 
-En mode **Dédiées** (`backgroundMusicMode === "context"`), les pages **detail** n’affichent **pas** la vidéo globale : évite les incohérences avec les musiques planète / partenaire sans refonte complète du flux d’override sur ces pages.
+En mode **Dédiées**, les autres fiches **detail** (artistes, shop, cours slug, etc.) n’affichent **pas** la vidéo globale : évite les conflits avec les musiques planète / partenaire. Les fiches nœud et structure partenaire font exception (pas d’overlay Explore sur ces URLs, ambiance alignée sur le reste du site).
 
 ## Persistance du mode musique
 
@@ -39,7 +42,7 @@ En mode **Dédiées** (`backgroundMusicMode === "context"`), les pages **detail*
 
 ## Son ambiant (suspension YouTube)
 
-Dans `GlobalVideoBackground`, la suspension `youtubeAmbientSuspended` est levée sur `/`, `/explore`, **et** lorsque `backgroundMusicMode === "site"`, pour que le mode Accueil garde l’ambiance YouTube audible sur toutes les routes où le player est monté.
+Dans `GlobalVideoBackground`, la suspension `youtubeAmbientSuspended` est levée sur `/`, `/explore`, sur les fiches nœud organisation, **et** lorsque `backgroundMusicMode === "site"`, pour que l’ambiance YouTube reste utilisable sur les routes où le player est monté.
 
 ## Main vs cycle (deux lecteurs)
 
@@ -55,6 +58,6 @@ Objectifs techniques :
 ## Fichiers de référence
 
 - [`frontend/src/components/layout/ClientLayoutWrapper.tsx`](../../frontend/src/components/layout/ClientLayoutWrapper.tsx) — `MainChrome`, `showVideo`
-- [`frontend/src/lib/routeSegments.ts`](../../frontend/src/lib/routeSegments.ts) — `getPageType`, `isDetailPage`, `isUserPage`, `isPartnerStructureVideoBackgroundPath`
+- [`frontend/src/lib/routeSegments.ts`](../../frontend/src/lib/routeSegments.ts) — `getPageType`, `isDetailPage`, `isUserPage`, `isPartnerStructureVideoBackgroundPath`, `isOrganizationNodeVideoBackgroundPath`
 - [`frontend/src/components/features/explore/canvas/ExploreVideos.tsx`](../../frontend/src/components/features/explore/canvas/ExploreVideos.tsx) — `effectiveOverride`, boutons Accueil / Dédiées, suspension ambiant, qualité « collante », players main/cycle
 - [`frontend/src/components/features/explore/canvas/VideoBackgroundClient.tsx`](../../frontend/src/components/features/explore/canvas/VideoBackgroundClient.tsx) — délai accueil cold start vs retour SPA

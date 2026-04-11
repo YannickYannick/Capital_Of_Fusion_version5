@@ -16,6 +16,7 @@ import {
 import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
 import {
   getPageType,
+  isOrganizationNodeVideoBackgroundPath,
   isPartnerStructureVideoBackgroundPath,
   isUserPage,
 } from "@/lib/routeSegments";
@@ -45,7 +46,8 @@ function MainChrome({
     pageType === "home" ||
     pageType === "explore" ||
     pageType === "menu" ||
-    isPartnerStructureVideoBackgroundPath(pathname);
+    isPartnerStructureVideoBackgroundPath(pathname) ||
+    isOrganizationNodeVideoBackgroundPath(pathname);
 
   const showVideo =
     baseVideo ||

@@ -73,3 +73,16 @@ export function isPartnerStructureVideoBackgroundPath(pathname: string): boolean
   const rest = p.slice(prefix.length);
   return rest.length > 0;
 }
+
+/**
+ * Fiche d’un nœud organisation (`/organisation/noeuds/[slug]`) : même fond vidéo global que le menu
+ * (pas seulement en mode Accueil), pour garder l’ambiance sonore comme sur les autres pages publiques.
+ * La liste seule `/organisation/noeuds` reste sans ce fond.
+ */
+export function isOrganizationNodeVideoBackgroundPath(pathname: string): boolean {
+  const p = pathname.replace(/\/$/, "") || "/";
+  const prefix = "/organisation/noeuds/";
+  if (!p.startsWith(prefix)) return false;
+  const rest = p.slice(prefix.length);
+  return rest.length > 0;
+}
