@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * Vidéo de fond globale (YouTube ou MP4) : **main_video** sur toutes les routes où le fond est actif.
- * La seconde piste « cycle » configurée en admin n’est plus affichée (un seul lecteur = visuel cohérent + moins de charge).
+ * Vidéo de fond globale (YouTube ou MP4) : main_video sur toutes les routes où le fond est actif.
+ * Sur la route /explore uniquement : seconde piste cycle (admin) derrière la principale, fondu temporisé
+ * (enableVideoCycle + sliders Options) ou superposition continue (principale semi-transparente).
  * Contrôles : qualité, mute, voile. Override possible depuis Explore (musique planète).
  */
 import { useEffect, useRef, useState } from "react";
@@ -28,6 +29,36 @@ const ADMIN_DEFAULT_QUALITIES = new Set<string>(
 );
 
 const DEFAULT_VIDEO_MAIN = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID || "jfKfPfyJRdk";
+const DEFAULT_CYCLE_YT_ID = process.env.NEXT_PUBLIC_YOUTUBE_CYCLE_VIDEO_ID || "eZhq_RMYRKQ";
+
+/** Opacités main (devant) / cycle (derrière) pour le mode « Vidéo en fondue » sur Explore. */
+function computeExploreVideoCrossfade(
+    nowMs: number,
+    visibleMs: number,
+    hiddenMs: number,
+    transitionMs: number
+): { main: number; cycle: number } {
+    const Tv = Math.max(0, visibleMs);
+    const Th = Math.max(0, hiddenMs);
+    const Tt = Math.max(transitionMs, 16);
+    const P = Tv + Tt + Th + Tt;
+    if (P < Tt * 2 + 50) {
+        return { main: 0.65, cycle: 1 };
+    }
+    const t = nowMs % P;
+    if (t < Tv) {
+        return { main: 1, cycle: 0 };
+    }
+    if (t < Tv + Tt) {
+        const u = (t - Tv) / Tt;
+        return { main: 1 - u, cycle: u };
+    }
+    if (t < Tv + Tt + Th) {
+        return { main: 0, cycle: 1 };
+    }
+    const u = (t - Tv - Tt - Th) / Tt;
+    return { main: u, cycle: 1 - u };
+}
 
 function getYoutubeVideoId(url: string): string | null {
     if (!url) return null;
@@ -174,6 +205,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         return bgYoutubeQuality as YoutubeQualitySetting;
     });
     const [muted, setMuted] = useState(true);
+    const [exploreLayerOpacities, setExploreLayerOpacities] = useState({ main: 1, cycle: 0 });
 
     const mainType = config?.main_video_type || 'youtube';
 
@@ -187,6 +219,20 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     };
 
     const mainMp4Url = formatUrl(config?.main_video_file);
+
+    const excludedForVideo = ["/dashboard", "/login", "/register"].some((route) => pathname.startsWith(route));
+    const showBlackForVideo = opts.useBlackBackground || opts.disableYouTubeIframes;
+    const cycleType = config?.cycle_video_type ?? "youtube";
+    const cycleYTId = config?.cycle_video_youtube_id?.trim() || DEFAULT_CYCLE_YT_ID;
+    const cycleMp4Url = formatUrl(config?.cycle_video_file ?? null);
+    const exploreCycleWanted =
+        pathname === "/explore" &&
+        !effectiveOverride &&
+        !showBlackForVideo &&
+        !excludedForVideo &&
+        (cycleType === "youtube"
+            ? !opts.disableYouTubeIframes && !!cycleYTId
+            : !!cycleMp4Url);
 
     // Don't create YT players if iframes are disabled
     const ytEnabled = !opts.disableYouTubeIframes;
@@ -213,8 +259,18 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         preferUnmuted
     );
 
+    const cycleYT = useYTPlayer(
+        cycleYTId,
+        apiReady && ytEnabled,
+        exploreCycleWanted && cycleType === "youtube" && ytEnabled,
+        "cycle",
+        quality,
+        false
+    );
+
     const mainNativeRef = useRef<HTMLVideoElement>(null);
     const overrideNativeRef = useRef<HTMLVideoElement>(null);
+    const cycleNativeRef = useRef<HTMLVideoElement>(null);
 
     // Quand override (effectif) YouTube est actif, charger l’API si la vidéo principale ne l’a pas déjà fait (ex. main en MP4).
     useEffect(() => {
@@ -259,6 +315,37 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         }
     }, [effectiveOverride, youtubeAmbientSuspended, apiReady]);
 
+    // Superposition main + cycle sur /explore (fondue temporisée ou continue)
+    useEffect(() => {
+        if (!exploreCycleWanted) {
+            setExploreLayerOpacities({ main: 1, cycle: 0 });
+            return;
+        }
+        if (!opts.enableVideoCycle) {
+            setExploreLayerOpacities({ main: 0.68, cycle: 1 });
+            return;
+        }
+        const tick = () => {
+            setExploreLayerOpacities(
+                computeExploreVideoCrossfade(
+                    performance.now(),
+                    opts.videoCycleVisible * 1000,
+                    opts.videoCycleHidden * 1000,
+                    Math.max(opts.videoTransition, 16)
+                )
+            );
+        };
+        tick();
+        const id = setInterval(tick, 80);
+        return () => clearInterval(id);
+    }, [
+        exploreCycleWanted,
+        opts.enableVideoCycle,
+        opts.videoCycleVisible,
+        opts.videoCycleHidden,
+        opts.videoTransition,
+    ]);
+
     // Responsive scale pour YT
     useEffect(() => {
         const update = () => setScale(Math.max(window.innerWidth / 1920, window.innerHeight / 1080));
@@ -273,7 +360,11 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         if (opts.disableYouTubeIframes) return;
         const needsYtForOverride =
             effectiveOverride?.type === "youtube" && !!effectiveOverride.youtubeUrl;
-        if (mainType !== "youtube" && !needsYtForOverride) return;
+        const needsYtForExploreCycle =
+            pathname === "/explore" &&
+            (config?.cycle_video_type ?? "youtube") === "youtube" &&
+            !opts.useBlackBackground;
+        if (mainType !== "youtube" && !needsYtForOverride && !needsYtForExploreCycle) return;
         if (typeof window === "undefined") return;
 
         // Si l'API est déjà dispo
@@ -359,7 +450,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             clearTimeout(deferTimer);
             cleanupInterval?.();
         };
-    }, [mainType, opts.disableYouTubeIframes, effectiveOverride]);
+    }, [mainType, opts.disableYouTubeIframes, effectiveOverride, pathname, config?.cycle_video_type, opts.useBlackBackground]);
 
     // Routes exclues de la vidéo de fond (admin, authentification)
     const excludedRoutes = ["/dashboard", "/login", "/register"];
@@ -393,6 +484,11 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     const handleQuality = (q: YoutubeQualitySetting) => {
         if (mainYT.playerRef.current) (mainYT.playerRef.current as any).setPlaybackQuality(q);
+        try {
+            cycleYT.playerRef.current?.setPlaybackQuality?.(q);
+        } catch {
+            /* ignore */
+        }
         setQuality(q);
     };
 
@@ -407,8 +503,56 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 <div className="fixed inset-0 -z-10 bg-[#0a0e27]" />
             )}
 
+            {/* /explore : vidéo cycle (admin), derrière la principale */}
+            {exploreCycleWanted && (
+                <div
+                    className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
+                    style={{
+                        filter: grayscale,
+                        opacity: exploreLayerOpacities.cycle,
+                        transition:
+                            exploreCycleWanted && opts.enableVideoCycle ? "filter 0.5s" : "filter 0.5s, opacity 0.35s",
+                    }}
+                >
+                    {cycleType === "youtube" ? (
+                        <div
+                            ref={cycleYT.containerRef}
+                            className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
+                            style={{ transform: playerTransform }}
+                        />
+                    ) : (
+                        cycleMp4Url && (
+                            <video
+                                ref={cycleNativeRef}
+                                src={cycleMp4Url}
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover"
+                                style={{ transform: "translate(-50%, -50%)" }}
+                            />
+                        )
+                    )}
+                </div>
+            )}
+
             {/* Vidéo principale (masquée si option C active ou YouTube disabled) */}
-            <div className="fixed inset-0 -z-10 overflow-hidden" style={{ filter: grayscale, transition: `filter 0.5s, opacity 0.5s`, opacity: showBlackBg ? 0 : (effectiveOverride ? 0.3 : 1) }}>
+            <div
+                className="fixed inset-0 -z-10 overflow-hidden"
+                style={{
+                    filter: grayscale,
+                    transition:
+                        exploreCycleWanted && opts.enableVideoCycle ? "filter 0.5s" : "filter 0.5s, opacity 0.5s",
+                    opacity: showBlackBg
+                        ? 0
+                        : effectiveOverride
+                          ? 0.3
+                          : exploreCycleWanted
+                            ? exploreLayerOpacities.main
+                            : 1,
+                }}
+            >
                 {mainType === 'youtube' ? (
                     <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
