@@ -308,6 +308,40 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const overrideNativeRef = useRef<HTMLVideoElement>(null);
     const cycleNativeRef = useRef<HTMLVideoElement>(null);
 
+    // iOS + YouTube : l'autoplay est parfois refusé tant qu'il n'y a pas eu de geste utilisateur.
+    // On "kick" le player au premier touch/click global, sans overlay intrusif.
+    useEffect(() => {
+        if (!isIos) return;
+        if (mainRenderType !== "youtube") return;
+        if (!ytEnabled) return;
+
+        const tryPlay = () => {
+            try {
+                mainYT.playerRef.current?.playVideo?.();
+                window.setTimeout(() => mainYT.playerRef.current?.playVideo?.(), 250);
+            } catch {
+                // ignore
+            }
+        };
+
+        // Tentative immédiate (au cas où autoplay est autorisé)
+        tryPlay();
+
+        const onFirstGesture = () => {
+            tryPlay();
+            window.removeEventListener("touchstart", onFirstGesture, { capture: true } as any);
+            window.removeEventListener("click", onFirstGesture, { capture: true } as any);
+        };
+
+        window.addEventListener("touchstart", onFirstGesture, { capture: true, passive: true });
+        window.addEventListener("click", onFirstGesture, { capture: true, passive: true } as any);
+
+        return () => {
+            window.removeEventListener("touchstart", onFirstGesture, { capture: true } as any);
+            window.removeEventListener("click", onFirstGesture, { capture: true } as any);
+        };
+    }, [isIos, mainRenderType, ytEnabled, mainYT.playerRef]);
+
     // iOS : "kick" au premier geste utilisateur pour garantir play() (autoplay parfois ignoré)
     useEffect(() => {
         if (!isIos) return;
