@@ -228,7 +228,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                   <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
                     {node.name}
                   </h1>
-                  {node.short_description && (
+                  {node.short_description && node.type !== "ROOT" && (
                     <p className="text-white/70 leading-[1.8em] text-sm">
                       {node.short_description}
                     </p>
