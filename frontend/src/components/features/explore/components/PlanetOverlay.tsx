@@ -234,16 +234,28 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     </p>
                   )}
                   <div className="flex flex-wrap flex-col sm:flex-row gap-3 mt-4 w-full">
-                    <button
-                      type="button"
-                      disabled
-                      className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-white/10 text-white/60 font-bold shadow-[0_0_20px_-5px_rgba(255,255,255,0.10)] border border-white/15 cursor-not-allowed"
-                      aria-disabled="true"
-                      title="Fonction à venir"
-                    >
-                      <span className="text-xl">⏳</span>
-                      <span>Fonction à venir</span>
-                    </button>
+                    {node.type === "ROOT" ? (
+                      <a
+                        href="https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnprgCFDBKaBIcXNxli3o4eSeZW2PkudBsk3Noz0zPCH1myeSa1TemsZFcRKo_aem_IPghO3-MUFniUMOa5ucZUg"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                      >
+                        <span className="text-xl">🎟️</span>
+                        <span>Réserver sur go&dance</span>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-white/10 text-white/60 font-bold shadow-[0_0_20px_-5px_rgba(255,255,255,0.10)] border border-white/15 cursor-not-allowed"
+                        aria-disabled="true"
+                        title="Fonction à venir"
+                      >
+                        <span className="text-xl">⏳</span>
+                        <span>Fonction à venir</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
