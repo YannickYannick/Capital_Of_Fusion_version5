@@ -133,6 +133,10 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     node.parent_slug === null ||
     node.parent_slug === undefined;
 
+  const nodeSlug = (node.slug || "").toLowerCase();
+  const nodeName = (node.name || "").toLowerCase();
+  const isBookYourHotelNode = nodeName.includes("book your hotel") || nodeSlug.includes("book-your-hotel") || nodeSlug === "amapiano-vibe";
+
   return (
     <>
       {/* Backdrop */}
@@ -182,7 +186,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     </div>
-                  ) : node.video_url && !videoError ? (
+                  ) : node.video_url && node.type !== "EVENT" && !videoError ? (
                     <div className="relative w-full h-full min-h-[220px]">
                       {node.cover_image && (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -234,7 +238,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     </p>
                   )}
                   <div className="flex flex-wrap flex-col sm:flex-row gap-3 mt-4 w-full">
-                    {node.slug?.toLowerCase?.().includes("book-your-hotel") ? (
+                    {isBookYourHotelNode ? (
                       <Link
                         href="/festival/book-your-hotel"
                         className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
@@ -242,6 +246,26 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         <span className="text-xl">🏨</span>
                         <span>Book Your Hotel</span>
                       </Link>
+                    ) : node.cta_url ? (
+                      node.cta_url.startsWith("/") ? (
+                        <Link
+                          href={node.cta_url}
+                          className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                        >
+                          <span className="text-xl">✨</span>
+                          <span>{node.cta_text || "En savoir plus"}</span>
+                        </Link>
+                      ) : (
+                        <a
+                          href={node.cta_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                        >
+                          <span className="text-xl">✨</span>
+                          <span>{node.cta_text || "En savoir plus"}</span>
+                        </a>
+                      )
                     ) : node.type === "ROOT" ? (
                       <a
                         href="https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnprgCFDBKaBIcXNxli3o4eSeZW2PkudBsk3Noz0zPCH1myeSa1TemsZFcRKo_aem_IPghO3-MUFniUMOa5ucZUg"
