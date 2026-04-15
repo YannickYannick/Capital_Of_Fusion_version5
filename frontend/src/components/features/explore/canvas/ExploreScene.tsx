@@ -980,6 +980,8 @@ function LabelSprite({
 }) {
   const spriteRef = useRef<THREE.Sprite>(null);
   const isCompact = useCompactPlanetLabels();
+  // Réduire les titres au-dessus des planètes sur smartphone.
+  const compactLabelFactor = isCompact ? 1 / 1.5 : 1;
 
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
@@ -989,13 +991,13 @@ function LabelSprite({
     canvas.height = h;
     const ctx = canvas.getContext("2d")!;
     ctx.clearRect(0, 0, w, h);
-    const fontSize = isCompact ? 72 : 48;
+    const fontSize = (isCompact ? 72 : 48) * compactLabelFactor;
     ctx.font = `bold ${fontSize}px Urbane, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const cx = w / 2;
     const cy = h / 2;
-    const strokeW = isCompact ? 10 : 6;
+    const strokeW = (isCompact ? 10 : 6) * compactLabelFactor;
     ctx.lineJoin = "round";
     ctx.miterLimit = 2;
     ctx.strokeStyle = "rgba(0,0,0,0.92)";
@@ -1004,9 +1006,9 @@ function LabelSprite({
     ctx.fillStyle = "#ffffff";
     if (showTextShadow) {
       ctx.shadowColor = "rgba(0,0,0,0.85)";
-      ctx.shadowBlur = isCompact ? 12 : 8;
-      ctx.shadowOffsetX = isCompact ? 3 : 2;
-      ctx.shadowOffsetY = isCompact ? 3 : 2;
+      ctx.shadowBlur = (isCompact ? 12 : 8) * compactLabelFactor;
+      ctx.shadowOffsetX = (isCompact ? 3 : 2) * compactLabelFactor;
+      ctx.shadowOffsetY = (isCompact ? 3 : 2) * compactLabelFactor;
     }
     ctx.fillText(text, cx, cy);
     if (showTextShadow) {
@@ -1020,7 +1022,7 @@ function LabelSprite({
     tex.magFilter = THREE.LinearFilter;
     tex.needsUpdate = true;
     return tex;
-  }, [text, showTextShadow, isCompact]);
+  }, [text, showTextShadow, isCompact, compactLabelFactor]);
 
   useEffect(() => {
     return () => {
@@ -1032,7 +1034,7 @@ function LabelSprite({
     if (!spriteRef.current) return;
     const dist = camera.position.length();
     const s = Math.max(0.5, dist * 0.12);
-    const layoutBoost = isCompact ? 1.9 : 1;
+    const layoutBoost = (isCompact ? 1.9 : 1) * compactLabelFactor;
     /** Sur smartphone : grossir les libellés des planètes éloignées (sinon la perspective les écrase). */
     let distanceBoost = 1;
     if (isCompact) {
