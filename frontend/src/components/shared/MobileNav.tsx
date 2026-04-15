@@ -14,6 +14,10 @@ export interface NavLinkItem {
   children: { id: string; name: string; url: string }[];
 }
 
+function isExternalHref(href: string): boolean {
+  return /^https?:\/\//i.test(href || "");
+}
+
 /**
  * MobileNav — menu hamburger pour mobile.
  * Affiche les entrées de menu (API ou fallback) ; sous-menus dépliables.
@@ -77,13 +81,25 @@ export function MobileNav({
               {children.length > 0 ? (
                 <>
                   <div className="flex items-center w-full px-6 text-white/90 hover:bg-white/5">
-                    <Link
-                      href={href}
-                      onClick={() => setOpen(false)}
-                      className="flex-1 py-3 text-left hover:text-white focus:outline-none focus-visible:underline"
-                    >
-                      {label}
-                    </Link>
+                    {isExternalHref(href) ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setOpen(false)}
+                        className="flex-1 py-3 text-left hover:text-white focus:outline-none focus-visible:underline"
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={href}
+                        onClick={() => setOpen(false)}
+                        className="flex-1 py-3 text-left hover:text-white focus:outline-none focus-visible:underline"
+                      >
+                        {label}
+                      </Link>
+                    )}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -111,29 +127,54 @@ export function MobileNav({
                       {children.map((child) => {
                         const url = child.url || "#";
                         return (
-                          <Link
-                            key={child.id}
-                            href={url}
-                            prefetch={!url.startsWith("/projets")}
-                            onClick={() => setOpen(false)}
-                            className="py-1.5 text-sm text-white/80 hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
-                          >
-                            {child.name}
-                          </Link>
+                          isExternalHref(url) ? (
+                            <a
+                              key={child.id}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpen(false)}
+                              className="py-1.5 text-sm text-white/80 hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
+                            >
+                              {child.name}
+                            </a>
+                          ) : (
+                            <Link
+                              key={child.id}
+                              href={url}
+                              prefetch={!url.startsWith("/projets")}
+                              onClick={() => setOpen(false)}
+                              className="py-1.5 text-sm text-white/80 hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
+                            >
+                              {child.name}
+                            </Link>
+                          )
                         );
                       })}
                     </div>
                   )}
                 </>
               ) : (
-                <Link
-                  href={href}
-                  prefetch={!href.startsWith("/projets")}
-                  onClick={() => setOpen(false)}
-                  className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
-                >
-                  {label}
-                </Link>
+                isExternalHref(href) ? (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpen(false)}
+                    className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <Link
+                    href={href}
+                    prefetch={!href.startsWith("/projets")}
+                    onClick={() => setOpen(false)}
+                    className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
+                  >
+                    {label}
+                  </Link>
+                )
               )}
             </div>
           ))}

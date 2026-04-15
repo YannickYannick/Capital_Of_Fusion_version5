@@ -42,13 +42,13 @@
     }
   },
   "landing": {
-    "badge": "Join the movement",
+    "badge": "Paris Bachata Vibe Festival",
     "title": "Capital of Fusion",
     "subtitle1": "Discover the world of Bachata like never before.",
     "subtitle2": "An interactive 3D experience at the heart of dance.",
     "ctaExplore": "Start the experience",
     "ctaCourses": "View classes",
-    "footerLine": "Paris, France • National Dance School"
+    "footerLine": "Paris, France"
   },
   "artistEdit": {
     "loginRequired": "Sign in required.",
@@ -135,6 +135,42 @@
     "dockWebsiteN": "Site {n}"
   },
   "pages": {
+    "festivalPlanning": {
+      "metaTitle": "Schedule & Shuttles | Festival",
+      "metaDescription": "Festival schedule, shuttles and practical info.",
+      "eyebrow": "Festival",
+      "title": "Schedule & Shuttles",
+      "subtitle": "Timetable, shuttles and practical information.",
+      "contentMarkdown": "## To fill\n\nAdd the **Schedule & Shuttles** page content here (Markdown).\n",
+      "empty": "Content coming soon."
+    },
+    "festivalVenue": {
+      "metaTitle": "Access & Venue | Festival",
+      "metaDescription": "How to get there and venue information.",
+      "eyebrow": "Festival",
+      "title": "Access & Venue",
+      "subtitle": "Address, access, transport and venue details.",
+      "contentMarkdown": "## To fill\n\nAdd the **Access & Venue** page content here (Markdown).\n",
+      "empty": "Content coming soon."
+    },
+    "supportFaq": {
+      "metaTitle": "FAQ | Support",
+      "metaDescription": "Frequently asked questions and answers.",
+      "eyebrow": "Support",
+      "title": "FAQ",
+      "subtitle": "Answers to the most common questions.",
+      "contentMarkdown": "## To fill\n\nAdd the **FAQ** content here (Markdown).\n",
+      "empty": "Content coming soon."
+    },
+    "supportContact": {
+      "metaTitle": "Contact us | Support",
+      "metaDescription": "Contact and support.",
+      "eyebrow": "Support",
+      "title": "Contact us",
+      "subtitle": "Need help? Write to us and we’ll reply.",
+      "contentMarkdown": "## To fill\n\nAdd the **Contact us** page content here (Markdown).\n",
+      "empty": "Content coming soon."
+    },
     "partnerHub": {
       "metaTitle": "Our partners | Capital of Fusion",
       "metaDescription": "Partner organizations, events and classes. Capital of Fusion.",
