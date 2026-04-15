@@ -229,6 +229,12 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     };
 
     const mainMp4Url = formatUrl(config?.main_video_file);
+    const hasUsableMainMp4 = useMemo(() => {
+        if (!mainMp4Url) return false;
+        // En prod, si NEXT_PUBLIC_API_URL n'est pas configuré, `formatUrl` peut fabriquer une URL locale.
+        // Sur iOS, ça forcerait un fallback MP4... vers un fichier inaccessible.
+        return !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\b/i.test(mainMp4Url);
+    }, [mainMp4Url]);
 
     /**
      * iOS Safari (et certains WebViews) bloquent fréquemment l'autoplay des iframes YouTube,
@@ -246,9 +252,9 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     const mainRenderType: "youtube" | "file" = useMemo(() => {
         if (mainType !== "youtube") return "file";
-        if (isIos && !!mainMp4Url) return "file";
+        if (isIos && hasUsableMainMp4) return "file";
         return "youtube";
-    }, [mainType, isIos, mainMp4Url]);
+    }, [mainType, isIos, hasUsableMainMp4]);
 
     const excludedForVideo = ["/dashboard", "/login", "/register"].some((route) => pathname.startsWith(route));
     const showBlackForVideo = opts.useBlackBackground || opts.disableYouTubeIframes;
