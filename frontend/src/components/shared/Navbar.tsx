@@ -71,7 +71,9 @@ export function Navbar() {
   const locale = useLocale();
   const t = useTranslations("navbar");
   const [menuItems, setMenuItems] = useState<MenuItemApi[] | null>(null);
-  const [menuError, setMenuError] = useState(false);
+  const [menuStatus, setMenuStatus] = useState<"loading" | "ready" | "error">(
+    "loading"
+  );
   const headerRef = useRef<HTMLElement | null>(null);
 
   useLayoutEffect(() => {
@@ -93,8 +95,13 @@ export function Navbar() {
 
   useEffect(() => {
     getMenuItems()
-      .then(setMenuItems)
-      .catch(() => setMenuError(true));
+      .then((items) => {
+        setMenuItems(items);
+        setMenuStatus("ready");
+      })
+      .catch(() => {
+        setMenuStatus("error");
+      });
   }, []);
 
   const {
@@ -373,7 +380,7 @@ export function Navbar() {
    * - Fallback uniquement si l'API est indisponible (erreur)
    */
   const apiLinks = useMemo((): NavLink[] => {
-    if (!menuItems?.length || menuError) return [];
+    if (!menuItems?.length) return [];
     const activeTree = filterActiveMenuTree(menuItems);
     return activeTree
       .map((item) => ({
@@ -388,15 +395,18 @@ export function Navbar() {
         if (EXCLUDED_ROOT_PATHS.has(h)) return false;
         return true;
       });
-  }, [menuItems, menuError]);
+  }, [menuItems]);
 
   const links: NavLink[] = useMemo(() => {
-    // Erreur / API indisponible → garder le menu de secours (comme avant)
-    if (menuError || !menuItems) return fallbackLinks;
-    // API OK mais tout est inactif → menu vide
-    if (apiLinks.length === 0) return [];
+    /**
+     * Évite le "flash" : au premier rendu, on ne montre pas le fallback tant que
+     * l'API n'a pas échoué. Avant ça, on garde le menu vide (layout stable).
+     */
+    if (menuStatus === "loading") return [];
+    if (menuStatus === "error") return fallbackLinks;
+    // menuStatus === "ready"
     return apiLinks;
-  }, [apiLinks, fallbackLinks, menuError, menuItems]);
+  }, [apiLinks, fallbackLinks, menuStatus]);
 
   const filteredLinks = links.filter((link) => normPath(link.href).toLowerCase() !== "/login");
 
