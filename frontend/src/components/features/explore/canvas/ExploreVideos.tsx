@@ -129,6 +129,16 @@ function useYTPlayer(
                         /* ignore */
                     }
                     try { e.target.setPlaybackQuality(playbackQualityRef.current); } catch (err) { }
+                    // iOS Safari ignore parfois `autoplay=1` même si la vidéo est muette.
+                    // Un `playVideo()` explicite (best-effort) suffit souvent à lancer la lecture.
+                    try {
+                        e.target.playVideo?.();
+                        // Retry court pour les cas où le player n'est pas encore pleinement prêt.
+                        window.setTimeout(() => e.target.playVideo?.(), 250);
+                        window.setTimeout(() => e.target.playVideo?.(), 1000);
+                    } catch {
+                        /* ignore */
+                    }
 
                     // Marqueur: player prêt + mesure depuis l'API prête
                     if (typeof performance !== "undefined") {

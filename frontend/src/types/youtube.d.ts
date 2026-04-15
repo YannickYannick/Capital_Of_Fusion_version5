@@ -7,6 +7,9 @@ interface YTPlayer {
   mute: () => void;
   unMute: () => void;
   isMuted: () => boolean;
+  playVideo?: () => void;
+  pauseVideo?: () => void;
+  getPlayerState?: () => number;
   setPlaybackQuality: (quality: string) => void;
   getAvailableQualityLevels: () => string[];
   destroy: () => void;
