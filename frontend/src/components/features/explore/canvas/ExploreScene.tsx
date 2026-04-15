@@ -1471,47 +1471,6 @@ function SceneContent({
   const router = useRouter();
   const opts = usePlanetsOptions();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  // Override des titres visibles sur Explore (labels + overlay) — attribution stable (pas de clignotement).
-  const rootDisplayNode = useMemo(() => {
-    if (!rootNode) return null;
-    return { ...rootNode, name: "BooK your Pass" };
-  }, [rootNode]);
-
-  const displayNameByNodeIdRef = useRef<Map<string, string>>(new Map());
-  const orbitDisplayNodes = useMemo(() => {
-    const pool = [
-      "Hôtel",
-      "artistes",
-      "Planning & Navettes",
-      "J&J Social French Cup",
-      "All star Street bachata Battle",
-      "acces & Venue",
-      "FAQ",
-    ];
-
-    const currentIds = new Set(orbitNodes.map((n) => n.id));
-    // Nettoyer les IDs qui ne sont plus dans la scène.
-    for (const id of displayNameByNodeIdRef.current.keys()) {
-      if (!currentIds.has(id)) displayNameByNodeIdRef.current.delete(id);
-    }
-
-    // Shuffle local pour attribuer aux nouvelles planètes uniquement.
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    let poolIdx = 0;
-
-    return orbitNodes.map((n) => {
-      const existing = displayNameByNodeIdRef.current.get(n.id);
-      if (existing) return { ...n, name: existing };
-      const assigned = pool[poolIdx] ?? "none";
-      poolIdx += 1;
-      displayNameByNodeIdRef.current.set(n.id, assigned);
-      return { ...n, name: assigned };
-    });
-  }, [orbitNodes]);
   const mousePosRef = useRef(new THREE.Vector3());
   const localAllPositions = useRef<Map<string, THREE.Vector3>>(new Map());
   const allPositions = externalAllPositions || localAllPositions;
@@ -1728,26 +1687,26 @@ function SceneContent({
       )}
 
       {/* Soleil ROOT */}
-      {rootDisplayNode && (
+      {rootNode && (
         <Sun
-          node={rootDisplayNode}
+          node={rootNode}
           frozen={frozen}
           globalPlanetScale={globalPlanetScale}
-          onClick={() => onPlanetClick(rootDisplayNode)}
+          onClick={() => onPlanetClick(rootNode)}
           onDoubleClick={() => {
-            if (rootDisplayNode.cta_url) router.push(rootDisplayNode.cta_url);
-            else router.push(`/organisation/noeuds/${encodeURIComponent(rootDisplayNode.slug)}`);
+            if (rootNode.cta_url) router.push(rootNode.cta_url);
+            else router.push(`/organisation/noeuds/${encodeURIComponent(rootNode.slug)}`);
           }}
-          isSelected={selectedId === rootDisplayNode.id}
-          isHovered={hoveredId === rootDisplayNode.id}
-          onHover={(v) => setHoveredId(v ? rootDisplayNode.id : null)}
+          isSelected={selectedId === rootNode.id}
+          isHovered={hoveredId === rootNode.id}
+          onHover={(v) => setHoveredId(v ? rootNode.id : null)}
           speedMultiplierRef={speedMultiplierRef}
           inOrbitZoneRef={inOrbitZoneRef}
         />
       )}
 
       {/* Planètes */}
-      {orbitDisplayNodes.map((node, i) => {
+      {orbitNodes.map((node, i) => {
         const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius);
         const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
         const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
