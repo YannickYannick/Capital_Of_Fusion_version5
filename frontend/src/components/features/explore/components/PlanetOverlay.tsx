@@ -128,7 +128,10 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   if (!node) return null;
 
   const centerTeaserSrc = "/teaser-pool-party.mp4";
-  const showCenterTeaser = node.slug === "capital-of-fusion-france";
+  const showCenterTeaser =
+    String(node.type || "").toLowerCase() === "root" ||
+    node.parent_slug === null ||
+    node.parent_slug === undefined;
 
   return (
     <>
@@ -168,15 +171,17 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                 {/* Gauche — Média */}
                 <div className="relative min-h-[220px] bg-black/40 rounded-tl-2xl rounded-bl-2xl overflow-hidden flex items-center justify-center">
                   {showCenterTeaser ? (
-                    <video
-                      src={centerTeaserSrc}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="metadata"
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="relative w-full h-full min-h-[220px]">
+                      <video
+                        src={centerTeaserSrc}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="metadata"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
                   ) : node.video_url && !videoError ? (
                     <div className="relative w-full h-full min-h-[220px]">
                       {node.cover_image && (
@@ -249,15 +254,6 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         <span>Explorer {node.name}</span>
                       </Link>
                     )}
-
-                    {/* Secondary Action: Vue filtrée des cours (si pertinent) */}
-                    <Link
-                      href={`/cours?organization=${node.id}`}
-                      className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition border border-white/10 text-center flex items-center justify-center"
-                      onClick={onClose}
-                    >
-                      Voir les cours liés
-                    </Link>
                   </div>
                 </div>
               </div>

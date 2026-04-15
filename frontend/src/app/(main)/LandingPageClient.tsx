@@ -91,7 +91,7 @@ export default function LandingPageClient() {
 
                     <div className="mt-5 flex justify-center">
                         <Image
-                            src="/pbv-logo.jpeg"
+                            src="/pbv-logo.png"
                             alt="Paris Bachata Vibe Festival"
                             width={260}
                             height={260}

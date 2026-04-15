@@ -934,8 +934,13 @@ function Planet({
       {/* Glow effect au hover/sélection */}
       {(isHovered || isSelected) && (
         <mesh>
-          <sphereGeometry args={[displayScale * 1.3, 16, 16]} />
-          <meshBasicMaterial color={color} transparent opacity={0.08} />
+          <sphereGeometry args={[displayScale * 1.01, 16, 16]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={0.035}
+            depthWrite={false}
+          />
         </mesh>
       )}
 
@@ -978,19 +983,19 @@ function LabelSprite({
 
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
-    const w = isCompact ? 640 : 384;
-    const h = isCompact ? 144 : 80;
+    const w = isCompact ? 1280 : 768;
+    const h = isCompact ? 288 : 160;
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d")!;
     ctx.clearRect(0, 0, w, h);
-    const fontSize = isCompact ? 36 : 24;
+    const fontSize = isCompact ? 72 : 48;
     ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const cx = w / 2;
     const cy = h / 2;
-    const strokeW = isCompact ? 5 : 3;
+    const strokeW = isCompact ? 10 : 6;
     ctx.lineJoin = "round";
     ctx.miterLimit = 2;
     ctx.strokeStyle = "rgba(0,0,0,0.92)";
@@ -1040,7 +1045,7 @@ function LabelSprite({
       );
     }
     const total = layoutBoost * distanceBoost;
-    spriteRef.current.scale.set(s * 1.8 * total, s * 0.45 * total, 1);
+    spriteRef.current.scale.set(s * 3.6 * total, s * 0.9 * total, 1);
     if (inOrbitZoneRef) {
       spriteRef.current.visible = inOrbitZoneRef.current || isHovered || isSelected;
     }
@@ -1466,6 +1471,47 @@ function SceneContent({
   const router = useRouter();
   const opts = usePlanetsOptions();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  // Override des titres visibles sur Explore (labels + overlay) — attribution stable (pas de clignotement).
+  const rootDisplayNode = useMemo(() => {
+    if (!rootNode) return null;
+    return { ...rootNode, name: "BooK your Pass" };
+  }, [rootNode]);
+
+  const displayNameByNodeIdRef = useRef<Map<string, string>>(new Map());
+  const orbitDisplayNodes = useMemo(() => {
+    const pool = [
+      "Hôtel",
+      "artistes",
+      "Planning & Navettes",
+      "J&J Social French Cup",
+      "All star Street bachata Battle",
+      "acces & Venue",
+      "FAQ",
+    ];
+
+    const currentIds = new Set(orbitNodes.map((n) => n.id));
+    // Nettoyer les IDs qui ne sont plus dans la scène.
+    for (const id of displayNameByNodeIdRef.current.keys()) {
+      if (!currentIds.has(id)) displayNameByNodeIdRef.current.delete(id);
+    }
+
+    // Shuffle local pour attribuer aux nouvelles planètes uniquement.
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    let poolIdx = 0;
+
+    return orbitNodes.map((n) => {
+      const existing = displayNameByNodeIdRef.current.get(n.id);
+      if (existing) return { ...n, name: existing };
+      const assigned = pool[poolIdx] ?? "none";
+      poolIdx += 1;
+      displayNameByNodeIdRef.current.set(n.id, assigned);
+      return { ...n, name: assigned };
+    });
+  }, [orbitNodes]);
   const mousePosRef = useRef(new THREE.Vector3());
   const localAllPositions = useRef<Map<string, THREE.Vector3>>(new Map());
   const allPositions = externalAllPositions || localAllPositions;
@@ -1682,26 +1728,26 @@ function SceneContent({
       )}
 
       {/* Soleil ROOT */}
-      {rootNode && (
+      {rootDisplayNode && (
         <Sun
-          node={rootNode}
+          node={rootDisplayNode}
           frozen={frozen}
           globalPlanetScale={globalPlanetScale}
-          onClick={() => onPlanetClick(rootNode)}
+          onClick={() => onPlanetClick(rootDisplayNode)}
           onDoubleClick={() => {
-            if (rootNode.cta_url) router.push(rootNode.cta_url);
-            else router.push(`/organisation/noeuds/${encodeURIComponent(rootNode.slug)}`);
+            if (rootDisplayNode.cta_url) router.push(rootDisplayNode.cta_url);
+            else router.push(`/organisation/noeuds/${encodeURIComponent(rootDisplayNode.slug)}`);
           }}
-          isSelected={selectedId === rootNode.id}
-          isHovered={hoveredId === rootNode.id}
-          onHover={(v) => setHoveredId(v ? rootNode.id : null)}
+          isSelected={selectedId === rootDisplayNode.id}
+          isHovered={hoveredId === rootDisplayNode.id}
+          onHover={(v) => setHoveredId(v ? rootDisplayNode.id : null)}
           speedMultiplierRef={speedMultiplierRef}
           inOrbitZoneRef={inOrbitZoneRef}
         />
       )}
 
       {/* Planètes */}
-      {orbitNodes.map((node, i) => {
+      {orbitDisplayNodes.map((node, i) => {
         const { r, y } = getDynamicOrbitParams(node, i, orbitNodes.length, autoDistributeOrbits, verticalMode, orbitSpacing, verticalHomogeneousBase, verticalHomogeneousStep, verticalJupiterAmplitude, verticalSphereRadius);
         const shape = globalShapeOverride ? globalShape : ((node.orbit_shape as "circle" | "squircle") || "circle");
         const roundness = globalShapeOverride ? globalRoundness : (node.orbit_roundness ?? 0.6);
