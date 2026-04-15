@@ -6,7 +6,7 @@
  * (enableVideoCycle + sliders Options) ou superposition continue (principale semi-transparente).
  * Contrôles : qualité, mute, voile. Override possible depuis Explore (musique planète).
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -220,6 +220,26 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
     const mainMp4Url = formatUrl(config?.main_video_file);
 
+    /**
+     * iOS Safari (et certains WebViews) bloquent fréquemment l'autoplay des iframes YouTube,
+     * même mutées, surtout en mode économie d'énergie / data saver / restrictions médias.
+     * On bascule automatiquement sur un MP4 natif si disponible.
+     */
+    const isIos = useMemo(() => {
+        if (typeof navigator === "undefined") return false;
+        const ua = navigator.userAgent || "";
+        // iPadOS 13+ peut se présenter comme "Macintosh" mais avec touch points.
+        const isAppleMobile = /iPhone|iPad|iPod/i.test(ua);
+        const isIpadOs = /Macintosh/i.test(ua) && (navigator as any).maxTouchPoints > 1;
+        return isAppleMobile || isIpadOs;
+    }, []);
+
+    const mainRenderType: "youtube" | "file" = useMemo(() => {
+        if (mainType !== "youtube") return "file";
+        if (isIos && !!mainMp4Url) return "file";
+        return "youtube";
+    }, [mainType, isIos, mainMp4Url]);
+
     const excludedForVideo = ["/dashboard", "/login", "/register"].some((route) => pathname.startsWith(route));
     const showBlackForVideo = opts.useBlackBackground || opts.disableYouTubeIframes;
     const cycleType = config?.cycle_video_type ?? "youtube";
@@ -241,7 +261,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const mainYT = useYTPlayer(
         mainYTId,
         apiReady && ytEnabled,
-        mainType === 'youtube' && !effectiveOverride && ytEnabled,
+        mainRenderType === "youtube" && !effectiveOverride && ytEnabled,
         "main",
         quality,
         preferUnmuted
@@ -271,6 +291,35 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     const mainNativeRef = useRef<HTMLVideoElement>(null);
     const overrideNativeRef = useRef<HTMLVideoElement>(null);
     const cycleNativeRef = useRef<HTMLVideoElement>(null);
+
+    // iOS : "kick" au premier geste utilisateur pour garantir play() (autoplay parfois ignoré)
+    useEffect(() => {
+        if (!isIos) return;
+        const v = mainNativeRef.current;
+        if (!v) return;
+        if (mainRenderType !== "file") return;
+        const tryPlay = () => {
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                v.play();
+            } catch {
+                // ignore
+            }
+        };
+        // Essayer immédiatement (au cas où l'autoplay est autorisé)
+        tryPlay();
+        const onFirstTouch = () => {
+            tryPlay();
+            window.removeEventListener("touchstart", onFirstTouch, { capture: true } as any);
+            window.removeEventListener("click", onFirstTouch, { capture: true } as any);
+        };
+        window.addEventListener("touchstart", onFirstTouch, { capture: true, passive: true });
+        window.addEventListener("click", onFirstTouch, { capture: true, passive: true } as any);
+        return () => {
+            window.removeEventListener("touchstart", onFirstTouch, { capture: true } as any);
+            window.removeEventListener("click", onFirstTouch, { capture: true } as any);
+        };
+    }, [isIos, mainRenderType]);
 
     // Quand override (effectif) YouTube est actif, charger l’API si la vidéo principale ne l’a pas déjà fait (ex. main en MP4).
     useEffect(() => {
@@ -553,11 +602,21 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                             : 1,
                 }}
             >
-                {mainType === 'youtube' ? (
+                {mainRenderType === "youtube" ? (
                     <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
                 ) : (
                     mainMp4Url && (
-                        <video ref={mainNativeRef} src={mainMp4Url} autoPlay loop muted={muted} playsInline className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover" style={{ transform: "translate(-50%, -50%)" }} />
+                        <video
+                            ref={mainNativeRef}
+                            src={mainMp4Url}
+                            autoPlay
+                            loop
+                            muted={muted}
+                            playsInline
+                            preload="auto"
+                            className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover"
+                            style={{ transform: "translate(-50%, -50%)" }}
+                        />
                     )
                 )}
             </div>
