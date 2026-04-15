@@ -3,8 +3,10 @@
 /**
  * Fiche dédiée d'un nœud — hero, à propos, cours et événements du nœud.
  * Style /artistes/profils/[username]. Lien "Explorer en 3D" vers /explore?node=slug.
+ *
+ * Exception : certains slugs festival utilisent un template éditorial (même look que /festival/planning-navettes).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +23,7 @@ import { profileLinksFromApi } from "@/types/profileLinks";
 import type { OrganizationNodeApi } from "@/types/organization";
 import type { CourseListApi } from "@/types/course";
 import type { EventApi } from "@/types/event";
+import { FestivalEditorialNode } from "./FestivalEditorialNode";
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -48,6 +51,17 @@ function nodeProfileUrl(profile: string | null | undefined): string | null {
 export default function NoeudProfilPage() {
   const params = useParams();
   const slug = typeof params?.slug === "string" ? params.slug : "";
+
+  // Map slugs → content keys (messages/* -> pages.*)
+  const festivalEditorialContentKey = useMemo(() => {
+    if (slug === "jack-n-jill-vibe") return "festivalJackNJill";
+    if (slug === "all-star-street-bachata-battle") return "festivalAllStarStreetBattle";
+    return null;
+  }, [slug]);
+
+  if (festivalEditorialContentKey) {
+    return <FestivalEditorialNode contentKey={festivalEditorialContentKey} />;
+  }
   const [node, setNode] = useState<OrganizationNodeApi | null>(null);
   const [courses, setCourses] = useState<CourseListApi[]>([]);
   const [events, setEvents] = useState<EventApi[]>([]);

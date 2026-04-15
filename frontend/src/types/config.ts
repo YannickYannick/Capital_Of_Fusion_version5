@@ -39,6 +39,12 @@ export interface SiteConfigurationApi {
     vision_markdown?: string;
     /** Contenu markdown de la page Identité COF → Notre histoire */
     history_markdown?: string;
+    festival_planning_navettes_markdown?: string;
+    festival_acces_venue_markdown?: string;
+    festival_jack_n_jill_markdown?: string;
+    festival_all_star_street_battle_markdown?: string;
+    support_faq_markdown?: string;
+    support_contact_markdown?: string;
     main_video_type: 'youtube' | 'mp4';
     main_video_youtube_id: string;
     main_video_file: string | null;

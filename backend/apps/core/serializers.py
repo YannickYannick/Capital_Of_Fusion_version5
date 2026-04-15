@@ -57,6 +57,12 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
         fields = [
             "site_name", "hero_title", "hero_subtitle",
             "vision_markdown", "history_markdown",
+            "festival_planning_navettes_markdown",
+            "festival_acces_venue_markdown",
+            "festival_jack_n_jill_markdown",
+            "festival_all_star_street_battle_markdown",
+            "support_faq_markdown",
+            "support_contact_markdown",
             "main_video_type", "main_video_youtube_id", "main_video_file",
             "cycle_video_type", "cycle_video_youtube_id", "cycle_video_file",
             "explore_config",

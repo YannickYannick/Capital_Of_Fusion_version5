@@ -29,7 +29,7 @@
       "partnerCourses": "Cours des partenaires",
       "partnerArtistsDirectory": "Profils artistes",
       "promotionsFestivals": "Promotions festivals",
-      "organisation": "Organisation",
+      "organisation": "About us",
       "structure": "Notre structure",
       "poles": "Nos pôles",
       "ourArtists": "Nos artistes",
@@ -42,13 +42,13 @@
     }
   },
   "landing": {
-    "badge": "Rejoins le mouvement",
+    "badge": "Paris Bachata Vibe Festival",
     "title": "Capital of Fusion",
     "subtitle1": "Découvrez l'univers de la Bachata comme jamais.",
     "subtitle2": "Une expérience interactive en 3D au cœur de la danse.",
     "ctaExplore": "Commencer l'Expérience",
     "ctaCourses": "Voir les Cours",
-    "footerLine": "Paris, France • École Nationale de Danse"
+    "footerLine": "Paris, France"
   },
   "artistEdit": {
     "loginRequired": "Connexion requise.",
@@ -135,6 +135,60 @@
     "dockWebsiteN": "Site {n}"
   },
   "pages": {
+    "festivalPlanning": {
+      "metaTitle": "Planning & Navettes | Festival",
+      "metaDescription": "Planning, navettes et infos pratiques du festival.",
+      "eyebrow": "Festival",
+      "title": "Planning & Navettes",
+      "subtitle": "Horaires, navettes et informations pratiques.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Planning & Navettes**.\n",
+      "empty": "Contenu à venir."
+    },
+    "festivalVenue": {
+      "metaTitle": "Accès & Venue | Festival",
+      "metaDescription": "Accès, adresse, et informations sur le venue.",
+      "eyebrow": "Festival",
+      "title": "Accès & Venue",
+      "subtitle": "Adresse, accès, transports, et infos sur le lieu.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Accès & Venue**.\n",
+      "empty": "Contenu à venir."
+    },
+    "festivalJackNJill": {
+      "metaTitle": "Jack N Jill | Festival",
+      "metaDescription": "Infos Jack N Jill Social French Cup & European Qualifier.",
+      "eyebrow": "Festival",
+      "title": "Jack N Jill Social French Cup & European Qualifier",
+      "subtitle": "Informations, règles, horaires et inscriptions.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Jack N Jill**.\n",
+      "empty": "Contenu à venir."
+    },
+    "festivalAllStarStreetBattle": {
+      "metaTitle": "All Star Street Bachata Battle | Festival",
+      "metaDescription": "Infos All Star Street Bachata Battle.",
+      "eyebrow": "Festival",
+      "title": "All Star Street Bachata Battle",
+      "subtitle": "Format, règles, horaires et informations.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **All Star Street Bachata Battle**.\n",
+      "empty": "Contenu à venir."
+    },
+    "supportFaq": {
+      "metaTitle": "FAQ | Support",
+      "metaDescription": "Questions fréquentes et réponses.",
+      "eyebrow": "Support",
+      "title": "FAQ",
+      "subtitle": "Les réponses aux questions les plus fréquentes.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la **FAQ**.\n",
+      "empty": "Contenu à venir."
+    },
+    "supportContact": {
+      "metaTitle": "Nous contacter | Support",
+      "metaDescription": "Contact et assistance.",
+      "eyebrow": "Support",
+      "title": "Nous contacter",
+      "subtitle": "Besoin d’aide ? Écris-nous et on te répond.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Nous contacter**.\n",
+      "empty": "Contenu à venir."
+    },
     "partnerHub": {
       "metaTitle": "Nos partenaires | Capital of Fusion",
       "metaDescription": "Structures, événements et cours de nos partenaires. Capital of Fusion.",

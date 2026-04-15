@@ -12,7 +12,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://capitaloffusion.fr"
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Capital of Fusion — École Nationale de Danse",
+    default: "Capital of Fusion",
     template: "%s — Capital of Fusion",
   },
   description:
@@ -21,12 +21,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "Capital of Fusion",
-    title: "Capital of Fusion — École Nationale de Danse",
+    title: "Capital of Fusion",
     description: "Bachata, cours et événements. Découvrez notre école et l'expérience Explore 3D.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Capital of Fusion — École Nationale de Danse",
+    title: "Capital of Fusion",
     description: "Bachata, cours et événements. Découvrez notre école et l'expérience Explore 3D.",
   },
   robots: {

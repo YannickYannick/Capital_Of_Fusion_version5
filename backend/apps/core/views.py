@@ -138,6 +138,16 @@ class SiteConfigurationAdminAPIView(APIView):
             payload["vision_markdown"] = request.data["vision_markdown"]
         if request.data.get("history_markdown") is not None:
             payload["history_markdown"] = request.data["history_markdown"]
+        for key in (
+            "festival_planning_navettes_markdown",
+            "festival_acces_venue_markdown",
+            "festival_jack_n_jill_markdown",
+            "festival_all_star_street_battle_markdown",
+            "support_faq_markdown",
+            "support_contact_markdown",
+        ):
+            if request.data.get(key) is not None:
+                payload[key] = request.data[key]
         if not payload:
             serializer = SiteConfigurationSerializer(config, context={'request': request})
             return Response(serializer.data)

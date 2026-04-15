@@ -174,6 +174,43 @@ export async function patchSiteConfigHistory(historyMarkdown: string): Promise<S
 }
 
 /**
+ * Mise à jour de champs markdown additionnels (Festival/Support). Staff/superuser.
+ * PATCH /api/admin/config/
+ */
+export async function patchSiteConfigMarkdownField(payload: Partial<Pick<
+  SiteConfigurationApi,
+  | "festival_planning_navettes_markdown"
+  | "festival_acces_venue_markdown"
+  | "festival_jack_n_jill_markdown"
+  | "festival_all_star_street_battle_markdown"
+  | "support_faq_markdown"
+  | "support_contact_markdown"
+>>): Promise<SiteConfigurationApi | { pending: true; message: string }> {
+  const base = getApiBaseUrl();
+  const token = getStoredToken();
+  if (!token) throw new Error("Authentification requise");
+  const lang = (await getLocaleFromCookie()) ?? "fr";
+  const url = addLangParam(`${base}/api/admin/config/`, lang);
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg =
+      (data && typeof data === "object" && "error" in data)
+        ? String((data as any).error)
+        : (data as any)?.detail || `Patch config API error: ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+/**
  * Liste de tous les bulletins (dont brouillons) pour édition. Staff/superuser.
  * GET /api/admin/identite/bulletins/
  */

@@ -16,6 +16,19 @@ function normPath(u: string): string {
   return (u || "").replace(/\/$/, "") || "/";
 }
 
+function isExternalHref(href: string): boolean {
+  return /^https?:\/\//i.test(href || "");
+}
+
+function filterActiveMenuTree(items: MenuItemApi[]): MenuItemApi[] {
+  return (items ?? [])
+    .filter((i) => i.is_active !== false)
+    .map((i) => ({
+      ...i,
+      children: filterActiveMenuTree(i.children ?? []),
+    }));
+}
+
 /** Slugs racine masqués (remplacés par les entrées injectées Identité / En cours / etc.). */
 const EXCLUDED_ROOT_SLUGS = new Set([
   "identite-cof",
@@ -354,9 +367,17 @@ export function Navbar() {
     ],
   );
 
-  const apiLinks = useMemo(() => {
+  /**
+   * Menu depuis l'API :
+   * - Filtre `is_active` (récursif)
+   * - Applique la blacklist root (EXCLUDED_ROOT_*)
+   * - Si l'API répond mais tout est inactif → menu vide (pas de fallback)
+   * - Fallback uniquement si l'API est indisponible (erreur)
+   */
+  const apiLinks = useMemo((): NavLink[] => {
     if (!menuItems?.length || menuError) return [];
-    return menuItems
+    const activeTree = filterActiveMenuTree(menuItems);
+    return activeTree
       .map((item) => ({
         href: item.url || "/",
         label: item.name,
@@ -371,39 +392,13 @@ export function Navbar() {
       });
   }, [menuItems, menuError]);
 
-  const organisationFromApi = useMemo(() => {
-    if (!menuItems?.length || menuError) return null;
-    const m = menuItems.find((item) => item.slug === "organisation");
-    if (!m) return null;
-    return {
-      href: m.url || "/organisation",
-      label: t("menu.organisation"),
-      children: localizeMenuChildren(m.children ?? [], t),
-    };
-  }, [menuItems, menuError, t]);
-
-  const autreFromApi = useMemo(() => {
-    if (!menuItems?.length || menuError) return null;
-    const m = menuItems.find((item) => item.slug === "autre");
-    if (!m) return null;
-    return {
-      href: m.url || "#",
-      label: t("menu.other"),
-      children: localizeMenuChildren(m.children ?? [], t),
-    };
-  }, [menuItems, menuError, t]);
-
-  const links =
-    apiLinks.length > 0
-      ? [
-          identiteCofEntry,
-          organisationFromApi ?? organisationEntry,
-          partenairesEntry,
-          promotionsFestivalsEntry,
-          autreFromApi ?? autreEntry,
-          enCoursEntry,
-        ]
-      : fallbackLinks;
+  const links: NavLink[] = useMemo(() => {
+    // Erreur / API indisponible → garder le menu de secours (comme avant)
+    if (menuError || !menuItems) return fallbackLinks;
+    // API OK mais tout est inactif → menu vide
+    if (apiLinks.length === 0) return [];
+    return apiLinks;
+  }, [apiLinks, fallbackLinks, menuError, menuItems]);
 
   const filteredLinks = links.filter((link) => normPath(link.href).toLowerCase() !== "/login");
 
@@ -434,40 +429,76 @@ export function Navbar() {
           {filteredLinks.map(({ href, label, children }) =>
             children.length > 0 ? (
               <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
-                <Link
-                  href={href}
-                  className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
-                >
-                  {label}
-                </Link>
+                {isExternalHref(href) ? (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <Link
+                    href={href}
+                    className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                  >
+                    {label}
+                  </Link>
+                )}
                 <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="bg-black/95 backdrop-blur-md border border-white/10 rounded-lg py-2 min-w-[180px] shadow-xl">
                     {children.map((child) => {
                       const url = child.url || "#";
                       const isProjets = url.startsWith("/projets");
+                      const external = isExternalHref(url);
                       return (
-                        <Link
-                          key={child.id}
-                          href={url}
-                          prefetch={!isProjets}
-                          className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
-                        >
-                          {child.name}
-                        </Link>
+                        external ? (
+                          <a
+                            key={child.id}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
+                          >
+                            {child.name}
+                          </a>
+                        ) : (
+                          <Link
+                            key={child.id}
+                            href={url}
+                            prefetch={!isProjets}
+                            className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
+                          >
+                            {child.name}
+                          </Link>
+                        )
                       );
                     })}
                   </div>
                 </div>
               </div>
             ) : (
-              <Link
-                key={href + label}
-                href={href}
-                prefetch={!href.startsWith("/projets")}
-                className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
-              >
-                {label}
-              </Link>
+              isExternalHref(href) ? (
+                <a
+                  key={href + label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
+                >
+                  {label}
+                </a>
+              ) : (
+                <Link
+                  key={href + label}
+                  href={href}
+                  prefetch={!href.startsWith("/projets")}
+                  className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
+                >
+                  {label}
+                </Link>
+              )
             ),
           )}
           <div className="flex items-center gap-1 ml-2" aria-label={t("language")}>
