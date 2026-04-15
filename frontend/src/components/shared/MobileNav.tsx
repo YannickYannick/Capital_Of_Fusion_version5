@@ -22,15 +22,7 @@ function isExternalHref(href: string): boolean {
  * MobileNav — menu hamburger pour mobile.
  * Affiche les entrées de menu (API ou fallback) ; sous-menus dépliables.
  */
-export function MobileNav({
-  items,
-  hasToken,
-  onLogout,
-}: {
-  items: NavLinkItem[];
-  hasToken?: boolean;
-  onLogout?: () => void;
-}) {
+export function MobileNav({ items }: { items: NavLinkItem[] }) {
   const [open, setOpen] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
   const t = useTranslations("navbar");
@@ -178,28 +170,6 @@ export function MobileNav({
               )}
             </div>
           ))}
-          {hasToken && onLogout ? (
-            <button
-              type="button"
-              onClick={() => {
-                onLogout();
-                setOpen(false);
-              }}
-              className="w-full text-left px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
-              aria-label={t("mobile.logout")}
-            >
-              {t("mobile.logout")}
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="block px-6 py-2 text-white/90 hover:text-white hover:bg-white/5 border-t border-white/10 mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-inset"
-              aria-label={t("login")}
-            >
-              {t("login")}
-            </Link>
-          )}
         </div>
       )}
     </div>

@@ -73,7 +73,7 @@ export default async function ProgrammesPage() {
                 <div className="flex items-center gap-4 mb-6">
                   <div
                     className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: level.color || "#a855f7" }}
+                    style={{ backgroundColor: level.color || "#f3ac41" }}
                   />
                   <h2 className="text-2xl font-bold text-white">
                     {level.name}
@@ -90,7 +90,7 @@ export default async function ProgrammesPage() {
                       href={`/cours/${course.slug}`}
                       className="group p-5 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/40 transition-all duration-300"
                       style={{
-                        borderLeftColor: level.color || "#a855f7",
+                        borderLeftColor: level.color || "#f3ac41",
                         borderLeftWidth: "3px",
                       }}
                     >

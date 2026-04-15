@@ -155,7 +155,7 @@ export default function FiltresPage() {
                       className="px-3 py-1 rounded-full text-xs font-medium"
                       style={{
                         backgroundColor: `${course.level_color}20`,
-                        color: course.level_color || "#a855f7",
+                        color: course.level_color || "#f3ac41",
                       }}
                     >
                       {course.level_name}

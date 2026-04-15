@@ -34,6 +34,20 @@ export default function FestivalIndexPage() {
           <div className="text-sm font-semibold">Accès &amp; Venue</div>
           <div className="mt-1 text-xs text-white/55">Adresse, transports, venue.</div>
         </Link>
+        <Link
+          href="/festival/book-your-hotel"
+          className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition"
+        >
+          <div className="text-sm font-semibold">Book your hôtel</div>
+          <div className="mt-1 text-xs text-white/55">Hébergement, liens et infos (Markdown).</div>
+        </Link>
+        <Link
+          href="/festival/notre-programme"
+          className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition"
+        >
+          <div className="text-sm font-semibold">Notre programme</div>
+          <div className="mt-1 text-xs text-white/55">Programme du festival (Markdown).</div>
+        </Link>
       </div>
     </div>
   );

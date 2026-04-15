@@ -9,6 +9,7 @@ import { AnimatedDiv } from "@/components/shared/AnimatedDiv";
 import { StandardPageShell, StandardPageHero } from "@/components/shared/StandardPage";
 import { AdminToolbar } from "@/components/shared/AdminEditButton";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 
 const DJANGO_ADMIN_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -61,7 +62,20 @@ export default function ArtistesPage() {
           title={t("artists.titleBefore")}
           highlight={t("artists.titleHighlight")}
           description={t("artists.subtitle")}
+          bottomSpacingClassName="mb-6"
         />
+
+        <div className="mb-12 flex justify-center">
+          <Image
+            src="/artistes-banner-fb.jpg"
+            alt={t("artists.bannerAlt")}
+            width={1200}
+            height={675}
+            sizes="(max-width: 768px) 100vw, 896px"
+            className="w-full max-w-4xl rounded-2xl border border-white/10 object-cover shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
+            priority
+          />
+        </div>
 
         {(user?.user_type === "STAFF" || user?.user_type === "ADMIN") && (
           <div className="mb-10 flex justify-center">

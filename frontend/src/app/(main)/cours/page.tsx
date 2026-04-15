@@ -203,7 +203,7 @@ export default function CoursPage() {
               <AdminEditButton onEdit={() => setEditingCourse(c)} />
               <Link
                 href={`/cours/${c.slug}`}
-                className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 hover:shadow-[0_0_30px_-5px_rgba(168,85,247,0.3)] transition-all duration-300 hover:-translate-y-1 block relative"
+                className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 hover:shadow-[0_0_30px_-5px_rgba(243,172,65,0.35)] transition-all duration-300 hover:-translate-y-1 block relative"
               >
                 <div className="flex justify-between items-start mb-4">
                   <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-purple-500/20 text-purple-300 border border-purple-500/30">

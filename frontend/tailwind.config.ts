@@ -1,5 +1,50 @@
 import type { Config } from "tailwindcss";
 
+/** Jaune or CoF — remplace l’ancienne identité violette (classes purple/violet/fuchsia conservées). */
+const cofGold = {
+  50: "#fffbeb",
+  100: "#fff4d6",
+  200: "#ffe8a8",
+  300: "#fad375",
+  400: "#f5bc4a",
+  500: "#f3ac41",
+  600: "#d99120",
+  700: "#b37418",
+  800: "#8f5a17",
+  900: "#764a18",
+  950: "#3f2609",
+};
+
+/** Accent chaud pour les gradients (ex-rose / second ton). */
+const cofAmber = {
+  50: "#fff7ed",
+  100: "#ffedd5",
+  200: "#fed7aa",
+  300: "#fdba74",
+  400: "#fb923c",
+  500: "#f97316",
+  600: "#ea580c",
+  700: "#c2410c",
+  800: "#9a3412",
+  900: "#7c2d12",
+  950: "#431407",
+};
+
+/** Tons foncés pour les fonds en dégradé (ex-indigo). */
+const cofDeep = {
+  50: "#fffbeb",
+  100: "#fef3c7",
+  200: "#fde68a",
+  300: "#fcd34d",
+  400: "#e8b84d",
+  500: "#d99120",
+  600: "#b37418",
+  700: "#8f5a17",
+  800: "#5c3a12",
+  900: "#3d260c",
+  950: "#1f0f05",
+};
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,6 +55,15 @@ const config: Config = {
     extend: {
       colors: {
         background: "#0a0e27",
+        brand: {
+          DEFAULT: "#f3ac41",
+          foreground: "#1a0f05",
+        },
+        purple: cofGold,
+        violet: cofGold,
+        fuchsia: cofGold,
+        pink: cofAmber,
+        indigo: cofDeep,
       },
       keyframes: {
         "progress-full": {

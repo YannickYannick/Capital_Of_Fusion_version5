@@ -56,8 +56,8 @@ export function AdminModal({
                 className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl"
                 style={{
                     background: "linear-gradient(135deg, #1a0a2e 0%, #0d0d1a 100%)",
-                    border: "1px solid rgba(139,92,246,0.3)",
-                    boxShadow: "0 25px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(139,92,246,0.1)",
+                    border: "1px solid rgba(243,172,65,0.35)",
+                    boxShadow: "0 25px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(243,172,65,0.12)",
                 }}
             >
                 {/* Header */}

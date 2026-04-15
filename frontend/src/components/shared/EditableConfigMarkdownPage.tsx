@@ -7,7 +7,7 @@ import { markdownToHtml } from "@/lib/markdownToHtml";
 import { patchSiteConfigMarkdownField } from "@/lib/api";
 
 const proseClasses =
-  "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
+  "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg [&_img]:my-8 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-2xl [&_img]:border [&_img]:border-white/10";
 
 export function EditableConfigMarkdownPage({
   eyebrow,
@@ -16,6 +16,7 @@ export function EditableConfigMarkdownPage({
   initialValue,
   field,
   emptyText,
+  ctaBelowSubtitle,
 }: {
   eyebrow: string;
   title: string;
@@ -26,9 +27,13 @@ export function EditableConfigMarkdownPage({
     | "festival_acces_venue_markdown"
     | "festival_jack_n_jill_markdown"
     | "festival_all_star_street_battle_markdown"
+    | "festival_book_your_hotel_markdown"
+    | "festival_notre_programme_markdown"
     | "support_faq_markdown"
     | "support_contact_markdown";
   emptyText: string;
+  /** Bouton d’action sous le sous-titre (ex. lien externe go&dance), style aligné sur la landing. */
+  ctaBelowSubtitle?: { href: string; label: string };
 }) {
   const { user } = useAuth();
   const router = useRouter();
@@ -56,6 +61,19 @@ export function EditableConfigMarkdownPage({
       <p className="text-xs uppercase tracking-widest text-purple-300/90">{eyebrow}</p>
       <h1 className="mt-3 text-4xl md:text-5xl font-extrabold tracking-tight">{title}</h1>
       <p className="mt-4 text-white/60">{subtitle}</p>
+
+      {ctaBelowSubtitle ? (
+        <div className="mt-6">
+          <a
+            href={ctaBelowSubtitle.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex px-6 py-3 rounded-lg bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-semibold transition text-center"
+          >
+            {ctaBelowSubtitle.label}
+          </a>
+        </div>
+      ) : null}
 
       {canEdit ? (
         <div className="mt-8 flex flex-wrap items-center gap-2">

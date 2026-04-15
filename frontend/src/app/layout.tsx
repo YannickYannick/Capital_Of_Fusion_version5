@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { TopLoadingBar } from "@/components/shared/TopLoadingBar";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const urbane = localFont({
+  src: [
+    { path: "../fonts/urbane/Urbane-Light.ttf", weight: "300", style: "normal" },
+    { path: "../fonts/urbane/Urbane-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/urbane/Urbane-DemiBold.ttf", weight: "600", style: "normal" },
+    { path: "../fonts/urbane/Urbane-Bold.ttf", weight: "700", style: "normal" },
+    { path: "../fonts/urbane/Urbane-Heavy.ttf", weight: "800", style: "normal" },
+  ],
+  variable: "--font-urbane",
+  display: "swap",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://capitaloffusion.fr";
 
@@ -49,7 +61,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${urbane.className} ${urbane.variable} ${inter.variable}`} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <TopLoadingBar />
           {children}

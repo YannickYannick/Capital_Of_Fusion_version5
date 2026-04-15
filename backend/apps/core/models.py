@@ -304,6 +304,18 @@ class SiteConfiguration(models.Model):
         verbose_name="Festival — All Star Street Battle (Markdown)",
         help_text="Contenu de la page All Star Street Bachata Battle (format Markdown).",
     )
+    festival_book_your_hotel_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Festival — Book your hôtel (Markdown)",
+        help_text="Contenu de la page Festival → Book your hôtel (format Markdown).",
+    )
+    festival_notre_programme_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Festival — Notre programme (Markdown)",
+        help_text="Contenu de la page Festival → Notre programme (format Markdown).",
+    )
 
     # Support — pages éditoriales (Markdown)
     support_faq_markdown = models.TextField(

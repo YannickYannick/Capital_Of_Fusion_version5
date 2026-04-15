@@ -23,8 +23,8 @@ import { DynamicPlanet, type PlanetType } from "./planets";
 // ─────────────────────────────────────────────────────────
 
 function hexToColor(hex: string): THREE.Color {
-  const h = hex?.startsWith("#") ? hex : `#${hex ?? "a855f7"}`;
-  return new THREE.Color(h || "#a855f7");
+  const h = hex?.startsWith("#") ? hex : `#${hex ?? "f3ac41"}`;
+  return new THREE.Color(h || "#f3ac41");
 }
 
 /** Téléphone / tablette tactile : libellés planètes plus grands et lisibles. */
@@ -687,7 +687,7 @@ function Planet({
 
   const perspectiveBoost = THREE.MathUtils.lerp(1, REMOTE_ORBIT_SCALE_MAX, orbitDepthBlend);
   const scale = (node.planet_scale ?? 0.6) * globalPlanetScale * perspectiveBoost;
-  const color = hexToColor(node.planet_color || "#a855f7");
+  const color = hexToColor(node.planet_color || "#f3ac41");
 
   const { targetOrbitPos, targetOrbitPhase, fanStartPos } = useMemo(() => {
     // ── Mode éventail : phase déterminée par index (répartition uniforme sur l'orbite)
@@ -912,7 +912,7 @@ function Planet({
       {showEntryTrajectory && !stateRef.current.hasEnteredOrbit && (
         <Line
           points={[entryPoint, targetOrbitPosArray]}
-          color="#a855f7"
+          color="#f3ac41"
           opacity={0.25}
           transparent
           lineWidth={1}
@@ -990,7 +990,7 @@ function LabelSprite({
     const ctx = canvas.getContext("2d")!;
     ctx.clearRect(0, 0, w, h);
     const fontSize = isCompact ? 72 : 48;
-    ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
+    ctx.font = `bold ${fontSize}px Urbane, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const cx = w / 2;
@@ -1722,7 +1722,7 @@ function SceneContent({
           inOrbitZoneRef={inOrbitZoneRef}
           orbitZoneRadiusRef={orbitZoneRadiusRef}
           show={opts.showOrbitZoneIndicator ?? true}
-          color={opts.orbitZoneIndicatorColor ?? "#a855f7"}
+          color={opts.orbitZoneIndicatorColor ?? "#f3ac41"}
           opacity={opts.orbitZoneIndicatorOpacity ?? 0.28}
         />
       )}

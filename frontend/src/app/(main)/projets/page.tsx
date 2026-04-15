@@ -192,7 +192,7 @@ export default function ProjetsPage() {
           <div className="flex gap-2 flex-wrap justify-center">
             <button
               onClick={() => setSelectedCategory("")}
-              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${selectedCategory === "" ? "bg-fuchsia-500 border-fuchsia-500 text-white shadow-[0_0_20px_-5px_rgba(217,70,239,0.6)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"}`}
+              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${selectedCategory === "" ? "bg-fuchsia-500 border-fuchsia-500 text-white shadow-[0_0_20px_-5px_rgba(243,172,65,0.55)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"}`}
             >
               Toutes les catégories
             </button>
@@ -200,7 +200,7 @@ export default function ProjetsPage() {
               <button
                 key={cat.slug}
                 onClick={() => setSelectedCategory(cat.slug)}
-                className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${selectedCategory === cat.slug ? "bg-fuchsia-500 border-fuchsia-500 text-white shadow-[0_0_20px_-5px_rgba(217,70,239,0.6)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"}`}
+                className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${selectedCategory === cat.slug ? "bg-fuchsia-500 border-fuchsia-500 text-white shadow-[0_0_20px_-5px_rgba(243,172,65,0.55)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"}`}
               >
                 {cat.name}
               </button>
@@ -250,7 +250,7 @@ export default function ProjetsPage() {
 
                   <Link
                     href={`/projets/${project.slug}`}
-                    className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-fuchsia-500/40 hover:shadow-[0_0_40px_-10px_rgba(217,70,239,0.25)] transition-all duration-300 hover:-translate-y-1 block"
+                    className="flex flex-col h-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-fuchsia-500/40 hover:shadow-[0_0_40px_-10px_rgba(243,172,65,0.3)] transition-all duration-300 hover:-translate-y-1 block"
                   >
                     <div className="flex justify-between items-start mb-5 gap-2">
                       <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30 truncate">

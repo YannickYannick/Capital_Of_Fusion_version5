@@ -153,6 +153,23 @@
       "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Accès & Venue**.\n",
       "empty": "Contenu à venir."
     },
+    "festivalBookHotel": {
+      "metaTitle": "Book your hôtel | Festival",
+      "metaDescription": "Hôtel 4★, petit-déjeuner, navette vers le festival — chambres premium ou standard.",
+      "eyebrow": "Festival",
+      "title": "Book your hôtel",
+      "subtitle": "Hôtel 4★ avec piscine et petit-déjeuner, navette festival, socials quotidiens.",
+      "ctaGoAndDance": "Réserver sur go&dance",
+      "empty": "Contenu à venir."
+    },
+    "festivalNotreProgramme": {
+      "metaTitle": "Notre programme | Festival",
+      "metaDescription": "Programme du festival : ateliers, soirées, événements.",
+      "eyebrow": "Festival",
+      "title": "Notre programme",
+      "subtitle": "Le détail du programme (Markdown éditable).",
+      "empty": "Contenu à venir."
+    },
     "festivalJackNJill": {
       "metaTitle": "Jack N Jill | Festival",
       "metaDescription": "Infos Jack N Jill Social French Cup & European Qualifier.",
@@ -410,6 +427,7 @@
       "titleBefore": "Nos",
       "titleHighlight": "Artistes",
       "subtitle": "Découvrez les talents qui font battre le cœur de Capital of Fusion. Membres officiels et artistes partenaires.",
+      "bannerAlt": "Visuel artistes Capital of Fusion",
       "filterAll": "Tous",
       "filterStaff": "Team CoF",
       "filterExternal": "Externe",

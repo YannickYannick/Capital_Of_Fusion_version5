@@ -9,7 +9,6 @@ import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
 import { localizeMenuChildren } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
-import { useAuth } from "@/contexts/AuthContext";
 import { ArtistProfileNavbarDock } from "@/components/shared/ArtistProfileNavbarDock";
 
 function normPath(u: string): string {
@@ -71,7 +70,6 @@ export function Navbar() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("navbar");
-  const { user, loading, logout } = useAuth();
   const [menuItems, setMenuItems] = useState<MenuItemApi[] | null>(null);
   const [menuError, setMenuError] = useState(false);
   const headerRef = useRef<HTMLElement | null>(null);
@@ -520,48 +518,10 @@ export function Navbar() {
               </button>
             ))}
           </div>
-          {!loading && user ? (
-            <Link
-              href="/dashboard"
-              className="ml-2 w-9 h-9 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-sm font-bold text-purple-300 hover:scale-105 transition-transform"
-              title={t("mySpace")}
-            >
-              {(user.first_name?.[0] ?? user.username[0]).toUpperCase()}
-            </Link>
-          ) : !loading && !user ? (
-            <Link
-              href="/login"
-              className="ml-2 w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 transition-all"
-              aria-label={t("login")}
-              title={t("login")}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-            </Link>
-          ) : null}
         </div>
 
         <div className="xl:hidden">
-          <MobileNav
-            items={filteredLinks}
-            hasToken={!!user}
-            onLogout={async () => {
-              await logout();
-              router.refresh();
-            }}
-          />
+          <MobileNav items={filteredLinks} />
         </div>
       </nav>
       <ArtistProfileNavbarDock />

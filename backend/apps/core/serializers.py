@@ -61,6 +61,8 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
             "festival_acces_venue_markdown",
             "festival_jack_n_jill_markdown",
             "festival_all_star_street_battle_markdown",
+            "festival_book_your_hotel_markdown",
+            "festival_notre_programme_markdown",
             "support_faq_markdown",
             "support_contact_markdown",
             "main_video_type", "main_video_youtube_id", "main_video_file",

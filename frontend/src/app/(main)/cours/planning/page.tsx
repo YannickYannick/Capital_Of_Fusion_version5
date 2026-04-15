@@ -103,7 +103,7 @@ export default async function PlanningPage() {
                               className="px-1.5 py-0.5 rounded text-[10px] font-medium"
                               style={{
                                 backgroundColor: `${schedule.level_color}20`,
-                                color: schedule.level_color || "#a855f7",
+                                color: schedule.level_color || "#f3ac41",
                               }}
                             >
                               {schedule.level_name}

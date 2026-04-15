@@ -4,9 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Bebas_Neue } from "next/font/google";
 import { useTranslations } from "next-intl";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { prefetchExploreModules, usePrefetchExplore } from "@/hooks/usePrefetchExplore";
+
+const ctaExploreFont = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export default function LandingPageClient() {
     const router = useRouter();
@@ -35,7 +41,7 @@ export default function LandingPageClient() {
         >
             {!isTransitioning ? (
                 <section className="relative z-10 max-w-3xl mx-auto text-center">
-                    <p className="text-sm uppercase tracking-widest text-purple-300/90 mb-4">
+                    <p className="text-sm uppercase tracking-widest text-[#f3ac41] mb-4">
                         {t("badge")}
                     </p>
                     <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-200 bg-clip-text text-transparent">
@@ -53,35 +59,35 @@ export default function LandingPageClient() {
                             onClick={handleStartPushed}
                             onMouseEnter={prefetchExploreModules}
                             onFocus={prefetchExploreModules}
-                            className="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition cursor-pointer relative overflow-hidden group"
+                            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#2464af] to-[#371957] text-white shadow-[0_10px_25px_rgba(0,0,0,0.35)] border border-white/20 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer relative overflow-hidden group"
                         >
-                            <span className="relative z-10">{t("ctaExplore")}</span>
+                            <span
+                              className={`relative z-10 block text-2xl sm:text-3xl tracking-[0.08em] uppercase ${ctaExploreFont.className}`}
+                            >
+                                {t("ctaExplore")}
+                            </span>
                         </a>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center w-full">
+                            <Link
+                                href="/festival/book-your-hotel"
+                                className="px-6 py-3 rounded-lg bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-semibold transition text-center"
+                            >
+                                Book your hôtel
+                            </Link>
                             <a
                                 href="https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnprgCFDBKaBIcXNxli3o4eSeZW2PkudBsk3Noz0zPCH1myeSa1TemsZFcRKo_aem_IPghO3-MUFniUMOa5ucZUg"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition text-center"
+                                className="px-6 py-3 rounded-lg border border-[#f3ac41] hover:bg-[#f3ac41]/10 text-white font-medium transition text-center"
                             >
                                 Book your pass
                             </a>
-                            <a
-                                href="https://all.accor.com/a/fr.html"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition text-center"
-                            >
-                                Book your hôtel
-                            </a>
-                            <a
-                                href="https://bachatagenevafestival.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-6 py-3 rounded-lg border border-white/30 hover:bg-white/10 text-white font-medium transition text-center"
+                            <Link
+                                href="/festival/notre-programme"
+                                className="px-6 py-3 rounded-lg border border-[#f3ac41] hover:bg-[#f3ac41]/10 text-white font-medium transition text-center"
                             >
                                 Notre programme
-                            </a>
+                            </Link>
                         </div>
                     </div>
 

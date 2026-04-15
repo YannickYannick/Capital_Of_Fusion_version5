@@ -43,6 +43,8 @@ export interface SiteConfigurationApi {
     festival_acces_venue_markdown?: string;
     festival_jack_n_jill_markdown?: string;
     festival_all_star_street_battle_markdown?: string;
+    festival_book_your_hotel_markdown?: string;
+    festival_notre_programme_markdown?: string;
     support_faq_markdown?: string;
     support_contact_markdown?: string;
     main_video_type: 'youtube' | 'mp4';

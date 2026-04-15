@@ -145,7 +145,7 @@ const DEFAULTS: PlanetsOptionsState = {
         dirPosition: [10, 15, 10],
         dirIntensity: 2.0,
         p1Position: [10, 10, 10], p1Intensity: 1.5, p1Color: "#ffffff",
-        p2Position: [-10, -10, -10], p2Intensity: 1.0, p2Color: "#7c3aed",
+        p2Position: [-10, -10, -10], p2Intensity: 1.0, p2Color: "#b37418",
         p3Position: [0, 5, 5], p3Intensity: 1.0, p3Color: "#06b6d4"
     },
     fishEye: 50,
@@ -216,7 +216,7 @@ const DEFAULTS: PlanetsOptionsState = {
     oscillationAmplitude: 0.3,
     oscillationFrequency: 0.5,
     showOrbitZoneIndicator: true,
-    orbitZoneIndicatorColor: "#a855f7",
+    orbitZoneIndicatorColor: "#f3ac41",
     orbitZoneIndicatorOpacity: 0.28,
 };
 

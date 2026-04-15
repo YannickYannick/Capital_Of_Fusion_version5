@@ -21,14 +21,16 @@ export function StandardPageShell({ children }: StandardPageShellProps) {
 }
 
 interface StandardPageHeroProps {
-  /** Petit libellé violet en uppercase (ex. "Apprentissage", "Nos partenaires"). */
+  /** Petit libellé d’accent (jaune CoF) en uppercase (ex. "Apprentissage", "Nos partenaires"). */
   eyebrow: string;
   /** Partie gauche du titre (ex. "Nos", "Capital"). */
   title: string;
-  /** Partie en gradient violet/rose (ex. "Cours", "Care"). */
+  /** Partie en gradient chaud (ex. "Cours", "Care"). */
   highlight?: string;
   /** Paragraphe sous le titre (text-white/60). */
   description?: string;
+  /** Marge basse du bloc hero (défaut mb-16). */
+  bottomSpacingClassName?: string;
 }
 
 /** Hero centré : eyebrow, h1 5xl/6xl avec partie optionnelle en gradient, description. */
@@ -37,9 +39,12 @@ export function StandardPageHero({
   title,
   highlight,
   description,
+  bottomSpacingClassName = "mb-16",
 }: StandardPageHeroProps) {
   return (
-    <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div
+      className={`text-center animate-in fade-in slide-in-from-bottom-4 duration-700 ${bottomSpacingClassName}`}
+    >
       <p className="text-purple-400 text-sm font-semibold uppercase tracking-widest mb-3">
         {eyebrow}
       </p>

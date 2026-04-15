@@ -15,8 +15,8 @@ export function markdownToHtml(markdown: string): string {
     ALLOWED_TAGS: [
       "p", "br", "strong", "em", "u", "s", "a", "ul", "ol", "li",
       "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "code",
-      "hr", "table", "thead", "tbody", "tr", "th", "td",
+      "hr", "table", "thead", "tbody", "tr", "th", "td", "img",
     ],
-    ALLOWED_ATTR: ["href", "target", "rel"],
+    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "title", "loading", "width", "height"],
   });
 }

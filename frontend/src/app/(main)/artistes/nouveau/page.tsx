@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";
 import { createArtistAdmin, getDanceProfessionsAdmin } from "@/lib/api";
+import { formatProfessionChipLabel } from "@/lib/professionLabel";
 import type { DanceProfessionApi } from "@/types/user";
 
 function PageShell({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -258,7 +259,7 @@ export default function NewArtistPage() {
               {allProfessions.map((p) => (
                 <label
                   key={p.id}
-                  className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-medium transition ${
+                  className={`inline-flex min-h-[2.25rem] min-w-[2.5rem] cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-xs font-medium transition ${
                     selectedProfessionIds.has(p.id)
                       ? "border-purple-400/50 bg-purple-600/40 text-white"
                       : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
@@ -270,7 +271,7 @@ export default function NewArtistPage() {
                     checked={selectedProfessionIds.has(p.id)}
                     onChange={() => toggleProfession(p.id)}
                   />
-                  {p.name}
+                  {formatProfessionChipLabel(p)}
                 </label>
               ))}
             </div>

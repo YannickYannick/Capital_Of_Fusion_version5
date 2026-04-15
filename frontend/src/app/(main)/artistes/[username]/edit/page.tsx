@@ -17,6 +17,7 @@ import {
 import type { PartnerNodeApi } from "@/types/partner";
 import { ProfileLinksFormFields } from "@/components/shared/ProfileLinksFormFields";
 import type { ArtistApi, DanceProfessionApi } from "@/types/user";
+import { formatProfessionChipLabel } from "@/lib/professionLabel";
 import {
   profileLinksFromApi,
   profileLinksToFormState,
@@ -460,7 +461,7 @@ export default function EditArtistPage() {
               {allProfessions.map((p) => (
                 <label
                   key={p.id}
-                  className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-medium transition ${
+                  className={`inline-flex min-h-[2.25rem] min-w-[2.5rem] cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-xs font-medium transition ${
                     selectedProfessionIds.has(p.id)
                       ? "border-purple-400/50 bg-purple-600/40 text-white"
                       : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
@@ -472,7 +473,7 @@ export default function EditArtistPage() {
                     checked={selectedProfessionIds.has(p.id)}
                     onChange={() => toggleProfession(p.id)}
                   />
-                  {p.name}
+                  {formatProfessionChipLabel(p)}
                 </label>
               ))}
             </div>

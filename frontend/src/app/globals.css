@@ -5,6 +5,7 @@
 :root {
   --background: #0a0e27;
   --foreground: #ffffff;
+  --brand: #f3ac41;
 }
 
 html {
@@ -14,7 +15,7 @@ html {
 body {
   color: var(--foreground);
   background: transparent;
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-urbane), var(--font-inter), sans-serif;
 }
 
 /* Curseur flèche sur le contenu (évite le curseur « texte » sur les titres) */

@@ -311,7 +311,7 @@ export default function EditOrganizationNodePage() {
                 type="text"
                 value={planetColor}
                 onChange={(e) => setPlanetColor(e.target.value)}
-                placeholder="#a855f7"
+                placeholder="#f3ac41"
                 className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
               />
             </div>

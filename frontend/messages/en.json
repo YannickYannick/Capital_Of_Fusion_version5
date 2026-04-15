@@ -153,6 +153,23 @@
       "contentMarkdown": "## To fill\n\nAdd the **Access & Venue** page content here (Markdown).\n",
       "empty": "Content coming soon."
     },
+    "festivalBookHotel": {
+      "metaTitle": "Book your hotel | Festival",
+      "metaDescription": "4★ hotel, breakfast, shuttle to the festival — premium or standard rooms.",
+      "eyebrow": "Festival",
+      "title": "Book your hotel",
+      "subtitle": "4★ hotel with pool and breakfast, festival shuttle, daily socials.",
+      "ctaGoAndDance": "Book on go&dance",
+      "empty": "Content coming soon."
+    },
+    "festivalNotreProgramme": {
+      "metaTitle": "Our programme | Festival",
+      "metaDescription": "Festival programme: workshops, parties, events.",
+      "eyebrow": "Festival",
+      "title": "Notre programme",
+      "subtitle": "Programme details (editable Markdown).",
+      "empty": "Content coming soon."
+    },
     "festivalJackNJill": {
       "metaTitle": "Jack N Jill | Festival",
       "metaDescription": "Jack N Jill Social French Cup & European Qualifier info.",
@@ -410,6 +427,7 @@
       "titleBefore": "Our",
       "titleHighlight": "Artists",
       "subtitle": "Discover the talents at the heart of Capital of Fusion. Official members and partner artists.",
+      "bannerAlt": "Capital of Fusion artists visual",
       "filterAll": "All",
       "filterStaff": "Team CoF",
       "filterExternal": "External",
