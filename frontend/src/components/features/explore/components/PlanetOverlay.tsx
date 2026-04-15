@@ -127,6 +127,9 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
 
   if (!node) return null;
 
+  const centerTeaserSrc = "/teaser-pool-party.mp4";
+  const showCenterTeaser = node.slug === "capital-of-fusion-france";
+
   return (
     <>
       {/* Backdrop */}
@@ -164,7 +167,17 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 {/* Gauche — Média */}
                 <div className="relative min-h-[220px] bg-black/40 rounded-tl-2xl rounded-bl-2xl overflow-hidden flex items-center justify-center">
-                  {node.video_url && !videoError ? (
+                  {showCenterTeaser ? (
+                    <video
+                      src={centerTeaserSrc}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : node.video_url && !videoError ? (
                     <div className="relative w-full h-full min-h-[220px]">
                       {node.cover_image && (
                         // eslint-disable-next-line @next/next/no-img-element
