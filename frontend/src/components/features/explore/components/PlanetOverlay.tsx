@@ -234,26 +234,16 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     </p>
                   )}
                   <div className="flex flex-wrap flex-col sm:flex-row gap-3 mt-4 w-full">
-                    {/* Primary Action: Routage principal vers la timeline/page */}
-                    {node.cta_url ? (
-                      <a
-                        href={node.cta_url}
-                        target={node.cta_url.startsWith("http") ? "_blank" : "_self"}
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center text-center px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold transition-all hover:scale-[1.02] shadow-[0_0_20px_-5px_rgba(6,182,212,0.4)] border border-cyan-400/30"
-                      >
-                        {node.cta_text || "Visiter le lien"} ↗
-                      </a>
-                    ) : (
-                      <Link
-                        href={`/organisation/noeuds/${encodeURIComponent(node.slug)}`}
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold transition-all hover:scale-[1.02] shadow-[0_0_20px_-5px_rgba(243,172,65,0.45)] border border-purple-400/30"
-                        onClick={onClose}
-                      >
-                        <span className="text-xl">🪐</span>
-                        <span>Explorer {node.name}</span>
-                      </Link>
-                    )}
+                    <button
+                      type="button"
+                      disabled
+                      className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-white/10 text-white/60 font-bold shadow-[0_0_20px_-5px_rgba(255,255,255,0.10)] border border-white/15 cursor-not-allowed"
+                      aria-disabled="true"
+                      title="Fonction à venir"
+                    >
+                      <span className="text-xl">⏳</span>
+                      <span>Fonction à venir</span>
+                    </button>
                   </div>
                 </div>
               </div>
