@@ -197,6 +197,8 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
         ("Général", {"fields": ("site_name", "hero_title", "hero_subtitle")}),
         ("Identité COF — Notre vision", {"fields": ("vision_markdown",)}),
         ("Identité COF — Notre histoire", {"fields": ("history_markdown",)}),
+        ("Festival — pages", {"fields": ("festival_planning_navettes_markdown", "festival_acces_venue_markdown", "festival_jack_n_jill_markdown", "festival_all_star_street_battle_markdown")}),
+        ("Support — pages", {"fields": ("support_faq_markdown", "support_contact_markdown")}),
         ("Explore 3D", {"fields": ("active_explore_preset",)}),
         ("Vidéo Accueil", {"fields": ("main_video_type", "main_video_youtube_id", "main_video_file")}),
         ("Vidéo Cycle", {"fields": ("cycle_video_type", "cycle_video_youtube_id", "cycle_video_file")}),

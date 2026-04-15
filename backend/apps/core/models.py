@@ -279,6 +279,46 @@ class SiteConfiguration(models.Model):
         help_text="Contenu de la page Identité COF → Notre histoire (format Markdown).",
     )
 
+    # Festival — pages éditoriales (Markdown)
+    festival_planning_navettes_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Festival — Planning & Navettes (Markdown)",
+        help_text="Contenu de la page Festival → Planning & Navettes (format Markdown).",
+    )
+    festival_acces_venue_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Festival — Accès & Venue (Markdown)",
+        help_text="Contenu de la page Festival → Accès & Venue (format Markdown).",
+    )
+    festival_jack_n_jill_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Festival — Jack N Jill (Markdown)",
+        help_text="Contenu de la page Jack N Jill (format Markdown).",
+    )
+    festival_all_star_street_battle_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Festival — All Star Street Battle (Markdown)",
+        help_text="Contenu de la page All Star Street Bachata Battle (format Markdown).",
+    )
+
+    # Support — pages éditoriales (Markdown)
+    support_faq_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Support — FAQ (Markdown)",
+        help_text="Contenu de la page Support → FAQ (format Markdown).",
+    )
+    support_contact_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Support — Nous contacter (Markdown)",
+        help_text="Contenu de la page Support → Nous contacter (format Markdown).",
+    )
+
     active_explore_preset = models.ForeignKey(ExplorePreset, on_delete=models.SET_NULL, null=True, blank=True)
     VIDEO_CHOICES = (('youtube', 'Vidéo YouTube'), ('mp4', 'Fichier Local (MP4)'))
     main_video_type = models.CharField(max_length=10, choices=VIDEO_CHOICES, default='youtube')

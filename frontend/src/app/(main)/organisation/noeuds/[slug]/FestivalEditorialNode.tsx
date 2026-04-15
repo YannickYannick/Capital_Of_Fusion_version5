@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { markdownToHtml } from "@/lib/markdownToHtml";
+import { getSiteConfig } from "@/lib/api";
+import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
 
 const proseClasses =
   "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
@@ -11,24 +14,45 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
   const eyebrow = t(`${contentKey}.eyebrow`);
   const title = t(`${contentKey}.title`);
   const subtitle = t(`${contentKey}.subtitle`);
-  const html = markdownToHtml(t(`${contentKey}.contentMarkdown`));
   const empty = t(`${contentKey}.empty`);
 
-  return (
-    <div className="min-h-screen bg-black text-white px-4 md:px-8 py-16">
-      <div className="max-w-4xl mx-auto">
-        <p className="text-xs uppercase tracking-widest text-purple-300/90">
-          {eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl md:text-5xl font-extrabold tracking-tight">
-          {title}
-        </h1>
-        <p className="mt-4 text-white/60">{subtitle}</p>
+  const field = useMemo(() => {
+    if (contentKey === "festivalJackNJill") return "festival_jack_n_jill_markdown";
+    if (contentKey === "festivalAllStarStreetBattle") return "festival_all_star_street_battle_markdown";
+    return null;
+  }, [contentKey]);
 
-        {html ? (
-          <div className={`mt-10 ${proseClasses}`} dangerouslySetInnerHTML={{ __html: html }} />
+  const [initialValue, setInitialValue] = useState("");
+  useEffect(() => {
+    if (!field) return;
+    let cancelled = false;
+    getSiteConfig()
+      .then((cfg) => {
+        const v = (cfg as any)[field] ?? "";
+        if (!cancelled) setInitialValue(String(v || ""));
+      })
+      .catch(() => {
+        if (!cancelled) setInitialValue("");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [field]);
+
+  return (
+    <div className="min-h-screen text-white px-4 md:px-8 py-16">
+      <div className="max-w-4xl mx-auto">
+        {field ? (
+          <EditableConfigMarkdownPage
+            eyebrow={eyebrow}
+            title={title}
+            subtitle={subtitle}
+            initialValue={initialValue}
+            field={field as any}
+            emptyText={empty}
+          />
         ) : (
-          <p className="mt-10 text-white/50">{empty}</p>
+          <p className="text-white/60">Page indisponible.</p>
         )}
       </div>
     </div>
