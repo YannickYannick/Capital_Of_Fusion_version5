@@ -153,6 +153,24 @@
       "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Accès & Venue**.\n",
       "empty": "Contenu à venir."
     },
+    "festivalJackNJill": {
+      "metaTitle": "Jack N Jill | Festival",
+      "metaDescription": "Infos Jack N Jill Social French Cup & European Qualifier.",
+      "eyebrow": "Festival",
+      "title": "Jack N Jill Social French Cup & European Qualifier",
+      "subtitle": "Informations, règles, horaires et inscriptions.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Jack N Jill**.\n",
+      "empty": "Contenu à venir."
+    },
+    "festivalAllStarStreetBattle": {
+      "metaTitle": "All Star Street Bachata Battle | Festival",
+      "metaDescription": "Infos All Star Street Bachata Battle.",
+      "eyebrow": "Festival",
+      "title": "All Star Street Bachata Battle",
+      "subtitle": "Format, règles, horaires et informations.",
+      "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **All Star Street Bachata Battle**.\n",
+      "empty": "Contenu à venir."
+    },
     "supportFaq": {
       "metaTitle": "FAQ | Support",
       "metaDescription": "Questions fréquentes et réponses.",
