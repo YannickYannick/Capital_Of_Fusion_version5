@@ -29,20 +29,9 @@ export function FestivalBookYourHotelClient({
         emptyText={emptyText}
       />
 
-      {/* Billetterie Go&dance pleine largeur sous le contenu */}
+      {/* Billetterie Go&dance (snippet officiel injecté par GoAndDanceTicketsEmbed) */}
       <div className="mt-16">
         <GoAndDanceTicketsEmbed />
-        <p className="mt-4 text-center text-xs text-white/40">
-          Powered by{" "}
-          <a
-            href="https://www.goandance.com"
-            className="underline decoration-dotted text-white/70 hover:text-white"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            go&amp;dance
-          </a>
-        </p>
       </div>
     </div>
   );

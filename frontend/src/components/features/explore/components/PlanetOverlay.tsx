@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
 import { patchOrganizationNode } from "@/lib/api";
+import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanceTicketsEmbed";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -52,71 +53,6 @@ function CardContent({ ev }: { ev: NodeEventApi }) {
       <p className="text-white text-sm font-semibold leading-snug line-clamp-2">{ev.title}</p>
       <p className="text-white/50 text-xs mt-1">{formatDate(ev.start_datetime)}</p>
       {ev.location && <p className="text-white/40 text-xs mt-0.5">📍 {ev.location}</p>}
-    </div>
-  );
-}
-
-function GoAndDanceTicketsEmbed() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    const wrapper = document.createElement("div");
-    wrapper.id = "goandance-tickets-73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa";
-    wrapper.className = "goandance-tickets";
-
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src =
-      "https://www.goandance.com/en/event/73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa/tickets.js";
-    script.async = true;
-
-    const iframeMount = document.createElement("div");
-    iframeMount.id =
-      "goandance-tickets-73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa-iframe";
-
-    wrapper.appendChild(script);
-    wrapper.appendChild(iframeMount);
-    container.appendChild(wrapper);
-
-    // Adapter l'iframe une fois injectée par Go&dance (taille, bordure, scroll)
-    const start = performance.now();
-    const maxMs = 8000;
-    const tick = () => {
-      if (!container.isConnected) return;
-      const iframe = container.querySelector("iframe");
-      if (iframe) {
-        const style = (iframe as HTMLIFrameElement).style;
-        style.width = "100%";
-        style.maxWidth = "960px";
-        style.border = "none";
-        style.borderRadius = "18px";
-        style.backgroundColor = "#ffffff";
-        // hauteur confortable pour voir la liste complète sans scroll interne
-        style.height = "640px";
-        return;
-      }
-      if (performance.now() - start < maxMs) {
-        requestAnimationFrame(tick);
-      }
-    };
-    requestAnimationFrame(tick);
-
-    return () => {
-      container.innerHTML = "";
-    };
-  }, []);
-
-  return (
-    <div className="w-full flex justify-center">
-      <div
-        ref={containerRef}
-        className="w-full max-w-4xl rounded-3xl bg-white/5 border border-white/10 px-4 py-4 sm:px-6 sm:py-5"
-      />
     </div>
   );
 }
@@ -375,7 +311,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               {(showCenterTeaser || node.description || showEditForm) && (
                 <div className="border-t border-white/10 px-8 py-6">
                   <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
-                    {showCenterTeaser ? "Billetterie" : "Description"}
+                    {showCenterTeaser ? "Réservez vos billets" : "Description"}
                   </h2>
                   {showCenterTeaser && !showEditForm ? (
                     <GoAndDanceTicketsEmbed />

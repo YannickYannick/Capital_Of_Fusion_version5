@@ -1,72 +1,78 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * Intégration Go&dance — widget billetterie en iframe.
- * Utilisé sur la page /festival/book-your-hotel.
+ * Billetterie Go&dance — équivalent à tickets.js (iframe + postMessage hauteur).
+ * - L'iframe est rendue en JSX avec `src` fixé au montage (comme une page HTML statique).
+ * - On n'utilise pas tickets.js : il s'abonne à `window "load"`, déjà passé en navigation client.
  */
+const GOANDANCE_EVENT_ID = "73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa";
+const GOANDANCE_WRAPPER_ID = `goandance-tickets-${GOANDANCE_EVENT_ID}`;
+const GOANDANCE_TICKETS_PAGE = `https://www.goandance.com/en/event-tickets/${GOANDANCE_EVENT_ID}`;
+
 export function GoAndDanceTicketsEmbed() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    const wrapper = document.createElement("div");
-    wrapper.id = "goandance-tickets-73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa";
-    wrapper.className = "goandance-tickets";
-
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src =
-      "https://www.goandance.com/en/event/73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa/tickets.js";
-    script.async = true;
-
-    const iframeMount = document.createElement("div");
-    iframeMount.id =
-      "goandance-tickets-73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa-iframe";
-
-    wrapper.appendChild(script);
-    wrapper.appendChild(iframeMount);
-    container.appendChild(wrapper);
-
-    // Ajuster visuellement l'iframe une fois que Go&dance l'a injectée.
-    const start = performance.now();
-    const maxMs = 8000;
-    const tick = () => {
-      if (!container.isConnected) return;
-      const iframe = container.querySelector("iframe");
-      if (iframe) {
-        const style = (iframe as HTMLIFrameElement).style;
-        style.width = "100%";
-        style.maxWidth = "960px";
-        style.border = "none";
-        style.borderRadius = "18px";
-        style.backgroundColor = "#ffffff";
-        style.height = "640px";
-        return;
-      }
-      if (performance.now() - start < maxMs) {
-        requestAnimationFrame(tick);
-      }
-    };
-    requestAnimationFrame(tick);
-
-    return () => {
-      container.innerHTML = "";
-    };
+    const url = new URL(GOANDANCE_TICKETS_PAGE);
+    url.searchParams.set("referer", window.location.href);
+    setIframeSrc(url.toString());
   }, []);
 
+  useEffect(() => {
+    if (!iframeSrc) return;
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    const goandanceIframeResize = (event: MessageEvent) => {
+      if (event.origin === "https://www.goandance.com") {
+        iframe.style.height = `${event.data}px`;
+      }
+    };
+    window.addEventListener("message", goandanceIframeResize, false);
+    return () => window.removeEventListener("message", goandanceIframeResize, false);
+  }, [iframeSrc]);
+
   return (
-    <div className="w-full flex justify-center">
-      <div
-        ref={containerRef}
-        className="w-full max-w-4xl rounded-3xl bg-white/5 border border-white/10 px-4 py-4 sm:px-6 sm:py-5"
-      />
-    </div>
+    <>
+      {/* START GOANDANCE INTEGRATION CODE */}
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-4xl rounded-3xl bg-white/5 border border-white/10 px-4 py-4 sm:px-6 sm:py-5">
+          <div id={GOANDANCE_WRAPPER_ID} className="goandance-tickets">
+            {iframeSrc ? (
+              <iframe
+                ref={iframeRef}
+                title="Billetterie Go&dance"
+                src={iframeSrc}
+                height={100}
+                width="100%"
+                frameBorder={0}
+                scrolling="auto"
+                className="w-full min-h-[500px] border-0 rounded-xl bg-white"
+              />
+            ) : (
+              <div
+                className="w-full min-h-[500px] rounded-xl bg-white/5 border border-white/10 animate-pulse"
+                aria-hidden
+              />
+            )}
+            <div className="mt-4 text-center text-sm text-white/50">
+              Powered by{" "}
+              <a
+                href="https://www.goandance.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-white"
+              >
+                go&dance
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* END GOANDANCE INTEGRATION CODE */}
+    </>
   );
 }
-
