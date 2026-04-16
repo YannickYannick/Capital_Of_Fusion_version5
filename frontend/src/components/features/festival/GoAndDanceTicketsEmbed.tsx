@@ -11,7 +11,11 @@ const GOANDANCE_EVENT_ID = "73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa";
 const GOANDANCE_WRAPPER_ID = `goandance-tickets-${GOANDANCE_EVENT_ID}`;
 const GOANDANCE_TICKETS_PAGE = `https://www.goandance.com/en/event-tickets/${GOANDANCE_EVENT_ID}`;
 
-export function GoAndDanceTicketsEmbed() {
+interface GoAndDanceTicketsEmbedProps {
+  compact?: boolean;
+}
+
+export function GoAndDanceTicketsEmbed({ compact = false }: GoAndDanceTicketsEmbedProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
 
@@ -35,11 +39,23 @@ export function GoAndDanceTicketsEmbed() {
     return () => window.removeEventListener("message", goandanceIframeResize, false);
   }, [iframeSrc]);
 
+  const containerClass = compact
+    ? "w-full max-w-2xl rounded-2xl bg-white/5 border border-white/10 px-3 py-3 sm:px-4 sm:py-4"
+    : "w-full max-w-4xl rounded-3xl bg-white/5 border border-white/10 px-4 py-4 sm:px-6 sm:py-5";
+  
+  const iframeClass = compact
+    ? "w-full min-h-[375px] border-0 rounded-lg bg-white"
+    : "w-full min-h-[500px] border-0 rounded-xl bg-white";
+  
+  const placeholderClass = compact
+    ? "w-full min-h-[375px] rounded-lg bg-white/5 border border-white/10 animate-pulse"
+    : "w-full min-h-[500px] rounded-xl bg-white/5 border border-white/10 animate-pulse";
+
   return (
     <>
       {/* START GOANDANCE INTEGRATION CODE */}
       <div className="w-full flex justify-center">
-        <div className="w-full max-w-4xl rounded-3xl bg-white/5 border border-white/10 px-4 py-4 sm:px-6 sm:py-5">
+        <div className={containerClass}>
           <div id={GOANDANCE_WRAPPER_ID} className="goandance-tickets">
             {iframeSrc ? (
               <iframe
@@ -50,15 +66,15 @@ export function GoAndDanceTicketsEmbed() {
                 width="100%"
                 frameBorder={0}
                 scrolling="auto"
-                className="w-full min-h-[500px] border-0 rounded-xl bg-white"
+                className={iframeClass}
               />
             ) : (
               <div
-                className="w-full min-h-[500px] rounded-xl bg-white/5 border border-white/10 animate-pulse"
+                className={placeholderClass}
                 aria-hidden
               />
             )}
-            <div className="mt-4 text-center text-sm text-white/50">
+            <div className={compact ? "mt-3 text-center text-xs text-white/50" : "mt-4 text-center text-sm text-white/50"}>
               Powered by{" "}
               <a
                 href="https://www.goandance.com"

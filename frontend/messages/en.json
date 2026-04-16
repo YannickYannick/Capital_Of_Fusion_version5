@@ -38,7 +38,17 @@
       "theory": "Theory",
       "care": "Care",
       "projects": "Projects",
-      "files": "Files"
+      "files": "Files",
+      "festival": "Festival",
+      "bookYourHotel": "Book your hotel",
+      "bookYourPass": "Book your pass",
+      "support": "Support",
+      "planningNavettes": "Schedule & Shuttles",
+      "accesVenue": "Access & Venue",
+      "notreProgramme": "Our programme",
+      "jackNJill": "Jack N Jill",
+      "allStarStreetBattle": "All Star Street Battle",
+      "nosArtistes": "Our artists"
     }
   },
   "landing": {
@@ -48,6 +58,9 @@
     "subtitle2": "An interactive 3D experience at the heart of dance.",
     "ctaExplore": "Start the experience",
     "ctaCourses": "View classes",
+    "ctaBookHotel": "Book your hotel",
+    "ctaBookPass": "Book your pass",
+    "ctaProgram": "Our programme",
     "footerLine": "Paris, France"
   },
   "artistEdit": {
@@ -135,6 +148,39 @@
     "dockWebsiteN": "Site {n}"
   },
   "pages": {
+    "festivalIndex": {
+      "metaTitle": "Festival",
+      "metaDescription": "Quick access to festival pages.",
+      "eyebrow": "Festival",
+      "title": "Festival",
+      "subtitle": "Quick access to key pages.",
+      "cards": {
+        "planning": {
+          "title": "Schedule & Shuttles",
+          "desc": "Timetable, shuttles, practical info."
+        },
+        "venue": {
+          "title": "Access & Venue",
+          "desc": "Address, transport, venue."
+        },
+        "bookHotel": {
+          "title": "Book your hotel",
+          "desc": "Accommodation, links and info."
+        },
+        "programme": {
+          "title": "Our programme",
+          "desc": "Festival programme."
+        },
+        "jackNJill": {
+          "title": "Jack N Jill",
+          "desc": "Social French Cup & European Qualifier."
+        },
+        "allStarBattle": {
+          "title": "All Star Street Battle",
+          "desc": "Street bachata competition."
+        }
+      }
+    },
     "festivalPlanning": {
       "metaTitle": "Schedule & Shuttles | Festival",
       "metaDescription": "Festival schedule, shuttles and practical info.",

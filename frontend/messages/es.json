@@ -38,7 +38,17 @@
       "theory": "Teoría",
       "care": "Care",
       "projects": "Proyectos",
-      "files": "Archivos"
+      "files": "Archivos",
+      "festival": "Festival",
+      "bookYourHotel": "Reservar hotel",
+      "bookYourPass": "Reservar pase",
+      "support": "Soporte",
+      "planningNavettes": "Horario y lanzaderas",
+      "accesVenue": "Acceso y Venue",
+      "notreProgramme": "Nuestro programa",
+      "jackNJill": "Jack N Jill",
+      "allStarStreetBattle": "All Star Street Battle",
+      "nosArtistes": "Nuestros artistas"
     }
   },
   "landing": {
@@ -48,6 +58,9 @@
     "subtitle2": "Una experiencia interactiva en 3D en el corazón del baile.",
     "ctaExplore": "Comenzar la experiencia",
     "ctaCourses": "Ver clases",
+    "ctaBookHotel": "Reservar hotel",
+    "ctaBookPass": "Reservar pase",
+    "ctaProgram": "Nuestro programa",
     "footerLine": "París, Francia"
   },
   "artistEdit": {
@@ -135,6 +148,39 @@
     "dockWebsiteN": "Sitio {n}"
   },
   "pages": {
+    "festivalIndex": {
+      "metaTitle": "Festival",
+      "metaDescription": "Acceso rápido a las páginas del festival.",
+      "eyebrow": "Festival",
+      "title": "Festival",
+      "subtitle": "Acceso rápido a las páginas clave.",
+      "cards": {
+        "planning": {
+          "title": "Horario y lanzaderas",
+          "desc": "Horarios, lanzaderas, info práctica."
+        },
+        "venue": {
+          "title": "Acceso y Venue",
+          "desc": "Dirección, transporte, venue."
+        },
+        "bookHotel": {
+          "title": "Reservar hotel",
+          "desc": "Alojamiento, enlaces e info."
+        },
+        "programme": {
+          "title": "Nuestro programa",
+          "desc": "Programa del festival."
+        },
+        "jackNJill": {
+          "title": "Jack N Jill",
+          "desc": "Social French Cup & European Qualifier."
+        },
+        "allStarBattle": {
+          "title": "All Star Street Battle",
+          "desc": "Competición street bachata."
+        }
+      }
+    },
     "festivalPlanning": {
       "metaTitle": "Horario y lanzaderas | Festival",
       "metaDescription": "Horario del festival, lanzaderas e información práctica.",

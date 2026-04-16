@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
-import { localizeMenuChildren } from "@/lib/navMenuLabels";
+import { localizeMenuChildren, localizeMenuRootItem } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
 import { ArtistProfileNavbarDock } from "@/components/shared/ArtistProfileNavbarDock";
 
@@ -376,6 +376,7 @@ export function Navbar() {
    * Menu depuis l'API :
    * - Filtre `is_active` (récursif)
    * - Applique la blacklist root (EXCLUDED_ROOT_*)
+   * - Applique les traductions aux items racines (Festival, Book your hotel, Support...)
    * - Si l'API répond mais tout est inactif → menu vide (pas de fallback)
    * - Fallback uniquement si l'API est indisponible (erreur)
    */
@@ -383,19 +384,23 @@ export function Navbar() {
     if (!menuItems?.length) return [];
     const activeTree = filterActiveMenuTree(menuItems);
     return activeTree
-      .map((item) => ({
-        href: item.url || "/",
-        label: item.name,
-        slug: item.slug,
-        children: item.children ?? [],
-      }))
+      .map((item) => {
+        const localizedItem = localizeMenuRootItem(item, t);
+        const localizedChildren = localizeMenuChildren(localizedItem.children ?? [], t);
+        return {
+          href: localizedItem.url || "/",
+          label: localizedItem.name,
+          slug: localizedItem.slug,
+          children: localizedChildren,
+        };
+      })
       .filter((item) => {
         if (item.slug && EXCLUDED_ROOT_SLUGS.has(item.slug)) return false;
         const h = normPath(item.href);
         if (EXCLUDED_ROOT_PATHS.has(h)) return false;
         return true;
       });
-  }, [menuItems]);
+  }, [menuItems, t]);
 
   const links: NavLink[] = useMemo(() => {
     /**

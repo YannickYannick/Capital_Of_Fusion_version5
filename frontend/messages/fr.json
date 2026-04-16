@@ -38,7 +38,17 @@
       "theory": "Théorie",
       "care": "Care",
       "projects": "Projets",
-      "files": "Fichiers"
+      "files": "Fichiers",
+      "festival": "Festival",
+      "bookYourHotel": "Book your hôtel",
+      "bookYourPass": "Book your pass",
+      "support": "Support",
+      "planningNavettes": "Planning & Navettes",
+      "accesVenue": "Accès & Venue",
+      "notreProgramme": "Notre programme",
+      "jackNJill": "Jack N Jill",
+      "allStarStreetBattle": "All Star Street Battle",
+      "nosArtistes": "Nos artistes"
     }
   },
   "landing": {
@@ -48,6 +58,9 @@
     "subtitle2": "Une expérience interactive en 3D au cœur de la danse.",
     "ctaExplore": "Commencer l'Expérience",
     "ctaCourses": "Voir les Cours",
+    "ctaBookHotel": "Book your hôtel",
+    "ctaBookPass": "Book your pass",
+    "ctaProgram": "Notre programme",
     "footerLine": "Paris, France"
   },
   "artistEdit": {
@@ -135,6 +148,39 @@
     "dockWebsiteN": "Site {n}"
   },
   "pages": {
+    "festivalIndex": {
+      "metaTitle": "Festival",
+      "metaDescription": "Accès rapide aux pages du festival.",
+      "eyebrow": "Festival",
+      "title": "Festival",
+      "subtitle": "Accès rapide aux pages clés.",
+      "cards": {
+        "planning": {
+          "title": "Planning & Navettes",
+          "desc": "Horaires, navettes, infos pratiques."
+        },
+        "venue": {
+          "title": "Accès & Venue",
+          "desc": "Adresse, transports, venue."
+        },
+        "bookHotel": {
+          "title": "Book your hôtel",
+          "desc": "Hébergement, liens et infos."
+        },
+        "programme": {
+          "title": "Notre programme",
+          "desc": "Programme du festival."
+        },
+        "jackNJill": {
+          "title": "Jack N Jill",
+          "desc": "Social French Cup & European Qualifier."
+        },
+        "allStarBattle": {
+          "title": "All Star Street Battle",
+          "desc": "Compétition street bachata."
+        }
+      }
+    },
     "festivalPlanning": {
       "metaTitle": "Planning & Navettes | Festival",
       "metaDescription": "Planning, navettes et infos pratiques du festival.",

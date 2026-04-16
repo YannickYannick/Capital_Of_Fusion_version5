@@ -314,7 +314,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     {showCenterTeaser ? "Réservez vos billets" : "Description"}
                   </h2>
                   {showCenterTeaser && !showEditForm ? (
-                    <GoAndDanceTicketsEmbed />
+                    <GoAndDanceTicketsEmbed compact />
                   ) : showEditForm ? (
                     <div className="space-y-4">
                       <div>

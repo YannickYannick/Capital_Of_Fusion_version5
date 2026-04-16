@@ -72,7 +72,7 @@ export default function LandingPageClient() {
                                 href="/festival/book-your-hotel"
                                 className="px-6 py-3 rounded-lg bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-semibold transition text-center"
                             >
-                                Book your hôtel
+                                {t("ctaBookHotel")}
                             </Link>
                             <a
                                 href="https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnprgCFDBKaBIcXNxli3o4eSeZW2PkudBsk3Noz0zPCH1myeSa1TemsZFcRKo_aem_IPghO3-MUFniUMOa5ucZUg"
@@ -80,13 +80,13 @@ export default function LandingPageClient() {
                                 rel="noopener noreferrer"
                                 className="px-6 py-3 rounded-lg border border-[#f3ac41] hover:bg-[#f3ac41]/10 text-white font-medium transition text-center"
                             >
-                                Book your pass
+                                {t("ctaBookPass")}
                             </a>
                             <Link
                                 href="/festival/notre-programme"
                                 className="px-6 py-3 rounded-lg border border-[#f3ac41] hover:bg-[#f3ac41]/10 text-white font-medium transition text-center"
                             >
-                                Notre programme
+                                {t("ctaProgram")}
                             </Link>
                         </div>
                     </div>
@@ -99,10 +99,10 @@ export default function LandingPageClient() {
                         <Image
                             src="/pbv-logo.png"
                             alt="Paris Bachata Vibe Festival"
-                            width={260}
-                            height={260}
-                            sizes="(max-width: 640px) 42vw, (max-width: 1024px) 220px, 240px"
-                            className="h-auto w-[min(42vw,240px)] max-h-[18vh] object-contain opacity-95 drop-shadow-[0_10px_30px_rgba(0,0,0,0.65)]"
+                            width={520}
+                            height={520}
+                            sizes="(max-width: 640px) 84vw, (max-width: 1024px) 440px, 480px"
+                            className="h-auto w-[min(84vw,480px)] max-h-[36vh] object-contain opacity-95 drop-shadow-[0_10px_30px_rgba(0,0,0,0.65)]"
                             priority
                         />
                     </div>
