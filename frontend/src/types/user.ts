@@ -42,6 +42,8 @@ export interface ArtistApi {
     styles?: Array<{ id: string; name: string }>;
     dance_level: LevelPublicApi | null;
     is_staff_member: boolean;
+    /** Ordre sur /artistes (API : plus petit = plus haut). */
+    artist_display_order?: number;
     is_vibe: boolean;
     external_links?: ProfileExternalLinks;
     /** Structures partenaires liées à ce profil (M2M). */

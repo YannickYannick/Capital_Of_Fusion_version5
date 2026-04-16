@@ -92,6 +92,12 @@ class User(AbstractUser):
         verbose_name="Membre du staff Capital of Fusion",
         help_text="Cocher si cet artiste fait partie de l'équipe officielle CoF."
     )
+    artist_display_order = models.IntegerField(
+        default=0,
+        db_index=True,
+        verbose_name="Ordre d'affichage (Artistes)",
+        help_text="Plus petit = affiché en premier sur la page Artistes.",
+    )
     professions = models.ManyToManyField(
         "core.DanceProfession",
         related_name="users",

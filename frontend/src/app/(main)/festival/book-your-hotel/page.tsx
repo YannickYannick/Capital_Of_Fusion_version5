@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getSiteConfig } from "@/lib/api";
-import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
+import { FestivalBookYourHotelClient } from "./FestivalBookYourHotelClient";
 
 const BOOK_HOTEL_LOCALES = new Set(["fr", "en", "es"]);
 
@@ -44,17 +44,12 @@ export default async function FestivalBookYourHotelPage() {
   }
 
   return (
-    <EditableConfigMarkdownPage
+    <FestivalBookYourHotelClient
       eyebrow={t("festivalBookHotel.eyebrow")}
       title={t("festivalBookHotel.title")}
       subtitle={t("festivalBookHotel.subtitle")}
       initialValue={initialValue}
-      field="festival_book_your_hotel_markdown"
       emptyText={t("festivalBookHotel.empty")}
-      ctaBelowSubtitle={{
-        href: "https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026",
-        label: t("festivalBookHotel.ctaGoAndDance"),
-      }}
     />
   );
 }

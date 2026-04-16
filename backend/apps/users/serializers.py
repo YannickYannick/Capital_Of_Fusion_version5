@@ -38,6 +38,7 @@ class ArtistSerializer(serializers.ModelSerializer):
             "cover_image",
             "professions",
             "is_staff_member",
+            "artist_display_order",
             "external_links",
             "linked_partner_structures",
         ]

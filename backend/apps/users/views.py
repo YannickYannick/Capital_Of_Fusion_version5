@@ -196,6 +196,13 @@ class ArtistListAPIView(APIView):
         elif staff_only == 'false':
             artists = artists.filter(is_staff_member=False)
 
+        artists = artists.order_by(
+            "artist_display_order",
+            "first_name",
+            "last_name",
+            "username",
+        )
+
         serializer = ArtistSerializer(artists, many=True, context={'request': request})
         return json_response_no_store(serializer.data)
 
@@ -266,6 +273,14 @@ class ArtistAdminDetailAPIView(APIView):
             artist.bio_es = str(request.data["bio_es"] or "")
         if "is_staff_member" in request.data:
             artist.is_staff_member = bool(request.data["is_staff_member"])
+        if "artist_display_order" in request.data:
+            try:
+                artist.artist_display_order = int(request.data["artist_display_order"])
+            except (TypeError, ValueError):
+                return Response(
+                    {"artist_display_order": "Attendu : un entier."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         if "phone" in request.data:
             artist.phone = str(request.data["phone"] or "")
         if "external_links" in request.data:
