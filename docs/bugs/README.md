@@ -17,6 +17,7 @@ Fiches par incident (symptômes, cause, correctif). Les correctifs sont dans le 
 | [fix-vercel-api-connection/bug_2026-02-19_vercel_appel_api_railway.md](fix-vercel-api-connection/bug_2026-02-19_vercel_appel_api_railway.md) | Front Vercel qui n’atteint pas l’API Railway |
 | [debug/bug_2026-02-19_disallowed_host_railway.md](debug/bug_2026-02-19_disallowed_host_railway.md) | `DisallowedHost` |
 | [debug/bug_2026-02-19_csrf_et_static_admin.md](debug/bug_2026-02-19_csrf_et_static_admin.md) | CSRF et admin en prod |
+| [debug/bug_2026-04-16_youtube_background_ios_fallback.md](debug/bug_2026-04-16_youtube_background_ios_fallback.md) | Fond vidéo YouTube intermittent sur iPhone, hypothèses Vercel/Railway écartées, fallback MP4 conservé |
 
 ## Médias, Cloudinary, statiques (avril 2026)
 

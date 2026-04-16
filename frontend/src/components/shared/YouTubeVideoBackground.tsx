@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { YTPlayer } from "@/types/youtube.d";
 
+const FALLBACK_MP4_SRC = "/aftermovie-vibe-2025-fallback.mp4";
 const QUALITY_OPTIONS = [
   { value: "medium", label: "360p" },
   { value: "large", label: "480p" },
@@ -21,6 +22,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
   const [quality, setQuality] = useState<string>("hd720");
   const [apiReady, setApiReady] = useState(false);
   const [scale, setScale] = useState(1);
+  const [useMp4Fallback, setUseMp4Fallback] = useState(false);
 
   // Adapter la taille du lecteur à la fenêtre (cover)
   useEffect(() => {
@@ -37,9 +39,25 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
     return () => window.removeEventListener("resize", updateScale);
   }, []);
 
+  // iOS + accessibility / data-saver : MP4 fallback (plus fiable que YouTube IFrame en fond).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ua = window.navigator.userAgent || "";
+    const isiOS = /iP(hone|od|ad)/.test(ua);
+    const prefersReducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = (window.navigator as any)?.connection?.saveData === true;
+
+    if (isiOS || prefersReducedMotion || saveData) {
+      setUseMp4Fallback(true);
+    }
+  }, []);
+
   // Charger l'API YouTube
   useEffect(() => {
     if (!videoId || typeof window === "undefined") return;
+    if (useMp4Fallback) return;
 
     if (window.YT?.Player) {
       setApiReady(true);
@@ -55,11 +73,23 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
     return () => {
       window.onYouTubeIframeAPIReady = undefined;
     };
-  }, [videoId]);
+  }, [videoId, useMp4Fallback]);
+
+  // Si l'API ne devient pas prête rapidement (réseaux/trackers), basculer en fallback.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (useMp4Fallback) return;
+    if (!videoId) return;
+    if (apiReady) return;
+
+    const t = window.setTimeout(() => setUseMp4Fallback(true), 4500);
+    return () => window.clearTimeout(t);
+  }, [apiReady, useMp4Fallback, videoId]);
 
   // Créer le lecteur quand l'API est prête
   useEffect(() => {
     if (!apiReady || !containerRef.current || !videoId) return;
+    if (useMp4Fallback) return;
 
     const player = new window.YT!.Player(containerRef.current, {
       videoId,
@@ -87,7 +117,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
       if (playerRef.current?.destroy) playerRef.current.destroy();
       playerRef.current = null;
     };
-  }, [apiReady, videoId]);
+  }, [apiReady, videoId, useMp4Fallback]);
 
   const handleMuteToggle = () => {
     if (!playerRef.current) return;
@@ -111,13 +141,26 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
   return (
     <>
       <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div
-          ref={containerRef}
-          className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
-          style={{
-            transform: `translate(-50%, -50%) scale(${scale})`,
-          }}
-        />
+        {useMp4Fallback ? (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            playsInline
+            loop
+            preload="metadata"
+          >
+            <source src={FALLBACK_MP4_SRC} type="video/mp4" />
+          </video>
+        ) : (
+          <div
+            ref={containerRef}
+            className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
+            style={{
+              transform: `translate(-50%, -50%) scale(${scale})`,
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-background/60" />
       </div>
 
@@ -129,6 +172,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
               key={value}
               type="button"
               onClick={() => handleQualityChange(value)}
+              disabled={useMp4Fallback}
               className={`px-3 py-2 text-xs font-medium transition ${
                 quality === value
                   ? "bg-purple-500 text-white"
@@ -142,6 +186,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
         <button
           type="button"
           onClick={handleMuteToggle}
+          disabled={useMp4Fallback}
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition"
           aria-label={muted ? "Activer le son" : "Couper le son"}
         >

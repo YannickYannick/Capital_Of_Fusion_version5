@@ -1,6 +1,6 @@
 """
 Modèles Core — BaseModel abstrait, DanceStyle, Level, DanceProfession,
-SiteConfiguration, MenuItem, Bulletin, PendingContentEdit.
+SiteConfiguration, MenuItem, Bulletin, FaqItem, PendingContentEdit.
 Alignés sur le MCD Phase 1 (sections 1.1).
 """
 import uuid
@@ -404,6 +404,28 @@ class Bulletin(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class FaqItem(BaseModel):
+    """
+    Entrée FAQ (question / réponse), gérée depuis l’admin Django.
+    """
+
+    question = models.CharField(max_length=500)
+    answer = models.TextField()
+    order = models.PositiveIntegerField(default=0)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Entrée FAQ"
+        verbose_name_plural = "FAQ (questions / réponses)"
+        ordering = ["order", "created_at"]
+
+    def __str__(self):
+        q = self.question.strip()
+        if len(q) <= 80:
+            return q
+        return f"{q[:77]}…"
 
 
 class PendingContentEdit(models.Model):

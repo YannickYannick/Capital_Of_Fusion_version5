@@ -8,6 +8,7 @@ from .models import (
     MenuItem,
     ExplorePreset,
     Bulletin,
+    FaqItem,
     PendingContentEdit,
 )
 
@@ -223,6 +224,15 @@ class BulletinAdmin(admin.ModelAdmin):
     list_filter = ("is_published",)
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ("title",)
+
+
+@admin.register(FaqItem)
+class FaqItemAdmin(admin.ModelAdmin):
+    list_display = ("question", "order", "is_published", "updated_at")
+    list_editable = ("order", "is_published")
+    list_filter = ("is_published",)
+    search_fields = ("question", "answer")
+    ordering = ("order", "created_at")
 
 
 @admin.register(MenuItem)

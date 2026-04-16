@@ -1,6 +1,6 @@
 from modeltranslation.translator import register, TranslationOptions
 
-from .models import Bulletin, DanceProfession, DanceStyle, Level, MenuItem, SiteConfiguration
+from .models import Bulletin, DanceProfession, DanceStyle, FaqItem, Level, MenuItem, SiteConfiguration
 
 
 @register(DanceStyle)
@@ -51,4 +51,9 @@ class MenuItemTranslationOptions(TranslationOptions):
 @register(Bulletin)
 class BulletinTranslationOptions(TranslationOptions):
     fields = ("title", "content_markdown")
+
+
+@register(FaqItem)
+class FaqItemTranslationOptions(TranslationOptions):
+    fields = ("question", "answer")
 
