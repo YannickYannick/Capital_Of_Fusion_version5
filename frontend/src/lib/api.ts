@@ -1425,3 +1425,22 @@ export async function deleteExplorePreset(id: string): Promise<void> {
     throw new Error(errData.detail || `Delete Preset error: ${res.status}`);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FAQ
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FaqItemApi {
+  id: string;
+  question: string;
+  answer: string;
+  order: number;
+}
+
+/** Liste des FAQ publiées. GET /api/faq/ */
+export async function getFaqItems(): Promise<FaqItemApi[]> {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/api/faq/`, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json();
+}

@@ -2,7 +2,7 @@
 Serializers Core — MenuItem récursif (parent → children) pour l’API menu.
 """
 from rest_framework import serializers
-from .models import MenuItem, SiteConfiguration, SiteVideoAmbience, ExplorePreset, Bulletin, PendingContentEdit
+from .models import MenuItem, SiteConfiguration, SiteVideoAmbience, ExplorePreset, Bulletin, PendingContentEdit, FaqItem
 
 
 class PendingContentEditSerializer(serializers.ModelSerializer):
@@ -121,3 +121,11 @@ class BulletinAdminSerializer(serializers.ModelSerializer):
             "content_markdown_es",
         )
         read_only_fields = ("title_en", "title_es", "content_markdown_en", "content_markdown_es")
+
+
+class FaqItemSerializer(serializers.ModelSerializer):
+    """Serializer pour les entrées FAQ publiques."""
+
+    class Meta:
+        model = FaqItem
+        fields = ("id", "question", "answer", "order")

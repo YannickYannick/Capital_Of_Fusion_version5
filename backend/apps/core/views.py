@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from google import genai
 from .gemini_utils import gemini_error_message
-from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin, PendingContentEdit
+from .models import MenuItem, SiteConfiguration, ExplorePreset, Bulletin, PendingContentEdit, FaqItem
 from .serializers import (
     MenuItemSerializer,
     SiteConfigurationSerializer,
@@ -21,6 +21,7 @@ from .serializers import (
     BulletinSerializer,
     BulletinAdminSerializer,
     PendingContentEditSerializer,
+    FaqItemSerializer,
 )
 from .permissions import IsStaffOrSuperUser, IsSuperUser, IsSuperUserOrAdminType
 from .pending_edits import apply_pending_edit
@@ -103,6 +104,17 @@ class BulletinDetailAPIView(APIView):
     def get(self, request, slug):
         bulletin = get_object_or_404(Bulletin, slug=slug, is_published=True)
         serializer = BulletinSerializer(bulletin)
+        return Response(serializer.data)
+
+
+class FaqItemListAPIView(APIView):
+    """
+    GET /api/faq/
+    Liste des FAQ publiées, ordonnées par le champ order puis date de création.
+    """
+    def get(self, request):
+        qs = FaqItem.objects.filter(is_published=True).order_by("order", "created_at")
+        serializer = FaqItemSerializer(qs, many=True)
         return Response(serializer.data)
 
 

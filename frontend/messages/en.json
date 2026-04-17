@@ -241,7 +241,8 @@
       "title": "FAQ",
       "subtitle": "Answers to the most common questions.",
       "contentMarkdown": "## To fill\n\nAdd the **FAQ** content here (Markdown).\n",
-      "empty": "Content coming soon."
+      "empty": "Content coming soon.",
+      "faqSectionTitle": "Frequently Asked Questions"
     },
     "supportContact": {
       "metaTitle": "Contact us | Support",

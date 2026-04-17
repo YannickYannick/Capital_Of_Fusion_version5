@@ -20,6 +20,7 @@ from apps.core.views import (
     BulletinAdminDetailAPIView,
     PendingContentEditListAPIView,
     PendingContentEditDetailAPIView,
+    FaqItemListAPIView,
 )
 from apps.courses.views import (
     CourseListAPIView, CourseDetailAPIView, ScheduleListAPIView,
@@ -98,6 +99,7 @@ urlpatterns = [
     path("menu/items/", MenuItemListAPIView.as_view()),
     path("identite/bulletins/", BulletinListAPIView.as_view()),
     path("identite/bulletins/<slug:slug>/", BulletinDetailAPIView.as_view()),
+    path("faq/", FaqItemListAPIView.as_view()),
     path("seed/", seed_database),
 
     # ── Courses (lecture) ────────────────────────────────────────────────────

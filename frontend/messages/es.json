@@ -241,7 +241,8 @@
       "title": "FAQ",
       "subtitle": "Respuestas a las preguntas más frecuentes.",
       "contentMarkdown": "## Por completar\n\nAñade aquí el contenido (Markdown) de la **FAQ**.\n",
-      "empty": "Contenido próximamente."
+      "empty": "Contenido próximamente.",
+      "faqSectionTitle": "Preguntas frecuentes"
     },
     "supportContact": {
       "metaTitle": "Contáctanos | Soporte",
