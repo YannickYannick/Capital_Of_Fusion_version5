@@ -278,6 +278,13 @@ class SiteConfiguration(models.Model):
         verbose_name="Notre histoire (Markdown)",
         help_text="Contenu de la page Identité COF → Notre histoire (format Markdown).",
     )
+    # Identité COF — ADN du festival (page markdown, même pattern que Book your hotel)
+    identite_adn_festival_markdown = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Identité COF — ADN du festival (Markdown)",
+        help_text="Contenu de la page Identité COF → ADN du festival (format Markdown).",
+    )
 
     # Festival — pages éditoriales (Markdown)
     festival_planning_navettes_markdown = models.TextField(
@@ -376,6 +383,11 @@ class MenuItem(BaseModel):
     icon = models.CharField(max_length=100, blank=True)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    is_visible = models.BooleanField(
+        default=True,
+        verbose_name="Visible (sous-menu)",
+        help_text="Pour un enfant de menu : si décoché, ce lien n’apparaît pas dans le déroulant. Ignoré ou sans effet sur une entrée racine sans parent.",
+    )
 
     class Meta:
         verbose_name = "Élément de menu"

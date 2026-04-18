@@ -33,23 +33,26 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
         return (
           <div
             key={item.id}
-            className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden"
+            className="rounded-2xl border border-white/15 overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.35)] ring-1 ring-inset ring-white/5"
           >
             <button
               type="button"
               onClick={() => toggle(item.id)}
-              className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-white/5 transition-colors"
+              className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left bg-transparent hover:bg-white/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               aria-expanded={isOpen}
             >
-              <span className="font-medium text-white">{item.question}</span>
+              <span className="font-semibold text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] pr-2">
+                {item.question}
+              </span>
               <svg
-                className={`w-5 h-5 text-white/60 flex-shrink-0 transition-transform duration-200 ${
+                className={`w-5 h-5 text-white/90 flex-shrink-0 transition-transform duration-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] ${
                   isOpen ? "rotate-180" : ""
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={2}
+                aria-hidden={true}
               >
                 <path
                   strokeLinecap="round"
@@ -63,7 +66,7 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
                 isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <div className="px-5 pb-4 text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+              <div className="border-t border-white/10 px-5 py-4 text-sm leading-relaxed text-white/95 whitespace-pre-wrap">
                 {item.answer}
               </div>
             </div>

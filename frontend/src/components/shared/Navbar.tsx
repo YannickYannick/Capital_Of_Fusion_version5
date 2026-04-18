@@ -10,6 +10,7 @@ import { getMenuItems } from "@/lib/api";
 import { localizeMenuChildren, localizeMenuRootItem } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
 import { ArtistProfileNavbarDock } from "@/components/shared/ArtistProfileNavbarDock";
+import { LocaleFlagEs, LocaleFlagFr, LocaleFlagGb } from "@/components/shared/LocaleFlagIcons";
 
 function normPath(u: string): string {
   return (u || "").replace(/\/$/, "") || "/";
@@ -22,15 +23,23 @@ function isExternalHref(href: string): boolean {
 function filterActiveMenuTree(items: MenuItemApi[]): MenuItemApi[] {
   return (items ?? [])
     .filter((i) => i.is_active !== false)
-    .map((i) => ({
-      ...i,
-      children: filterActiveMenuTree(i.children ?? []),
-    }));
+    .map((i) => {
+      const children = (i.children ?? []).filter(
+        (c) => c.is_active !== false && c.is_visible !== false,
+      );
+      return {
+        ...i,
+        children: filterActiveMenuTree(children),
+      };
+    });
 }
 
-/** Slugs racine masqués (remplacés par les entrées injectées Identité / En cours / etc.). */
+/**
+ * Slugs / URLs racine masqués : évite les doublons avec la structure « En cours »
+ * du fallback (cours, événements…) ou des pages gérées ailleurs. Identité COF
+ * est piloté par l’API + admin (migration 0021), donc non exclu.
+ */
 const EXCLUDED_ROOT_SLUGS = new Set([
-  "identite-cof",
   "formations",
   "cours",
   "evenements",
@@ -41,10 +50,6 @@ const EXCLUDED_ROOT_SLUGS = new Set([
 ]);
 
 const EXCLUDED_ROOT_PATHS = new Set([
-  "/identite-cof",
-  "/identite-cof/notre-vision",
-  "/identite-cof/notre-histoire",
-  "/identite-cof/bulletins",
   "/formations",
   "/promotions-festivals",
   "/cours",
@@ -137,12 +142,22 @@ export function Navbar() {
           children: [],
         },
         {
+          id: "id-adn-festival",
+          name: t("menu.identiteAdnFestival"),
+          url: "/identite-cof/adn-du-festival",
+          slug: "identite-adn-festival",
+          icon: "",
+          order: 3,
+          is_active: true,
+          children: [],
+        },
+        {
           id: "id-bulletins",
           name: t("menu.ourBulletins"),
           url: "/identite-cof/bulletins",
           slug: "identite-bulletins",
           icon: "",
-          order: 3,
+          order: 4,
           is_active: true,
           children: [],
         },
@@ -515,23 +530,32 @@ export function Navbar() {
             ),
           )}
           <div className="flex items-center gap-1 ml-2" aria-label={t("language")}>
-            {(["fr", "en", "es"] as const).map((l) => (
-              <button
-                key={l}
-                type="button"
-                onClick={() => {
-                  document.cookie = `locale=${l}; path=/; max-age=31536000`;
-                  router.refresh();
-                }}
-                className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition ${
-                  locale === l
-                    ? "bg-purple-500/20 border-purple-500/50 text-purple-300"
-                    : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-purple-500/30 hover:text-purple-200"
-                }`}
-              >
-                {l}
-              </button>
-            ))}
+            {(["fr", "en", "es"] as const).map((l) => {
+              const localeName =
+                l === "fr" ? t("localeFr") : l === "en" ? t("localeEn") : t("localeEs");
+              const Flag =
+                l === "fr" ? LocaleFlagFr : l === "en" ? LocaleFlagGb : LocaleFlagEs;
+              return (
+                <button
+                  key={l}
+                  type="button"
+                  aria-label={localeName}
+                  aria-pressed={locale === l}
+                  title={localeName}
+                  onClick={() => {
+                    document.cookie = `locale=${l}; path=/; max-age=31536000`;
+                    router.refresh();
+                  }}
+                  className={`flex h-7 w-8 shrink-0 items-center justify-center rounded-md border p-0.5 transition ${
+                    locale === l
+                      ? "border-purple-500/60 bg-purple-500/15 ring-1 ring-purple-400/35"
+                      : "border-white/15 bg-black/30 opacity-80 hover:border-purple-500/35 hover:bg-white/10 hover:opacity-100"
+                  }`}
+                >
+                  <Flag className="h-3.5 w-[22px] rounded-[2px] shadow-sm" />
+                </button>
+              );
+            })}
           </div>
         </div>
 

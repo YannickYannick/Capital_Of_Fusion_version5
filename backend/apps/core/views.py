@@ -5,7 +5,7 @@ import os
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.core.management import call_command
 from django.apps import apps
 from rest_framework import status, viewsets
@@ -24,7 +24,11 @@ from .serializers import (
     FaqItemSerializer,
 )
 from .permissions import IsStaffOrSuperUser, IsSuperUser, IsSuperUserOrAdminType
-from .pending_edits import apply_pending_edit
+from .pending_edits import (
+    SITE_CONFIG_MARKDOWN_PATCH_KEYS,
+    _apply_siteconfig_translated_payload,
+    apply_pending_edit,
+)
 
 # Langues alignées sur modeltranslation (vision_markdown_fr / _en / _es).
 TRANSLATION_LANGS = frozenset({"fr", "en", "es"})
@@ -33,18 +37,6 @@ TRANSLATION_LANGS = frozenset({"fr", "en", "es"})
 def _request_translation_lang(request):
     lang = (request.GET.get("lang") or "fr").strip().lower()
     return lang if lang in TRANSLATION_LANGS else "fr"
-
-
-def _apply_siteconfig_translated_payload(config: SiteConfiguration, payload: dict, lang: str) -> None:
-    """
-    Écrit sur les colonnes réelles modeltranslation (ex. vision_markdown_fr).
-    setattr(config, "vision_markdown", ...) ne persiste pas de façon fiable sans
-    activation de langue cohérente avec modeltranslation.
-    """
-    for base in ("vision_markdown", "history_markdown"):
-        if base in payload:
-            setattr(config, f"{base}_{lang}", payload[base])
-    config.save()
 
 
 def _user_is_admin_direct(user) -> bool:
@@ -57,13 +49,18 @@ def _user_is_admin_direct(user) -> bool:
 
 
 class SiteConfigurationAPIView(APIView):
-    """GET /api/config/ — lecture publique de la configuration."""
+    """GET /api/config/?lang=fr|en|es — lecture publique (champs traduits modeltranslation)."""
     def get(self, request):
+        lang = _request_translation_lang(request)
         config = SiteConfiguration.objects.first()
         if not config:
             config = SiteConfiguration.objects.create()
-        serializer = SiteConfigurationSerializer(config, context={'request': request})
-        return Response(serializer.data)
+        translation.activate(lang)
+        try:
+            serializer = SiteConfigurationSerializer(config, context={'request': request})
+            return Response(serializer.data)
+        finally:
+            translation.deactivate()
 
 
 def health_check(request):
@@ -75,14 +72,20 @@ def health_check(request):
 
 class MenuItemListAPIView(APIView):
     """
-    GET /api/menu/items/
+    GET /api/menu/items/?lang=fr|en|es
     Liste des MenuItem racine (parent=None), avec enfants récursifs. Ordre par order.
+    Le paramètre lang active modeltranslation sur le champ name (MenuItem).
     """
 
     def get(self, request):
+        lang = _request_translation_lang(request)
         items = MenuItem.objects.filter(parent=None, is_active=True).order_by("order")
-        serializer = MenuItemSerializer(items, many=True)
-        return Response(serializer.data)
+        translation.activate(lang)
+        try:
+            serializer = MenuItemSerializer(items, many=True)
+            return Response(serializer.data)
+        finally:
+            translation.deactivate()
 
 
 class BulletinListAPIView(APIView):
@@ -109,13 +112,19 @@ class BulletinDetailAPIView(APIView):
 
 class FaqItemListAPIView(APIView):
     """
-    GET /api/faq/
+    GET /api/faq/?lang=fr|en|es
     Liste des FAQ publiées, ordonnées par le champ order puis date de création.
+    Le paramètre lang active modeltranslation pour question / answer.
     """
     def get(self, request):
+        lang = _request_translation_lang(request)
         qs = FaqItem.objects.filter(is_published=True).order_by("order", "created_at")
-        serializer = FaqItemSerializer(qs, many=True)
-        return Response(serializer.data)
+        translation.activate(lang)
+        try:
+            serializer = FaqItemSerializer(qs, many=True)
+            return Response(serializer.data)
+        finally:
+            translation.deactivate()
 
 
 def _siteconfig_identity_translations_payload(config: SiteConfiguration) -> dict:
@@ -146,20 +155,7 @@ class SiteConfigurationAdminAPIView(APIView):
         if not config:
             config = SiteConfiguration.objects.create()
         payload = {}
-        if request.data.get("vision_markdown") is not None:
-            payload["vision_markdown"] = request.data["vision_markdown"]
-        if request.data.get("history_markdown") is not None:
-            payload["history_markdown"] = request.data["history_markdown"]
-        for key in (
-            "festival_planning_navettes_markdown",
-            "festival_acces_venue_markdown",
-            "festival_jack_n_jill_markdown",
-            "festival_all_star_street_battle_markdown",
-            "festival_book_your_hotel_markdown",
-            "festival_notre_programme_markdown",
-            "support_faq_markdown",
-            "support_contact_markdown",
-        ):
+        for key in SITE_CONFIG_MARKDOWN_PATCH_KEYS:
             if request.data.get(key) is not None:
                 payload[key] = request.data[key]
         if not payload:
@@ -404,7 +400,11 @@ class _TranslationAdminMixin:
     ALLOWED_TARGETS = {"en", "es"}
     # Liste blanche explicite (extensible) des champs traduisibles via popup admin.
     ALLOWED_MODEL_FIELDS = {
-        "core.SiteConfiguration": {"vision_markdown", "history_markdown"},
+        "core.SiteConfiguration": {
+            "vision_markdown",
+            "history_markdown",
+            "identite_adn_festival_markdown",
+        },
         "core.Bulletin": {"title", "content_markdown"},
         "users.User": {"bio"},
     }

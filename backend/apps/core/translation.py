@@ -32,6 +32,7 @@ class SiteConfigurationTranslationOptions(TranslationOptions):
         "hero_footer_text",
         "vision_markdown",
         "history_markdown",
+        "identite_adn_festival_markdown",
         "festival_planning_navettes_markdown",
         "festival_acces_venue_markdown",
         "festival_jack_n_jill_markdown",

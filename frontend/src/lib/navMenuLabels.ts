@@ -20,6 +20,7 @@ export function menuTranslationKeyForRootUrl(url: string | undefined): string | 
   // Puis les patterns génériques
   if (p === "/festival") return "menu.festival";
   if (p === "/support" || p.startsWith("/support/")) return "menu.support";
+  if (p === "/identite-cof") return "menu.identiteCof";
 
   return null;
 }
@@ -52,6 +53,37 @@ export function menuTranslationKeyForChildUrl(url: string | undefined): string |
   if (p === "/organisation/staff" || p.startsWith("/organisation/staff/")) return "menu.ourStaff";
   if (p === "/artistes" || p.startsWith("/artistes/")) return "menu.nosArtistes";
 
+  // Identité COF (URLs alignées MenuItem / admin)
+  if (p === "/identite-cof/notre-vision") return "menu.ourVision";
+  if (p === "/identite-cof/notre-histoire") return "menu.ourHistory";
+  if (p === "/identite-cof/adn-du-festival") return "menu.identiteAdnFestival";
+  if (p === "/identite-cof/bulletins" || p.startsWith("/identite-cof/bulletins/")) {
+    return "menu.ourBulletins";
+  }
+
+  return null;
+}
+
+/**
+ * Clés `pages.identiteHub.*` (titre + description) pour une URL d’enfant Identité COF.
+ * Retourne null si URL inconnue (on utilisera le nom API + description vide sur le hub).
+ */
+export function identiteHubCardTranslationKeys(
+  url: string | undefined,
+): { titleKey: string; descKey: string } | null {
+  const p = normalizeNavPath(url || "#");
+  if (p === "/identite-cof/notre-vision") {
+    return { titleKey: "cardVisionTitle", descKey: "cardVisionDesc" };
+  }
+  if (p === "/identite-cof/notre-histoire") {
+    return { titleKey: "cardHistoryTitle", descKey: "cardHistoryDesc" };
+  }
+  if (p === "/identite-cof/adn-du-festival") {
+    return { titleKey: "cardAdnTitle", descKey: "cardAdnDesc" };
+  }
+  if (p === "/identite-cof/bulletins" || p.startsWith("/identite-cof/bulletins/")) {
+    return { titleKey: "cardBulletinsTitle", descKey: "cardBulletinsDesc" };
+  }
   return null;
 }
 

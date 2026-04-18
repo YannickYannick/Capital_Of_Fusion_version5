@@ -57,6 +57,7 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
         fields = [
             "site_name", "hero_title", "hero_subtitle",
             "vision_markdown", "history_markdown",
+            "identite_adn_festival_markdown",
             "festival_planning_navettes_markdown",
             "festival_acces_venue_markdown",
             "festival_jack_n_jill_markdown",
@@ -88,11 +89,11 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MenuItem
-        fields = ("id", "name", "slug", "url", "icon", "order", "is_active", "children")
+        fields = ("id", "name", "slug", "url", "icon", "order", "is_active", "is_visible", "children")
 
     def get_children(self, obj):
-        """Enfants actifs, triés par order."""
-        children = obj.children.filter(is_active=True).order_by("order")
+        """Enfants actifs et visibles dans le sous-menu, triés par order."""
+        children = obj.children.filter(is_active=True, is_visible=True).order_by("order")
         return MenuItemSerializer(children, many=True).data
 
 

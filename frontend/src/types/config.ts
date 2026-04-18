@@ -39,6 +39,8 @@ export interface SiteConfigurationApi {
     vision_markdown?: string;
     /** Contenu markdown de la page Identité COF → Notre histoire */
     history_markdown?: string;
+    /** Contenu markdown Identité COF → ADN du festival */
+    identite_adn_festival_markdown?: string;
     festival_planning_navettes_markdown?: string;
     festival_acces_venue_markdown?: string;
     festival_jack_n_jill_markdown?: string;

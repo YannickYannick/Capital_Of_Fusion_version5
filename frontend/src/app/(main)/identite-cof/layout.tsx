@@ -1,6 +1,5 @@
 /**
- * Layout Identité COF — Notre vision, Notre histoire & Dernières informations.
- * Aligné sur formations/contenu : pt-64 pb-20, max-w-4xl.
+ * Layout Identité COF — même enveloppe que Support (hub + pages éditoriales).
  */
 export default function IdentiteCofLayout({
   children,
@@ -8,10 +7,8 @@ export default function IdentiteCofLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen pt-64 pb-20 px-4 md:px-8 text-white">
-      <div className="max-w-4xl mx-auto">
-        {children}
-      </div>
+    <div className="min-h-screen px-4 md:px-8 py-16 text-white">
+      <div className="max-w-4xl mx-auto">{children}</div>
     </div>
   );
 }

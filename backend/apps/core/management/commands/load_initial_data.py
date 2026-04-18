@@ -33,10 +33,53 @@ class Command(BaseCommand):
 
         self.stdout.write("Création des MenuItem...")
         menu_data = [
-            {"name": "Identité COF", "slug": "identite-cof", "url": "/identite-cof/", "order": 1, "children": [
-                {"name": "Notre vision", "slug": "identite-vision", "url": "/identite-cof/notre-vision", "order": 1},
-                {"name": "Bulletins", "slug": "identite-bulletins", "url": "/identite-cof/bulletins", "order": 2},
-            ]},
+            {
+                "name": "Identité COF",
+                "name_fr": "Identité COF",
+                "name_en": "COF identity",
+                "name_es": "Identidad COF",
+                "slug": "identite-cof",
+                "url": "/identite-cof/",
+                "order": 1,
+                "children": [
+                    {
+                        "name": "Notre vision",
+                        "name_fr": "Notre vision",
+                        "name_en": "Our vision",
+                        "name_es": "Nuestra visión",
+                        "slug": "identite-vision",
+                        "url": "/identite-cof/notre-vision",
+                        "order": 1,
+                    },
+                    {
+                        "name": "Notre histoire",
+                        "name_fr": "Notre histoire",
+                        "name_en": "Our history",
+                        "name_es": "Nuestra historia",
+                        "slug": "identite-histoire",
+                        "url": "/identite-cof/notre-histoire",
+                        "order": 2,
+                    },
+                    {
+                        "name": "ADN du festival",
+                        "name_fr": "ADN du festival",
+                        "name_en": "Festival DNA",
+                        "name_es": "ADN del festival",
+                        "slug": "identite-adn-festival",
+                        "url": "/identite-cof/adn-du-festival",
+                        "order": 3,
+                    },
+                    {
+                        "name": "Dernières informations",
+                        "name_fr": "Dernières informations",
+                        "name_en": "Latest updates",
+                        "name_es": "Últimas novedades",
+                        "slug": "identite-bulletins",
+                        "url": "/identite-cof/bulletins",
+                        "order": 4,
+                    },
+                ],
+            },
             {"name": "Événements", "slug": "evenements", "url": "/evenements/", "order": 2, "children": [
                 {"name": "Liste & Événements", "slug": "evenements-liste", "url": "/evenements/", "order": 1},
                 {"name": "Festivals", "slug": "evenements-festivals", "url": "/evenements/festivals/", "order": 2},
@@ -89,11 +132,14 @@ class Command(BaseCommand):
         for p_data in menu_data:
             children = p_data.pop("children", [])
             parent, _ = MenuItem.objects.get_or_create(
-                slug=p_data["slug"], defaults={**p_data, "is_active": True, "parent": None}
+                slug=p_data["slug"],
+                defaults={**p_data, "is_active": True, "is_visible": True, "parent": None},
             )
             for c_data in children:
                 MenuItem.objects.get_or_create(
-                    slug=c_data["slug"], parent=parent, defaults={**c_data, "is_active": True}
+                    slug=c_data["slug"],
+                    parent=parent,
+                    defaults={**c_data, "is_active": True, "is_visible": True},
                 )
 
         self.stdout.write(self.style.SUCCESS(f"  Menu créé avec {len(menu_data)} parents (et enfants)."))

@@ -14,9 +14,24 @@ User = get_user_model()
 
 TRANSLATION_LANGS = frozenset({"fr", "en", "es"})
 
+# Champs SiteConfiguration patchables (colonnes modeltranslation *_fr / _en / _es).
+SITE_CONFIG_MARKDOWN_PATCH_KEYS = (
+    "vision_markdown",
+    "history_markdown",
+    "identite_adn_festival_markdown",
+    "festival_planning_navettes_markdown",
+    "festival_acces_venue_markdown",
+    "festival_jack_n_jill_markdown",
+    "festival_all_star_street_battle_markdown",
+    "festival_book_your_hotel_markdown",
+    "festival_notre_programme_markdown",
+    "support_faq_markdown",
+    "support_contact_markdown",
+)
+
 
 def _apply_siteconfig_translated_payload(config: SiteConfiguration, payload: dict, lang: str) -> None:
-    for base in ("vision_markdown", "history_markdown"):
+    for base in SITE_CONFIG_MARKDOWN_PATCH_KEYS:
         if base in payload:
             setattr(config, f"{base}_{lang}", payload[base])
     config.save()
@@ -49,7 +64,7 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
                 filtered = {
                     k: v
                     for k, v in fields.items()
-                    if k in ("vision_markdown", "history_markdown")
+                    if k in SITE_CONFIG_MARKDOWN_PATCH_KEYS
                 }
                 if filtered:
                     _apply_siteconfig_translated_payload(config, filtered, lang)
@@ -60,7 +75,7 @@ def apply_pending_edit(edit: PendingContentEdit) -> None:
         filtered = {
             k: v
             for k, v in raw.items()
-            if k in ("vision_markdown", "history_markdown")
+            if k in SITE_CONFIG_MARKDOWN_PATCH_KEYS
         }
         _apply_siteconfig_translated_payload(config, filtered, lang)
         return

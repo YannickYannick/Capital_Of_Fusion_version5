@@ -10,5 +10,7 @@ export interface MenuItemApi {
   icon: string;
   order: number;
   is_active: boolean;
+  /** Sous-menus : si false, l’entrée n’apparaît pas dans le déroulant. */
+  is_visible?: boolean;
   children: MenuItemApi[];
 }

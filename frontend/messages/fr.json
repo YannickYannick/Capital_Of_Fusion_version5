@@ -1,6 +1,9 @@
 {
   "navbar": {
     "language": "Langue",
+    "localeFr": "Français",
+    "localeEn": "English",
+    "localeEs": "Español",
     "mySpace": "Mon Espace",
     "login": "Connexion",
     "ariaMainNav": "Navigation principale",
@@ -18,6 +21,7 @@
       "ourVision": "Notre vision",
       "ourHistory": "Notre histoire",
       "ourBulletins": "Dernières informations",
+      "identiteAdnFestival": "ADN du festival",
       "ongoing": "En cours",
       "courses": "Cours",
       "events": "Événements",
@@ -449,6 +453,29 @@
       "draftHint": "Les brouillons sont enregistrés sur le serveur.",
       "canEdit": "Vous pouvez modifier ce texte.",
       "cannotEdit": "Vous ne pouvez pas modifier ce texte."
+    },
+    "identiteHub": {
+      "metaTitle": "Identité COF",
+      "metaDescription": "Notre vision, notre histoire, l’ADN du festival et les dernières informations.",
+      "eyebrow": "Identité COF",
+      "title": "Identité COF",
+      "subtitle": "Découvre les pages qui présentent le projet et la communauté.",
+      "cardVisionTitle": "Notre vision",
+      "cardVisionDesc": "Valeurs et direction du festival.",
+      "cardHistoryTitle": "Notre histoire",
+      "cardHistoryDesc": "Origines et jalons.",
+      "cardAdnTitle": "ADN du festival",
+      "cardAdnDesc": "Ce qui définit l’esprit et l’identité du festival.",
+      "cardBulletinsTitle": "Dernières informations",
+      "cardBulletinsDesc": "Annonces et actualités."
+    },
+    "identiteAdnFestival": {
+      "metaTitle": "ADN du festival | Identité COF",
+      "metaDescription": "L’ADN du festival Capital of Fusion — identité, valeurs et expérience.",
+      "eyebrow": "Identité COF",
+      "title": "ADN du festival",
+      "subtitle": "Contenu éditorial (Markdown) — modifiable par le staff sur place.",
+      "empty": "Contenu à venir."
     },
     "identiteHistory": {
       "metaTitle": "Notre histoire | Identité COF",

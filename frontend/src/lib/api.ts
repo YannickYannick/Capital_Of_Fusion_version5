@@ -185,6 +185,7 @@ export async function patchSiteConfigMarkdownField(payload: Partial<Pick<
   | "festival_all_star_street_battle_markdown"
   | "festival_book_your_hotel_markdown"
   | "festival_notre_programme_markdown"
+  | "identite_adn_festival_markdown"
   | "support_faq_markdown"
   | "support_contact_markdown"
 >>): Promise<SiteConfigurationApi | { pending: true; message: string }> {
@@ -1437,10 +1438,12 @@ export interface FaqItemApi {
   order: number;
 }
 
-/** Liste des FAQ publiées. GET /api/faq/ */
+/** Liste des FAQ publiées. GET /api/faq/?lang=... (aligné sur le cookie locale) */
 export async function getFaqItems(): Promise<FaqItemApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/faq/`, { cache: "no-store" });
+  const lang = await getLocaleFromCookie();
+  const url = addLangParam(`${base}/api/faq/`, lang);
+  const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) return [];
   return res.json();
 }

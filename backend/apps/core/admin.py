@@ -198,6 +198,7 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
         ("Général", {"fields": ("site_name", "hero_title", "hero_subtitle")}),
         ("Identité COF — Notre vision", {"fields": ("vision_markdown",)}),
         ("Identité COF — Notre histoire", {"fields": ("history_markdown",)}),
+        ("Identité COF — ADN du festival", {"fields": ("identite_adn_festival_markdown",)}),
         (
             "Festival — pages",
             {
@@ -237,9 +238,9 @@ class FaqItemAdmin(admin.ModelAdmin):
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "parent", "url", "order", "is_active")
-    list_editable = ("order", "is_active")
-    list_filter = ("parent", "is_active")
+    list_display = ("name", "slug", "parent", "url", "order", "is_active", "is_visible")
+    list_editable = ("order", "is_active", "is_visible")
+    list_filter = ("parent", "is_active", "is_visible")
 
 
 @admin.register(PendingContentEdit)

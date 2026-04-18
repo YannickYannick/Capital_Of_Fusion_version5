@@ -1,6 +1,9 @@
 {
   "navbar": {
     "language": "Language",
+    "localeFr": "Français",
+    "localeEn": "English",
+    "localeEs": "Español",
     "mySpace": "My Space",
     "login": "Log in",
     "ariaMainNav": "Main navigation",
@@ -18,6 +21,7 @@
       "ourVision": "Our vision",
       "ourHistory": "Our history",
       "ourBulletins": "Latest updates",
+      "identiteAdnFestival": "Festival DNA",
       "ongoing": "Current",
       "courses": "Classes",
       "events": "Events",
@@ -449,6 +453,29 @@
       "draftHint": "Drafts are saved on the server.",
       "canEdit": "You can edit this text.",
       "cannotEdit": "You cannot edit this text."
+    },
+    "identiteHub": {
+      "metaTitle": "COF Identity",
+      "metaDescription": "Our vision, our story, festival DNA, and latest updates.",
+      "eyebrow": "COF Identity",
+      "title": "COF Identity",
+      "subtitle": "Explore the pages that present the project and the community.",
+      "cardVisionTitle": "Our vision",
+      "cardVisionDesc": "Values and direction of the festival.",
+      "cardHistoryTitle": "Our story",
+      "cardHistoryDesc": "Origins and milestones.",
+      "cardAdnTitle": "Festival DNA",
+      "cardAdnDesc": "What defines the spirit and identity of the festival.",
+      "cardBulletinsTitle": "Latest updates",
+      "cardBulletinsDesc": "Announcements and news."
+    },
+    "identiteAdnFestival": {
+      "metaTitle": "Festival DNA | COF Identity",
+      "metaDescription": "The DNA of the Capital of Fusion festival — identity, values, and experience.",
+      "eyebrow": "COF Identity",
+      "title": "Festival DNA",
+      "subtitle": "Editorial content (Markdown) — editable on-site by staff.",
+      "empty": "Content coming soon."
     },
     "identiteHistory": {
       "metaTitle": "Our story | COF Identity",
