@@ -19,7 +19,7 @@ function isExternalHref(href: string): boolean {
 }
 
 /**
- * MobileNav — menu hamburger pour mobile.
+ * MobileNav — menu hamburger pour les écrans &lt; xl (affichage piloté par la Navbar).
  * Affiche les entrées de menu (API ou fallback) ; sous-menus dépliables.
  */
 export function MobileNav({ items }: { items: NavLinkItem[] }) {
@@ -28,7 +28,7 @@ export function MobileNav({ items }: { items: NavLinkItem[] }) {
   const t = useTranslations("navbar");
 
   return (
-    <div className="md:hidden">
+    <div className="relative">
       <button
         type="button"
         onClick={() => setOpen(!open)}

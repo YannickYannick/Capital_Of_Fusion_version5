@@ -453,83 +453,89 @@ export function Navbar() {
           />
         </Link>
 
-        <div className="hidden xl:flex items-center gap-2 lg:gap-4 flex-1 justify-end pl-2 flex-wrap lg:flex-nowrap">
-          {filteredLinks.map(({ href, label, children }) =>
-            children.length > 0 ? (
-              <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
-                {isExternalHref(href) ? (
+        <div className="flex flex-1 items-center justify-end gap-2 min-w-0 pl-2">
+          <div className="hidden xl:flex items-center gap-2 lg:gap-4 flex-wrap lg:flex-nowrap">
+            {filteredLinks.map(({ href, label, children }) =>
+              children.length > 0 ? (
+                <div key={href + label} className="relative group" role="group" aria-haspopup="true" aria-label={label}>
+                  {isExternalHref(href) ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                    >
+                      {label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={href}
+                      className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                    >
+                      {label}
+                    </Link>
+                  )}
+                  <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="bg-black/95 backdrop-blur-md border border-white/10 rounded-lg py-2 min-w-[180px] shadow-xl">
+                      {children.map((child) => {
+                        const url = child.url || "#";
+                        const isProjets = url.startsWith("/projets");
+                        const external = isExternalHref(url);
+                        return (
+                          external ? (
+                            <a
+                              key={child.id}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
+                            >
+                              {child.name}
+                            </a>
+                          ) : (
+                            <Link
+                              key={child.id}
+                              href={url}
+                              prefetch={!isProjets}
+                              className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
+                            >
+                              {child.name}
+                            </Link>
+                          )
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                isExternalHref(href) ? (
                   <a
+                    key={href + label}
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                    className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
                   >
                     {label}
                   </a>
                 ) : (
                   <Link
+                    key={href + label}
                     href={href}
-                    className="text-white/90 hover:text-white text-sm font-medium transition py-2 block focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded px-1"
+                    prefetch={!href.startsWith("/projets")}
+                    className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
                   >
                     {label}
                   </Link>
-                )}
-                <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="bg-black/95 backdrop-blur-md border border-white/10 rounded-lg py-2 min-w-[180px] shadow-xl">
-                    {children.map((child) => {
-                      const url = child.url || "#";
-                      const isProjets = url.startsWith("/projets");
-                      const external = isExternalHref(url);
-                      return (
-                        external ? (
-                          <a
-                            key={child.id}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
-                          >
-                            {child.name}
-                          </a>
-                        ) : (
-                          <Link
-                            key={child.id}
-                            href={url}
-                            prefetch={!isProjets}
-                            className="block px-4 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 focus-visible:text-white rounded"
-                          >
-                            {child.name}
-                          </Link>
-                        )
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              isExternalHref(href) ? (
-                <a
-                  key={href + label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
-                >
-                  {label}
-                </a>
-              ) : (
-                <Link
-                  key={href + label}
-                  href={href}
-                  prefetch={!href.startsWith("/projets")}
-                  className="text-white/90 hover:text-white text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1"
-                >
-                  {label}
-                </Link>
-              )
-            ),
-          )}
-          <div className="flex items-center gap-1 ml-2" aria-label={t("language")}>
+                )
+              ),
+            )}
+          </div>
+
+          <div
+            className="flex items-center gap-1 shrink-0 xl:ml-1"
+            aria-label={t("language")}
+          >
             {(["fr", "en", "es"] as const).map((l) => {
               const localeName =
                 l === "fr" ? t("localeFr") : l === "en" ? t("localeEn") : t("localeEs");
@@ -557,10 +563,10 @@ export function Navbar() {
               );
             })}
           </div>
-        </div>
 
-        <div className="xl:hidden">
-          <MobileNav items={filteredLinks} />
+          <div className="xl:hidden shrink-0">
+            <MobileNav items={filteredLinks} />
+          </div>
         </div>
       </nav>
       <ArtistProfileNavbarDock />
