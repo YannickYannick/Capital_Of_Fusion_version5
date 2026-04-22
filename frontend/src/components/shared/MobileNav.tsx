@@ -28,7 +28,7 @@ export function MobileNav({ items }: { items: NavLinkItem[] }) {
   const t = useTranslations("navbar");
 
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -66,7 +66,7 @@ export function MobileNav({ items }: { items: NavLinkItem[] }) {
           id="mobile-menu"
           role="navigation"
           aria-label={t("mobile.mobileNavLabel")}
-          className="absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto"
+          className="fixed left-0 right-0 top-[var(--app-header-height,4rem)] z-40 w-full bg-black/95 backdrop-blur-md border-b border-white/10 py-4 flex flex-col gap-1 max-h-[min(80vh,calc(100dvh-var(--app-header-height,4rem)))] overflow-y-auto shadow-lg"
         >
           {items.map(({ href, label, children }) => (
             <div key={href + label}>
