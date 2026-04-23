@@ -5,6 +5,7 @@ import "./globals.css";
 import { TopLoadingBar } from "@/components/shared/TopLoadingBar";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const urbane = localFont({
@@ -66,6 +67,7 @@ export default async function RootLayout({
           <TopLoadingBar />
           {children}
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
