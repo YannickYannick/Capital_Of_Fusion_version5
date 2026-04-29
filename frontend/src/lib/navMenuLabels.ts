@@ -61,6 +61,10 @@ export function menuTranslationKeyForChildUrl(url: string | undefined): string |
     return "menu.ourBulletins";
   }
 
+  // Support
+  if (p === "/support/faq") return "menu.faq";
+  if (p === "/support/nous-contacter" || p === "/support/contact") return "menu.contactUs";
+
   return null;
 }
 
