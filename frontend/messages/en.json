@@ -578,7 +578,9 @@
       "descriptionPlaceholder": "Node description",
       "aboutContentLabel": "Detailed content (About)",
       "aboutContentPlaceholder": "Rich content (markdown allowed)",
-      "about": "About"
+      "about": "About",
+      "loadingFaq": "Loading FAQ…",
+      "emptyFaq": "No FAQ items yet."
     },
     "video": {
       "enableSound": "Enable sound",

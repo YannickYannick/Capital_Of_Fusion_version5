@@ -578,7 +578,9 @@
       "descriptionPlaceholder": "Descripción del nodo",
       "aboutContentLabel": "Contenido detallado (Acerca de)",
       "aboutContentPlaceholder": "Contenido enriquecido (markdown permitido)",
-      "about": "Acerca de"
+      "about": "Acerca de",
+      "loadingFaq": "Cargando FAQ…",
+      "emptyFaq": "Todavía no hay preguntas frecuentes."
     },
     "video": {
       "enableSound": "Activar sonido",

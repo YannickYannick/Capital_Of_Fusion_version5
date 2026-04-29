@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
-import { patchOrganizationNode } from "@/lib/api";
+import { getFaqItems, patchOrganizationNode, type FaqItemApi } from "@/lib/api";
 import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanceTicketsEmbed";
 
 interface PlanetOverlayProps {
@@ -150,6 +150,37 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   );
 
   if (!node) return null;
+
+  const isFaqNode = useMemo(() => {
+    const slug = (node.slug || "").toLowerCase();
+    const name = (node.name || "").toLowerCase();
+    return slug === "faq" || slug.includes("faq") || name === "faq" || name.includes("faq");
+  }, [node.slug, node.name]);
+
+  const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
+  const [faqLoading, setFaqLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isFaqNode) {
+      setFaqItems(null);
+      return;
+    }
+    let cancelled = false;
+    setFaqLoading(true);
+    getFaqItems()
+      .then((items) => {
+        if (!cancelled) setFaqItems(items);
+      })
+      .catch(() => {
+        if (!cancelled) setFaqItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setFaqLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isFaqNode, locale]);
 
   const centerTeaserSrc = "/teaser-pool-party.mp4";
   const showCenterTeaser =
@@ -401,6 +432,44 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
                       {node.description}
                     </p>
+                  )}
+                </div>
+              )}
+
+              {/* FAQ — affichée directement dans la planète FAQ */}
+              {isFaqNode && !showEditForm && (
+                <div className="border-t border-white/10 px-8 py-6">
+                  <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
+                    FAQ
+                  </h2>
+
+                  {faqLoading && (
+                    <p className="text-white/50 text-sm">{t("overlay.loadingFaq")}</p>
+                  )}
+
+                  {!faqLoading && faqItems && faqItems.length === 0 && (
+                    <p className="text-white/50 text-sm">{t("overlay.emptyFaq")}</p>
+                  )}
+
+                  {!faqLoading && faqItems && faqItems.length > 0 && (
+                    <div className="space-y-3">
+                      {faqItems.map((item) => (
+                        <details
+                          key={item.id}
+                          className="group rounded-xl bg-white/5 border border-white/10 px-4 py-3 open:bg-white/7 open:border-purple-500/30"
+                        >
+                          <summary className="cursor-pointer list-none flex items-center justify-between gap-4">
+                            <span className="text-white font-semibold text-sm">
+                              {item.question}
+                            </span>
+                            <span className="text-white/40 group-open:rotate-180 transition">▾</span>
+                          </summary>
+                          <div className="mt-3 text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+                            {item.answer}
+                          </div>
+                        </details>
+                      ))}
+                    </div>
                   )}
                 </div>
               )}

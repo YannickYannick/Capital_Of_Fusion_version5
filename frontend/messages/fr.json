@@ -578,7 +578,9 @@
       "descriptionPlaceholder": "Description du nœud",
       "aboutContentLabel": "Contenu détaillé (À propos)",
       "aboutContentPlaceholder": "Contenu riche (markdown possible)",
-      "about": "À propos"
+      "about": "À propos",
+      "loadingFaq": "Chargement de la FAQ…",
+      "emptyFaq": "Aucune question fréquente pour le moment."
     },
     "video": {
       "enableSound": "Activer le son",
