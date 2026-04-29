@@ -88,8 +88,6 @@ function ExplorePageInner() {
   const [nodes, setNodes] = useState<OrganizationNodeApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedNode, setSelectedNode] = useState<OrganizationNodeApi | null>(null);
-  const [selectedPlanetScreenPos, setSelectedPlanetScreenPos] = useState<{ x: number; y: number } | null>(null);
   const [overlayNode, setOverlayNode] = useState<OrganizationNodeApi | null>(null);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
   
@@ -108,10 +106,6 @@ function ExplorePageInner() {
 
   const { setOverride: setPlanetMusicOverride } = usePlanetMusicOverride();
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
-
-  useEffect(() => {
-    if (!selectedNode) setSelectedPlanetScreenPos(null);
-  }, [selectedNode]);
 
   // Musique de fond planète : activer quand l'overlay s'ouvre sur un nœud avec musique, désactiver à la fermeture
   useEffect(() => {
@@ -239,19 +233,13 @@ function ExplorePageInner() {
   // Solution 3: Utiliser les nodes différés pour le rendu 3D (ne bloque pas l'UI)
   const visibleNodes = deferredNodes.filter((n) => n.is_visible_3d);
 
-  const handleSelectNode = useCallback((node: OrganizationNodeApi | null) => {
-    setSelectedNode(node);
+  const handleSelectNode = useCallback((_node: OrganizationNodeApi | null) => {
+    // La sélection existe encore dans la scène pour le zoom/état interne,
+    // mais on n'affiche plus de panneau d'action intermédiaire côté page.
   }, []);
 
-  const handleSelectedPlanetScreenPosition = useCallback((x: number, y: number) => {
-    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-    const margin = 80;
-    const w = typeof window !== "undefined" ? window.innerWidth : 1920;
-    const h = typeof window !== "undefined" ? window.innerHeight : 1080;
-    setSelectedPlanetScreenPos({
-      x: Math.max(margin, Math.min(w - margin, x)),
-      y: Math.max(margin, Math.min(h - margin, y)),
-    });
+  const handleSelectedPlanetScreenPosition = useCallback((_x: number, _y: number) => {
+    // Conservé pour compatibilité avec ExploreScene ; plus utilisé ici.
   }, []);
 
   const handleOpenOverlay = useCallback(
@@ -345,47 +333,6 @@ function ExplorePageInner() {
           onPlanetsLoaded={(count) => perf.markPlanetsLoaded(count)}
           onAllPlanetsOnOrbit={perf.markAllPlanetsOnOrbit}
           />
-        </div>
-      )}
-
-      {/* Barre d'action planète sélectionnée — centre du cadre aligné sur la planète (fallback: bas centré) */}
-      {selectedNode && !overlayNode && (
-        <div
-          className="fixed z-30 pointer-events-none"
-          style={
-            selectedPlanetScreenPos != null
-              ? {
-                  left: selectedPlanetScreenPos.x,
-                  top: selectedPlanetScreenPos.y,
-                  transform: "translate(-50%, -50%)",
-                }
-              : {
-                  bottom: "6rem",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                }
-          }
-        >
-          <div className="pointer-events-auto px-8 py-6 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col items-center gap-4 min-w-[340px] max-w-[90vw] animate-fadeInScale">
-            <p className="text-white/40 text-sm uppercase tracking-widest font-semibold">Sélectionné</p>
-            <p className="text-white text-4xl font-bold text-center leading-tight">{selectedNode.name}</p>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => handleOpenOverlay(selectedNode)}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-base font-semibold transition-all hover:scale-105 shadow-lg shadow-purple-500/20 flex items-center gap-2"
-              >
-                ↗ Détails
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-base font-medium transition border border-white/10 flex items-center gap-2"
-              >
-                ← Retour
-              </button>
-            </div>
-          </div>
         </div>
       )}
 

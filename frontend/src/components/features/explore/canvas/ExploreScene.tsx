@@ -1874,7 +1874,7 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPla
       // Utilise la ref pour éviter le stale closure
       const currentSelectedId = selectedIdRef.current;
 
-      // Si la planète est déjà sélectionnée → ouvrir l'overlay (2ème clic)
+      // Si la planète est déjà sélectionnée, rouvrir/rafraîchir directement l'overlay.
       if (currentSelectedId === node.id) {
         onOpenOverlay(node);
         return;
@@ -1905,6 +1905,9 @@ export function ExploreScene({ nodes, onOpenOverlay, onSelectNode, onSelectedPla
           setSelectedNodePos(fbPos);
         }
       }
+
+      // Ouvrir directement les détails au premier clic pour éviter une étape intermédiaire.
+      onOpenOverlay(node);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [onOpenOverlay, onSelectNode, opts, orbitNodes] // selectedId retiré → remplacé par ref
