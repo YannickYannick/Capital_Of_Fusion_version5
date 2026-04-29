@@ -269,7 +269,8 @@ function ExplorePageInner() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setSelectedNode(null);
+    // La sélection est gérée dans la scène (ExploreScene). Ici, on force juste le reset global.
+    setOverlayNode(null);
     opts.triggerReset();
     opts.set("freezePlanets", false);
   }, [opts]);
