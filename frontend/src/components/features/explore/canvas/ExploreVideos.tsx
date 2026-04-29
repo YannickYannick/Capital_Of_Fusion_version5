@@ -11,6 +11,7 @@ import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { isOrganizationNodeVideoBackgroundPath } from "@/lib/routeSegments";
 import type { SiteConfigurationApi } from "@/types/config";
 import type { YTPlayer } from "@/types/youtube.d";
@@ -185,6 +186,7 @@ function useYTPlayer(
 }
 
 export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi | null }) {
+    const t = useTranslations("explore");
     const pathname = usePathname();
     const isHome = pathname === "/";
     const isExplore = pathname === "/explore";
@@ -714,56 +716,56 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                         type="button" 
                         onClick={() => opts.set("showVideoOverlay", !opts.showVideoOverlay)} 
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.showVideoOverlay ? "bg-purple-500 border-purple-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Ajoute un voile sombre sur la vidéo"
+                        title={t("videoAdmin.overlayTitle")}
                     >
-                        A: Voile
+                        {t("videoAdmin.overlayButton")}
                     </button>
                     <button 
                         type="button" 
                         onClick={() => opts.set("enableTextShadow", !opts.enableTextShadow)} 
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.enableTextShadow ? "bg-purple-500 border-purple-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Ajoute une ombre sur les textes"
+                        title={t("videoAdmin.textShadowTitle")}
                     >
-                        B: Ombre texte
+                        {t("videoAdmin.textShadowButton")}
                     </button>
                     <button 
                         type="button" 
                         onClick={() => opts.set("useBlackBackground", !opts.useBlackBackground)} 
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.useBlackBackground ? "bg-purple-500 border-purple-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Remplace la vidéo par un fond noir"
+                        title={t("videoAdmin.blackBackgroundTitle")}
                     >
-                        C: Fond noir
+                        {t("videoAdmin.blackBackgroundButton")}
                     </button>
                     <button 
                         type="button" 
                         onClick={() => opts.set("disableYouTubeIframes", !opts.disableYouTubeIframes)} 
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.disableYouTubeIframes ? "bg-red-500 border-red-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Désactive complètement les iframes YouTube (test perf)"
+                        title={t("videoAdmin.disableYouTubeTitle")}
                     >
-                        🚫 YT
+                        {t("videoAdmin.disableYouTubeButton")}
                     </button>
                     <button
                         type="button"
                         onClick={() => opts.set("backgroundMusicMode", "site")}
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.backgroundMusicMode === "site" ? "bg-amber-500 border-amber-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Son uniquement des vidéos du site (page d’accueil + cycle), sans musiques planètes ni partenaires"
+                        title={t("videoAdmin.musicModeSiteTitle")}
                     >
-                        🏠 Accueil
+                        {t("videoAdmin.musicModeSiteButton")}
                     </button>
                     <button
                         type="button"
                         onClick={() => opts.set("backgroundMusicMode", "context")}
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${opts.backgroundMusicMode === "context" ? "bg-teal-600 border-teal-500 text-white" : "border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10"}`}
-                        title="Musiques dédiées : planètes Explore et structures partenaires quand elles en ont une"
+                        title={t("videoAdmin.musicModeContextTitle")}
                     >
-                        🤝 Dédiées
+                        {t("videoAdmin.musicModeContextButton")}
                     </button>
                 </div>
                 )}
 
                 {/* Contrôle son — visible pour tous les visiteurs */}
                 <button type="button" onClick={handleMute} className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2">
-                    {muted ? "🔇 Activer le son" : "🔊 Son activé"}
+                    {muted ? t("video.enableSound") : t("video.soundEnabled")}
                 </button>
             </div>
         </>

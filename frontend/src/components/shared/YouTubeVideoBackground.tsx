@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { YTPlayer } from "@/types/youtube.d";
 
 const FALLBACK_MP4_SRC = "/aftermovie-vibe-2025-fallback.mp4";
@@ -16,6 +17,7 @@ const QUALITY_OPTIONS = [
  * Fond vidéo via YouTube IFrame API (qualité + son contrôlables).
  */
 export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
+  const t = useTranslations("explore");
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const [muted, setMuted] = useState(true);
@@ -188,7 +190,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
           onClick={handleMuteToggle}
           disabled={useMp4Fallback}
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition"
-          aria-label={muted ? "Activer le son" : "Couper le son"}
+          aria-label={muted ? t("video.enableSound") : t("video.muteSound")}
         >
           {muted ? (
             <svg
@@ -228,7 +230,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
             </svg>
           )}
           <span className="text-sm">
-            {muted ? "Activer le son" : "Son activé"}
+            {muted ? t("video.enableSound") : t("video.soundEnabled")}
           </span>
         </button>
       </div>

@@ -558,6 +558,135 @@
       "error": "Error de carga"
     }
   },
+  "explore": {
+    "overlay": {
+      "featured": "Destacado",
+      "editDescription": "✏️ Editar descripción",
+      "addOrEditDescription": "✏️ Añadir / editar descripción",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "bookGoAndDance": "Reservar en go&dance",
+      "bookHotel": "Book Your Hotel",
+      "learnMore": "Saber más",
+      "comingSoon": "Próximamente",
+      "upcomingEvents": "Próximos eventos",
+      "bookTickets": "Reserva tus entradas",
+      "description": "Descripción",
+      "shortHookLabel": "Frase corta (máx. 300 caracteres)",
+      "shortHookPlaceholder": "Frase corta bajo el título",
+      "descriptionPlaceholder": "Descripción del nodo",
+      "aboutContentLabel": "Contenido detallado (Acerca de)",
+      "aboutContentPlaceholder": "Contenido enriquecido (markdown permitido)",
+      "about": "Acerca de"
+    },
+    "video": {
+      "enableSound": "Activar sonido",
+      "muteSound": "Silenciar",
+      "soundEnabled": "Sonido activado"
+    },
+    "videoAdmin": {
+      "overlayTitle": "Añade un velo oscuro sobre el vídeo",
+      "overlayButton": "A: Velo",
+      "textShadowTitle": "Añade una sombra al texto",
+      "textShadowButton": "B: Sombra texto",
+      "blackBackgroundTitle": "Sustituye el vídeo por un fondo negro",
+      "blackBackgroundButton": "C: Fondo negro",
+      "disableYouTubeTitle": "Desactiva completamente los iframes de YouTube (prueba perf)",
+      "disableYouTubeButton": "🚫 YT",
+      "musicModeSiteTitle": "Sonido solo de los vídeos del sitio (inicio + ciclo), sin música de planetas ni socios",
+      "musicModeSiteButton": "🏠 Inicio",
+      "musicModeContextTitle": "Música dedicada: planetas Explore y estructuras socias cuando exista",
+      "musicModeContextButton": "🤝 Dedicadas"
+    },
+    "options": {
+      "title": "Opciones 3D",
+      "presets": {
+        "promptName": "Nombre del preset:",
+        "promptDefaultName": "Nuevo Preset",
+        "saved": "¡Preset guardado con éxito! ✨",
+        "savedNoName": "Preset guardado.",
+        "saveError": "Error al guardar: {error}",
+        "updated": "¡Preset \"{name}\" actualizado! ✨",
+        "updateError": "Error al actualizar: {error}",
+        "confirmDelete": "¿Eliminar el preset \"{name}\"?",
+        "deleted": "Preset \"{name}\" eliminado.",
+        "deleteError": "Error al eliminar: {error}"
+      }
+    }
+  },
+  "dashboard": {
+    "loading": "Verificando…",
+    "logout": "Cerrar sesión",
+    "roles": {
+      "teacher": "Profesor",
+      "organizer": "Organizador",
+      "artist": "Artista",
+      "care": "Practicante / Care",
+      "shop": "Tienda",
+      "communications": "Comunicación",
+      "staff": "Staff",
+      "teacherWithIcon": "🎓 Profesor",
+      "organizerWithIcon": "📅 Organizador",
+      "artistWithIcon": "🎤 Artista",
+      "careWithIcon": "💆 Practicante",
+      "shopWithIcon": "🛍️ Tienda",
+      "commsWithIcon": "📢 Comunicación"
+    },
+    "pendingStaff": {
+      "title": "Solicitudes de staff pendientes",
+      "none": "✅ No hay solicitudes de staff pendientes",
+      "approve": "✓ Aprobar",
+      "reject": "✕ Rechazar"
+    },
+    "admin": {
+      "badge": "Administrador",
+      "hello": "Hola, {username} 👑",
+      "subtitle": "Tienes acceso completo a la plataforma Capital of Fusion."
+    },
+    "contentEdits": {
+      "title": "Cambios de contenido",
+      "ctaTitle": "Solicitudes para aprobar",
+      "ctaDesc": "Cambios propuestos por el staff (páginas, últimas novedades, eventos…)"
+    },
+    "quickAccess": {
+      "title": "Accesos rápidos",
+      "djangoAdmin": { "label": "Admin Django", "desc": "Gestionar todos los datos" },
+      "users": { "label": "Usuarios", "desc": "Gestionar cuentas y roles" },
+      "projects": { "label": "Proyectos", "desc": "Iniciativas e incubación" },
+      "events": { "label": "Eventos", "desc": "Agenda de la comunidad" },
+      "courses": { "label": "Clases", "desc": "Formación y pedagogía" },
+      "organization": { "label": "Organización", "desc": "Estructura CoF" }
+    },
+    "staff": {
+      "badge": "Staff CoF — {role}",
+      "hello": "Hola, {username} 🎯",
+      "subtitle": "Zona de creación y gestión de contenido.",
+      "pendingEdits": "Mis solicitudes pendientes",
+      "dbMenu": "DB menu",
+      "links": {
+        "myCourses": "Mis clases",
+        "theory": "Teoría",
+        "events": "Eventos",
+        "myArtistProfile": "Mi perfil de artista",
+        "practitioners": "Practicantes",
+        "care": "Cuidados",
+        "shop": "Tienda",
+        "projects": "Proyectos"
+      }
+    },
+    "member": {
+      "badge": "Miembro",
+      "welcome": "Bienvenido, {username} 👋",
+      "subtitle": "Tu espacio Capital of Fusion.",
+      "cards": {
+        "events": { "title": "Nuestros eventos", "desc": "Festivales, fiestas, talleres" },
+        "courses": { "title": "Nuestros cursos", "desc": "Aprender bachata" },
+        "explore": { "title": "Explorar en 3D", "desc": "El universo Capital of Fusion" },
+        "projects": { "title": "Nuestros proyectos", "desc": "Iniciativas e incubación" }
+      }
+    }
+  },
   "exploreTransition": {
     "title": "Navegación en el espacio",
     "loadingHint": "Cargando la escena 3D y el vídeo…",

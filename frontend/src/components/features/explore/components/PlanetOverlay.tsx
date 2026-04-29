@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
 import { patchOrganizationNode } from "@/lib/api";
 import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanceTicketsEmbed";
@@ -15,8 +16,10 @@ interface PlanetOverlayProps {
   onNodeUpdated?: (node: OrganizationNodeApi) => void;
 }
 
-function formatDate(s: string): string {
-  return new Date(s).toLocaleString("fr-FR", {
+function formatDate(s: string, locale: string): string {
+  const map: Record<string, string> = { fr: "fr-FR", en: "en-US", es: "es-ES" };
+  const resolved = map[locale] || locale || "fr-FR";
+  return new Date(s).toLocaleString(resolved, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -25,7 +28,17 @@ function formatDate(s: string): string {
   });
 }
 
-function EventCard({ ev, index }: { ev: NodeEventApi; index: number }) {
+function EventCard({
+  ev,
+  index,
+  locale,
+  featuredLabel,
+}: {
+  ev: NodeEventApi;
+  index: number;
+  locale: string;
+  featuredLabel: string;
+}) {
   return (
     <div
       className="flex-shrink-0 w-52 rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-purple-500/40 transition animate-slideInX"
@@ -33,25 +46,33 @@ function EventCard({ ev, index }: { ev: NodeEventApi; index: number }) {
     >
       {ev.external_url ? (
         <a href={ev.external_url} target="_blank" rel="noopener noreferrer">
-          <CardContent ev={ev} />
+          <CardContent ev={ev} locale={locale} featuredLabel={featuredLabel} />
         </a>
       ) : (
-        <CardContent ev={ev} />
+        <CardContent ev={ev} locale={locale} featuredLabel={featuredLabel} />
       )}
     </div>
   );
 }
 
-function CardContent({ ev }: { ev: NodeEventApi }) {
+function CardContent({
+  ev,
+  locale,
+  featuredLabel,
+}: {
+  ev: NodeEventApi;
+  locale: string;
+  featuredLabel: string;
+}) {
   return (
     <div className="p-3">
       {ev.is_featured && (
         <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-purple-600/50 border border-purple-500/40 text-purple-200 mb-2">
-          À la une
+          {featuredLabel}
         </span>
       )}
       <p className="text-white text-sm font-semibold leading-snug line-clamp-2">{ev.title}</p>
-      <p className="text-white/50 text-xs mt-1">{formatDate(ev.start_datetime)}</p>
+      <p className="text-white/50 text-xs mt-1">{formatDate(ev.start_datetime, locale)}</p>
       {ev.location && <p className="text-white/40 text-xs mt-0.5">📍 {ev.location}</p>}
     </div>
   );
@@ -63,6 +84,8 @@ function CardContent({ ev }: { ev: NodeEventApi }) {
  * Section événements en scroll horizontal. Section à propos.
  */
 export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdated }: PlanetOverlayProps) {
+  const t = useTranslations("explore");
+  const locale = useLocale();
   const [videoError, setVideoError] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editDescription, setEditDescription] = useState("");
@@ -158,7 +181,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                 onClick={showEditForm ? () => setShowEditForm(false) : openEditForm}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition"
               >
-                {showEditForm ? "Annuler" : "✏️ Modifier la description"}
+                {showEditForm ? t("overlay.cancel") : t("overlay.editDescription")}
               </button>
             )}
             <button
@@ -247,7 +270,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
                       >
                         <span className="text-xl">🎟️</span>
-                        <span>Réserver sur go&dance</span>
+                        <span>{t("overlay.bookGoAndDance")}</span>
                       </a>
                     ) : isBookYourHotelNode ? (
                       <Link
@@ -255,7 +278,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
                       >
                         <span className="text-xl">🏨</span>
-                        <span>Book Your Hotel</span>
+                        <span>{t("overlay.bookHotel")}</span>
                       </Link>
                     ) : node.cta_url ? (
                       node.cta_url.startsWith("/") ? (
@@ -264,7 +287,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                           className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
                         >
                           <span className="text-xl">✨</span>
-                          <span>{node.cta_text || "En savoir plus"}</span>
+                          <span>{node.cta_text || t("overlay.learnMore")}</span>
                         </Link>
                       ) : (
                         <a
@@ -274,7 +297,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                           className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
                         >
                           <span className="text-xl">✨</span>
-                          <span>{node.cta_text || "En savoir plus"}</span>
+                          <span>{node.cta_text || t("overlay.learnMore")}</span>
                         </a>
                       )
                       ) : (
@@ -283,10 +306,10 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         disabled
                         className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-white/10 text-white/60 font-bold shadow-[0_0_20px_-5px_rgba(255,255,255,0.10)] border border-white/15 cursor-not-allowed"
                         aria-disabled="true"
-                        title="Fonction à venir"
+                        title={t("overlay.comingSoon")}
                       >
                         <span className="text-xl">⏳</span>
-                        <span>Fonction à venir</span>
+                        <span>{t("overlay.comingSoon")}</span>
                       </button>
                     )}
                   </div>
@@ -297,11 +320,17 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               {node.node_events && node.node_events.length > 0 && (
                 <div className="border-t border-white/10 px-8 py-6">
                   <h2 className="flex items-center gap-2 text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
-                    <span>📅</span> Prochains événements
+                    <span>📅</span> {t("overlay.upcomingEvents")}
                   </h2>
                   <div className="flex gap-4 overflow-x-auto pb-2">
                     {node.node_events.map((ev, i) => (
-                      <EventCard key={ev.id} ev={ev} index={i} />
+                      <EventCard
+                        key={ev.id}
+                        ev={ev}
+                        index={i}
+                        locale={locale}
+                        featuredLabel={t("overlay.featured")}
+                      />
                     ))}
                   </div>
                 </div>
@@ -311,40 +340,40 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               {(showCenterTeaser || node.description || showEditForm) && (
                 <div className="border-t border-white/10 px-8 py-6">
                   <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
-                    {showCenterTeaser ? "Réservez vos billets" : "Description"}
+                    {showCenterTeaser ? t("overlay.bookTickets") : t("overlay.description")}
                   </h2>
                   {showCenterTeaser && !showEditForm ? (
                     <GoAndDanceTicketsEmbed compact />
                   ) : showEditForm ? (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-xs text-white/50 mb-1">Accroche courte (max 300 car.)</label>
+                        <label className="block text-xs text-white/50 mb-1">{t("overlay.shortHookLabel")}</label>
                         <textarea
                           value={editShortDescription}
                           onChange={(e) => setEditShortDescription(e.target.value.slice(0, 300))}
                           rows={2}
                           className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50"
-                          placeholder="Courte phrase sous le titre"
+                          placeholder={t("overlay.shortHookPlaceholder")}
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-white/50 mb-1">Description</label>
+                        <label className="block text-xs text-white/50 mb-1">{t("overlay.description")}</label>
                         <textarea
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
                           rows={4}
                           className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50"
-                          placeholder="Description du nœud"
+                          placeholder={t("overlay.descriptionPlaceholder")}
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-white/50 mb-1">Contenu détaillé (À propos)</label>
+                        <label className="block text-xs text-white/50 mb-1">{t("overlay.aboutContentLabel")}</label>
                         <textarea
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
                           rows={6}
                           className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50"
-                          placeholder="Contenu riche (markdown possible)"
+                          placeholder={t("overlay.aboutContentPlaceholder")}
                         />
                       </div>
                       {saveError && (
@@ -357,14 +386,14 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                           disabled={saving}
                           className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium disabled:opacity-50"
                         >
-                          {saving ? "Enregistrement…" : "Enregistrer"}
+                          {saving ? t("overlay.saving") : t("overlay.save")}
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowEditForm(false)}
                           className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm"
                         >
-                          Annuler
+                          {t("overlay.cancel")}
                         </button>
                       </div>
                     </div>
@@ -384,7 +413,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     onClick={openEditForm}
                     className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-sm font-medium transition"
                   >
-                    ✏️ Ajouter / modifier la description
+                    {t("overlay.addOrEditDescription")}
                   </button>
                 </div>
               )}
@@ -393,7 +422,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
           {node.content && (
             <div className="border-t border-white/10 px-8 py-6">
               <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
-                À propos
+                {t("overlay.about")}
               </h2>
               <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
                 {node.content}

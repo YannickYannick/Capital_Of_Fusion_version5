@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import type { PlanetsOptionsState } from "@/contexts/PlanetsOptionsContext";
 import { getSiteConfig, createExplorePreset, getExplorePresets, updateExplorePreset, deleteExplorePreset } from "@/lib/api";
@@ -106,6 +107,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
  * Bouton engrenage et panneau en position fixed (sans wrapper plein écran) pour rester cliquables au-dessus du canvas.
  */
 export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelProps) {
+    const t = useTranslations("explore");
     const [visible, setVisible] = useState(false);
     const opts = usePlanetsOptions();
     const [saving, setSaving] = useState(false);
@@ -193,11 +195,11 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
             }
 
             await updateExplorePreset(selectedPresetId, optionsData);
-            alert(`Preset "${preset.name}" mis à jour ! ✨`);
+            alert(t("options.presets.updated", { name: preset.name }));
             fetchPresets();
         } catch (err) {
             console.error("Erreur mise à jour preset:", err);
-            alert("Erreur lors de la mise à jour : " + (err instanceof Error ? err.message : String(err)));
+            alert(t("options.presets.updateError", { error: err instanceof Error ? err.message : String(err) }));
         } finally {
             setSaving(false);
         }
@@ -208,24 +210,24 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
         if (!selectedPresetId) return;
         const preset = presets.find((p) => p.id === selectedPresetId);
         if (!preset) return;
-        if (!confirm(`Supprimer le preset "${preset.name}" ?`)) return;
+        if (!confirm(t("options.presets.confirmDelete", { name: preset.name }))) return;
 
         setSaving(true);
         try {
             await deleteExplorePreset(selectedPresetId);
             setSelectedPresetId(null);
-            alert(`Preset "${preset.name}" supprimé.`);
+            alert(t("options.presets.deleted", { name: preset.name }));
             fetchPresets();
         } catch (err) {
             console.error("Erreur suppression preset:", err);
-            alert("Erreur lors de la suppression : " + (err instanceof Error ? err.message : String(err)));
+            alert(t("options.presets.deleteError", { error: err instanceof Error ? err.message : String(err) }));
         } finally {
             setSaving(false);
         }
     };
 
     const handleSavePreset = async () => {
-        const name = prompt("Nom du preset :", "Nouveau Preset");
+        const name = prompt(t("options.presets.promptName"), t("options.presets.promptDefaultName"));
         if (!name) return;
 
         setSaving(true);
@@ -257,10 +259,10 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
             }
 
             await createExplorePreset(optionsData);
-            alert("Preset sauvegardé avec succès ! ✨");
+            alert(t("options.presets.saved"));
         } catch (err) {
             console.error("Erreur sauvegarde preset:", err);
-            alert("Erreur lors de la sauvegarde : " + (err instanceof Error ? err.message : String(err)));
+            alert(t("options.presets.saveError", { error: err instanceof Error ? err.message : String(err) }));
         } finally {
             setSaving(false);
         }
@@ -288,7 +290,7 @@ export function OptionsPanel({ onOpenPlanetConfig, nodes = [] }: OptionsPanelPro
                 onClick={() => setVisible((v) => !v)}
                 className="fixed right-4 z-[60] p-2.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-black/60 transition shadow-lg cursor-pointer pointer-events-auto"
                 style={{ top: "max(14rem, 220px)" }}
-                title="Options 3D"
+                title={t("options.title")}
             >
                 ⚙️
             </button>

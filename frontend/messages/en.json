@@ -558,6 +558,135 @@
       "error": "Loading error"
     }
   },
+  "explore": {
+    "overlay": {
+      "featured": "Featured",
+      "editDescription": "✏️ Edit description",
+      "addOrEditDescription": "✏️ Add / edit description",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…",
+      "bookGoAndDance": "Book on go&dance",
+      "bookHotel": "Book Your Hotel",
+      "learnMore": "Learn more",
+      "comingSoon": "Coming soon",
+      "upcomingEvents": "Upcoming events",
+      "bookTickets": "Book your tickets",
+      "description": "Description",
+      "shortHookLabel": "Short hook (max 300 chars)",
+      "shortHookPlaceholder": "Short sentence under the title",
+      "descriptionPlaceholder": "Node description",
+      "aboutContentLabel": "Detailed content (About)",
+      "aboutContentPlaceholder": "Rich content (markdown allowed)",
+      "about": "About"
+    },
+    "video": {
+      "enableSound": "Enable sound",
+      "muteSound": "Mute sound",
+      "soundEnabled": "Sound enabled"
+    },
+    "videoAdmin": {
+      "overlayTitle": "Adds a dark overlay on the video",
+      "overlayButton": "A: Overlay",
+      "textShadowTitle": "Adds a shadow to texts",
+      "textShadowButton": "B: Text shadow",
+      "blackBackgroundTitle": "Replaces the video with a black background",
+      "blackBackgroundButton": "C: Black background",
+      "disableYouTubeTitle": "Disables YouTube iframes completely (perf test)",
+      "disableYouTubeButton": "🚫 YT",
+      "musicModeSiteTitle": "Sound only from site videos (home + cycle), no planet/partner music",
+      "musicModeSiteButton": "🏠 Home",
+      "musicModeContextTitle": "Dedicated music: Explore planets and partner structures when available",
+      "musicModeContextButton": "🤝 Dedicated"
+    },
+    "options": {
+      "title": "3D options",
+      "presets": {
+        "promptName": "Preset name:",
+        "promptDefaultName": "New Preset",
+        "saved": "Preset saved successfully! ✨",
+        "savedNoName": "Preset saved.",
+        "saveError": "Error while saving: {error}",
+        "updated": "Preset \"{name}\" updated! ✨",
+        "updateError": "Error while updating: {error}",
+        "confirmDelete": "Delete preset \"{name}\"?",
+        "deleted": "Preset \"{name}\" deleted.",
+        "deleteError": "Error while deleting: {error}"
+      }
+    }
+  },
+  "dashboard": {
+    "loading": "Checking…",
+    "logout": "Log out",
+    "roles": {
+      "teacher": "Teacher",
+      "organizer": "Organizer",
+      "artist": "Artist",
+      "care": "Practitioner / Care",
+      "shop": "Shop",
+      "communications": "Communications",
+      "staff": "Staff",
+      "teacherWithIcon": "🎓 Teacher",
+      "organizerWithIcon": "📅 Organizer",
+      "artistWithIcon": "🎤 Artist",
+      "careWithIcon": "💆 Practitioner",
+      "shopWithIcon": "🛍️ Shop",
+      "commsWithIcon": "📢 Communications"
+    },
+    "pendingStaff": {
+      "title": "Pending staff requests",
+      "none": "✅ No pending staff requests",
+      "approve": "✓ Approve",
+      "reject": "✕ Reject"
+    },
+    "admin": {
+      "badge": "Administrator",
+      "hello": "Hello, {username} 👑",
+      "subtitle": "You have full access to the Capital of Fusion platform."
+    },
+    "contentEdits": {
+      "title": "Content edits",
+      "ctaTitle": "Requests to review",
+      "ctaDesc": "Edits proposed by staff (pages, latest updates, events…)"
+    },
+    "quickAccess": {
+      "title": "Quick access",
+      "djangoAdmin": { "label": "Django admin", "desc": "Manage all data" },
+      "users": { "label": "Users", "desc": "Manage accounts and roles" },
+      "projects": { "label": "Projects", "desc": "Initiatives & Incubation" },
+      "events": { "label": "Events", "desc": "Community agenda" },
+      "courses": { "label": "Classes", "desc": "Training & pedagogy" },
+      "organization": { "label": "Organization", "desc": "CoF structure" }
+    },
+    "staff": {
+      "badge": "CoF staff — {role}",
+      "hello": "Hello, {username} 🎯",
+      "subtitle": "Content creation and management area.",
+      "pendingEdits": "My pending requests",
+      "dbMenu": "DB menu",
+      "links": {
+        "myCourses": "My classes",
+        "theory": "Theory",
+        "events": "Events",
+        "myArtistProfile": "My artist profile",
+        "practitioners": "Practitioners",
+        "care": "Care",
+        "shop": "Shop",
+        "projects": "Projects"
+      }
+    },
+    "member": {
+      "badge": "Member",
+      "welcome": "Welcome, {username} 👋",
+      "subtitle": "Your Capital of Fusion space.",
+      "cards": {
+        "events": { "title": "Our events", "desc": "Festivals, parties, workshops" },
+        "courses": { "title": "Our classes", "desc": "Learn bachata" },
+        "explore": { "title": "Explore in 3D", "desc": "The Capital of Fusion universe" },
+        "projects": { "title": "Our projects", "desc": "Initiatives & Incubation" }
+      }
+    }
+  },
   "exploreTransition": {
     "title": "Navigating space",
     "loadingHint": "Loading the 3D scene and video…",

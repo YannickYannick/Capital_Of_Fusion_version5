@@ -558,6 +558,135 @@
       "error": "Erreur chargement"
     }
   },
+  "explore": {
+    "overlay": {
+      "featured": "À la une",
+      "editDescription": "✏️ Modifier la description",
+      "addOrEditDescription": "✏️ Ajouter / modifier la description",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "bookGoAndDance": "Réserver sur go&dance",
+      "bookHotel": "Book Your Hotel",
+      "learnMore": "En savoir plus",
+      "comingSoon": "Fonction à venir",
+      "upcomingEvents": "Prochains événements",
+      "bookTickets": "Réservez vos billets",
+      "description": "Description",
+      "shortHookLabel": "Accroche courte (max 300 car.)",
+      "shortHookPlaceholder": "Courte phrase sous le titre",
+      "descriptionPlaceholder": "Description du nœud",
+      "aboutContentLabel": "Contenu détaillé (À propos)",
+      "aboutContentPlaceholder": "Contenu riche (markdown possible)",
+      "about": "À propos"
+    },
+    "video": {
+      "enableSound": "Activer le son",
+      "muteSound": "Couper le son",
+      "soundEnabled": "Son activé"
+    },
+    "videoAdmin": {
+      "overlayTitle": "Ajoute un voile sombre sur la vidéo",
+      "overlayButton": "A: Voile",
+      "textShadowTitle": "Ajoute une ombre sur les textes",
+      "textShadowButton": "B: Ombre texte",
+      "blackBackgroundTitle": "Remplace la vidéo par un fond noir",
+      "blackBackgroundButton": "C: Fond noir",
+      "disableYouTubeTitle": "Désactive complètement les iframes YouTube (test perf)",
+      "disableYouTubeButton": "🚫 YT",
+      "musicModeSiteTitle": "Son uniquement des vidéos du site (page d’accueil + cycle), sans musiques planètes ni partenaires",
+      "musicModeSiteButton": "🏠 Accueil",
+      "musicModeContextTitle": "Musiques dédiées : planètes Explore et structures partenaires quand elles en ont une",
+      "musicModeContextButton": "🤝 Dédiées"
+    },
+    "options": {
+      "title": "Options 3D",
+      "presets": {
+        "promptName": "Nom du preset :",
+        "promptDefaultName": "Nouveau Preset",
+        "saved": "Preset sauvegardé avec succès ! ✨",
+        "savedNoName": "Preset sauvegardé.",
+        "saveError": "Erreur lors de la sauvegarde : {error}",
+        "updated": "Preset \"{name}\" mis à jour ! ✨",
+        "updateError": "Erreur lors de la mise à jour : {error}",
+        "confirmDelete": "Supprimer le preset \"{name}\" ?",
+        "deleted": "Preset \"{name}\" supprimé.",
+        "deleteError": "Erreur lors de la suppression : {error}"
+      }
+    }
+  },
+  "dashboard": {
+    "loading": "Vérification…",
+    "logout": "Se déconnecter",
+    "roles": {
+      "teacher": "Enseignant",
+      "organizer": "Organisateur",
+      "artist": "Artiste",
+      "care": "Praticien / Care",
+      "shop": "Boutique",
+      "communications": "Communication",
+      "staff": "Staff",
+      "teacherWithIcon": "🎓 Enseignant",
+      "organizerWithIcon": "📅 Organisateur",
+      "artistWithIcon": "🎤 Artiste",
+      "careWithIcon": "💆 Praticien",
+      "shopWithIcon": "🛍️ Boutique",
+      "commsWithIcon": "📢 Communication"
+    },
+    "pendingStaff": {
+      "title": "Demandes Staff en attente",
+      "none": "✅ Aucune demande Staff en attente",
+      "approve": "✓ Approuver",
+      "reject": "✕ Refuser"
+    },
+    "admin": {
+      "badge": "Administrateur",
+      "hello": "Bonjour, {username} 👑",
+      "subtitle": "Tu as accès complet à la plateforme Capital of Fusion."
+    },
+    "contentEdits": {
+      "title": "Modifications de contenu",
+      "ctaTitle": "Demandes à approuver",
+      "ctaDesc": "Modifications proposées par le staff (pages, dernières informations, événements…)"
+    },
+    "quickAccess": {
+      "title": "Accès rapides",
+      "djangoAdmin": { "label": "Admin Django", "desc": "Gérer toutes les données" },
+      "users": { "label": "Utilisateurs", "desc": "Gérer les comptes et rôles" },
+      "projects": { "label": "Projets", "desc": "Initiatives & Incubation" },
+      "events": { "label": "Événements", "desc": "Agenda de la communauté" },
+      "courses": { "label": "Cours", "desc": "Formation & Pédagogie" },
+      "organization": { "label": "Organisation", "desc": "Structure CoF" }
+    },
+    "staff": {
+      "badge": "Staff CoF — {role}",
+      "hello": "Bonjour, {username} 🎯",
+      "subtitle": "Espace de création et de gestion de contenu.",
+      "pendingEdits": "Mes demandes en attente",
+      "dbMenu": "DB menu",
+      "links": {
+        "myCourses": "Mes cours",
+        "theory": "Théorie",
+        "events": "Événements",
+        "myArtistProfile": "Mon profil artiste",
+        "practitioners": "Praticiens",
+        "care": "Soins",
+        "shop": "Boutique",
+        "projects": "Projets"
+      }
+    },
+    "member": {
+      "badge": "Membre",
+      "welcome": "Bienvenue, {username} 👋",
+      "subtitle": "Ton espace Capital of Fusion.",
+      "cards": {
+        "events": { "title": "Nos événements", "desc": "Festivals, soirées, ateliers" },
+        "courses": { "title": "Nos cours", "desc": "Apprendre la bachata" },
+        "explore": { "title": "Explorer en 3D", "desc": "L'univers Capital of Fusion" },
+        "projects": { "title": "Nos projets", "desc": "Initiatives & Incubation" }
+      }
+    }
+  },
   "exploreTransition": {
     "title": "Navigation dans l'espace",
     "loadingHint": "Chargement de la scène 3D et de la vidéo…",
