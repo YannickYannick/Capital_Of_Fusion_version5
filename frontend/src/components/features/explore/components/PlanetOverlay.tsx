@@ -149,13 +149,13 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     [handleClose]
   );
 
-  if (!node) return null;
-
+  // FAQ hooks — DOIVENT être appelés avant tout return conditionnel (Rules of Hooks)
   const isFaqNode = useMemo(() => {
+    if (!node) return false;
     const slug = (node.slug || "").toLowerCase();
     const name = (node.name || "").toLowerCase();
     return slug === "faq" || slug.includes("faq") || name === "faq" || name.includes("faq");
-  }, [node.slug, node.name]);
+  }, [node]);
 
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
@@ -181,6 +181,9 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
       cancelled = true;
     };
   }, [isFaqNode, locale]);
+
+  // Early return APRÈS tous les hooks
+  if (!node) return null;
 
   const centerTeaserSrc = "/teaser-pool-party.mp4";
   const showCenterTeaser =
