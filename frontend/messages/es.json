@@ -605,11 +605,19 @@
       "emptyFaq": "Todavía no hay preguntas frecuentes."
     },
     "mobileCarousel": {
-      "hint": "Desliza para explorar, toca una tarjeta para abrir",
+      "hint": "Desliza en horizontal, usa las flechas o los puntos para cambiar de planeta.",
       "empty": "No hay planetas que mostrar.",
       "regionLabel": "Carrusel de planetas",
       "openPlanet": "Abrir {name}",
-      "slideStatus": "{name}, tarjeta {index} de {total}"
+      "slideStatus": "{name}, tarjeta {index} de {total}",
+      "centerLabel": "Explorar",
+      "cardEyebrow": "Destacado",
+      "prev": "Planeta anterior",
+      "next": "Planeta siguiente",
+      "open": "Abrir",
+      "openCta": "Abrir {name}",
+      "dotsLabel": "Paginación del carrusel",
+      "dotLabel": "Ir a {name} (tarjeta {index})"
     },
     "video": {
       "enableSound": "Activar sonido",
