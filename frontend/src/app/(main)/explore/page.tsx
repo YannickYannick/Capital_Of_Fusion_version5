@@ -327,6 +327,7 @@ function ExplorePageInner({ initialNodeSlug }: { initialNodeSlug: string | null 
             nodes={orbitNodes}
             onOpenPlanet={handleOpenOverlay}
             initialNodeSlug={initialNodeSlug}
+            reversePlanetOrder
           />
         </div>
       )}
