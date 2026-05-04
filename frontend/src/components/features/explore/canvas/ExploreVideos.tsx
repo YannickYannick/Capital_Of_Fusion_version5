@@ -9,6 +9,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
+import {
+    DEFAULT_AMBIENT_VIDEO_SOUND_API,
+    useAmbientVideoSoundSetter,
+} from "@/contexts/AmbientVideoSoundContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -596,6 +600,35 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
     // Determine if we should show black background (either option C or YouTube disabled)
     const showBlackBg = opts.useBlackBackground || opts.disableYouTubeIframes;
 
+    const setAmbientApi = useAmbientVideoSoundSetter();
+    const handleMuteRef = useRef(handleMute);
+    handleMuteRef.current = handleMute;
+
+    useEffect(() => {
+        if (!isVisibleGlobally) {
+            setAmbientApi(DEFAULT_AMBIENT_VIDEO_SOUND_API);
+            return;
+        }
+        const disabled = showBlackBg || (youtubeAmbientSuspended && !effectiveOverride);
+        setAmbientApi({
+            muted,
+            disabled,
+            toggle: () => {
+                handleMuteRef.current();
+            },
+        });
+        return () => {
+            setAmbientApi(DEFAULT_AMBIENT_VIDEO_SOUND_API);
+        };
+    }, [
+        isVisibleGlobally,
+        muted,
+        showBlackBg,
+        youtubeAmbientSuspended,
+        effectiveOverride,
+        setAmbientApi,
+    ]);
+
     return (
         <>
             {/* Option C : Fond noir solide (remplace toutes les vidéos) */}
@@ -763,8 +796,12 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 </div>
                 )}
 
-                {/* Contrôle son — visible pour tous les visiteurs */}
-                <button type="button" onClick={handleMute} className="px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm flex items-center gap-2">
+                {/* Contrôle son — desktop uniquement (mobile : icône dans la Navbar) */}
+                <button
+                    type="button"
+                    onClick={handleMute}
+                    className="hidden xl:flex px-4 py-2 rounded-lg border border-white/20 bg-black/60 backdrop-blur-sm text-white/90 hover:bg-white/10 transition text-sm items-center gap-2"
+                >
                     {muted ? t("video.enableSound") : t("video.soundEnabled")}
                 </button>
             </div>

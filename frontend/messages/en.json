@@ -1,5 +1,6 @@
 {
   "navbar": {
+    "ambientSoundToggle": "Background sound: turn on or mute",
     "language": "Language",
     "localeFr": "Français",
     "localeEn": "English",

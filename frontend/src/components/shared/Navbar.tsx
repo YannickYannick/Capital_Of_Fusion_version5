@@ -9,8 +9,10 @@ import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
 import { localizeMenuChildren, localizeMenuRootItem } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
+import { IconVolume, IconVolumeOff } from "@tabler/icons-react";
 import { ArtistProfileNavbarDock } from "@/components/shared/ArtistProfileNavbarDock";
 import { LocaleFlagEs, LocaleFlagFr, LocaleFlagGb } from "@/components/shared/LocaleFlagIcons";
+import { useAmbientVideoSound } from "@/contexts/AmbientVideoSoundContext";
 
 function normPath(u: string): string {
   return (u || "").replace(/\/$/, "") || "/";
@@ -75,6 +77,7 @@ export function Navbar() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("navbar");
+  const ambientSound = useAmbientVideoSound();
   const [menuItems, setMenuItems] = useState<MenuItemApi[] | null>(null);
   const [menuStatus, setMenuStatus] = useState<"loading" | "ready" | "error">(
     "loading"
@@ -531,6 +534,22 @@ export function Navbar() {
               ),
             )}
           </div>
+
+          {!ambientSound.disabled ? (
+            <button
+              type="button"
+              className="xl:hidden flex h-7 w-8 shrink-0 items-center justify-center rounded-md border border-white/15 bg-black/30 text-white/90 transition hover:border-purple-500/35 hover:bg-white/10"
+              aria-label={t("ambientSoundToggle")}
+              aria-pressed={!ambientSound.muted}
+              onClick={ambientSound.toggle}
+            >
+              {ambientSound.muted ? (
+                <IconVolumeOff className="h-4 w-4" stroke={1.75} />
+              ) : (
+                <IconVolume className="h-4 w-4" stroke={1.75} />
+              )}
+            </button>
+          ) : null}
 
           <div
             className="flex items-center gap-1 shrink-0 xl:ml-1"

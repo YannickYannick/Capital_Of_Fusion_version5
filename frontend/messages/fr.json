@@ -1,5 +1,6 @@
 {
   "navbar": {
+    "ambientSoundToggle": "Son du fond : activer ou couper",
     "language": "Langue",
     "localeFr": "Français",
     "localeEn": "English",

@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { OrganizationNodeApi } from "@/types/organization";
-import { ExploreOrbitBackdrop } from "./ExploreOrbitBackdrop";
 import { PlanetCardSphere } from "./PlanetCardSphere";
 import {
   orbitAngleForSlot,
@@ -19,6 +18,11 @@ export interface ExploreMobileCarouselProps {
   nodes: OrganizationNodeApi[];
   onOpenPlanet: (node: OrganizationNodeApi) => void;
   initialNodeSlug?: string | null;
+  /**
+   * Si true (défaut), l’ordre des cartes est l’inverse de la liste API (souvent plus naturel sur l’anneau).
+   * Passer `false` pour garder l’ordre serveur tel quel.
+   */
+  reversePlanetOrder?: boolean;
 }
 
 /** Orbite elliptique large (inspiré maquette : planètes latérales + profondeur verticale). */
@@ -39,8 +43,13 @@ export function ExploreMobileCarousel({
   nodes,
   onOpenPlanet,
   initialNodeSlug,
+  reversePlanetOrder = true,
 }: ExploreMobileCarouselProps) {
   const t = useTranslations("explore.mobileCarousel");
+  const displayNodes = useMemo(
+    () => (reversePlanetOrder ? [...nodes].reverse() : nodes),
+    [nodes, reversePlanetOrder]
+  );
   const swipeZoneRef = useRef<HTMLDivElement>(null);
   const [focusIndex, setFocusIndex] = useState(0);
   /** Décalage fractionnaire pendant le drag (positif = focus avance). */
@@ -60,16 +69,16 @@ export function ExploreMobileCarousel({
     dragOffsetRef.current = dragOffset;
   }, [dragOffset]);
 
-  const n = nodes.length;
+  const n = displayNodes.length;
   const focusFloat = n > 0 ? focusIndex + dragOffset : 0;
 
   useLayoutEffect(() => {
     if (!initialNodeSlug || n === 0) return;
-    const i = nodes.findIndex((node) => node.slug === initialNodeSlug);
+    const i = displayNodes.findIndex((node) => node.slug === initialNodeSlug);
     if (i < 0) return;
     setFocusIndex(i);
     setDragOffset(0);
-  }, [initialNodeSlug, n, nodes]);
+  }, [initialNodeSlug, n, displayNodes]);
 
   const snapFromOffset = useCallback((offset: number) => {
     if (n === 0) return;
@@ -119,7 +128,8 @@ export function ExploreMobileCarousel({
         horizontalSwipeRef.current = true;
       }
       const w = swipeWidthRef.current;
-      const delta = (startXRef.current - e.clientX) / w;
+      /** Inversé : glisser vers la droite avance comme la flèche droite (comportement « naturel » iOS). */
+      const delta = (e.clientX - startXRef.current) / w;
       const next = dragAtPointerDownRef.current + delta * n * SWIPE_SENS;
       setDragOffset(next);
     },
@@ -171,7 +181,7 @@ export function ExploreMobileCarousel({
   }
 
   const previewIndex = orbitModIndex(Math.round(focusFloat), n);
-  const activeNode = nodes[previewIndex] ?? nodes[0];
+  const activeNode = displayNodes[previewIndex] ?? displayNodes[0];
   const enableCssTransition = !isDragging;
 
   return (
@@ -183,10 +193,6 @@ export function ExploreMobileCarousel({
           total: n,
         })}
       </p>
-      <p className="pointer-events-none shrink-0 px-6 pt-2 text-center text-xs uppercase tracking-[0.2em] text-white/45">
-        {t("hint")}
-      </p>
-
       <div
         ref={swipeZoneRef}
         role="region"
@@ -201,22 +207,7 @@ export function ExploreMobileCarousel({
         onPointerCancel={endPointer}
       >
         <div className="relative min-h-[12rem] flex-1">
-        <ExploreOrbitBackdrop />
-        {/* Centre décoratif (option A du plan) */}
-        <div
-          className="pointer-events-none absolute left-1/2 top-[40%] z-[80] -translate-x-1/2 -translate-y-1/2"
-          aria-hidden
-        >
-          <div className="relative flex h-20 w-20 items-center justify-center md:h-24 md:w-24">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400/50 via-orange-500/35 to-fuchsia-600/25 blur-2xl" />
-            <div className="absolute inset-[18%] rounded-full bg-gradient-to-br from-amber-300/90 to-orange-600/70 shadow-[0_0_40px_rgba(251,191,36,0.45)]" />
-            <span className="relative z-[1] rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-100/95 backdrop-blur-sm">
-              {t("centerLabel")}
-            </span>
-          </div>
-        </div>
-
-        {nodes.map((node, i) => {
+        {displayNodes.map((node, i) => {
           const angle = orbitAngleForSlot(i, focusFloat, n);
           const sinDepth = orbitSinDepth(angle);
           const dx = RX_VW * Math.cos(angle);
@@ -278,16 +269,8 @@ export function ExploreMobileCarousel({
 
         <div className="mx-auto mt-2 w-full max-w-md shrink-0 px-4 pb-1">
           <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
-            <div className="flex justify-center">
-              <span className="rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">
-                {(activeNode.planet_type || "glass").replace(/-/g, " ").toUpperCase()}
-              </span>
-            </div>
-            <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-amber-200/90">
-              {t("cardEyebrow")}
-            </p>
-            <p className="mt-1 line-clamp-2 text-center text-sm text-white/80">
-              {activeNode.short_description || activeNode.name}
+            <p className="text-center text-base font-semibold tracking-tight text-white [text-shadow:0_1px_14px_rgba(0,0,0,0.65)]">
+              {activeNode.name}
             </p>
           </div>
         </div>
@@ -297,11 +280,11 @@ export function ExploreMobileCarousel({
         <div className="flex items-center justify-center gap-3">
           <button
             type="button"
-            onClick={goPrev}
+            onClick={goNext}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/50 text-xl text-white/90 transition hover:bg-black/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/80"
-            aria-label={t("prev")}
+            aria-label={t("next")}
           >
-            ‹
+            ›
           </button>
           <button
             type="button"
@@ -314,16 +297,16 @@ export function ExploreMobileCarousel({
           </button>
           <button
             type="button"
-            onClick={goNext}
+            onClick={goPrev}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/50 text-xl text-white/90 transition hover:bg-black/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400/80"
-            aria-label={t("next")}
+            aria-label={t("prev")}
           >
-            ›
+            ‹
           </button>
         </div>
 
         <div className="flex justify-center gap-2 pb-1" role="tablist" aria-label={t("dotsLabel")}>
-          {nodes.map((node, i) => {
+          {displayNodes.map((node, i) => {
             const active = previewIndex === i;
             return (
               <button

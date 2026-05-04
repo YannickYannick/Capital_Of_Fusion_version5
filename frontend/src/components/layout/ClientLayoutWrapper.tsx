@@ -15,6 +15,7 @@ import {
   usePlanetsOptions,
 } from "@/contexts/PlanetsOptionsContext";
 import { PlanetMusicOverrideProvider } from "@/contexts/PlanetMusicOverrideContext";
+import { AmbientVideoSoundProvider } from "@/contexts/AmbientVideoSoundContext";
 import {
   getPageType,
   isOrganizationNodeVideoBackgroundPath,
@@ -78,7 +79,9 @@ export function ClientLayoutWrapper({
   return (
     <PlanetsOptionsProvider videoAmbience={videoAmbience}>
       <PlanetMusicOverrideProvider>
-        <MainChrome config={config}>{children}</MainChrome>
+        <AmbientVideoSoundProvider>
+          <MainChrome config={config}>{children}</MainChrome>
+        </AmbientVideoSoundProvider>
       </PlanetMusicOverrideProvider>
     </PlanetsOptionsProvider>
   );

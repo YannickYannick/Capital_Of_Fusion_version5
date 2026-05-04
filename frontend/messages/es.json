@@ -1,5 +1,6 @@
 {
   "navbar": {
+    "ambientSoundToggle": "Sonido de fondo: activar o silenciar",
     "language": "Idioma",
     "localeFr": "Français",
     "localeEn": "English",
