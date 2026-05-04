@@ -17,9 +17,10 @@ export default async function FestivalNotreProgrammePage() {
   let initialValue = "";
   try {
     const config = await getSiteConfig();
-    initialValue = config.festival_notre_programme_markdown ?? "";
+    const fromApi = (config.festival_notre_programme_markdown ?? "").trim();
+    initialValue = fromApi || t("festivalNotreProgramme.defaultMarkdown");
   } catch {
-    initialValue = "";
+    initialValue = t("festivalNotreProgramme.defaultMarkdown");
   }
 
   return (
@@ -31,6 +32,10 @@ export default async function FestivalNotreProgrammePage() {
       field="festival_notre_programme_markdown"
       emptyText={t("festivalNotreProgramme.empty")}
       preface={<FestivalPlanningSchedule variant="page" />}
+      collapsibleMarkdown={{
+        expandLabel: t("festivalNotreProgramme.expandMarkdownDetails"),
+        collapseLabel: t("festivalNotreProgramme.collapseMarkdownDetails"),
+      }}
     />
   );
 }

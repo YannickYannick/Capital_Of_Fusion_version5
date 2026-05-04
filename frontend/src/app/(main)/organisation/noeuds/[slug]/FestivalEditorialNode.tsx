@@ -57,6 +57,14 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
                 <FestivalPlanningSchedule variant="page" />
               ) : undefined
             }
+            collapsibleMarkdown={
+              contentKey === "festivalNotreProgramme"
+                ? {
+                    expandLabel: t("festivalNotreProgramme.expandMarkdownDetails"),
+                    collapseLabel: t("festivalNotreProgramme.collapseMarkdownDetails"),
+                  }
+                : undefined
+            }
           />
         ) : (
           <p className="text-white/60">Page indisponible.</p>

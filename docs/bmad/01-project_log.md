@@ -78,5 +78,8 @@
 | [2026-03-07] Trace session | Fichier `docs/history/trace_deduction_cursor_vs_antigravity_2026-03-07.md` (comparaison déduction Cursor / conv Antigravity). |
 | [2026-05-03] Starting Task | Explore mobile carrousel 2.5D | Objectif : layout compact sans WebGL, carrousel DOM (scroll-snap + perspective), mêmes nœuds orbite + PlanetOverlay ; deep link `?node=` ; préfetch 3D désactivé sur compact. |
 | [2026-05-03] Completed Task | Explore mobile carrousel 2.5D | Fichiers : `useExploreCompactLayout.ts`, `exploreOrbitNodes.ts`, `ExploreMobileCarousel.tsx`, `PlanetCardSphere.tsx`, branche dans `explore/page.tsx`, `usePrefetchExplore.ts` ; clés i18n `explore.mobileCarousel` (fr/en/es). |
+| [2026-05-03] Starting Task | Admin Django — Notre programme | Objectif : fieldset + aide admin, seed DB aligné sur `defaultMarkdown` i18n (FR/EN/ES). |
+| [2026-05-03] Completed Task | Admin Django — Notre programme | `admin.py` : fieldset dédié + description (tabs FR/EN/ES, repli Next si vide). `models.py` : help_text champ. Migrations `0028_seed_festival_notre_programme_markdown` (sidecars `.md` depuis messages) + `0029_alter_notre_programme_help_text`. |
+| [2026-05-03] Completed Task | Notre programme — Markdown repliable | `EditableConfigMarkdownPage` : prop `collapsibleMarkdown` (bouton + `aria-expanded`, région). Page `notre-programme` + `FestivalEditorialNode` ; clés i18n `expandMarkdownDetails` / `collapseMarkdownDetails` (fr/en/es). |
 
 *Dernière mise à jour : 2026-05-03*

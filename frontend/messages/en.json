@@ -216,11 +216,13 @@
     },
     "festivalNotreProgramme": {
       "metaTitle": "Our programme | Festival",
-      "metaDescription": "Festival programme: workshops, parties, events.",
+      "metaDescription": "Paris Bachata Vibe Festival 2026: the full experience, emotional arc, dress codes and day-by-day vibe.",
       "eyebrow": "Festival",
       "title": "Our programme",
-      "subtitle": "Official Paris Bachata Vibe Festival 2026 schedule (Sept 17–21) — detailed posters below, plus optional Markdown for the team.",
+      "subtitle": "Paris Bachata Vibe Festival — the full experience. This festival is not a string of parties: it's an emotional arc.",
       "empty": "Content coming soon.",
+      "expandMarkdownDetails": "See the day-by-day programme",
+      "collapseMarkdownDetails": "Hide details",
       "planningSectionTitle": "2026 schedule",
       "planningIntro": "Part one of the schedule: Thursday and Friday across the hotel (social day), La Palmeraie (opening, workshops, battles, Urban Vibe and Añejo Vibe parties), and the Vibe Room (DJ sets, Instagram live). Times on the posters are as published by the organizers.",
       "planningBetween": "The rest of the weekend: Saturday and Sunday with workshops (La Casa, La Escuela, El Patio), Jack & Jill, French Social Cup, Capital of Fusion Party and afterparty at Aquaboulevard, then Smooth Vibe Party and Vibe Room DJ sets to close the festival.",
@@ -229,7 +231,8 @@
       "planningDisclaimer": "Provisional schedule — subject to change.",
       "planningVisualNote": "Timetables on the posters are in English (official artwork).",
       "planningCredit": "Artwork credit: Genia Prod.",
-      "planningFullPageCta": "Open the Our programme page"
+      "planningFullPageCta": "Open the Our programme page",
+      "defaultMarkdown": "## 🌴 Paris Bachata Vibe Festival — The full experience\n\nThis festival is not a string of parties.  \nIt is an emotional arc.\n\nA build-up.  \nA peak.  \nA come-down.  \nA release.\n\n👉 Total immersion where music, dress code, staging and energy become one.\n\n---\n\n## 🔮 Thursday — Urban Vibe (Purple)\n\n**Dress code:** streetwear, lifestyle, urban  \n**Vibe:** underground / city energy\n\nThis is your entry into the festival.  \nA raw, modern world, connected to the street.\n\n**Musically:**\n\nMostly today's European bachata sounds.\n\nPlus an opening to fusion with influences from big cities: hip-hop, reggaeton, amapiano…\n\n- Remixes allowed (but in the minority)\n- An experimental, current vibe\n\n---\n\n## 🌵 Friday — Añejo Vibe (Green & Orange)\n\n**Dress code:** Coachella vibe, sunglasses  \n**Vibe:** warmth, nostalgia, groove\n\n**Musically:**\n\n- ❌ No remixes\n- ✅ 50% moderna bachata classics\n- ✅ 50% current hits\n\n🔥 **+ Live bachata concert (full band)**\n\n---\n\n## 🌊 Saturday — Capital of Fusion + XXL Pool Party (Yellow & Blue)\n\n**Dress code:** beach / swimwear  \n**Vibe:** explosion, freedom, controlled chaos\n\nThis is the festival's climax.\n\n**Musically:**\n\n- Full fusion\n- Each DJ's own identity\n- Cultures and influences mixed together\n\n---\n\n## 🌌 Sunday — Smooth Vibe (final blackout)\n\n**Dress code:** free / soft / elegant  \n**Vibe:** introspection, connection, letting go\n\n**Musically:**\n\n- Remixes allowed\n- BPM gradually comes down\n- A cappella finale in the dark, guided by starlight"
     },
     "festivalJackNJill": {
       "metaTitle": "Jack N Jill | Festival",
@@ -679,12 +682,30 @@
     },
     "quickAccess": {
       "title": "Quick access",
-      "djangoAdmin": { "label": "Django admin", "desc": "Manage all data" },
-      "users": { "label": "Users", "desc": "Manage accounts and roles" },
-      "projects": { "label": "Projects", "desc": "Initiatives & Incubation" },
-      "events": { "label": "Events", "desc": "Community agenda" },
-      "courses": { "label": "Classes", "desc": "Training & pedagogy" },
-      "organization": { "label": "Organization", "desc": "CoF structure" }
+      "djangoAdmin": {
+        "label": "Django admin",
+        "desc": "Manage all data"
+      },
+      "users": {
+        "label": "Users",
+        "desc": "Manage accounts and roles"
+      },
+      "projects": {
+        "label": "Projects",
+        "desc": "Initiatives & Incubation"
+      },
+      "events": {
+        "label": "Events",
+        "desc": "Community agenda"
+      },
+      "courses": {
+        "label": "Classes",
+        "desc": "Training & pedagogy"
+      },
+      "organization": {
+        "label": "Organization",
+        "desc": "CoF structure"
+      }
     },
     "staff": {
       "badge": "CoF staff — {role}",
@@ -708,10 +729,22 @@
       "welcome": "Welcome, {username} 👋",
       "subtitle": "Your Capital of Fusion space.",
       "cards": {
-        "events": { "title": "Our events", "desc": "Festivals, parties, workshops" },
-        "courses": { "title": "Our classes", "desc": "Learn bachata" },
-        "explore": { "title": "Explore in 3D", "desc": "The Capital of Fusion universe" },
-        "projects": { "title": "Our projects", "desc": "Initiatives & Incubation" }
+        "events": {
+          "title": "Our events",
+          "desc": "Festivals, parties, workshops"
+        },
+        "courses": {
+          "title": "Our classes",
+          "desc": "Learn bachata"
+        },
+        "explore": {
+          "title": "Explore in 3D",
+          "desc": "The Capital of Fusion universe"
+        },
+        "projects": {
+          "title": "Our projects",
+          "desc": "Initiatives & Incubation"
+        }
       }
     }
   },

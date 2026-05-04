@@ -321,7 +321,10 @@ class SiteConfiguration(models.Model):
         blank=True,
         default="",
         verbose_name="Festival — Notre programme (Markdown)",
-        help_text="Contenu de la page Festival → Notre programme (format Markdown).",
+        help_text=(
+            "Page Festival → Notre programme (Markdown). Trilingue via l’admin "
+            "(FR / EN / ES). Vide partout : repli sur le texte i18n du frontend."
+        ),
     )
 
     # Support — pages éditoriales (Markdown)

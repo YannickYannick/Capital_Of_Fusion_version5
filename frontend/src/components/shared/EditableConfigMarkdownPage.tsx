@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { markdownToHtml } from "@/lib/markdownToHtml";
@@ -26,6 +26,7 @@ export function EditableConfigMarkdownPage({
   emptyText,
   ctaBelowSubtitle,
   preface,
+  collapsibleMarkdown,
 }: {
   eyebrow: string;
   title: string;
@@ -45,7 +46,16 @@ export function EditableConfigMarkdownPage({
   /** Bouton d’action sous le sous-titre (ex. lien externe go&dance), style aligné sur la landing. */
   ctaBelowSubtitle?: { href: string; label: string };
   preface?: ReactNode;
+  /** Affiche le corps Markdown derrière un bouton (réduit la hauteur de page en lecture seule). */
+  collapsibleMarkdown?: {
+    expandLabel: string;
+    collapseLabel: string;
+    /** Par défaut : replié. */
+    defaultOpen?: boolean;
+  };
 }) {
+  const markdownToggleId = useId();
+  const markdownPanelId = useId();
   const { user } = useAuth();
   const router = useRouter();
   const canEdit = user?.user_type === "STAFF" || user?.user_type === "ADMIN";
@@ -56,6 +66,9 @@ export function EditableConfigMarkdownPage({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [markdownExpanded, setMarkdownExpanded] = useState(
+    () => collapsibleMarkdown?.defaultOpen ?? false,
+  );
 
   useEffect(() => {
     if (!editing) {
@@ -169,7 +182,48 @@ export function EditableConfigMarkdownPage({
 
         {!editing ? (
           html ? (
-            <div className={`mt-10 ${proseClasses}`} dangerouslySetInnerHTML={{ __html: html }} />
+            collapsibleMarkdown ? (
+              <div className="mt-10">
+                <button
+                  type="button"
+                  id={markdownToggleId}
+                  aria-expanded={markdownExpanded}
+                  aria-controls={markdownPanelId}
+                  onClick={() => setMarkdownExpanded((o) => !o)}
+                  className={[
+                    "inline-flex w-full max-w-xl items-center justify-between gap-3 rounded-xl",
+                    "border border-white/20 bg-white/10 px-4 py-3 text-left text-sm font-semibold text-white",
+                    "shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm transition",
+                    "hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-300",
+                  ].join(" ")}
+                >
+                  <span>
+                    {markdownExpanded
+                      ? collapsibleMarkdown.collapseLabel
+                      : collapsibleMarkdown.expandLabel}
+                  </span>
+                  <span
+                    aria-hidden
+                    className={[
+                      "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black/30 text-lg text-white/90 transition-transform",
+                      markdownExpanded ? "rotate-180" : "",
+                    ].join(" ")}
+                  >
+                    ▼
+                  </span>
+                </button>
+                <div
+                  id={markdownPanelId}
+                  role="region"
+                  aria-labelledby={markdownToggleId}
+                  className={markdownExpanded ? "mt-5" : "hidden"}
+                >
+                  <div className={proseClasses} dangerouslySetInnerHTML={{ __html: html }} />
+                </div>
+              </div>
+            ) : (
+              <div className={`mt-10 ${proseClasses}`} dangerouslySetInnerHTML={{ __html: html }} />
+            )
           ) : preface ? null : (
             <p className="mt-10 text-white/70">{emptyText}</p>
           )

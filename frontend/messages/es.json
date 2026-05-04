@@ -216,11 +216,13 @@
     },
     "festivalNotreProgramme": {
       "metaTitle": "Nuestro programa | Festival",
-      "metaDescription": "Programa del festival: talleres, fiestas, eventos.",
+      "metaDescription": "Paris Bachata Vibe Festival 2026: experiencia completa, curva emocional, dress codes y ambiente día a día.",
       "eyebrow": "Festival",
       "title": "Nuestro programa",
-      "subtitle": "Calendario oficial del Paris Bachata Vibe Festival 2026 (17–21 sept.) — carteles detallados abajo y Markdown opcional para el equipo.",
+      "subtitle": "Paris Bachata Vibe Festival — la experiencia completa. Este festival no es una sucesión de fiestas: es una curva emocional.",
       "empty": "Contenido próximamente.",
+      "expandMarkdownDetails": "Ver el programa día a día",
+      "collapseMarkdownDetails": "Ocultar detalle",
       "planningSectionTitle": "Planning 2026",
       "planningIntro": "Primera parte del calendario: jueves y viernes entre el hotel (social day), La Palmeraie (apertura, talleres, battles, fiestas Urban Vibe y Añejo Vibe) y la Vibe Room (DJ sets, directo Instagram). Los horarios de los carteles son los publicados por la organización.",
       "planningBetween": "Resto del fin de semana: sábado y domingo con talleres (La Casa, La Escuela, El Patio), Jack & Jill, French Social Cup, Capital of Fusion Party y after en Aquaboulevard, luego Smooth Vibe Party y DJ sets en Vibe Room para cerrar el festival.",
@@ -229,7 +231,8 @@
       "planningDisclaimer": "Horarios provisionales — sujetos a cambios.",
       "planningVisualNote": "Los cuadros de horarios en los carteles están en inglés (obra oficial).",
       "planningCredit": "Crédito visual: Genia Prod.",
-      "planningFullPageCta": "Ver la página Nuestro programa"
+      "planningFullPageCta": "Ver la página Nuestro programa",
+      "defaultMarkdown": "## 🌴 Paris Bachata Vibe Festival — La experiencia completa\n\nEste festival no es una sucesión de fiestas.  \nEs una curva emocional.\n\nUna subida.  \nUn pico.  \nUna bajada.  \nUna liberación.\n\n👉 Una inmersión total donde música, dress code, escenografía y energía son uno solo.\n\n---\n\n## 🔮 Jueves — Urban Vibe (Violeta)\n\n**Dress code:** streetwear, lifestyle, urban  \n**Ambiente:** underground / energía de ciudad\n\nEs la entrada al festival.  \nUn universo crudo, moderno, conectado a la calle.\n\n**Musicalmente:**\n\nEn su mayoría los sonidos actuales de la bachata en Europa.\n\nTambién una apertura a la fusión con influencias de las grandes metrópolis: hip-hop, reggaeton, amapiano…\n\n- Remixes permitidos (pero minoritarios)\n- Una vibra experimental y actual\n\n---\n\n## 🌵 Viernes — Añejo Vibe (Verde y naranja)\n\n**Dress code:** estilo Coachella, gafas de sol  \n**Ambiente:** calor, nostalgia, groove\n\n**Musicalmente:**\n\n- ❌ Sin remixes\n- ✅ 50 % clásicos de la bachata moderna\n- ✅ 50 % hits actuales\n\n🔥 **+ Concierto en vivo de bachata (formación completa)**\n\n---\n\n## 🌊 Sábado — Capital of Fusion + XXL Pool Party (Amarillo y azul)\n\n**Dress code:** playa / bañador  \n**Ambiente:** explosión, libertad, caos controlado\n\nEs el punto culminante del festival.\n\n**Musicalmente:**\n\n- Fusión total\n- Identidad propia de cada DJ\n- Mezcla de culturas e influencias\n\n---\n\n## 🌌 Domingo — Smooth Vibe (black-out final)\n\n**Dress code:** libre / suave / elegante  \n**Ambiente:** introspección, conexión, soltar\n\n**Musicalmente:**\n\n- Remixes permitidos\n- BPM en descenso progresivo\n- Final a cappella en la oscuridad, guiado por la luz de las estrellas"
     },
     "festivalJackNJill": {
       "metaTitle": "Jack N Jill | Festival",
@@ -679,12 +682,30 @@
     },
     "quickAccess": {
       "title": "Accesos rápidos",
-      "djangoAdmin": { "label": "Admin Django", "desc": "Gestionar todos los datos" },
-      "users": { "label": "Usuarios", "desc": "Gestionar cuentas y roles" },
-      "projects": { "label": "Proyectos", "desc": "Iniciativas e incubación" },
-      "events": { "label": "Eventos", "desc": "Agenda de la comunidad" },
-      "courses": { "label": "Clases", "desc": "Formación y pedagogía" },
-      "organization": { "label": "Organización", "desc": "Estructura CoF" }
+      "djangoAdmin": {
+        "label": "Admin Django",
+        "desc": "Gestionar todos los datos"
+      },
+      "users": {
+        "label": "Usuarios",
+        "desc": "Gestionar cuentas y roles"
+      },
+      "projects": {
+        "label": "Proyectos",
+        "desc": "Iniciativas e incubación"
+      },
+      "events": {
+        "label": "Eventos",
+        "desc": "Agenda de la comunidad"
+      },
+      "courses": {
+        "label": "Clases",
+        "desc": "Formación y pedagogía"
+      },
+      "organization": {
+        "label": "Organización",
+        "desc": "Estructura CoF"
+      }
     },
     "staff": {
       "badge": "Staff CoF — {role}",
@@ -708,10 +729,22 @@
       "welcome": "Bienvenido, {username} 👋",
       "subtitle": "Tu espacio Capital of Fusion.",
       "cards": {
-        "events": { "title": "Nuestros eventos", "desc": "Festivales, fiestas, talleres" },
-        "courses": { "title": "Nuestros cursos", "desc": "Aprender bachata" },
-        "explore": { "title": "Explorar en 3D", "desc": "El universo Capital of Fusion" },
-        "projects": { "title": "Nuestros proyectos", "desc": "Iniciativas e incubación" }
+        "events": {
+          "title": "Nuestros eventos",
+          "desc": "Festivales, fiestas, talleres"
+        },
+        "courses": {
+          "title": "Nuestros cursos",
+          "desc": "Aprender bachata"
+        },
+        "explore": {
+          "title": "Explorar en 3D",
+          "desc": "El universo Capital of Fusion"
+        },
+        "projects": {
+          "title": "Nuestros proyectos",
+          "desc": "Iniciativas e incubación"
+        }
       }
     }
   },

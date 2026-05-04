@@ -200,7 +200,18 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
         ("Identité COF — Notre histoire", {"fields": ("history_markdown",)}),
         ("Identité COF — ADN du festival", {"fields": ("identite_adn_festival_markdown",)}),
         (
-            "Festival — pages",
+            "Festival — Notre programme",
+            {
+                "fields": ("festival_notre_programme_markdown",),
+                "description": (
+                    "Markdown de la page « Notre programme ». Les onglets FR / EN / ES "
+                    "(modeltranslation) servent chaque langue. Si tout est vide, le site "
+                    "affiche le texte par défaut des traductions Next.js."
+                ),
+            },
+        ),
+        (
+            "Festival — autres pages (Markdown)",
             {
                 "fields": (
                     "festival_planning_navettes_markdown",
@@ -208,7 +219,6 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
                     "festival_jack_n_jill_markdown",
                     "festival_all_star_street_battle_markdown",
                     "festival_book_your_hotel_markdown",
-                    "festival_notre_programme_markdown",
                 )
             },
         ),
