@@ -24,7 +24,16 @@ export interface ExploreMobileCarouselProps {
 /** Orbite elliptique large (inspiré maquette : planètes latérales + profondeur verticale). */
 const RX_VW = 38;
 const RY_VW = 24;
-const SWIPE_SENS = 0.55;
+const SWIPE_SENS = 0.72;
+/** Déplacement horizontal (px) au-delà duquel on considère un swipe (pas un tap). */
+const SWIPE_PX_THRESHOLD = 14;
+
+/** Distance sur l’anneau (indices) entre deux places — pour limiter le nombre de GLB actifs. */
+function carouselRingDistance(index: number, focus: number, total: number): number {
+  if (total <= 0) return 0;
+  const d = Math.abs(index - focus);
+  return Math.min(d, total - d);
+}
 
 export function ExploreMobileCarousel({
   nodes,
@@ -32,7 +41,7 @@ export function ExploreMobileCarousel({
   initialNodeSlug,
 }: ExploreMobileCarouselProps) {
   const t = useTranslations("explore.mobileCarousel");
-  const arenaRef = useRef<HTMLDivElement>(null);
+  const swipeZoneRef = useRef<HTMLDivElement>(null);
   const [focusIndex, setFocusIndex] = useState(0);
   /** Décalage fractionnaire pendant le drag (positif = focus avance). */
   const [dragOffset, setDragOffset] = useState(0);
@@ -42,7 +51,10 @@ export function ExploreMobileCarousel({
   const pointerIdRef = useRef<number | null>(null);
   const startXRef = useRef(0);
   const dragAtPointerDownRef = useRef(0);
-  const arenaWidthRef = useRef(1);
+  const swipeWidthRef = useRef(1);
+  /** Après un swipe horizontal, bloque le `click` sur la carte planète sous le doigt. */
+  const suppressPlanetTapRef = useRef(false);
+  const horizontalSwipeRef = useRef(false);
 
   useEffect(() => {
     dragOffsetRef.current = dragOffset;
@@ -77,19 +89,25 @@ export function ExploreMobileCarousel({
     setDragOffset(0);
   }, [n]);
 
-  const onPointerDown = useCallback(
+  const onPointerDownCapture = useCallback(
     (e: React.PointerEvent) => {
       if (n === 0) return;
       if (e.button !== 0) return;
-      const el = arenaRef.current;
+      const el = swipeZoneRef.current;
       if (!el) return;
+      horizontalSwipeRef.current = false;
+      suppressPlanetTapRef.current = false;
       pointerGestureRef.current = true;
       setIsDragging(true);
       pointerIdRef.current = e.pointerId;
       startXRef.current = e.clientX;
       dragAtPointerDownRef.current = dragOffsetRef.current;
-      arenaWidthRef.current = Math.max(1, el.getBoundingClientRect().width);
-      el.setPointerCapture(e.pointerId);
+      swipeWidthRef.current = Math.max(1, el.getBoundingClientRect().width);
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        /* certains navigateurs si la cible n’est pas sous le pointeur */
+      }
     },
     [n]
   );
@@ -97,7 +115,10 @@ export function ExploreMobileCarousel({
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (!pointerGestureRef.current || e.pointerId !== pointerIdRef.current) return;
-      const w = arenaWidthRef.current;
+      if (Math.abs(e.clientX - startXRef.current) >= SWIPE_PX_THRESHOLD) {
+        horizontalSwipeRef.current = true;
+      }
+      const w = swipeWidthRef.current;
       const delta = (startXRef.current - e.clientX) / w;
       const next = dragAtPointerDownRef.current + delta * n * SWIPE_SENS;
       setDragOffset(next);
@@ -108,7 +129,7 @@ export function ExploreMobileCarousel({
   const endPointer = useCallback(
     (e: React.PointerEvent) => {
       if (e.pointerId !== pointerIdRef.current) return;
-      const el = arenaRef.current;
+      const el = swipeZoneRef.current;
       if (el && pointerIdRef.current !== null) {
         try {
           el.releasePointerCapture(pointerIdRef.current);
@@ -116,6 +137,10 @@ export function ExploreMobileCarousel({
           /* ignore */
         }
       }
+      if (horizontalSwipeRef.current) {
+        suppressPlanetTapRef.current = true;
+      }
+      horizontalSwipeRef.current = false;
       pointerIdRef.current = null;
       pointerGestureRef.current = false;
       setIsDragging(false);
@@ -129,6 +154,7 @@ export function ExploreMobileCarousel({
       if (!pointerGestureRef.current) return;
       pointerGestureRef.current = false;
       pointerIdRef.current = null;
+      horizontalSwipeRef.current = false;
       setIsDragging(false);
       snapFromOffset(dragOffsetRef.current);
     };
@@ -162,17 +188,19 @@ export function ExploreMobileCarousel({
       </p>
 
       <div
-        ref={arenaRef}
+        ref={swipeZoneRef}
         role="region"
         aria-roledescription="carousel"
         aria-label={t("regionLabel")}
-        className="relative mx-auto mt-1 w-full min-h-0 flex-1 max-h-[min(56dvh,520px)]"
-        style={{ touchAction: "pan-x" }}
-        onPointerDown={onPointerDown}
+        tabIndex={0}
+        className="relative mx-auto mt-1 flex w-full min-h-0 flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 max-h-[min(56dvh,520px)]"
+        style={{ touchAction: "none" }}
+        onPointerDownCapture={onPointerDownCapture}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
       >
+        <div className="relative min-h-[12rem] flex-1">
         <ExploreOrbitBackdrop />
         {/* Centre décoratif (option A du plan) */}
         <div
@@ -199,6 +227,7 @@ export function ExploreMobileCarousel({
           const opacity = orbitOpacityForDepth(sinDepth, 0.32);
           const emphasis = (sinDepth + 1) / 2;
           const z = orbitZIndex(sinDepth);
+          const loadGlbPreview = carouselRingDistance(i, previewIndex, n) <= 1;
 
           return (
             <div
@@ -218,12 +247,19 @@ export function ExploreMobileCarousel({
               <button
                 type="button"
                 className="group flex w-full flex-col items-center gap-2 rounded-3xl border border-transparent bg-transparent px-1 py-2 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
-                onClick={() => onOpenPlanet(node)}
+                onClick={() => {
+                  if (suppressPlanetTapRef.current) {
+                    suppressPlanetTapRef.current = false;
+                    return;
+                  }
+                  onOpenPlanet(node);
+                }}
                 aria-label={t("openPlanet", { name: node.name })}
               >
                 <PlanetCardSphere
                   node={node}
                   emphasis={emphasis}
+                  loadGlbPreview={loadGlbPreview}
                   className="!w-[min(42vw,168px)] !max-h-[26vh] md:!w-[min(38vw,176px)]"
                 />
                 <div className="max-w-[min(90vw,280px)] text-center">
@@ -238,21 +274,26 @@ export function ExploreMobileCarousel({
             </div>
           );
         })}
+        </div>
+
+        <div className="mx-auto mt-2 w-full max-w-md shrink-0 px-4 pb-1">
+          <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <div className="flex justify-center">
+              <span className="rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">
+                {(activeNode.planet_type || "glass").replace(/-/g, " ").toUpperCase()}
+              </span>
+            </div>
+            <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-amber-200/90">
+              {t("cardEyebrow")}
+            </p>
+            <p className="mt-1 line-clamp-2 text-center text-sm text-white/80">
+              {activeNode.short_description || activeNode.name}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="shrink-0 space-y-4 px-4 pt-2">
-        <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
-          <div className="flex justify-center">
-            <span className="rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">
-              {(activeNode.planet_type || "glass").replace(/-/g, " ").toUpperCase()}
-            </span>
-          </div>
-          <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-amber-200/90">
-            {t("cardEyebrow")}
-          </p>
-          <p className="mt-1 line-clamp-2 text-center text-sm text-white/80">{activeNode.short_description || activeNode.name}</p>
-        </div>
-
         <div className="flex items-center justify-center gap-3">
           <button
             type="button"

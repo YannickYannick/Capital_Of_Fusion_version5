@@ -605,7 +605,7 @@
       "emptyFaq": "No FAQ items yet."
     },
     "mobileCarousel": {
-      "hint": "Swipe horizontally, use the arrows or dots to change planet.",
+      "hint": "Swipe left or right on the orbit or the info card to change planet. Arrows and dots for quick navigation.",
       "empty": "No planets to show.",
       "regionLabel": "Planet carousel",
       "openPlanet": "Open {name}",

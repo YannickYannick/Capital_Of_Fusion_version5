@@ -605,7 +605,7 @@
       "emptyFaq": "Aucune question fréquente pour le moment."
     },
     "mobileCarousel": {
-      "hint": "Glissez horizontalement, utilisez les flèches ou les points pour changer de planète.",
+      "hint": "Glissez à gauche ou à droite sur l’orbite ou la carte pour changer de planète. Flèches et points : accès rapide.",
       "empty": "Aucune planète à afficher.",
       "regionLabel": "Carrousel des planètes",
       "openPlanet": "Ouvrir {name}",

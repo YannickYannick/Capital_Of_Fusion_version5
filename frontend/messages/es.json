@@ -605,7 +605,7 @@
       "emptyFaq": "Todavía no hay preguntas frecuentes."
     },
     "mobileCarousel": {
-      "hint": "Desliza en horizontal, usa las flechas o los puntos para cambiar de planeta.",
+      "hint": "Desliza a izquierda o derecha en la órbita o en la tarjeta para cambiar de planeta. Flechas y puntos: acceso rápido.",
       "empty": "No hay planetas que mostrar.",
       "regionLabel": "Carrusel de planetas",
       "openPlanet": "Abrir {name}",

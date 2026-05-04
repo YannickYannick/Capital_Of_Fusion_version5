@@ -2,6 +2,7 @@
 
 import type { OrganizationNodeApi } from "@/types/organization";
 import { getPlanetCarouselFlatImageUrl } from "@/lib/explorePlanetCarouselVisual";
+import { PlanetCarouselModelViewer } from "./PlanetCarouselModelViewer";
 
 function normalizeHex(color: string | undefined): string {
   const c = (color ?? "").replace(/^#/, "").trim();
@@ -87,32 +88,47 @@ export interface PlanetCardSphereProps {
   className?: string;
   /** 0 = arrière-plan, 1 = premier plan — intensifie le bloom. */
   emphasis?: number;
+  /** Si vrai et noeud GLB : charge le fichier `model_3d` (coûteux — réservé au focus ± 1). */
+  loadGlbPreview?: boolean;
 }
 
 /**
  * Sphère « moderne » carrousel mobile : dégradé + halo couleur, motif selon planet_type,
- * ou image 2D encadrée avec le même halo.
+ * ou image 2D encadrée avec le même halo ; noeuds GLB : aperçu `model-viewer` si `loadGlbPreview`.
  */
-export function PlanetCardSphere({ node, className = "", emphasis = 0.75 }: PlanetCardSphereProps) {
+export function PlanetCardSphere({
+  node,
+  className = "",
+  emphasis = 0.75,
+  loadGlbPreview = false,
+}: PlanetCardSphereProps) {
   const hex = normalizeHex(node.planet_color);
   const { r, g, b } = hexToRgb(hex);
+  const vs = (node.visual_source || "preset").toLowerCase();
+  const glbUrl = vs === "glb" && node.model_3d?.trim() ? node.model_3d.trim() : null;
   const flatUrl = getPlanetCarouselFlatImageUrl(node);
   const planetType = node.planet_type || "glass";
   const e = Math.min(1, Math.max(0, emphasis));
   const glowPx = 10 + e * 28;
   const glowAlpha = 0.35 + e * 0.45;
 
-  const sphereBg = flatUrl
-    ? undefined
-    : {
-        background: [
-          `radial-gradient(circle at 32% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.08) 8%, transparent 42%)`,
-          `radial-gradient(circle at 78% 82%, rgba(0,0,0,0.55) 0%, transparent 45%)`,
-          `radial-gradient(circle at 50% 50%, ${hex} 0%, ${hex}cc 42%, #0a0a12 100%)`,
-        ].join(", "),
-      };
+  const showGlb = Boolean(glbUrl && loadGlbPreview);
+  const showFlatImage = Boolean(flatUrl && (!glbUrl || !loadGlbPreview));
+  const showGradient = !showGlb && !showFlatImage;
+
+  const sphereBg =
+    showGlb || showFlatImage
+      ? undefined
+      : {
+          background: [
+            `radial-gradient(circle at 32% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.08) 8%, transparent 42%)`,
+            `radial-gradient(circle at 78% 82%, rgba(0,0,0,0.55) 0%, transparent 45%)`,
+            `radial-gradient(circle at 50% 50%, ${hex} 0%, ${hex}cc 42%, #0a0a12 100%)`,
+          ].join(", "),
+        };
 
   const outerGlow = `0 0 ${glowPx}px rgba(${r},${g},${b},${glowAlpha}), 0 0 ${glowPx * 0.45}px rgba(${r},${g},${b},${glowAlpha * 0.6})`;
+  const rotationPerSecond = `${Math.round(8 + e * 22)}deg`;
 
   return (
     <div
@@ -128,15 +144,25 @@ export function PlanetCardSphere({ node, className = "", emphasis = 0.75 }: Plan
       <div
         className={[
           "relative h-full w-full overflow-hidden rounded-full",
-          flatUrl ? "bg-zinc-950/80 ring-1 ring-white/25" : "ring-1 ring-white/30",
+          showFlatImage || showGlb ? "bg-zinc-950/80 ring-1 ring-white/25" : "ring-1 ring-white/30",
         ].join(" ")}
         style={{
           boxShadow: `${outerGlow}, inset 0 -14px 28px rgba(0,0,0,0.35), inset 0 10px 22px rgba(255,255,255,0.12)`,
           ...sphereBg,
         }}
       >
-        {!flatUrl ? <PlanetPatternOverlay planetType={planetType} /> : null}
-        {flatUrl ? (
+        {showGradient ? <PlanetPatternOverlay planetType={planetType} /> : null}
+        {showGlb && glbUrl ? (
+          <div className="relative z-[1] h-[92%] w-[92%] overflow-hidden rounded-full">
+            <PlanetCarouselModelViewer
+              src={glbUrl}
+              poster={flatUrl}
+              rotationPerSecond={rotationPerSecond}
+              className="min-h-[120px]"
+            />
+          </div>
+        ) : null}
+        {showFlatImage && flatUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element -- URL API dynamique hors domains next/image */
           <img
             src={flatUrl}
