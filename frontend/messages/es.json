@@ -218,9 +218,18 @@
       "metaTitle": "Nuestro programa | Festival",
       "metaDescription": "Programa del festival: talleres, fiestas, eventos.",
       "eyebrow": "Festival",
-      "title": "Notre programme",
-      "subtitle": "Detalle del programa (Markdown editable).",
-      "empty": "Contenido próximamente."
+      "title": "Nuestro programa",
+      "subtitle": "Calendario oficial del Paris Bachata Vibe Festival 2026 (17–21 sept.) — carteles detallados abajo y Markdown opcional para el equipo.",
+      "empty": "Contenido próximamente.",
+      "planningSectionTitle": "Planning 2026",
+      "planningIntro": "Primera parte del calendario: jueves y viernes entre el hotel (social day), La Palmeraie (apertura, talleres, battles, fiestas Urban Vibe y Añejo Vibe) y la Vibe Room (DJ sets, directo Instagram). Los horarios de los carteles son los publicados por la organización.",
+      "planningBetween": "Resto del fin de semana: sábado y domingo con talleres (La Casa, La Escuela, El Patio), Jack & Jill, French Social Cup, Capital of Fusion Party y after en Aquaboulevard, luego Smooth Vibe Party y DJ sets en Vibe Room para cerrar el festival.",
+      "planningImage1Alt": "Cartel planning Paris Bachata Vibe Festival 2026 — jueves y viernes: columnas Hotel, Palmeraie, Vibe Room con horarios y eventos.",
+      "planningImage2Alt": "Cartel planning Paris Bachata Vibe Festival 2026 — sábado y domingo: Hotel, Palmeraie, Aquaboulevard, Vibe Room, Jack & Jill y fiestas.",
+      "planningDisclaimer": "Horarios provisionales — sujetos a cambios.",
+      "planningVisualNote": "Los cuadros de horarios en los carteles están en inglés (obra oficial).",
+      "planningCredit": "Crédito visual: Genia Prod.",
+      "planningFullPageCta": "Ver la página Nuestro programa"
     },
     "festivalJackNJill": {
       "metaTitle": "Jack N Jill | Festival",
@@ -257,7 +266,15 @@
       "title": "Contáctanos",
       "subtitle": "¿Necesitas ayuda? Escríbenos y responderemos.",
       "contentMarkdown": "## Por completar\n\nAñade aquí el contenido (Markdown) de **Contáctanos**.\n",
-      "empty": "Contenido próximamente."
+      "empty": "Contenido próximamente.",
+      "channelsHeader": "Contacto — Paris Bachata Vibe Festival 2026",
+      "channelsIntroBefore": "Puedes contactar con ",
+      "channelsIntroHighlight": "Paris Bachata Vibe Festival 2026",
+      "channelsIntroAfter": " a través de los siguientes medios.",
+      "whatsappLabel": "WhatsApp",
+      "emailLabel": "Correo",
+      "whatsappLinkLabel": "Chatear por WhatsApp con el +33 6 29 05 96 44",
+      "emailLinkLabel": "Enviar un correo a cofmovement.france@gmail.com"
     },
     "partnerHub": {
       "metaTitle": "Nuestros socios | Capital of Fusion",
@@ -583,6 +600,13 @@
       "about": "Acerca de",
       "loadingFaq": "Cargando FAQ…",
       "emptyFaq": "Todavía no hay preguntas frecuentes."
+    },
+    "mobileCarousel": {
+      "hint": "Desliza para explorar, toca una tarjeta para abrir",
+      "empty": "No hay planetas que mostrar.",
+      "regionLabel": "Carrusel de planetas",
+      "openPlanet": "Abrir {name}",
+      "slideStatus": "{name}, tarjeta {index} de {total}"
     },
     "video": {
       "enableSound": "Activar sonido",

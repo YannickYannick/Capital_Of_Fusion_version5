@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
 import { getFaqItems, patchOrganizationNode, type FaqItemApi } from "@/lib/api";
 import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanceTicketsEmbed";
+import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -155,6 +156,14 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     const slug = (node.slug || "").toLowerCase();
     const name = (node.name || "").toLowerCase();
     return slug === "faq" || slug.includes("faq") || name === "faq" || name.includes("faq");
+  }, [node]);
+
+  const isNotreProgrammePlanet = useMemo(() => {
+    if (!node) return false;
+    const cta = (node.cta_url || "").trim().replace(/\/$/, "");
+    if (cta === "/festival/notre-programme") return true;
+    const slug = (node.slug || "").toLowerCase();
+    return slug.includes("notre-programme") || slug.includes("notre_programme");
   }, [node]);
 
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
@@ -474,6 +483,12 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {isNotreProgrammePlanet && !showEditForm && (
+                <div className="border-t border-white/10 px-5 md:px-8 py-6">
+                  <FestivalPlanningSchedule variant="overlay" showFullPageLink />
                 </div>
               )}
 

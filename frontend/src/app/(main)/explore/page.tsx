@@ -1,15 +1,19 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback, useEffect, useRef, startTransition, useDeferredValue } from "react";
+import { Suspense, useState, useCallback, useEffect, useRef, startTransition, useDeferredValue, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import type * as THREE from "three";
 import { getOrganizationNodeBySlug, getOrganizationNodes, getSiteConfig } from "@/lib/api";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { usePlanetMusicOverride } from "@/contexts/PlanetMusicOverrideContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PlanetOverlay } from "@/components/features/explore/components/PlanetOverlay";
+import { ExploreMobileCarousel } from "@/components/features/explore/components/ExploreMobileCarousel";
 import { useExplorePerformance } from "@/hooks/useExplorePerformance";
-import { prefetchExploreModules } from "@/hooks/usePrefetchExplore";
+import { useExploreLayoutMode } from "@/hooks/useExploreCompactLayout";
+import { getExploreOrbitNodes } from "@/lib/exploreOrbitNodes";
 import { ExploreLoadingModal } from "@/components/features/explore/components/ExploreLoadingModal";
 
 const OptionsPanel = dynamic(
@@ -43,7 +47,7 @@ function ExploreSkeleton() {
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       {/* Soleil central pulsant */}
       <div className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 animate-pulse shadow-lg shadow-amber-500/50" />
-      
+
       {/* Orbites animées */}
       {[1, 2, 3, 4, 5].map((i) => (
         <div
@@ -67,7 +71,7 @@ function ExploreSkeleton() {
           />
         </div>
       ))}
-      
+
       {/* Texte de chargement */}
       <div className="absolute bottom-1/4 text-white/40 text-sm tracking-widest uppercase animate-pulse">
         Initialisation du système solaire...
@@ -80,25 +84,24 @@ function ExploreSkeleton() {
 //  Inner page (inside Provider)
 // ─────────────────────────────────────────────────────────
 
-function ExplorePageInner() {
+function ExplorePageInner({ initialNodeSlug }: { initialNodeSlug: string | null }) {
+  const layoutMode = useExploreLayoutMode();
   const opts = usePlanetsOptions();
   const { setBatch, showExploreLoadingModal, isTransitioningToExplore } = opts;
-  const controlsRef = useRef<any>(null);
-  const cameraRef = useRef<any>(null);
+  const controlsRef = useRef<{ target: THREE.Vector3; update: () => void } | null>(null);
+  const cameraRef = useRef<THREE.Camera | null>(null);
   const [nodes, setNodes] = useState<OrganizationNodeApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [overlayNode, setOverlayNode] = useState<OrganizationNodeApi | null>(null);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
-  
-  // Solution 1: Différer le montage de Three.js après le FCP
-  const [mountScene, setMountScene] = useState(false);
-  
-  // Solution 3: useDeferredValue pour ne pas bloquer l'UI pendant le rendu 3D
+
+  /** Desktop uniquement : canvas WebGL monté. */
+  const [webglMounted, setWebglMounted] = useState(false);
+
   const deferredNodes = useDeferredValue(nodes);
 
-  // Performance monitoring
-  const perf = useExplorePerformance({ 
+  const perf = useExplorePerformance({
     debug: process.env.NODE_ENV === "development",
     trackFps: true,
     fpsSampleDuration: 5,
@@ -107,7 +110,6 @@ function ExplorePageInner() {
   const { setOverride: setPlanetMusicOverride } = usePlanetMusicOverride();
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
-  // Musique de fond planète : activer quand l'overlay s'ouvre sur un nœud avec musique, désactiver à la fermeture
   useEffect(() => {
     if (!overlayNode || !overlayNode.music_type) {
       setPlanetMusicOverride(null);
@@ -129,7 +131,6 @@ function ExplorePageInner() {
   useEffect(() => {
     const t0 = performance.now();
 
-    // Charger les nœuds en priorité — débloque l'apparition des planètes
     getOrganizationNodes()
       .then((nodesData) => {
         perf.setNodesApiMs(performance.now() - t0);
@@ -142,27 +143,23 @@ function ExplorePageInner() {
         setLoading(false);
       });
 
-    // Charger la config visuelle en parallèle, sans bloquer les planètes
     getSiteConfig()
       .then((config) => {
         if (config.explore_config) {
           const raw = config.explore_config as unknown as Record<string, unknown>;
-          const { id, name, created_at, updated_at, ...rest } = raw;
-          const visualOptions = { ...rest };
-          delete (visualOptions as Record<string, unknown>)['isTransitioningToExplore'];
-          delete (visualOptions as Record<string, unknown>)['showExploreLoadingModal'];
+          const visualOptions = { ...raw };
+          delete visualOptions.id;
+          delete visualOptions.name;
+          delete visualOptions.created_at;
+          delete visualOptions.updated_at;
+          delete visualOptions.isTransitioningToExplore;
+          delete visualOptions.showExploreLoadingModal;
           startTransition(() => setBatch(visualOptions as Parameters<typeof setBatch>[0]));
         }
       })
-      .catch(() => {
-        // Config visuelle non critique — on ignore l'erreur, les défauts s'appliquent
-      });
-    // setBatch uniquement : ne pas mettre perf en deps (objet recréé chaque rendu → boucle de requêtes)
-  }, [setBatch]);
+      .catch(() => {});
+  }, [setBatch, perf]);
 
-  // Réinitialiser les flags de transition si on quitte /explore avant la fin du chargement.
-  // On utilise un ref pour éviter que React Strict Mode (double mount/unmount en dev)
-  // ne réinitialise les flags lors du premier cycle unmount.
   const isMountedRef = useRef(false);
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -176,19 +173,22 @@ function ExplorePageInner() {
     };
   }, [setBatch]);
 
-  // Fin de transition : scène 3D prête à être montée
-  // On ferme seulement isTransitioningToExplore, mais PAS la modale — l'utilisateur doit cliquer "Compris"
-  useEffect(() => {
-    if (!mountScene) return;
-    setBatch({ isTransitioningToExplore: false });
-  }, [mountScene, setBatch]);
+  const exploreContentReady =
+    layoutMode !== "unknown" &&
+    !loading &&
+    !error &&
+    nodes.length > 0 &&
+    (layoutMode === "compact" || webglMounted);
 
-  // Callback pour fermer manuellement la modale (bouton "Compris")
+  useEffect(() => {
+    if (!exploreContentReady) return;
+    setBatch({ isTransitioningToExplore: false });
+  }, [exploreContentReady, setBatch]);
+
   const handleDismissModal = useCallback(() => {
     setBatch({ showExploreLoadingModal: false });
   }, [setBatch]);
 
-  // Erreur : ne pas laisser la modale bloquer
   useEffect(() => {
     if (!showExploreLoadingModal) return;
     if (error) {
@@ -196,7 +196,6 @@ function ExplorePageInner() {
     }
   }, [showExploreLoadingModal, error, setBatch]);
 
-  // Sécurité : fermer après 45s même si le canvas ne monte pas
   useEffect(() => {
     if (!showExploreLoadingModal) return;
     const id = window.setTimeout(() => {
@@ -205,75 +204,67 @@ function ExplorePageInner() {
     return () => window.clearTimeout(id);
   }, [showExploreLoadingModal, setBatch]);
 
-  // Monter la scène juste après le prochain paint (double rAF) pour éviter l’attente requestIdleCallback
-  // tout en laissant le navigateur finir la mise en page ; startTransition garde le rendu 3D non-bloquant.
+  // Desktop : monter WebGL après double rAF
   useEffect(() => {
-    if (!loading && !error && nodes.length > 0 && !mountScene) {
-      perf.markCanvasInit();
+    if (layoutMode !== "wide") return;
+    if (loading || error || nodes.length === 0 || webglMounted) return;
 
-      const mount = () => {
-        startTransition(() => {
-          setMountScene(true);
-          perf.markCanvasReady();
-        });
-      };
+    perf.markCanvasInit();
 
-      let raf1 = 0;
-      let raf2 = 0;
-      raf1 = requestAnimationFrame(() => {
-        raf2 = requestAnimationFrame(mount);
+    const mount = () => {
+      startTransition(() => {
+        setWebglMounted(true);
+        perf.markCanvasReady();
       });
-      return () => {
-        cancelAnimationFrame(raf1);
-        cancelAnimationFrame(raf2);
-      };
-    }
-  }, [loading, error, nodes.length, mountScene, perf]);
+    };
 
-  // Solution 3: Utiliser les nodes différés pour le rendu 3D (ne bloque pas l'UI)
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(mount);
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [layoutMode, loading, error, nodes.length, webglMounted, perf]);
+
+  // Compact : décharger le canvas si on rétrécit la fenêtre
+  useEffect(() => {
+    if (layoutMode === "compact") {
+      setWebglMounted(false);
+    }
+  }, [layoutMode]);
+
   const visibleNodes = deferredNodes.filter((n) => n.is_visible_3d);
+  const orbitNodes = useMemo(() => getExploreOrbitNodes(visibleNodes), [visibleNodes]);
 
   const handleSelectNode = useCallback((_node: OrganizationNodeApi | null) => {
-    // La sélection existe encore dans la scène pour le zoom/état interne,
-    // mais on n'affiche plus de panneau d'action intermédiaire côté page.
+    void _node;
   }, []);
 
   const handleSelectedPlanetScreenPosition = useCallback((_x: number, _y: number) => {
-    // Conservé pour compatibilité avec ExploreScene ; plus utilisé ici.
+    void _x;
+    void _y;
   }, []);
 
-  const handleOpenOverlay = useCallback(
-    async (node: OrganizationNodeApi) => {
-      // Ouvrir immédiatement avec les données légères
-      setOverlayNode(node);
+  const handleOpenOverlay = useCallback(async (node: OrganizationNodeApi) => {
+    setOverlayNode(node);
 
-      try {
-        const full = await getOrganizationNodeBySlug(node.slug);
-        // Mettre à jour l'overlay uniquement si on est toujours sur le même noeud
-        setOverlayNode((current) => (current && current.id === node.id ? full : current));
-        // Mettre à jour la liste des noeuds pour refléter les changements (musique, contenu, etc.)
-        setNodes((prev) => prev.map((n) => (n.id === full.id ? full : n)));
-      } catch (e) {
-        // En cas d'erreur réseau, on garde au moins la version légère
-        if (process.env.NODE_ENV !== "production") {
-          // eslint-disable-next-line no-console
-          console.warn("[Explore] Échec du chargement détaillé du noeud", node.slug, e);
-        }
+    try {
+      const full = await getOrganizationNodeBySlug(node.slug);
+      setOverlayNode((current) => (current && current.id === node.id ? full : current));
+      setNodes((prev) => prev.map((n) => (n.id === full.id ? full : n)));
+    } catch (e) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[Explore] Échec du chargement détaillé du noeud", node.slug, e);
       }
-    },
-    []
-  );
+    }
+  }, []);
 
   const handleCloseOverlay = useCallback(() => {
     setOverlayNode(null);
   }, []);
-
-  const handleReset = useCallback(() => {
-    // La sélection est gérée dans la scène (ExploreScene). Ici, on force juste le reset global.
-    setOverlayNode(null);
-    opts.triggerReset();
-    opts.set("freezePlanets", false);
-  }, [opts]);
 
   const { user } = useAuth();
   const isAdmin = user?.user_type === "ADMIN";
@@ -284,21 +275,16 @@ function ExplorePageInner() {
   }, []);
 
   const handleSaved = useCallback(() => {
-    // Après sauvegarde, rejouer l'intro pour mettre à jour la scène
     opts.triggerRestart();
   }, [opts]);
 
   return (
-    // Wrapper fullscreen — le canvas 3D est transparent, les vidéos sont en -z-10 dessous
     <div className="fixed inset-0 z-10">
-      {/* La vidéo est gérée globalement dans layout.tsx (GlobalVideoBackground) */}
-
       {(showExploreLoadingModal || isTransitioningToExplore) && (
         <ExploreLoadingModal onDismiss={handleDismissModal} />
       )}
 
-      {/* Skeleton sous la modale (z-25) : feedback visuel même pendant la transition */}
-      {!mountScene && (
+      {!exploreContentReady && (
         <div
           className={
             showExploreLoadingModal || isTransitioningToExplore
@@ -310,34 +296,41 @@ function ExplorePageInner() {
         </div>
       )}
 
-      {/* Erreur */}
       {error && (
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-xl bg-red-900/60 border border-red-500/30 text-red-300 text-sm">
+        <div className="absolute top-24 left-1/2 z-20 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-900/60 px-4 py-2 text-sm text-red-300">
           {error}
         </div>
       )}
 
-      {/* Canvas 3D - z-0 pour rester sous les panneaux. pointer-events désactivés quand config planètes ouverte pour ne pas voler les clics (WebGL au-dessus en hit-test). */}
-      {mountScene && !error && visibleNodes.length > 0 && (
+      {exploreContentReady && layoutMode === "wide" && visibleNodes.length > 0 && (
         <div
           className={`absolute inset-0 z-0 ${planetConfigOpen ? "pointer-events-none" : ""}`}
         >
           <ExploreScene
-          nodes={visibleNodes}
-          onOpenOverlay={handleOpenOverlay}
-          onSelectNode={handleSelectNode}
-          onSelectedPlanetScreenPosition={handleSelectedPlanetScreenPosition}
-          controlsRef={controlsRef}
-          cameraRef={cameraRef}
-          onFirstFrame={perf.markFirstFrame}
-          onSceneReady={perf.markSceneReady}
-          onPlanetsLoaded={(count) => perf.markPlanetsLoaded(count)}
-          onAllPlanetsOnOrbit={perf.markAllPlanetsOnOrbit}
+            nodes={visibleNodes}
+            onOpenOverlay={handleOpenOverlay}
+            onSelectNode={handleSelectNode}
+            onSelectedPlanetScreenPosition={handleSelectedPlanetScreenPosition}
+            controlsRef={controlsRef}
+            cameraRef={cameraRef}
+            onFirstFrame={perf.markFirstFrame}
+            onSceneReady={perf.markSceneReady}
+            onPlanetsLoaded={(count) => perf.markPlanetsLoaded(count)}
+            onAllPlanetsOnOrbit={perf.markAllPlanetsOnOrbit}
           />
         </div>
       )}
 
-      {/* Options 3D, Config planètes et Debug caméra : visibles uniquement pour les comptes admin */}
+      {exploreContentReady && layoutMode === "compact" && (
+        <div className={`absolute inset-0 z-0 ${planetConfigOpen ? "pointer-events-none" : ""}`}>
+          <ExploreMobileCarousel
+            nodes={orbitNodes}
+            onOpenPlanet={handleOpenOverlay}
+            initialNodeSlug={initialNodeSlug}
+          />
+        </div>
+      )}
+
       {isAdmin && (
         <OptionsPanel onOpenPlanetConfig={() => setPlanetConfigOpen(true)} nodes={nodes} />
       )}
@@ -350,11 +343,10 @@ function ExplorePageInner() {
         />
       )}
 
-      {isAdmin && opts.showDebugInfo && (
+      {isAdmin && layoutMode === "wide" && opts.showDebugInfo && (
         <DebugPanel controlsRef={controlsRef} cameraRef={cameraRef} />
       )}
 
-      {/* Overlay détails planète (z-50) */}
       <PlanetOverlay
         node={overlayNode}
         onClose={handleCloseOverlay}
@@ -362,9 +354,8 @@ function ExplorePageInner() {
         onNodeUpdated={handleNodeUpdated}
       />
 
-      {/* Accessible fallback liste (screen readers) */}
       <ul className="sr-only" aria-label="Liste des planètes">
-        {visibleNodes.map((node) => (
+        {orbitNodes.map((node) => (
           <li key={node.id}>
             <button type="button" onClick={() => handleOpenOverlay(node)}>
               {node.name}: {node.short_description}
@@ -376,15 +367,20 @@ function ExplorePageInner() {
   );
 }
 
-// ─────────────────────────────────────────────────────────
-//  Page principale (wrappée dans le Provider)
-// ─────────────────────────────────────────────────────────
+function ExplorePageWithSearchParams() {
+  const searchParams = useSearchParams();
+  const nodeParam = searchParams.get("node");
+  return <ExplorePageInner initialNodeSlug={nodeParam} />;
+}
 
 /**
- * Page /explore — Canvas 3D fullscreen avec planètes, physique et overlays.
+ * Page /explore — Canvas 3D (grand écran) ou carrousel 2.5D (compact), même données et overlay.
  * Le fond vidéo est géré par le layout parent (z-0).
  */
 export default function ExplorePage() {
-  /** Même PlanetsOptionsProvider que le layout (accueil / menu) pour conserver les flags de transition. */
-  return <ExplorePageInner />;
+  return (
+    <Suspense fallback={<ExplorePageInner initialNodeSlug={null} />}>
+      <ExplorePageWithSearchParams />
+    </Suspense>
+  );
 }

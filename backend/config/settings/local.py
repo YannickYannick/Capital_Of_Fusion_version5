@@ -10,6 +10,13 @@ import os
 
 DEBUG = True
 
+# Front ouvert depuis la LAN (ex. Next affiche http://192.168.x.x:3000 pour le mobile).
+# Utiliser : python manage.py runserver 0.0.0.0:8000
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://192\.168\.\d{1,3}\.\d{1,3}:(3000|3001|3002|3003)$",
+    r"^http://10\.\d{1,3}\.\d{1,3}\.\d{1,3}:(3000|3001|3002|3003)$",
+]
+
 _cn = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()
 _key = os.environ.get("CLOUDINARY_API_KEY", "").strip()
 _secret = os.environ.get("CLOUDINARY_API_SECRET", "").strip()

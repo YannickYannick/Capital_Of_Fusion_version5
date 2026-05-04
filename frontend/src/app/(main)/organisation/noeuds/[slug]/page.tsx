@@ -56,6 +56,7 @@ export default function NoeudProfilPage() {
   const festivalEditorialContentKey = useMemo(() => {
     if (slug === "jack-n-jill-vibe") return "festivalJackNJill";
     if (slug === "all-star-street-bachata-battle") return "festivalAllStarStreetBattle";
+    if (slug === "festival-notre-programme" || slug === "notre-programme-pbvf") return "festivalNotreProgramme";
     return null;
   }, [slug]);
 

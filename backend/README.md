@@ -34,6 +34,12 @@ set DJANGO_SETTINGS_MODULE=config.settings.local
 python manage.py runserver
 ```
 
+Écouter sur tout le réseau local (test téléphone / tablette avec le front sur `http://LAN:3000`) :
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+
 Par défaut : `http://127.0.0.1:8000/`. Admin : `http://127.0.0.1:8000/admin/`.
 
 ## Données initiales

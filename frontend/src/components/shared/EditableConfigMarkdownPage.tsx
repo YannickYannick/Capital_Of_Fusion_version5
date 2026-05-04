@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { markdownToHtml } from "@/lib/markdownToHtml";
@@ -25,6 +25,7 @@ export function EditableConfigMarkdownPage({
   field,
   emptyText,
   ctaBelowSubtitle,
+  preface,
 }: {
   eyebrow: string;
   title: string;
@@ -43,6 +44,7 @@ export function EditableConfigMarkdownPage({
   emptyText: string;
   /** Bouton d’action sous le sous-titre (ex. lien externe go&dance), style aligné sur la landing. */
   ctaBelowSubtitle?: { href: string; label: string };
+  preface?: ReactNode;
 }) {
   const { user } = useAuth();
   const router = useRouter();
@@ -95,6 +97,8 @@ export function EditableConfigMarkdownPage({
             </a>
           </div>
         ) : null}
+
+        {preface}
 
         {canEdit ? (
           <div className="mt-6 flex flex-wrap items-center gap-2 border-b border-white/10 pb-6">
@@ -166,7 +170,7 @@ export function EditableConfigMarkdownPage({
         {!editing ? (
           html ? (
             <div className={`mt-10 ${proseClasses}`} dangerouslySetInnerHTML={{ __html: html }} />
-          ) : (
+          ) : preface ? null : (
             <p className="mt-10 text-white/70">{emptyText}</p>
           )
         ) : (

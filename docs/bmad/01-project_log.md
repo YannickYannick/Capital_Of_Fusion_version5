@@ -76,5 +76,7 @@
 | [2026-03-07] Doc par feature | Création `docs/features/` : README (index), `explore-presets.md`, `landing-config.md`, `navbar-dashboard.md`. Référence depuis `docs/README.md`. |
 | [2026-03-07] API docs | Mise à jour `docs/bmad/03-api_docs.md` : section Core (GET `/api/config/`, CRUD `/api/core/presets/`). |
 | [2026-03-07] Trace session | Fichier `docs/history/trace_deduction_cursor_vs_antigravity_2026-03-07.md` (comparaison déduction Cursor / conv Antigravity). |
+| [2026-05-03] Starting Task | Explore mobile carrousel 2.5D | Objectif : layout compact sans WebGL, carrousel DOM (scroll-snap + perspective), mêmes nœuds orbite + PlanetOverlay ; deep link `?node=` ; préfetch 3D désactivé sur compact. |
+| [2026-05-03] Completed Task | Explore mobile carrousel 2.5D | Fichiers : `useExploreCompactLayout.ts`, `exploreOrbitNodes.ts`, `ExploreMobileCarousel.tsx`, `PlanetCardSphere.tsx`, branche dans `explore/page.tsx`, `usePrefetchExplore.ts` ; clés i18n `explore.mobileCarousel` (fr/en/es). |
 
-*Dernière mise à jour : 2026-03-07*
+*Dernière mise à jour : 2026-05-03*

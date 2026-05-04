@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
+import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
 
 const proseClasses =
   "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
@@ -19,6 +20,7 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
   const field = useMemo(() => {
     if (contentKey === "festivalJackNJill") return "festival_jack_n_jill_markdown";
     if (contentKey === "festivalAllStarStreetBattle") return "festival_all_star_street_battle_markdown";
+    if (contentKey === "festivalNotreProgramme") return "festival_notre_programme_markdown";
     return null;
   }, [contentKey]);
 
@@ -50,6 +52,11 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
             initialValue={initialValue}
             field={field as any}
             emptyText={empty}
+            preface={
+              contentKey === "festivalNotreProgramme" ? (
+                <FestivalPlanningSchedule variant="page" />
+              ) : undefined
+            }
           />
         ) : (
           <p className="text-white/60">Page indisponible.</p>

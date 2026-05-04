@@ -25,8 +25,14 @@ import type {
 
 /**
  * Retourne l'URL de base de l'API (sans slash final).
- * En prod (Vercel) : NEXT_PUBLIC_API_URL doit être défini (ex. URL Railway).
- * En dev : http://localhost:8000 si non défini.
+ *
+ * Priorité :
+ * 1. `NEXT_PUBLIC_API_URL` si défini (fichier `.env.local` en dev — voir `.env.local.example`)
+ * 2. Côté navigateur uniquement : même host que le front, port 8000
+ * 3. Fallback `http://localhost:8000` (SSR sans env)
+ *
+ * La production ne doit pas déployer de `.env.local` : configurer les variables
+ * sur l'hébergeur (ex. Vercel → URL Railway).
  */
 export function getApiBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_URL;

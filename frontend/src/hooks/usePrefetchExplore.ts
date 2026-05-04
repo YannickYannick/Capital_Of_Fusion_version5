@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isExploreCompactViewport, useExploreLayoutMode } from "@/hooks/useExploreCompactLayout";
 
 let globalPrefetchDone = false;
 
@@ -15,9 +16,12 @@ const PREFETCH_MODULES = [
 /**
  * Précharge immédiatement Three.js + ExploreScene (chunk lourd).
  * Appelable au survol du CTA « Explorer » ou au montage de /explore pour chevaucher le réseau.
+ * Sur viewport compact (mobile / tactile), ne charge pas ces modules.
  */
 export function prefetchExploreModules(): void {
   if (typeof window === "undefined" || globalPrefetchDone) return;
+  if (isExploreCompactViewport()) return;
+
   globalPrefetchDone = true;
 
   if (process.env.NODE_ENV === "development") {
@@ -35,9 +39,7 @@ export function prefetchExploreModules(): void {
       })
     ).then((rows) => {
       const wallMs = Math.round(performance.now() - wallStart);
-      // eslint-disable-next-line no-console
       console.log("[Prefetch] Temps par module (chargés en parallèle) :");
-      // eslint-disable-next-line no-console
       console.table([
         ...rows,
         { Module: "— mur (tous en parallèle) —", "Durée (ms)": wallMs },
@@ -54,15 +56,19 @@ export function prefetchExploreModules(): void {
 /**
  * Hook pour précharger les modules Three.js/ExploreScene en arrière-plan.
  * Utilise requestIdleCallback pour ne pas bloquer le main thread.
+ * En mise en page compacte, aucun préchargement lourd.
  *
  * @param delayMs - Délai avant de lancer le prefetch (défaut: 600ms, plus court qu'avant pour /explore plus réactif)
  * @param enabled - Active/désactive le prefetch (défaut: true)
  */
 export function usePrefetchExplore(delayMs = 600, enabled = true) {
+  const layoutMode = useExploreLayoutMode();
   const hasPrefetched = useRef(false);
 
   useEffect(() => {
     if (!enabled || hasPrefetched.current) return;
+    if (layoutMode === "unknown") return;
+    if (layoutMode === "compact") return;
 
     let idleId: number | undefined;
 
@@ -84,5 +90,5 @@ export function usePrefetchExplore(delayMs = 600, enabled = true) {
       clearTimeout(timer);
       if (idleId !== undefined) cancelIdleCallback(idleId);
     };
-  }, [delayMs, enabled]);
+  }, [delayMs, enabled, layoutMode]);
 }
