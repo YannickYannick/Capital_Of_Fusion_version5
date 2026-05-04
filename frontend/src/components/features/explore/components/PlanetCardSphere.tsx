@@ -1,6 +1,7 @@
 "use client";
 
 import type { OrganizationNodeApi } from "@/types/organization";
+import { getPlanetCarouselFlatImageUrl } from "@/lib/explorePlanetCarouselVisual";
 
 function normalizeHex(color: string | undefined): string {
   const c = (color ?? "").replace(/^#/, "").trim();
@@ -14,37 +15,46 @@ export interface PlanetCardSphereProps {
 }
 
 /**
- * Sphère « 2.5D » légère : dégradé + couleur planète, option image de couverture.
+ * Pastille 2D pour le carrousel mobile : image selon visual_source (gif / glb / preset),
+ * sinon disque dégradé (couleur planète).
  */
 export function PlanetCardSphere({ node, className = "" }: PlanetCardSphereProps) {
   const hex = normalizeHex(node.planet_color);
-  const cover = node.cover_image?.trim();
+  const flatUrl = getPlanetCarouselFlatImageUrl(node);
 
   return (
     <div
-      className={`relative flex aspect-square w-[min(72vw,280px)] max-h-[42vh] items-center justify-center ${className}`}
+      className={`relative flex aspect-square w-[min(52vw,200px)] max-h-[32vh] items-center justify-center ${className}`}
     >
       <div
         aria-hidden
-        className="absolute inset-[8%] rounded-full opacity-55 blur-xl"
+        className="absolute inset-[6%] rounded-full opacity-40 blur-lg"
         style={{
-          background: `radial-gradient(circle at 30% 28%, ${hex}ff, transparent 62%), radial-gradient(circle at 70% 72%, ${hex}99, transparent 58%)`,
+          background: `radial-gradient(circle at 30% 28%, ${hex}ee, transparent 60%), radial-gradient(circle at 70% 72%, ${hex}88, transparent 55%)`,
         }}
       />
       <div
-        className="relative h-full w-full rounded-full shadow-[inset_-18px_-12px_40px_rgba(0,0,0,0.45),inset_12px_10px_28px_rgba(255,255,255,0.22)] ring-2 ring-white/15"
-        style={{
-          background: cover
+        className={[
+          "relative h-full w-full overflow-hidden rounded-full ring-2 ring-white/20",
+          flatUrl
+            ? "bg-black/50 shadow-[0_12px_28px_rgba(0,0,0,0.35)]"
+            : "shadow-[inset_-12px_-10px_28px_rgba(0,0,0,0.4),inset_8px_8px_20px_rgba(255,255,255,0.18)]",
+        ].join(" ")}
+        style={
+          flatUrl
             ? undefined
-            : `radial-gradient(circle at 28% 24%, #ffffffaa 0%, ${hex} 28%, ${hex}dd 55%, #050508 100%)`,
-        }}
+            : {
+                background: `radial-gradient(circle at 28% 24%, #ffffffaa 0%, ${hex} 28%, ${hex}dd 55%, #050508 100%)`,
+              }
+        }
       >
-        {cover ? (
+        {flatUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element -- URL API dynamique hors domains next/image */
           <img
-            src={cover}
+            src={flatUrl}
             alt=""
-            className="absolute inset-0 h-full w-full rounded-full object-cover"
+            loading="lazy"
+            className="absolute inset-0 m-auto h-[88%] w-[88%] rounded-full object-contain"
           />
         ) : null}
       </div>

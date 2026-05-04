@@ -20,8 +20,8 @@ export interface ExploreMobileCarouselProps {
   initialNodeSlug?: string | null;
 }
 
-const RX_VW = 40;
-const RY_VW = 22;
+const RX_VW = 34;
+const RY_VW = 18;
 const SWIPE_SENS = 0.55;
 
 export function ExploreMobileCarousel({
@@ -164,7 +164,7 @@ export function ExploreMobileCarousel({
         role="region"
         aria-roledescription="carousel"
         aria-label={t("regionLabel")}
-        className="relative mx-auto mt-1 w-full min-h-0 flex-1 max-h-[min(58dvh,520px)]"
+        className="relative mx-auto mt-1 w-full min-h-0 flex-1 max-h-[min(52dvh,460px)]"
         style={{ touchAction: "pan-x" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -176,7 +176,7 @@ export function ExploreMobileCarousel({
           className="pointer-events-none absolute left-1/2 top-[40%] z-[80] -translate-x-1/2 -translate-y-1/2"
           aria-hidden
         >
-          <div className="relative flex h-24 w-24 items-center justify-center md:h-28 md:w-28">
+          <div className="relative flex h-20 w-20 items-center justify-center md:h-24 md:w-24">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400/50 via-orange-500/35 to-fuchsia-600/25 blur-2xl" />
             <div className="absolute inset-[18%] rounded-full bg-gradient-to-br from-amber-300/90 to-orange-600/70 shadow-[0_0_40px_rgba(251,191,36,0.45)]" />
             <span className="relative z-[1] rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-100/95 backdrop-blur-sm">
@@ -190,7 +190,7 @@ export function ExploreMobileCarousel({
           const sinDepth = orbitSinDepth(angle);
           const dx = RX_VW * Math.cos(angle);
           const dy = RY_VW * Math.sin(angle);
-          const scale = orbitScaleForDepth(sinDepth, 0.48);
+          const scale = orbitScaleForDepth(sinDepth, 0.4);
           const blur = sinDepth < 0.12 ? orbitBlurForDepth(sinDepth, 4) : 0;
           const opacity = orbitOpacityForDepth(sinDepth, 0.42);
           const z = orbitZIndex(sinDepth);
@@ -198,7 +198,7 @@ export function ExploreMobileCarousel({
           return (
             <div
               key={node.id}
-              className="absolute left-1/2 top-[40%] w-[min(88vw,360px)] max-w-none -translate-x-1/2 -translate-y-1/2"
+              className="absolute left-1/2 top-[40%] w-[min(72vw,280px)] max-w-none -translate-x-1/2 -translate-y-1/2"
               style={{
                 zIndex: z,
                 transform: `translate(calc(-50% + ${dx.toFixed(2)}vw), calc(-50% + ${dy.toFixed(2)}vw)) scale(${scale.toFixed(3)})`,
@@ -212,13 +212,13 @@ export function ExploreMobileCarousel({
             >
               <button
                 type="button"
-                className="group flex w-full flex-col items-center gap-3 rounded-3xl border border-white/10 bg-black/20 px-3 py-5 shadow-lg shadow-black/35 backdrop-blur-sm transition-colors hover:bg-black/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
+                className="group flex w-full flex-col items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-2 py-3 shadow-lg shadow-black/35 backdrop-blur-sm transition-colors hover:bg-black/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
                 onClick={() => onOpenPlanet(node)}
                 aria-label={t("openPlanet", { name: node.name })}
               >
-                <PlanetCardSphere node={node} className="!w-[min(68vw,260px)]" />
-                <div className="max-w-[88vw] text-center">
-                  <h2 className="text-base font-semibold text-white drop-shadow-md md:text-lg">{node.name}</h2>
+                <PlanetCardSphere node={node} className="!w-[min(50vw,180px)] !max-h-[28vh]" />
+                <div className="max-w-[min(88vw,260px)] text-center">
+                  <h2 className="text-sm font-semibold text-white drop-shadow-md md:text-base">{node.name}</h2>
                   {node.short_description ? (
                     <p className="mt-1 line-clamp-2 text-xs text-white/75 md:text-sm">{node.short_description}</p>
                   ) : null}
