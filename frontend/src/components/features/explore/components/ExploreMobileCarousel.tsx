@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { OrganizationNodeApi } from "@/types/organization";
+import { ExploreOrbitBackdrop } from "./ExploreOrbitBackdrop";
 import { PlanetCardSphere } from "./PlanetCardSphere";
 import {
   orbitAngleForSlot,
@@ -20,8 +21,9 @@ export interface ExploreMobileCarouselProps {
   initialNodeSlug?: string | null;
 }
 
-const RX_VW = 34;
-const RY_VW = 18;
+/** Orbite elliptique large (inspiré maquette : planètes latérales + profondeur verticale). */
+const RX_VW = 38;
+const RY_VW = 24;
 const SWIPE_SENS = 0.55;
 
 export function ExploreMobileCarousel({
@@ -164,13 +166,14 @@ export function ExploreMobileCarousel({
         role="region"
         aria-roledescription="carousel"
         aria-label={t("regionLabel")}
-        className="relative mx-auto mt-1 w-full min-h-0 flex-1 max-h-[min(52dvh,460px)]"
+        className="relative mx-auto mt-1 w-full min-h-0 flex-1 max-h-[min(56dvh,520px)]"
         style={{ touchAction: "pan-x" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
       >
+        <ExploreOrbitBackdrop />
         {/* Centre décoratif (option A du plan) */}
         <div
           className="pointer-events-none absolute left-1/2 top-[40%] z-[80] -translate-x-1/2 -translate-y-1/2"
@@ -190,15 +193,17 @@ export function ExploreMobileCarousel({
           const sinDepth = orbitSinDepth(angle);
           const dx = RX_VW * Math.cos(angle);
           const dy = RY_VW * Math.sin(angle);
-          const scale = orbitScaleForDepth(sinDepth, 0.4);
-          const blur = sinDepth < 0.12 ? orbitBlurForDepth(sinDepth, 4) : 0;
-          const opacity = orbitOpacityForDepth(sinDepth, 0.42);
+          const scale = orbitScaleForDepth(sinDepth, 0.3);
+          const blurRaw = orbitBlurForDepth(sinDepth, 5.5);
+          const blur = blurRaw > 0.35 ? blurRaw : 0;
+          const opacity = orbitOpacityForDepth(sinDepth, 0.32);
+          const emphasis = (sinDepth + 1) / 2;
           const z = orbitZIndex(sinDepth);
 
           return (
             <div
               key={node.id}
-              className="absolute left-1/2 top-[40%] w-[min(72vw,280px)] max-w-none -translate-x-1/2 -translate-y-1/2"
+              className="absolute left-1/2 top-[40%] w-[min(78vw,300px)] max-w-none -translate-x-1/2 -translate-y-1/2"
               style={{
                 zIndex: z,
                 transform: `translate(calc(-50% + ${dx.toFixed(2)}vw), calc(-50% + ${dy.toFixed(2)}vw)) scale(${scale.toFixed(3)})`,
@@ -212,13 +217,19 @@ export function ExploreMobileCarousel({
             >
               <button
                 type="button"
-                className="group flex w-full flex-col items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-2 py-3 shadow-lg shadow-black/35 backdrop-blur-sm transition-colors hover:bg-black/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
+                className="group flex w-full flex-col items-center gap-2 rounded-3xl border border-transparent bg-transparent px-1 py-2 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
                 onClick={() => onOpenPlanet(node)}
                 aria-label={t("openPlanet", { name: node.name })}
               >
-                <PlanetCardSphere node={node} className="!w-[min(50vw,180px)] !max-h-[28vh]" />
-                <div className="max-w-[min(88vw,260px)] text-center">
-                  <h2 className="text-sm font-semibold text-white drop-shadow-md md:text-base">{node.name}</h2>
+                <PlanetCardSphere
+                  node={node}
+                  emphasis={emphasis}
+                  className="!w-[min(42vw,168px)] !max-h-[26vh] md:!w-[min(38vw,176px)]"
+                />
+                <div className="max-w-[min(90vw,280px)] text-center">
+                  <h2 className="text-sm font-semibold tracking-tight text-white [text-shadow:0_1px_18px_rgba(0,0,0,0.75)] md:text-base">
+                    {node.name}
+                  </h2>
                   {node.short_description ? (
                     <p className="mt-1 line-clamp-2 text-xs text-white/75 md:text-sm">{node.short_description}</p>
                   ) : null}
@@ -230,8 +241,13 @@ export function ExploreMobileCarousel({
       </div>
 
       <div className="shrink-0 space-y-4 px-4 pt-2">
-        <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
-          <p className="text-center text-[10px] font-bold uppercase tracking-[0.25em] text-amber-200/90">
+        <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
+          <div className="flex justify-center">
+            <span className="rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">
+              {(activeNode.planet_type || "glass").replace(/-/g, " ").toUpperCase()}
+            </span>
+          </div>
+          <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-amber-200/90">
             {t("cardEyebrow")}
           </p>
           <p className="mt-1 line-clamp-2 text-center text-sm text-white/80">{activeNode.short_description || activeNode.name}</p>
