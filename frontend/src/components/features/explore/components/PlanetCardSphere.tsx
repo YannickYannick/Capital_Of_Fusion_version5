@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { OrganizationNodeApi } from "@/types/organization";
 import { getPlanetCarouselFlatImageUrl } from "@/lib/explorePlanetCarouselVisual";
 import { PlanetCarouselModelViewer } from "./PlanetCarouselModelViewer";
@@ -128,6 +129,12 @@ export function PlanetCardSphere({
         };
 
   const outerGlow = `0 0 ${glowPx}px rgba(${r},${g},${b},${glowAlpha}), 0 0 ${glowPx * 0.45}px rgba(${r},${g},${b},${glowAlpha * 0.6})`;
+  const insetSphereShade = `inset 0 -14px 28px rgba(0,0,0,0.35), inset 0 10px 22px rgba(255,255,255,0.12)`;
+  /** Pas de fond noir ni d’ombre intérieure sur GLB / image : le modèle ou la vignette remplit le disque. */
+  const mediaStyle: CSSProperties =
+    showGlb || showFlatImage
+      ? { boxShadow: outerGlow }
+      : { boxShadow: `${outerGlow}, ${insetSphereShade}` };
   const rotationPerSecond = `${Math.round(8 + e * 22)}deg`;
 
   return (
@@ -144,16 +151,18 @@ export function PlanetCardSphere({
       <div
         className={[
           "relative h-full w-full overflow-hidden rounded-full",
-          showFlatImage || showGlb ? "bg-zinc-950/80 ring-1 ring-white/25" : "ring-1 ring-white/30",
+          showFlatImage || showGlb
+            ? "bg-transparent ring-1 ring-white/20"
+            : "ring-1 ring-white/30",
         ].join(" ")}
         style={{
-          boxShadow: `${outerGlow}, inset 0 -14px 28px rgba(0,0,0,0.35), inset 0 10px 22px rgba(255,255,255,0.12)`,
+          ...mediaStyle,
           ...sphereBg,
         }}
       >
         {showGradient ? <PlanetPatternOverlay planetType={planetType} /> : null}
         {showGlb && glbUrl ? (
-          <div className="relative z-[1] h-[92%] w-[92%] overflow-hidden rounded-full">
+          <div className="relative z-[1] h-full w-full overflow-hidden rounded-full">
             <PlanetCarouselModelViewer
               src={glbUrl}
               poster={flatUrl}
@@ -168,7 +177,7 @@ export function PlanetCardSphere({
             src={flatUrl}
             alt=""
             loading="lazy"
-            className="relative z-[1] m-auto h-[86%] w-[86%] rounded-full object-contain"
+            className="relative z-[1] h-full w-full rounded-full object-contain"
           />
         ) : null}
       </div>

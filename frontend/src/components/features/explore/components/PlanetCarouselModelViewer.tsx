@@ -35,12 +35,12 @@ export function PlanetCarouselModelViewer({
 
   if (!ready) {
     return (
-      <div className={`relative h-full w-full overflow-hidden rounded-full bg-zinc-900/90 ${className}`}>
+      <div className={`relative h-full w-full overflow-hidden rounded-full bg-transparent ${className}`}>
         {poster ? (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+          <img src={poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-50" />
         ) : null}
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/10 to-transparent" />
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/[0.07] to-transparent" />
       </div>
     );
   }
@@ -55,10 +55,15 @@ export function PlanetCarouselModelViewer({
     "rotation-per-second": rotationPerSecond,
     "shadow-intensity": "0",
     exposure: "1.05",
+    /** Réduit la zone « vide » autour du mesh dans le cercle. */
+    "field-of-view": "28deg",
     "interaction-prompt": "none",
     "touch-action": "none",
     tabIndex: -1,
     className: `h-full w-full bg-transparent ${className}`,
-    style: { pointerEvents: "none" as const },
+    style: {
+      pointerEvents: "none" as const,
+      backgroundColor: "transparent",
+    },
   });
 }
