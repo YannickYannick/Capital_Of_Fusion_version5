@@ -602,11 +602,19 @@
       "emptyFaq": "Aucune question fréquente pour le moment."
     },
     "mobileCarousel": {
-      "hint": "Glissez pour explorer, touchez une carte pour ouvrir",
+      "hint": "Glissez horizontalement, utilisez les flèches ou les points pour changer de planète.",
       "empty": "Aucune planète à afficher.",
       "regionLabel": "Carrousel des planètes",
       "openPlanet": "Ouvrir {name}",
-      "slideStatus": "{name}, carte {index} sur {total}"
+      "slideStatus": "{name}, carte {index} sur {total}",
+      "centerLabel": "Explorer",
+      "cardEyebrow": "À la une",
+      "prev": "Planète précédente",
+      "next": "Planète suivante",
+      "open": "Ouvrir",
+      "openCta": "Ouvrir {name}",
+      "dotsLabel": "Pagination du carrousel",
+      "dotLabel": "Aller à {name} (carte {index})"
     },
     "video": {
       "enableSound": "Activer le son",

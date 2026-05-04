@@ -602,11 +602,19 @@
       "emptyFaq": "No FAQ items yet."
     },
     "mobileCarousel": {
-      "hint": "Swipe to explore, tap a card to open",
+      "hint": "Swipe horizontally, use the arrows or dots to change planet.",
       "empty": "No planets to show.",
       "regionLabel": "Planet carousel",
       "openPlanet": "Open {name}",
-      "slideStatus": "{name}, card {index} of {total}"
+      "slideStatus": "{name}, card {index} of {total}",
+      "centerLabel": "Explore",
+      "cardEyebrow": "Featured",
+      "prev": "Previous planet",
+      "next": "Next planet",
+      "open": "Open",
+      "openCta": "Open {name}",
+      "dotsLabel": "Carousel pagination",
+      "dotLabel": "Go to {name} (card {index})"
     },
     "video": {
       "enableSound": "Enable sound",
