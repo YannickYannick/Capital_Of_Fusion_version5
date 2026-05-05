@@ -32,12 +32,8 @@ const SWIPE_SENS = 0.72;
 /** Déplacement horizontal (px) au-delà duquel on considère un swipe (pas un tap). */
 const SWIPE_PX_THRESHOLD = 14;
 
-/** Distance sur l’anneau (indices) entre deux places — pour limiter le nombre de GLB actifs. */
-function carouselRingDistance(index: number, focus: number, total: number): number {
-  if (total <= 0) return 0;
-  const d = Math.abs(index - focus);
-  return Math.min(d, total - d);
-}
+/** Facteur appliqué aux tailles d’affichage des planètes (réduction demandée ÷ 1,2). */
+const PLANET_VISUAL_SCALE = 1 / 1.2;
 
 export function ExploreMobileCarousel({
   nodes,
@@ -185,7 +181,7 @@ export function ExploreMobileCarousel({
   const enableCssTransition = !isDragging;
 
   return (
-    <div className="absolute inset-0 flex flex-col justify-between overflow-hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="absolute inset-0 flex min-h-0 flex-col overflow-hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {t("slideStatus", {
           name: activeNode?.name ?? "",
@@ -199,34 +195,35 @@ export function ExploreMobileCarousel({
         aria-roledescription="carousel"
         aria-label={t("regionLabel")}
         tabIndex={0}
-        className="relative mx-auto mt-1 flex w-full min-h-0 flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 max-h-[min(56dvh,520px)]"
+        className="relative mx-auto flex min-h-0 w-full flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
         style={{ touchAction: "none" }}
         onPointerDownCapture={onPointerDownCapture}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
         onPointerCancel={endPointer}
       >
-        <div className="relative min-h-[12rem] flex-1">
+        <div className="relative min-h-0 flex-1">
+          <div className="absolute inset-0 flex items-center justify-center px-2">
+            <div className="relative aspect-[5/4] w-[min(92vw,400px)] max-h-[min(52dvh,340px)] min-h-[min(44vw,220px)]">
         {displayNodes.map((node, i) => {
           const angle = orbitAngleForSlot(i, focusFloat, n);
           const sinDepth = orbitSinDepth(angle);
           const dx = RX_VW * Math.cos(angle);
           const dy = RY_VW * Math.sin(angle);
-          const scale = orbitScaleForDepth(sinDepth, 0.3);
+          const scale = orbitScaleForDepth(sinDepth, 0.3) * PLANET_VISUAL_SCALE;
           const blurRaw = orbitBlurForDepth(sinDepth, 5.5);
           const blur = blurRaw > 0.35 ? blurRaw : 0;
           const opacity = orbitOpacityForDepth(sinDepth, 0.32);
           const emphasis = (sinDepth + 1) / 2;
           const z = orbitZIndex(sinDepth);
-          const loadGlbPreview = carouselRingDistance(i, previewIndex, n) <= 1;
 
           return (
             <div
               key={node.id}
-              className="absolute left-1/2 top-[40%] w-[min(78vw,300px)] max-w-none -translate-x-1/2 -translate-y-1/2"
+              className="absolute left-1/2 top-1/2 w-[min(65vw,250px)] max-w-none -translate-x-1/2 -translate-y-1/2"
               style={{
                 zIndex: z,
-                transform: `translate(calc(-50% + ${dx.toFixed(2)}vw), calc(-50% + ${dy.toFixed(2)}vw)) scale(${scale.toFixed(3)})`,
+                transform: `translate(calc(-50% + ${(dx * PLANET_VISUAL_SCALE).toFixed(2)}vw), calc(-50% + ${(dy * PLANET_VISUAL_SCALE).toFixed(2)}vw)) scale(${scale.toFixed(4)})`,
                 opacity,
                 filter: blur > 0.4 ? `blur(${blur.toFixed(2)}px)` : undefined,
                 transitionProperty: enableCssTransition ? "transform, opacity, filter" : "none",
@@ -237,7 +234,7 @@ export function ExploreMobileCarousel({
             >
               <button
                 type="button"
-                className="group flex w-full flex-col items-center gap-2 rounded-3xl border border-transparent bg-transparent px-1 py-2 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
+                className="group flex w-full flex-col items-center rounded-3xl border border-transparent bg-transparent px-1 py-1 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
                 onClick={() => {
                   if (suppressPlanetTapRef.current) {
                     suppressPlanetTapRef.current = false;
@@ -250,21 +247,15 @@ export function ExploreMobileCarousel({
                 <PlanetCardSphere
                   node={node}
                   emphasis={emphasis}
-                  loadGlbPreview={loadGlbPreview}
-                  className="!w-[min(42vw,168px)] !max-h-[26vh] md:!w-[min(38vw,176px)]"
+                  loadGlbPreview
+                  className="!w-[min(35vw,140px)] !max-h-[22vh] md:!w-[min(31.7vw,147px)]"
                 />
-                <div className="max-w-[min(90vw,280px)] text-center">
-                  <h2 className="text-sm font-semibold tracking-tight text-white [text-shadow:0_1px_18px_rgba(0,0,0,0.75)] md:text-base">
-                    {node.name}
-                  </h2>
-                  {node.short_description ? (
-                    <p className="mt-1 line-clamp-2 text-xs text-white/75 md:text-sm">{node.short_description}</p>
-                  ) : null}
-                </div>
               </button>
             </div>
           );
         })}
+            </div>
+          </div>
         </div>
 
         <div className="mx-auto mt-2 w-full max-w-md shrink-0 px-4 pb-1">

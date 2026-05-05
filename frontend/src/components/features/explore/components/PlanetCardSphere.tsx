@@ -89,7 +89,7 @@ export interface PlanetCardSphereProps {
   className?: string;
   /** 0 = arrière-plan, 1 = premier plan — intensifie le bloom. */
   emphasis?: number;
-  /** Si vrai et noeud GLB : charge le fichier `model_3d` (coûteux — réservé au focus ± 1). */
+  /** Si vrai et noeud GLB : charge le fichier `model_3d` (tous affichés dans le carrousel mobile). */
   loadGlbPreview?: boolean;
 }
 
@@ -139,7 +139,7 @@ export function PlanetCardSphere({
 
   return (
     <div
-      className={`relative flex aspect-square w-[min(48vw,188px)] max-h-[30vh] items-center justify-center ${className}`}
+      className={`relative flex aspect-square w-[min(40vw,156px)] max-h-[25vh] items-center justify-center ${className}`}
     >
       <div
         aria-hidden
