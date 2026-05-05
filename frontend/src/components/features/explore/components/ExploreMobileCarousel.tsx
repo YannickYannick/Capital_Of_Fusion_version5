@@ -225,8 +225,8 @@ export function ExploreMobileCarousel({
           onPointerUp={endPointer}
           onPointerCancel={endPointer}
         >
-          {/* Réserve basse pour le dock ; pas de px horizontal pour éviter tout biais latéral. Offsets orbite en px (vw→px) pour éviter le mélange % / vw dans `transform`. */}
-          <div className="flex h-full w-full min-h-0 items-center justify-center px-0 pb-[min(38vh,280px)] pt-2">
+          {/* Centrage vertical sur toute la hauteur de l’écran : pas de réserve basse en padding (celle-ci remontait le groupe). Le dock bas reste en overlay z-10. */}
+          <div className="flex h-full w-full min-h-0 items-center justify-center px-0 py-0">
             <div className="relative mx-auto aspect-[5/4] w-[min(92vw,400px)] max-h-[min(56dvh,380px)] min-h-[min(40vw,200px)]">
         {displayNodes.map((node, i) => {
           const angle = orbitAngleForSlot(i, focusFloat, n);
