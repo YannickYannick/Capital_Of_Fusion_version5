@@ -109,6 +109,7 @@ class OrganizationNodeSerializer(serializers.ModelSerializer):
             "entry_start_z",
             "entry_speed",
             "is_visible_3d",
+            "explore_order",
             "node_events",
         )
 
@@ -164,6 +165,7 @@ class OrganizationNodeLightSerializer(serializers.ModelSerializer):
             "entry_start_z",
             "entry_speed",
             "is_visible_3d",
+            "explore_order",
             "node_events",
         )
 

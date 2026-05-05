@@ -85,6 +85,7 @@
 | [2026-05-02] Completed Task | Explore mobile — centrage orbite (suivi) | `ExploreMobileCarousel.tsx` : suppression `ref` inutilisé ; `vw`→px basé sur `document.documentElement.clientWidth` (aligné sur l’unité CSS `vw`) + `useLayoutEffect` pour le 1er paint. |
 | [2026-05-02] Completed Task | Explore mobile — centrage planètes (correctif réel) | Cause : wrap `w-[65vw]` + bouton `inline-flex` aligné à gauche → `translate(-50%)` centrait la boîte vide, pas la sphère. Fix : `w-max max-w-[…]` + `transformOrigin`. `PlanetCardSphere` : highlights radial symétriques en X (évite biais visuel gauche). |
 | [2026-05-05] Completed Task | Explore mobile — orbite centrée sur l’axe vertical écran | `ExploreMobileCarousel` : suppression `pb-[38vh]` sur le flex de centrage (le dock est overlay) pour placer le centre de l’orbite au milieu vertical. |
-| [2026-05-05] Completed Task | OrganizationNode — ordre Explore | Champ `explore_order` (PositiveSmallIntegerField), migration `0008`, API `GET /api/organization/nodes/` triée par `explore_order`, `created_at`, `name` ; serializers + `PATCH` admin ; admin list editable + fieldset ; type TS `explore_order` ; `03-api_docs.md`. |
+| [2026-05-05] Completed Task | Page /artistes — perf (Cloudinary + SSR) | `cloudinaryImage.ts` (c_fill,w,f_auto,q_auto) ; `ArtistCard` sans `unoptimized` Cloudinary ; liste en Server Component + `getArtistsForArtistsPage` (revalidate 120s) + `ArtistesPageClient` ; refresh admin garde `getArtists` no-store. |
+| [2026-05-05] Completed Task | OrganizationNode — ordre Explore | Champ `explore_order`, migration `0008`, API triée ; serializers + PATCH admin ; admin list editable ; type TS ; `03-api_docs.md`. |
 
 *Dernière mise à jour : 2026-05-05*

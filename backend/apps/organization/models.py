@@ -209,6 +209,11 @@ class OrganizationNode(BaseModel):
         default=True,
         help_text="Afficher cette planète dans la scène 3D"
     )
+    explore_order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name="Ordre Explore / carrousel",
+        help_text="Plus la valeur est petite, plus le nœud apparaît tôt dans l’API /explore et le carrousel mobile. À égalité, tri par date de création.",
+    )
 
     # Musique de fond (overlay) — prend le pas sur la vidéo d'accueil quand l'overlay est ouvert. Configurable uniquement en admin.
     MUSIC_TYPE_CHOICES = (

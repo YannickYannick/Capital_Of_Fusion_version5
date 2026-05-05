@@ -174,7 +174,7 @@
 
 | Méthode | URL | Description |
 |--------|-----|-------------|
-| GET | `/api/organization/nodes/` | Liste des noeuds visibles en 3D (`is_visible_3d=True`), avec paramètres 3D et `node_events`. |
+| GET | `/api/organization/nodes/` | Liste des noeuds visibles en 3D (`is_visible_3d=True`), avec paramètres 3D et `node_events`. **Tri :** `explore_order` croissant, puis `created_at`, puis `name`. |
 | GET | `/api/organization/nodes/<slug>/` | Détail d’un noeud par slug (pour overlay). |
 
 ---

@@ -58,7 +58,7 @@ class OrganizationNodeListAPIView(APIView):
                 OrganizationNode.objects.all()
                 .select_related("parent")
                 .prefetch_related("node_events")
-                .order_by("created_at")
+                .order_by("explore_order", "created_at", "name")
             )
             serializer_class = OrganizationNodeSerializer
         else:
@@ -76,7 +76,7 @@ class OrganizationNodeListAPIView(APIView):
                     "music_youtube_url",
                     "music_file",
                 )
-                .order_by("created_at")
+                .order_by("explore_order", "created_at", "name")
             )
             serializer_class = OrganizationNodeLightSerializer
 
@@ -174,6 +174,7 @@ class OrganizationNodeAdminDetailAPIView(APIView):
             "orbit_position_y",
             "orbit_roundness",
         )
+        int_fields = ("explore_order",)
         bool_fields = ("is_visible_3d",)
 
         def build_payload_dict(for_pending: bool):
@@ -185,6 +186,12 @@ class OrganizationNodeAdminDetailAPIView(APIView):
                 if f in plain:
                     try:
                         payload[f] = float(plain[f])
+                    except (TypeError, ValueError):
+                        pass
+            for f in int_fields:
+                if f in plain:
+                    try:
+                        payload[f] = int(plain[f])
                     except (TypeError, ValueError):
                         pass
             for f in bool_fields:
@@ -210,6 +217,15 @@ class OrganizationNodeAdminDetailAPIView(APIView):
                 if f in plain:
                     try:
                         setattr(node, f, float(plain[f]))
+                    except (TypeError, ValueError):
+                        pass
+            for f in int_fields:
+                if f in plain:
+                    try:
+                        v = int(plain[f])
+                        if v < 0:
+                            continue
+                        setattr(node, f, v)
                     except (TypeError, ValueError):
                         pass
             for f in bool_fields:

@@ -49,6 +49,8 @@ export interface OrganizationNodeApi {
   entry_start_z: number | null;
   entry_speed: number | null;
   is_visible_3d: boolean;
+  /** Ordre d’affichage API /explore et carrousel mobile (plus petit = plus tôt). */
+  explore_order: number;
   node_events: NodeEventApi[];
   /** Musique de fond (overlay) — configurable en admin uniquement */
   music_type?: "" | "youtube" | "file";

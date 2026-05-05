@@ -926,6 +926,7 @@ export async function logout(): Promise<void> {
 
 /**
  * Liste des artistes. GET /api/users/artists/
+ * Côté client ou refresh admin : pas de cache (données à jour).
  */
 export async function getArtists(staffOnly?: boolean): Promise<ArtistApi[]> {
   const base = getApiBaseUrl();
@@ -936,6 +937,35 @@ export async function getArtists(staffOnly?: boolean): Promise<ArtistApi[]> {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Artists API error: ${res.status}`);
   return res.json();
+}
+
+/** Revalidation ISR pour la page /artistes (Server Components). */
+const ARTISTS_PAGE_REVALIDATE_SEC = 120;
+
+/**
+ * Même endpoint que getArtists, avec cache Next (réduction waterfall + cold start perçu).
+ * Réservé au rendu serveur de la page liste artistes.
+ */
+export async function getArtistsForArtistsPage(): Promise<{
+  artists: ArtistApi[];
+  error: string | null;
+}> {
+  const base = getApiBaseUrl();
+  try {
+    const res = await fetch(`${base}/api/users/artists/`, {
+      next: { revalidate: ARTISTS_PAGE_REVALIDATE_SEC },
+    });
+    if (!res.ok) {
+      return { error: `Artists API error: ${res.status}`, artists: [] };
+    }
+    const artists = (await res.json()) as ArtistApi[];
+    return { artists, error: null };
+  } catch (e) {
+    return {
+      error: e instanceof Error ? e.message : "Erreur réseau",
+      artists: [],
+    };
+  }
 }
 
 /**

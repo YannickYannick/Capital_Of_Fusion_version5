@@ -25,10 +25,12 @@ class NodeEventInline(admin.TabularInline):
 
 @admin.register(OrganizationNode)
 class OrganizationNodeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'parent', 'slug', 'is_visible_3d', 'events_count')
-    list_filter = ('type', 'is_visible_3d', 'planet_type')
+    list_display = ("name", "type", "parent", "slug", "explore_order", "is_visible_3d", "events_count")
+    list_filter = ("type", "is_visible_3d", "planet_type")
+    list_editable = ("explore_order",)
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name', 'slug', 'description', 'short_description']
+    ordering = ("explore_order", "created_at", "name")
     inlines = [NodeEventInline]
     
     fieldsets = [
@@ -47,6 +49,7 @@ class OrganizationNodeAdmin(admin.ModelAdmin):
         ('Configuration 3D', {
             'fields': [
                 'is_visible_3d',
+                'explore_order',
                 'visual_source',
                 'planet_type', 
                 ('model_3d', 'planet_texture'),
@@ -57,7 +60,7 @@ class OrganizationNodeAdmin(admin.ModelAdmin):
                 'rotation_speed',
             ],
             'classes': ['collapse'],
-            'description': 'Paramètres de visualisation 3D pour la page /explore'
+            'description': 'Paramètres de visualisation 3D pour la page /explore. Ordre Explore : position dans l’API et le carrousel mobile (plus petit = plus tôt).'
         }),
         ('Animation d\'Entrée', {
             'fields': [

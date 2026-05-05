@@ -4,6 +4,7 @@ import { memo } from "react";
 import { ArtistApi } from "@/types/user";
 import { AdminEditButton } from "@/components/shared/AdminEditButton";
 import { getApiBaseUrl } from "@/lib/api";
+import { cloudinaryCardImageUrl } from "@/lib/cloudinaryImage";
 
 function resolveArtistPhotoUrl(url: string | null | undefined): string {
     if (!url) return "/images/placeholder-artist.jpg";
@@ -13,8 +14,21 @@ function resolveArtistPhotoUrl(url: string | null | undefined): string {
     return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-const ArtistCard = memo(function ArtistCard({ artist, priority = false }: { artist: ArtistApi; priority?: boolean }) {
-    const photoUrl = resolveArtistPhotoUrl(artist.profile_picture);
+const ArtistCard = memo(function ArtistCard({
+    artist,
+    priority = false,
+    /** Largeur max Cloudinary (c_fill) + budget pour Next/Image ; grille ~25vw ×2 rétine. */
+    imageWidth = 560,
+}: {
+    artist: ArtistApi;
+    priority?: boolean;
+    imageWidth?: number;
+}) {
+    const rawUrl = resolveArtistPhotoUrl(artist.profile_picture);
+    const photoUrl =
+        rawUrl.includes("res.cloudinary.com") && rawUrl.includes("/image/upload/")
+            ? cloudinaryCardImageUrl(rawUrl, imageWidth)
+            : rawUrl;
     const fullName = `${artist.first_name || ""} ${artist.last_name || ""}`.trim() || artist.username;
 
     return (
@@ -34,10 +48,10 @@ const ArtistCard = memo(function ArtistCard({ artist, priority = false }: { arti
                         className="object-cover transition-transform group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         priority={priority}
+                        /* Cloudinary : vignettes déjà rognées via cloudinaryCardImageUrl ; Next optimise format/tailles. */
                         unoptimized={
                             photoUrl.includes("localhost") ||
-                            photoUrl.includes("127.0.0.1") ||
-                            photoUrl.includes("res.cloudinary.com")
+                            photoUrl.includes("127.0.0.1")
                         }
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
