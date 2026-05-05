@@ -8,6 +8,8 @@ import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
 import { getFaqItems, patchOrganizationNode, type FaqItemApi } from "@/lib/api";
 import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanceTicketsEmbed";
 import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
+import { OverlayArtistsGrid } from "./OverlayArtistsGrid";
+import { OverlayIdentityAdnSection } from "./OverlayIdentityAdnSection";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -165,6 +167,66 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     if (cta === "/festival/notre-programme") return true;
     const slug = (node.slug || "").toLowerCase();
     return slug.includes("notre-programme") || slug.includes("notre_programme");
+  }, [node]);
+
+  /** Planète « Nos artistes » : annuaire API + CTA vers /artistes (plus de « à venir » / placeholder description). */
+  const isOurArtistsNode = useMemo(() => {
+    if (!node) return false;
+    const slug = (node.slug || "").toLowerCase();
+    const name = (node.name || "").toLowerCase();
+    const cta = (node.cta_url || "").trim().replace(/\/$/, "");
+    if (cta === "/artistes" || cta === "/artistes/annuaire") return true;
+    const slugHits = [
+      "nos-artistes",
+      "nos_artistes",
+      "our-artists",
+      "our_artists",
+      "artistes-cof",
+    ];
+    if (slugHits.some((h) => slug === h || slug.endsWith(`-${h}`) || slug.startsWith(`${h}-`)))
+      return true;
+    if (
+      name.includes("nos artistes") ||
+      name.includes("our artists") ||
+      name.includes("nuestros artistas") ||
+      name.includes("nos artistas")
+    )
+      return true;
+    return false;
+  }, [node]);
+
+  /** Planète « Our Identity » / ADN — même markdown que `/identite-cof/adn-du-festival`. */
+  const isIdentityAdnNode = useMemo(() => {
+    if (!node) return false;
+    const slug = (node.slug || "").toLowerCase();
+    const name = (node.name || "").toLowerCase();
+    const cta = (node.cta_url || "").trim().replace(/\/$/, "");
+    if (cta === "/identite-cof/adn-du-festival") return true;
+    const slugHints = [
+      "our-identity",
+      "our_identity",
+      "identite-cof",
+      "identite_cof",
+      "adn-du-festival",
+      "adn_du_festival",
+      "identite-adn",
+      "identity-cof",
+      "identite-adn-festival",
+    ];
+    if (slugHints.some((h) => slug === h || slug.endsWith(`-${h}`) || slug.startsWith(`${h}-`)))
+      return true;
+    if (
+      name.includes("our identity") ||
+      name.includes("notre identité") ||
+      name.includes("notre identite") ||
+      (name.includes("identity") && name.includes("our")) ||
+      name.includes("adn du festival") ||
+      name.includes("identité cof") ||
+      name.includes("identite cof") ||
+      name.includes("nuestra identidad")
+    )
+      return true;
+    return false;
   }, [node]);
 
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
@@ -330,6 +392,30 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         <span className="text-xl">🏨</span>
                         <span>{t("overlay.bookHotel")}</span>
                       </Link>
+                    ) : isFaqNode ? (
+                      <Link
+                        href="/support/faq"
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                      >
+                        <span className="text-xl">❓</span>
+                        <span>{t("overlay.openFaqFullPage")}</span>
+                      </Link>
+                    ) : isIdentityAdnNode ? (
+                      <Link
+                        href="/identite-cof/adn-du-festival"
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                      >
+                        <span className="text-xl">✨</span>
+                        <span>{t("overlay.openIdentityFullPage")}</span>
+                      </Link>
+                    ) : isOurArtistsNode ? (
+                      <Link
+                        href="/artistes"
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                      >
+                        <span className="text-xl">🎤</span>
+                        <span>{t("overlay.browseArtists")}</span>
+                      </Link>
                     ) : node.cta_url ? (
                       node.cta_url.startsWith("/") ? (
                         <Link
@@ -490,6 +576,15 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                       ))}
                     </div>
                   )}
+
+                  <div className="mt-6 flex justify-center">
+                    <Link
+                      href="/support/faq"
+                      className="text-sm font-semibold text-[#f3ac41] underline-offset-4 hover:underline"
+                    >
+                      {t("overlay.openFaqFullPage")}
+                    </Link>
+                  </div>
                 </div>
               )}
 
@@ -499,8 +594,31 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                 </div>
               )}
 
-              {/* Bouton "Modifier" visible pour staff même sans description (ouvre le formulaire) */}
-              {canEditDescriptions && !node.description && !showEditForm && (
+              {isIdentityAdnNode && !showEditForm && (
+                <div className="border-t border-white/10 px-5 md:px-8 py-6">
+                  <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-white/50">
+                    {t("overlay.identityAdnSectionTitle")}
+                  </h2>
+                  <OverlayIdentityAdnSection />
+                </div>
+              )}
+
+              {isOurArtistsNode && !showEditForm && (
+                <div className="border-t border-white/10 px-5 md:px-8 py-6">
+                  <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-white/50">
+                    {t("overlay.artistsRoster")}
+                  </h2>
+                  <OverlayArtistsGrid />
+                </div>
+              )}
+
+              {/* Bouton description : masqué quand le contenu vient d’une page dédiée (artistes, identité, FAQ…) */}
+              {canEditDescriptions &&
+                !node.description &&
+                !showEditForm &&
+                !isOurArtistsNode &&
+                !isIdentityAdnNode &&
+                !isFaqNode && (
                 <div className="border-t border-white/10 px-8 py-6">
                   <button
                     type="button"

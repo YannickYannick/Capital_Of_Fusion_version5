@@ -274,7 +274,7 @@ export function Navbar() {
         {
           id: "o-artistes",
           name: t("menu.ourArtists"),
-          url: "/artistes/annuaire",
+          url: "/artistes",
           slug: "",
           icon: "",
           order: 0,

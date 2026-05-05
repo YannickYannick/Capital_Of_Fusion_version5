@@ -181,7 +181,7 @@ export function ExploreMobileCarousel({
   const enableCssTransition = !isDragging;
 
   return (
-    <div className="absolute inset-0 flex min-h-0 flex-col overflow-hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="absolute inset-0 flex min-h-0 flex-col overflow-hidden">
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {t("slideStatus", {
           name: activeNode?.name ?? "",
@@ -189,22 +189,24 @@ export function ExploreMobileCarousel({
           total: n,
         })}
       </p>
-      <div
-        ref={swipeZoneRef}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={t("regionLabel")}
-        tabIndex={0}
-        className="relative mx-auto flex min-h-0 w-full flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
-        style={{ touchAction: "none" }}
-        onPointerDownCapture={onPointerDownCapture}
-        onPointerMove={onPointerMove}
-        onPointerUp={endPointer}
-        onPointerCancel={endPointer}
-      >
-        <div className="relative min-h-0 flex-1">
-          <div className="absolute inset-0 flex items-center justify-center px-2">
-            <div className="relative aspect-[5/4] w-[min(92vw,400px)] max-h-[min(52dvh,340px)] min-h-[min(44vw,220px)]">
+      {/* Zone relative pleine hauteur : l’orbite se centre dans tout l’écran Explore ; le dock bas est en overlay (ne réduit plus la zone de centrage). */}
+      <div className="relative min-h-0 w-full flex-1">
+        <div
+          ref={swipeZoneRef}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label={t("regionLabel")}
+          tabIndex={0}
+          className="absolute inset-0 z-0 mx-auto outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+          style={{ touchAction: "none" }}
+          onPointerDownCapture={onPointerDownCapture}
+          onPointerMove={onPointerMove}
+          onPointerUp={endPointer}
+          onPointerCancel={endPointer}
+        >
+          {/* Réserve basse ≈ pilule + contrôles pour que le centre de l’ellipse reste au milieu du viewport (pas coincé sous le header). */}
+          <div className="flex h-full w-full min-h-0 items-center justify-center px-2 pb-[min(38vh,280px)] pt-2">
+            <div className="relative aspect-[5/4] w-[min(92vw,400px)] max-h-[min(56dvh,380px)] min-h-[min(40vw,200px)]">
         {displayNodes.map((node, i) => {
           const angle = orbitAngleForSlot(i, focusFloat, n);
           const sinDepth = orbitSinDepth(angle);
@@ -258,16 +260,16 @@ export function ExploreMobileCarousel({
           </div>
         </div>
 
-        <div className="mx-auto mt-2 w-full max-w-md shrink-0 px-4 pb-1">
-          <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
-            <p className="text-center text-base font-semibold tracking-tight text-white [text-shadow:0_1px_14px_rgba(0,0,0,0.65)]">
-              {activeNode.name}
-            </p>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+          <div className="pointer-events-auto w-full max-w-md">
+            <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
+              <p className="text-center text-base font-semibold tracking-tight text-white [text-shadow:0_1px_14px_rgba(0,0,0,0.65)]">
+                {activeNode.name}
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="shrink-0 space-y-4 px-4 pt-2">
+          <div className="pointer-events-auto w-full max-w-md space-y-4">
         <div className="flex items-center justify-center gap-3">
           <button
             type="button"
@@ -317,6 +319,8 @@ export function ExploreMobileCarousel({
               />
             );
           })}
+        </div>
+          </div>
         </div>
       </div>
     </div>
