@@ -47,6 +47,8 @@ export function ExploreMobileCarousel({
     [nodes, reversePlanetOrder]
   );
   const swipeZoneRef = useRef<HTMLDivElement>(null);
+  /** Largeur viewport pour convertir RX/RY (historiquement en vw) en px — même référence que le navigateur pour les `vw`. */
+  const [vwPx, setVwPx] = useState(390);
   const [focusIndex, setFocusIndex] = useState(0);
   /** Décalage fractionnaire pendant le drag (positif = focus avance). */
   const [dragOffset, setDragOffset] = useState(0);
@@ -64,6 +66,25 @@ export function ExploreMobileCarousel({
   useEffect(() => {
     dragOffsetRef.current = dragOffset;
   }, [dragOffset]);
+
+  useLayoutEffect(() => {
+    /** Même référence que l’unité CSS `vw` (viewport de mise en page, pas `visualViewport`). */
+    const readVwBasePx = () => {
+      if (typeof document === "undefined") return 390;
+      const w = document.documentElement?.clientWidth;
+      return Math.round(
+        typeof w === "number" && w > 0 ? w : typeof window !== "undefined" ? window.innerWidth : 390
+      );
+    };
+    const update = () => setVwPx(readVwBasePx());
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, []);
 
   const n = displayNodes.length;
   const focusFloat = n > 0 ? focusIndex + dragOffset : 0;
@@ -204,14 +225,16 @@ export function ExploreMobileCarousel({
           onPointerUp={endPointer}
           onPointerCancel={endPointer}
         >
-          {/* Réserve basse ≈ pilule + contrôles pour que le centre de l’ellipse reste au milieu du viewport (pas coincé sous le header). */}
-          <div className="flex h-full w-full min-h-0 items-center justify-center px-2 pb-[min(38vh,280px)] pt-2">
-            <div className="relative aspect-[5/4] w-[min(92vw,400px)] max-h-[min(56dvh,380px)] min-h-[min(40vw,200px)]">
+          {/* Réserve basse pour le dock ; pas de px horizontal pour éviter tout biais latéral. Offsets orbite en px (vw→px) pour éviter le mélange % / vw dans `transform`. */}
+          <div className="flex h-full w-full min-h-0 items-center justify-center px-0 pb-[min(38vh,280px)] pt-2">
+            <div className="relative mx-auto aspect-[5/4] w-[min(92vw,400px)] max-h-[min(56dvh,380px)] min-h-[min(40vw,200px)]">
         {displayNodes.map((node, i) => {
           const angle = orbitAngleForSlot(i, focusFloat, n);
           const sinDepth = orbitSinDepth(angle);
-          const dx = RX_VW * Math.cos(angle);
-          const dy = RY_VW * Math.sin(angle);
+          const dxPx =
+            (RX_VW / 100) * vwPx * PLANET_VISUAL_SCALE * Math.cos(angle);
+          const dyPx =
+            (RY_VW / 100) * vwPx * PLANET_VISUAL_SCALE * Math.sin(angle);
           const scale = orbitScaleForDepth(sinDepth, 0.3) * PLANET_VISUAL_SCALE;
           const blurRaw = orbitBlurForDepth(sinDepth, 5.5);
           const blur = blurRaw > 0.35 ? blurRaw : 0;
@@ -222,10 +245,10 @@ export function ExploreMobileCarousel({
           return (
             <div
               key={node.id}
-              className="absolute left-1/2 top-1/2 w-[min(65vw,250px)] max-w-none -translate-x-1/2 -translate-y-1/2"
+              className="absolute left-1/2 top-1/2 w-[min(65vw,250px)] max-w-none"
               style={{
                 zIndex: z,
-                transform: `translate(calc(-50% + ${(dx * PLANET_VISUAL_SCALE).toFixed(2)}vw), calc(-50% + ${(dy * PLANET_VISUAL_SCALE).toFixed(2)}vw)) scale(${scale.toFixed(4)})`,
+                transform: `translate(calc(-50% + ${dxPx.toFixed(2)}px), calc(-50% + ${dyPx.toFixed(2)}px)) scale(${scale.toFixed(4)})`,
                 opacity,
                 filter: blur > 0.4 ? `blur(${blur.toFixed(2)}px)` : undefined,
                 transitionProperty: enableCssTransition ? "transform, opacity, filter" : "none",

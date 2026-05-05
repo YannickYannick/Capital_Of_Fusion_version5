@@ -82,5 +82,6 @@
 | [2026-05-03] Completed Task | Admin Django — Notre programme | `admin.py` : fieldset dédié + description (tabs FR/EN/ES, repli Next si vide). `models.py` : help_text champ. Migrations `0028_seed_festival_notre_programme_markdown` (sidecars `.md` depuis messages) + `0029_alter_notre_programme_help_text`. |
 | [2026-05-03] Completed Task | Notre programme — Markdown repliable | `EditableConfigMarkdownPage` : prop `collapsibleMarkdown` (bouton + `aria-expanded`, région). Page `notre-programme` + `FestivalEditorialNode` ; clés i18n `expandMarkdownDetails` / `collapseMarkdownDetails` (fr/en/es). |
 | [2026-05-02] Completed Task | Explore carrousel elliptique — commit + push V2 | Commit `5f83f70` sur `main` (5 fichiers : `exploreOrbitLayout.ts`, `ExploreMobileCarousel.tsx`, messages fr/en/es). Cherry-pick `9962a0f` sur `amelioration-experience-mobile-V2` ; `git push origin amelioration-experience-mobile-V2` (c741403..9962a0f). WIP restant en stash (`wip fichiers restants`, etc.). |
+| [2026-05-02] Completed Task | Explore mobile — centrage orbite (suivi) | `ExploreMobileCarousel.tsx` : suppression `ref` inutilisé ; `vw`→px basé sur `document.documentElement.clientWidth` (aligné sur l’unité CSS `vw`) + `useLayoutEffect` pour le 1er paint. |
 
 *Dernière mise à jour : 2026-05-02*
