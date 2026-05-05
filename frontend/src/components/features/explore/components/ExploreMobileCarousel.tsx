@@ -245,9 +245,11 @@ export function ExploreMobileCarousel({
           return (
             <div
               key={node.id}
-              className="absolute left-1/2 top-1/2 w-[min(65vw,250px)] max-w-none"
+              /** `w-max` : le point d’ancrage -50% doit coïncider avec le bouton/sphère ; une largeur fixée >= carte créait un vide à droite et décalait tout le groupe vers la gauche (inline-flex aligné au début du bloc). */
+              className="absolute left-1/2 top-1/2 w-max max-w-[min(65vw,250px)]"
               style={{
                 zIndex: z,
+                transformOrigin: "center center",
                 transform: `translate(calc(-50% + ${dxPx.toFixed(2)}px), calc(-50% + ${dyPx.toFixed(2)}px)) scale(${scale.toFixed(4)})`,
                 opacity,
                 filter: blur > 0.4 ? `blur(${blur.toFixed(2)}px)` : undefined,

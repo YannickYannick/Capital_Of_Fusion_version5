@@ -122,8 +122,9 @@ export function PlanetCardSphere({
       ? undefined
       : {
           background: [
-            `radial-gradient(circle at 32% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.08) 8%, transparent 42%)`,
-            `radial-gradient(circle at 78% 82%, rgba(0,0,0,0.55) 0%, transparent 45%)`,
+            /* Centré en X pour le carrousel : un highlight à 32% décale le volume perçu vers la gauche. */
+            `radial-gradient(circle at 50% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.08) 8%, transparent 42%)`,
+            `radial-gradient(circle at 50% 82%, rgba(0,0,0,0.55) 0%, transparent 45%)`,
             `radial-gradient(circle at 50% 50%, ${hex} 0%, ${hex}cc 42%, #0a0a12 100%)`,
           ].join(", "),
         };
