@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
@@ -80,7 +81,7 @@ function CardContent({
 }
 
 /**
- * PlanetOverlay V5 — modal centré (z-50), AnimatePresence Framer Motion.
+ * PlanetOverlay V5 — modal en portail (`document.body`, z-[100] au-dessus de la navbar).
  * Grille 2 colonnes : média (vidéo/image/lettrine) + titre/CTA.
  * Section événements en scroll horizontal. Section à propos.
  */
@@ -168,6 +169,11 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
 
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
+  const [overlayMounted, setOverlayMounted] = useState(false);
+
+  useEffect(() => {
+    setOverlayMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isFaqNode) {
@@ -193,6 +199,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
 
   // Early return APRÈS tous les hooks
   if (!node) return null;
+  if (!overlayMounted) return null;
 
   const centerTeaserSrc = "/teaser-pool-party.mp4";
   const showCenterTeaser =
@@ -204,11 +211,11 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const nodeName = (node.name || "").toLowerCase();
   const isBookYourHotelNode = nodeName.includes("book your hotel") || nodeSlug.includes("book-your-hotel") || nodeSlug === "amapiano-vibe";
 
-  return (
+  return createPortal(
     <>
-      {/* Backdrop */}
+      {/* Portail `document.body` + z > navbar (z-50) : la croix et le fond restent cliquables au-dessus du header. */}
       <div
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 ${isClosing ? "animate-fadeOut" : "animate-fadeIn"}`}
+        className={`fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 ${isClosing ? "animate-fadeOut" : "animate-fadeIn"}`}
         onClick={handleBackdropClickWithAnimation}
       >
         {/* Modal */}
@@ -216,8 +223,8 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
           className={`relative w-full max-w-5xl max-h-[85vh] overflow-y-auto rounded-2xl bg-[#0a0e27]/95 border border-white/10 shadow-2xl ${isClosing ? "animate-fadeOutScale" : "animate-fadeInScale"}`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Bouton fermer */}
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+          {/* Bouton fermer — z élevé vs contenu scrollable du modal */}
+          <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
             {canEditDescriptions && (
               <button
                 type="button"
@@ -518,6 +525,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

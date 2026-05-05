@@ -151,9 +151,11 @@ export function PlanetCardSphere({
       <div
         className={[
           "relative h-full w-full overflow-hidden rounded-full",
-          showFlatImage || showGlb
-            ? "bg-transparent ring-1 ring-white/20"
-            : "ring-1 ring-white/30",
+          showGlb
+            ? "bg-transparent"
+            : showFlatImage
+              ? "bg-transparent ring-1 ring-white/15"
+              : "ring-1 ring-white/30",
         ].join(" ")}
         style={{
           ...mediaStyle,

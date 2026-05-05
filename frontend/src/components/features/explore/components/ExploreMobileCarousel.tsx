@@ -234,7 +234,7 @@ export function ExploreMobileCarousel({
             >
               <button
                 type="button"
-                className="group flex w-full flex-col items-center rounded-3xl border border-transparent bg-transparent px-1 py-1 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
+                className="group inline-flex max-w-full flex-col items-center rounded-full border border-transparent bg-transparent px-0 py-0 transition-colors hover:bg-white/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400/90"
                 onClick={() => {
                   if (suppressPlanetTapRef.current) {
                     suppressPlanetTapRef.current = false;
