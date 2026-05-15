@@ -66,7 +66,7 @@ else:
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Permet tout sous-domaine Railway (.up.railway.app) si ALLOWED_HOSTS non défini.
-_default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app"
+_default_hosts = "capitaloffusionversion5-production.up.railway.app,.up.railway.app,capitaloffusion.com,www.capitaloffusion.com"
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get("ALLOWED_HOSTS", _default_hosts).split(",")
@@ -75,7 +75,12 @@ ALLOWED_HOSTS = [
 
 # CORS : origines autorisées (URL du front Vercel). Ex: https://mon-site.vercel.app,https://capitaloffusion.fr
 _cors = os.environ.get("CORS_ALLOWED_ORIGINS", "")
-CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors.split(",") if o.strip()]
+_cors_from_env = [o.strip() for o in _cors.split(",") if o.strip()]
+_cors_hardcoded = [
+    "https://capitaloffusion.com",
+    "https://www.capitaloffusion.com",
+]
+CORS_ALLOWED_ORIGINS = list({*_cors_hardcoded, *_cors_from_env})
 # Autorise tout sous-domaine Vercel (preview + prod) pour éviter de mettre à jour CORS à chaque déploiement.
 CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://[\w-]+\.vercel\.app$"]
 CORS_ALLOW_CREDENTIALS = True
@@ -83,7 +88,7 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF : origines de confiance pour les formulaires POST (admin, login, etc.). Format: https://domaine (sans slash final).
 _csrf_origins = os.environ.get(
     "CSRF_TRUSTED_ORIGINS",
-    "https://capitaloffusionversion5-production.up.railway.app,http://capitaloffusionversion5-production.up.railway.app",
+    "https://capitaloffusionversion5-production.up.railway.app,http://capitaloffusionversion5-production.up.railway.app,https://capitaloffusion.com,https://www.capitaloffusion.com",
 )
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()]
 
