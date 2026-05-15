@@ -91,7 +91,7 @@ export default function LandingPageClient() {
                         </div>
                         <Link
                             href="/festival/giveaway"
-                            className="mt-3 w-full max-w-xl px-6 py-3 rounded-lg bg-gradient-to-r from-purple-700 to-pink-600 border border-white/20 hover:brightness-110 text-white font-bold tracking-[0.12em] uppercase text-center shadow-[0_8px_24px_rgba(168,85,247,0.35)]"
+                            className="mt-3 px-6 py-3 rounded-lg bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-semibold transition text-center"
                         >
                             {t("ctaGiveaway")}
                         </Link>
