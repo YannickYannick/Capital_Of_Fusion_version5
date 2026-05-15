@@ -322,8 +322,9 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const displayShortForOverlay =
     node.short_description || (isAllStarStreetBattleNode ? allStarOverlayFallback.hook : "");
   const displayBodyDescription =
-    node.description ||
-    (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.description : "");
+    (isAllStarStreetBattleNode && !showEditForm)
+      ? allStarOverlayFallback.description
+      : (node.description || "");
   const displayAboutContent =
     node.content ||
     (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.rules : "");
@@ -504,7 +505,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                           rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center text-center px-4 py-3 h-12 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black text-sm font-bold transition"
                         >
-                          {(node.cta_text || "").trim() || "Inscris-toi"}
+                          Inscris-toi
                         </a>
                         <a
                           href={streetBattleFestivalHref}
