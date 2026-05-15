@@ -11,7 +11,7 @@ import {
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 import type { ExternalPageCta } from "@/components/shared/EditableConfigMarkdownPage";
 
-({ contentKey }: { contentKey: string }) {
+export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
   const t = useTranslations("pages");
   const eyebrow = t(`${contentKey}.eyebrow`);
   const title = t(`${contentKey}.title`);

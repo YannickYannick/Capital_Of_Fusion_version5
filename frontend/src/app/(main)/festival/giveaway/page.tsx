@@ -7,8 +7,8 @@ import { FestivalGiveawayClient } from "./FestivalGiveawayClient";
 
 const GIVEAWAY_LOCALES = new Set(["fr", "en", "es"]);
 
-/** Publication officielle du jeu concours PBVF ([Instagram](https://www.instagram.com/p/DYU6CXUih_w/?igsh=aXpuNXEwcTJ2cnpi)). */
-export const FESTIVAL_GIVEAWAY_INSTAGRAM_URL =
+/** Publication officielle du jeu concours PBVF sur Instagram. */
+const FESTIVAL_GIVEAWAY_INSTAGRAM_URL =
   "https://www.instagram.com/p/DYU6CXUih_w/?igsh=aXpuNXEwcTJ2cnpi";
 
 function readGiveawayMarkdown(locale: string): string {
