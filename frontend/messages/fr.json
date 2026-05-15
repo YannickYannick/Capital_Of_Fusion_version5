@@ -70,7 +70,14 @@
     "ctaBookPass": "Book your pass",
     "ctaProgram": "Notre programme",
     "ctaGiveaway": "Jeu-concours",
-    "footerLine": "Paris, France"
+    "footerLine": "Paris, France",
+    "countdown": {
+      "label": "Le festival commence dans",
+      "days": "jours",
+      "hours": "heures",
+      "minutes": "min",
+      "seconds": "sec"
+    }
   },
   "artistEdit": {
     "loginRequired": "Connexion requise.",

@@ -8,6 +8,7 @@ import { Bebas_Neue } from "next/font/google";
 import { useTranslations } from "next-intl";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { prefetchExploreModules, usePrefetchExplore } from "@/hooks/usePrefetchExplore";
+import FestivalCountdown from "@/components/features/festival/FestivalCountdown";
 
 const ctaExploreFont = Bebas_Neue({
   weight: "400",
@@ -96,6 +97,8 @@ export default function LandingPageClient() {
                             {t("ctaGiveaway")}
                         </Link>
                     </div>
+
+                    <FestivalCountdown />
 
                     <p className="mt-8 text-sm text-white/50">
                         {t("footerLine")}

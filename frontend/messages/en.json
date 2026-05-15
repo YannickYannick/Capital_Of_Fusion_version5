@@ -70,7 +70,14 @@
     "ctaBookPass": "Book your pass",
     "ctaProgram": "Our program",
     "ctaGiveaway": "GIVEAWAY",
-    "footerLine": "Paris, France"
+    "footerLine": "Paris, France",
+    "countdown": {
+      "label": "Festival starts in",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "min",
+      "seconds": "sec"
+    }
   },
   "artistEdit": {
     "loginRequired": "Sign in required.",
