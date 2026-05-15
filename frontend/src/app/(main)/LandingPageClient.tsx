@@ -89,6 +89,12 @@ export default function LandingPageClient() {
                                 {t("ctaProgram")}
                             </Link>
                         </div>
+                        <Link
+                            href="/festival/giveaway"
+                            className="mt-3 w-full max-w-xl px-6 py-3 rounded-lg bg-gradient-to-r from-purple-700 to-pink-600 border border-white/20 hover:brightness-110 text-white font-bold tracking-[0.12em] uppercase text-center shadow-[0_8px_24px_rgba(168,85,247,0.35)]"
+                        >
+                            {t("ctaGiveaway")}
+                        </Link>
                     </div>
 
                     <p className="mt-8 text-sm text-white/50">

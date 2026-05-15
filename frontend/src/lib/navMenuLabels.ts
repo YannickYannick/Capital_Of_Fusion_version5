@@ -17,6 +17,7 @@ export function menuTranslationKeyForRootUrl(url: string | undefined): string | 
 
   // Plus spécifique d'abord
   if (p === "/festival/book-your-hotel") return "menu.bookYourHotel";
+  if (p === "/festival/giveaway") return "menu.giveaway";
   // Puis les patterns génériques
   if (p === "/festival") return "menu.festival";
   if (p === "/support" || p.startsWith("/support/")) return "menu.support";
@@ -34,6 +35,7 @@ export function menuTranslationKeyForChildUrl(url: string | undefined): string |
 
   // Festival sub-pages
   if (p === "/festival/book-your-hotel") return "menu.bookYourHotel";
+  if (p === "/festival/giveaway") return "menu.giveaway";
   if (p === "/festival/planning-navettes") return "menu.planningNavettes";
   if (p === "/festival/acces-venue") return "menu.accesVenue";
   if (p === "/festival/notre-programme") return "menu.notreProgramme";

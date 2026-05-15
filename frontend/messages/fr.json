@@ -47,6 +47,7 @@
       "festival": "Festival",
       "bookYourHotel": "Book your hôtel",
       "bookYourPass": "Book your pass",
+      "giveaway": "Jeu-concours",
       "support": "Support",
       "faq": "FAQ",
       "contactUs": "Nous contacter",
@@ -68,6 +69,7 @@
     "ctaBookHotel": "Book your hôtel",
     "ctaBookPass": "Book your pass",
     "ctaProgram": "Notre programme",
+    "ctaGiveaway": "Jeu-concours",
     "footerLine": "Paris, France"
   },
   "artistEdit": {
@@ -185,6 +187,10 @@
         "allStarBattle": {
           "title": "All Star Street Battle",
           "desc": "Compétition street bachata."
+        },
+        "giveaway": {
+          "title": "Jeu-concours",
+          "desc": "Giveaway Ultimate, Capital of Culture & participation sur Instagram."
         }
       }
     },
@@ -214,6 +220,14 @@
       "subtitle": "Hôtel 4★ avec piscine et petit-déjeuner, navette festival, socials quotidiens.",
       "ctaGoAndDance": "Réserver sur go&dance",
       "empty": "Contenu à venir."
+    },
+    "festivalGiveaway": {
+      "metaTitle": "Giveaway & Capital of Culture | Festival",
+      "metaDescription": "Jeu concours PBVF : hôtel + passes, backstage et plus. Capital of Culture — participe via Instagram.",
+      "eyebrow": "Festival",
+      "title": "Giveaway & Capital of Culture",
+      "subtitle": "Découvre Capital of Culture, les lots Ultimate Giveaway pour 2027 — et joue depuis notre publication Instagram officielle.",
+      "instagramCta": "Voir le post Instagram officiel"
     },
     "festivalNotreProgramme": {
       "metaTitle": "Notre programme | Festival",
