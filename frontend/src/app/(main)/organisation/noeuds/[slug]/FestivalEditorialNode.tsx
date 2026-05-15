@@ -6,13 +6,17 @@ import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
 import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
 import {
+  ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK,
   ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
   getStreetBattleRegistrationLinks,
+  type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
+import { useLocale } from "next-intl";
 import type { ExternalPageCta } from "@/components/shared/EditableConfigMarkdownPage";
 
 export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
   const t = useTranslations("pages");
+  const locale = useLocale() as OverlayLocale;
   const eyebrow = t(`${contentKey}.eyebrow`);
   const title = t(`${contentKey}.title`);
   const subtitle = t(`${contentKey}.subtitle`);
@@ -42,6 +46,14 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
     };
   }, [field]);
 
+  const fallbackContent = useMemo(() => {
+    if (contentKey !== "festivalAllStarStreetBattle") return "";
+    const fb = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[locale];
+    return fb.description + "\n\n---\n\n" + fb.rules;
+  }, [contentKey, locale]);
+
+  const displayValue = initialValue || fallbackContent;
+
   const streetBattleCtasAboveHero = useMemo((): ExternalPageCta[] | undefined => {
     if (contentKey !== "festivalAllStarStreetBattle") return undefined;
     const [primaryHref, secondaryHref] = getStreetBattleRegistrationLinks();
@@ -69,7 +81,7 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
             eyebrow={eyebrow}
             title={title}
             subtitle={subtitle}
-            initialValue={initialValue}
+            initialValue={displayValue}
             field={field as any}
             emptyText={empty}
             titleBeforeVideo={isStreetBattle}

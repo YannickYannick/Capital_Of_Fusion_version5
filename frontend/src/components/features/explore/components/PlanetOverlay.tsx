@@ -14,6 +14,7 @@ import {
   ALL_STAR_STREET_BATTLE_NODE_HREF,
   ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK,
   ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
+  getStreetBattleRegistrationLinks,
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 import { markdownToHtml } from "@/lib/markdownToHtml";
@@ -329,6 +330,9 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const allStarPrimaryCtaHref = isAllStarStreetBattleNode
     ? (node.cta_url || "").trim() || ALL_STAR_STREET_BATTLE_NODE_HREF
     : "";
+  const [streetBattleRegisterHref, streetBattleFestivalHref] = isAllStarStreetBattleNode
+    ? getStreetBattleRegistrationLinks()
+    : ["", ""];
 
   const overlayBodyDescriptionHtml =
     displayBodyDescription.trim() &&
@@ -382,7 +386,6 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         muted
                         loop
                         playsInline
-                        controls
                         preload="auto"
                         aria-label={node.name}
                       />
@@ -494,15 +497,24 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         <span>{t("overlay.browseArtists")}</span>
                       </Link>
                     ) : isAllStarStreetBattleNode ? (
-                      <Link
-                        href={allStarPrimaryCtaHref}
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                      >
-                        <span className="text-xl">✨</span>
-                        <span>
-                          {(node.cta_text || "").trim() || allStarOverlayFallback.cta}
-                        </span>
-                      </Link>
+                      <>
+                        <a
+                          href={streetBattleRegisterHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center text-center px-4 py-3 h-12 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black text-sm font-bold transition"
+                        >
+                          {(node.cta_text || "").trim() || "Inscris-toi"}
+                        </a>
+                        <a
+                          href={streetBattleFestivalHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center text-center px-4 py-3 h-12 rounded-xl border-2 border-white/30 bg-white/10 hover:bg-white/15 text-white text-sm font-bold transition"
+                        >
+                          Billets &amp; pass festival
+                        </a>
+                      </>
                     ) : node.cta_url ? (
                       node.cta_url.startsWith("/") ? (
                         <Link
