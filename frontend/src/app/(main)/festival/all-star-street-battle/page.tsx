@@ -34,7 +34,13 @@ export default async function FestivalAllStarStreetBattlePage() {
       initialValue={initialValue}
       field="festival_all_star_street_battle_markdown"
       emptyText={t("festivalAllStarStreetBattle.empty")}
-      ctaAboveHero={[
+      titleBeforeVideo
+      heroVideo={{
+        src: ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
+        ariaLabel: t("festivalAllStarStreetBattle.title"),
+        controls: false,
+      }}
+      ctaAfterHero={[
         {
           href: registerHref,
           label: t("festivalAllStarStreetBattle.registerCtaPrimary"),
@@ -46,10 +52,6 @@ export default async function FestivalAllStarStreetBattlePage() {
           variant: "secondary",
         },
       ]}
-      heroVideo={{
-        src: ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
-        ariaLabel: t("festivalAllStarStreetBattle.title"),
-      }}
     />
   );
 }

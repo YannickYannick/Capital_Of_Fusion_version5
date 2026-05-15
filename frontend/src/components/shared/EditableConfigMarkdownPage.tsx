@@ -78,6 +78,8 @@ export function EditableConfigMarkdownPage({
   emptyText,
   ctaBelowSubtitle,
   ctaAboveHero,
+  ctaAfterHero,
+  titleBeforeVideo,
   preface,
   collapsibleMarkdown,
   heroVideo,
@@ -101,6 +103,10 @@ export function EditableConfigMarkdownPage({
   ctaAboveHero?: ExternalPageCta | ExternalPageCta[];
   /** Boutons sous le sous-titre (un ou plusieurs liens externes). */
   ctaBelowSubtitle?: ExternalPageCta | ExternalPageCta[];
+  /** Boutons affichés APRÈS la vidéo hero, avant le panneau principal. */
+  ctaAfterHero?: ExternalPageCta | ExternalPageCta[];
+  /** Si true : eyebrow/titre/sous-titre s'affichent avant la vidéo hero (hors panneau). */
+  titleBeforeVideo?: boolean;
   preface?: ReactNode;
   /** Affiche le corps Markdown derrière un bouton (réduit la hauteur de page en lecture seule). */
   collapsibleMarkdown?: {
@@ -143,7 +149,20 @@ export function EditableConfigMarkdownPage({
   const html = markdownToHtml(value);
   const previewHtml = markdownToHtml(editValue);
   const ctasAbove = normalizeExternalCtas(ctaAboveHero);
+  const ctasAfter = normalizeExternalCtas(ctaAfterHero);
   const ctasBelowSubtitle = normalizeExternalCtas(ctaBelowSubtitle);
+
+  const titleBlock = (
+    <>
+      <p className="text-xs uppercase tracking-widest text-purple-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+        {eyebrow}
+      </p>
+      <h1 className="mt-3 text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)]">
+        {title}
+      </h1>
+      <p className="mt-4 text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.75)] max-w-3xl">{subtitle}</p>
+    </>
+  );
 
   return (
     <div className="text-white">
@@ -153,8 +172,14 @@ export function EditableConfigMarkdownPage({
         </div>
       ) : null}
 
+      {titleBeforeVideo ? (
+        <div className="mb-6 rounded-2xl border border-white/15 bg-black/60 backdrop-blur-md px-5 py-7 md:px-9 md:py-8 shadow-[0_8px_32px_rgba(0,0,0,0.45)] ring-1 ring-inset ring-white/10">
+          {titleBlock}
+        </div>
+      ) : null}
+
       {heroVideo ? (
-        <div className="mb-8 overflow-hidden rounded-2xl border border-white/15 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/10">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-white/15 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/10">
           <video
             className="mx-auto w-full max-h-[min(72vh,680px)] bg-black object-contain"
             src={heroVideo.src}
@@ -167,6 +192,13 @@ export function EditableConfigMarkdownPage({
           />
         </div>
       ) : null}
+
+      {ctasAfter.length > 0 ? (
+        <div className="mb-8 rounded-2xl border border-white/15 bg-gradient-to-br from-purple-950/80 to-black/80 p-6 shadow-[0_16px_48px_rgba(0,0,0,0.45)] backdrop-blur-sm ring-1 ring-inset ring-white/10 md:p-8">
+          <ExternalCtasRow ctas={ctasAfter} className="gap-4 sm:gap-4" />
+        </div>
+      ) : null}
+
       <div
         className={[
           "rounded-2xl border border-white/15",
@@ -175,16 +207,10 @@ export function EditableConfigMarkdownPage({
           "px-5 py-8 md:px-9 md:py-10",
         ].join(" ")}
       >
-        <p className="text-xs uppercase tracking-widest text-purple-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
-          {eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)]">
-          {title}
-        </h1>
-        <p className="mt-4 text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.75)] max-w-3xl">{subtitle}</p>
+        {!titleBeforeVideo ? titleBlock : null}
 
         {ctasBelowSubtitle.length > 0 ? (
-          <div className="mt-6">
+          <div className={titleBeforeVideo ? "" : "mt-6"}>
             <ExternalCtasRow ctas={ctasBelowSubtitle} />
           </div>
         ) : null}
