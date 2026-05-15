@@ -37,8 +37,8 @@ import type {
 export function getApiBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_URL;
   if (typeof window !== "undefined") {
-    console.debug("[API] NEXT_PUBLIC_API_URL =", url ?? "(not set)");
-    console.debug("[API] window.origin =", window.location.origin);
+    console.log("[API] NEXT_PUBLIC_API_URL =", url ?? "(not set)");
+    console.log("[API] window.origin =", window.location.origin);
   }
   if (url) return url.replace(/\/$/, "");
   if (typeof window !== "undefined") {
@@ -91,7 +91,7 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/menu/items/`, lang);
   if (typeof window !== "undefined") {
-    console.debug("[API] getMenuItems → fetch", url);
+    console.log("[API] getMenuItems → fetch", url);
   }
   let res: Response;
   try {
@@ -101,7 +101,7 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
     throw err;
   }
   if (typeof window !== "undefined") {
-    console.debug(
+    console.log(
       "[API] getMenuItems réponse",
       res.status,
       "Access-Control-Allow-Origin:",
