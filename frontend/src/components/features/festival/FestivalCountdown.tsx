@@ -17,9 +17,11 @@ function getTimeLeft() {
 
 export default function FestivalCountdown() {
   const t = useTranslations("landing.countdown");
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft);
+  // null on first render to avoid SSR/client hydration mismatch (Date.now() differs)
+  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft>>(null);
 
   useEffect(() => {
+    setTimeLeft(getTimeLeft());
     const id = setInterval(() => setTimeLeft(getTimeLeft()), 1000);
     return () => clearInterval(id);
   }, []);
