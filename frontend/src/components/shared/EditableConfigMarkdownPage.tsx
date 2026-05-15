@@ -6,6 +6,58 @@ import { useAuth } from "@/contexts/AuthContext";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import { patchSiteConfigMarkdownField } from "@/lib/api";
 
+export type ExternalPageCta = {
+  href: string;
+  label: string;
+  /** Par défaut : premier lien = primaire, suivants = secondaires. */
+  variant?: "primary" | "secondary";
+};
+
+function normalizeExternalCtas(input?: ExternalPageCta | ExternalPageCta[]): ExternalPageCta[] {
+  if (!input) return [];
+  return Array.isArray(input) ? input : [input];
+}
+
+function ExternalCtasRow({
+  ctas,
+  className,
+}: {
+  ctas: ExternalPageCta[];
+  className?: string;
+}) {
+  if (ctas.length === 0) return null;
+  return (
+    <div
+      className={[
+        "flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center",
+        className ?? "",
+      ].join(" ")}
+    >
+      {ctas.map((c, idx) => {
+        const inferred =
+          c.variant ?? (idx === 0 ? ("primary" as const) : ("secondary" as const));
+        const primary = inferred === "primary";
+        return (
+          <a
+            key={`${c.href}-${idx}-${c.label}`}
+            href={c.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={[
+              "inline-flex w-full shrink-0 items-center justify-center text-center transition sm:w-auto",
+              primary
+                ? "rounded-2xl border-2 border-[#f3ac41] bg-[#f3ac41] px-10 py-4 text-lg font-black uppercase tracking-wider text-black shadow-[0_10px_40px_rgba(243,172,65,0.45)] hover:brightness-110"
+                : "rounded-xl border-2 border-white/30 bg-white/10 px-6 py-3 text-sm font-bold text-white hover:bg-white/15",
+            ].join(" ")}
+          >
+            {c.label}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Prose lisible sur fond photo / vidéo (contraste + séparateurs visibles). */
 const proseClasses =
   "leading-relaxed text-white/95 [&_p]:text-white/95 [&_li]:text-white/95 " +
@@ -25,6 +77,7 @@ export function EditableConfigMarkdownPage({
   field,
   emptyText,
   ctaBelowSubtitle,
+  ctaAboveHero,
   preface,
   collapsibleMarkdown,
   heroVideo,
@@ -44,8 +97,10 @@ export function EditableConfigMarkdownPage({
     | "support_faq_markdown"
     | "support_contact_markdown";
   emptyText: string;
-  /** Bouton d’action sous le sous-titre (ex. lien externe go&dance), style aligné sur la landing. */
-  ctaBelowSubtitle?: { href: string; label: string };
+  /** Liens très visibles au-dessus de la vidéo hero / du panneau (ex. inscriptions festival). */
+  ctaAboveHero?: ExternalPageCta | ExternalPageCta[];
+  /** Boutons sous le sous-titre (un ou plusieurs liens externes). */
+  ctaBelowSubtitle?: ExternalPageCta | ExternalPageCta[];
   preface?: ReactNode;
   /** Affiche le corps Markdown derrière un bouton (réduit la hauteur de page en lecture seule). */
   collapsibleMarkdown?: {
@@ -87,9 +142,17 @@ export function EditableConfigMarkdownPage({
 
   const html = markdownToHtml(value);
   const previewHtml = markdownToHtml(editValue);
+  const ctasAbove = normalizeExternalCtas(ctaAboveHero);
+  const ctasBelowSubtitle = normalizeExternalCtas(ctaBelowSubtitle);
 
   return (
     <div className="text-white">
+      {ctasAbove.length > 0 ? (
+        <div className="mb-10 rounded-2xl border border-white/15 bg-gradient-to-br from-purple-950/80 to-black/80 p-6 shadow-[0_16px_48px_rgba(0,0,0,0.45)] backdrop-blur-sm ring-1 ring-inset ring-white/10 md:p-8">
+          <ExternalCtasRow ctas={ctasAbove} className="gap-4 sm:gap-4" />
+        </div>
+      ) : null}
+
       {heroVideo ? (
         <div className="mb-8 overflow-hidden rounded-2xl border border-white/15 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/10">
           <video
@@ -120,16 +183,9 @@ export function EditableConfigMarkdownPage({
         </h1>
         <p className="mt-4 text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.75)] max-w-3xl">{subtitle}</p>
 
-        {ctaBelowSubtitle ? (
+        {ctasBelowSubtitle.length > 0 ? (
           <div className="mt-6">
-            <a
-              href={ctaBelowSubtitle.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex px-6 py-3 rounded-lg bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-semibold transition text-center"
-            >
-              {ctaBelowSubtitle.label}
-            </a>
+            <ExternalCtasRow ctas={ctasBelowSubtitle} />
           </div>
         ) : null}
 

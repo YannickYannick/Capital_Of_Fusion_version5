@@ -250,6 +250,8 @@
       "eyebrow": "Festival",
       "title": "All Star Street Bachata Battle",
       "subtitle": "Formato, reglas, horarios e información.",
+      "registerCtaPrimary": "Inscríbete",
+      "registerCtaSecondary": "Entradas y abono festival (go&dance)",
       "contentMarkdown": "## Por completar\n\nAñade aquí el contenu (Markdown) de **All Star Street Bachata Battle**.\n",
       "empty": "Contenido próximamente."
     },

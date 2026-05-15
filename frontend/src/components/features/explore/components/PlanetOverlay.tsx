@@ -13,6 +13,7 @@ import { OverlayIdentityAdnSection } from "./OverlayIdentityAdnSection";
 import {
   ALL_STAR_STREET_BATTLE_NODE_HREF,
   ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK,
+  ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 
@@ -256,10 +257,22 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
   const [overlayMounted, setOverlayMounted] = useState(false);
+  /** Après ouverture overlay All Star : logo/cover 3 s puis vidéo hero à la place. */
+  const [showAllStarOverlayHeroVideo, setShowAllStarOverlayHeroVideo] = useState(false);
 
   useEffect(() => {
     setOverlayMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!node || !isAllStarStreetBattleNode) {
+      setShowAllStarOverlayHeroVideo(false);
+      return;
+    }
+    setShowAllStarOverlayHeroVideo(false);
+    const timer = window.setTimeout(() => setShowAllStarOverlayHeroVideo(true), 3000);
+    return () => window.clearTimeout(timer);
+  }, [node, isAllStarStreetBattleNode]);
 
   useEffect(() => {
     if (!isFaqNode) {
@@ -353,7 +366,21 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 {/* Gauche — Média */}
                 <div className="relative min-h-[220px] bg-black/40 rounded-tl-2xl rounded-bl-2xl overflow-hidden flex items-center justify-center">
-                  {showCenterTeaser ? (
+                  {isAllStarStreetBattleNode && showAllStarOverlayHeroVideo ? (
+                    <div className="relative h-full min-h-[260px] w-full bg-black md:min-h-[300px]">
+                      <video
+                        src={ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC}
+                        className="absolute inset-0 h-full w-full object-contain bg-black"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        controls
+                        preload="auto"
+                        aria-label={node.name}
+                      />
+                    </div>
+                  ) : showCenterTeaser ? (
                     <div className="relative w-full h-full min-h-[220px]">
                       <video
                         src={centerTeaserSrc}

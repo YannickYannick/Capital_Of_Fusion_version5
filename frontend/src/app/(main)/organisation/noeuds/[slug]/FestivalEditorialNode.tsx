@@ -2,16 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { markdownToHtml } from "@/lib/markdownToHtml";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
 import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
-import { ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC } from "@/data/allStarStreetBattlePlanetOverlayFallback";
+import {
+  ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
+  getStreetBattleRegistrationLinks,
+} from "@/data/allStarStreetBattlePlanetOverlayFallback";
+import type { ExternalPageCta } from "@/components/shared/EditableConfigMarkdownPage";
 
-const proseClasses =
-  "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
-
-export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
+({ contentKey }: { contentKey: string }) {
   const t = useTranslations("pages");
   const eyebrow = t(`${contentKey}.eyebrow`);
   const title = t(`${contentKey}.title`);
@@ -42,6 +42,23 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
     };
   }, [field]);
 
+  const streetBattleCtasAboveHero = useMemo((): ExternalPageCta[] | undefined => {
+    if (contentKey !== "festivalAllStarStreetBattle") return undefined;
+    const [primaryHref, secondaryHref] = getStreetBattleRegistrationLinks();
+    return [
+      {
+        href: primaryHref,
+        label: t("festivalAllStarStreetBattle.registerCtaPrimary"),
+        variant: "primary",
+      },
+      {
+        href: secondaryHref,
+        label: t("festivalAllStarStreetBattle.registerCtaSecondary"),
+        variant: "secondary",
+      },
+    ];
+  }, [contentKey, t]);
+
   return (
     <div className="min-h-screen text-white px-4 md:px-8 py-16">
       <div className="max-w-4xl mx-auto">
@@ -53,6 +70,7 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
             initialValue={initialValue}
             field={field as any}
             emptyText={empty}
+            ctaAboveHero={streetBattleCtasAboveHero}
             heroVideo={
               contentKey === "festivalAllStarStreetBattle"
                 ? {

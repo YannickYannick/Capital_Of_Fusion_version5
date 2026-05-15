@@ -39,3 +39,23 @@ export const ALL_STAR_STREET_BATTLE_NODE_HREF = "/organisation/noeuds/all-star-s
 
 /** Vidéo hero (fichier statique `public/video/`, pré-traitée rotation 270° horaire). */
 export const ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC = "/video/street-bachata-battle-hero.mp4";
+
+/** Fallback = même passerelle billetterie que `GoAndDanceTicketsEmbed`. */
+const DEFAULT_STREET_BATTLE_REGISTER_URL =
+  "https://www.goandance.com/en/event-tickets/73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa";
+const DEFAULT_STREET_BATTLE_FESTIVAL_URL =
+  "https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026";
+
+function trimmedEnv(url: string | undefined): string | null {
+  const s = typeof url === "string" ? url.trim() : "";
+  return s.length > 0 ? s : null;
+}
+
+/** [ inscription battle / pass préféré, page événement festival ] — surcharge via `NEXT_PUBLIC_*`. */
+export function getStreetBattleRegistrationLinks(): readonly [primary: string, secondary: string] {
+  const primary =
+    trimmedEnv(process.env.NEXT_PUBLIC_STREET_BATTLE_REGISTER_URL) ?? DEFAULT_STREET_BATTLE_REGISTER_URL;
+  const secondary =
+    trimmedEnv(process.env.NEXT_PUBLIC_STREET_BATTLE_FESTIVAL_URL) ?? DEFAULT_STREET_BATTLE_FESTIVAL_URL;
+  return [primary, secondary];
+}
