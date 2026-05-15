@@ -16,6 +16,7 @@ import {
   ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
+import { markdownToHtml } from "@/lib/markdownToHtml";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -329,6 +330,12 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     ? (node.cta_url || "").trim() || ALL_STAR_STREET_BATTLE_NODE_HREF
     : "";
 
+  const overlayBodyDescriptionHtml =
+    displayBodyDescription.trim() &&
+    /\!\[[^\]]*\]\([^)]+\)/.test(displayBodyDescription)
+      ? markdownToHtml(displayBodyDescription)
+      : "";
+
   return createPortal(
     <>
       {/* Portail `document.body` + z > navbar (z-50) : la croix et le fond restent cliquables au-dessus du header. */}
@@ -613,6 +620,15 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         </button>
                       </div>
                     </div>
+                  ) : overlayBodyDescriptionHtml ? (
+                    <div
+                      className={
+                        "text-white/70 text-sm leading-relaxed space-y-3 " +
+                        "[&_img]:rounded-xl [&_img]:border [&_img]:border-white/15 [&_img]:max-h-[min(52vh,520px)] [&_img]:w-auto [&_img]:max-w-full [&_img]:mx-auto [&_img]:my-4 [&_img]:block [&_img]:object-contain [&_img]:shadow-lg " +
+                        "[&_p]:mb-3 [&_p:last-child]:mb-0"
+                      }
+                      dangerouslySetInnerHTML={{ __html: overlayBodyDescriptionHtml }}
+                    />
                   ) : (
                     <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
                       {displayBodyDescription}

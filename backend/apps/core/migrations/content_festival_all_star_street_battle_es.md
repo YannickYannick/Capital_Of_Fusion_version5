@@ -5,6 +5,8 @@ El choque definitivo entre **musicalidad, actitud y creatividad**.
 Los mejores bailarines se enfrentarán en una battle donde la **técnica sola no basta**.  
 Aquí hace falta **estilo**, **carácter**, **interpretación**… y sobre todo una **identidad real**.
 
+![Street Bachata Battle — Paris Bachata Vibe Festival, 18 de septiembre de 2026](/images/street-bachata-battle-18-sept-26.jpg)
+
 ## ⚡ Preselecciones explosivas
 
 Cada bailarín dispone de **45 segundos** para convencer al jurado y asegurar su plaza en el **cuadro final**.

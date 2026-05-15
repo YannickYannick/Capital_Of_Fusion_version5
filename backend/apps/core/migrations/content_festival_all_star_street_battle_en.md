@@ -5,6 +5,8 @@ The ultimate clash of **musicality, attitude, and creativity**.
 The best dancers will go head-to-head in a battle where **technique alone won’t be enough**.  
 Here, you’ll need **style**, **character**, **interpretation**… and above all a **real identity**.
 
+![Street Bachata Battle — Paris Bachata Vibe Festival, September 18, 2026](/images/street-bachata-battle-18-sept-26.jpg)
+
 ## ⚡ Explosive prelims
 
 Each dancer has **45 seconds** to convince the judges and secure a spot in the **final bracket**.

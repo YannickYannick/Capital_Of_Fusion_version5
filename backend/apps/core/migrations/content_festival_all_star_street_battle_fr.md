@@ -5,6 +5,8 @@ Le clash ultime entre musicalité, attitude et créativité.
 Les meilleurs danseurs vont s’affronter dans une battle où la technique seule ne suffira pas.  
 Ici, il faudra du style, du caractère, de l’interprétation… et surtout une vraie identité.
 
+![Street Bachata Battle — Paris Bachata Vibe Festival, 18 septembre 2026](/images/street-bachata-battle-18-sept-26.jpg)
+
 ## ⚡ Pré-sélections explosives
 
 Chaque danseur aura **45 secondes** pour convaincre les juges et décrocher sa place dans le tableau final.
