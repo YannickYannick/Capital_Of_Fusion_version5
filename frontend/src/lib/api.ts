@@ -36,9 +36,15 @@ import type {
  */
 export function getApiBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== "undefined") {
+    console.debug("[API] NEXT_PUBLIC_API_URL =", url ?? "(not set)");
+    console.debug("[API] window.origin =", window.location.origin);
+  }
   if (url) return url.replace(/\/$/, "");
   if (typeof window !== "undefined") {
-    return `${window.location.protocol}//${window.location.hostname}:8000`;
+    const fallback = `${window.location.protocol}//${window.location.hostname}:8000`;
+    console.warn("[API] NEXT_PUBLIC_API_URL manquant — fallback:", fallback);
+    return fallback;
   }
   return "http://localhost:8000";
 }
@@ -84,8 +90,28 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/menu/items/`, lang);
-  const res = await fetch(url, { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error(`Menu API error: ${res.status}`);
+  if (typeof window !== "undefined") {
+    console.debug("[API] getMenuItems → fetch", url);
+  }
+  let res: Response;
+  try {
+    res = await fetch(url, { next: { revalidate: 60 } });
+  } catch (err) {
+    console.error("[API] getMenuItems fetch FAILED (réseau/CORS):", err);
+    throw err;
+  }
+  if (typeof window !== "undefined") {
+    console.debug(
+      "[API] getMenuItems réponse",
+      res.status,
+      "Access-Control-Allow-Origin:",
+      res.headers.get("access-control-allow-origin") ?? "(absent)",
+    );
+  }
+  if (!res.ok) {
+    console.error("[API] getMenuItems HTTP error:", res.status, url);
+    throw new Error(`Menu API error: ${res.status}`);
+  }
   return res.json();
 }
 

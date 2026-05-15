@@ -102,12 +102,15 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    console.debug("[Navbar] chargement du menu…");
     getMenuItems()
       .then((items) => {
+        console.debug("[Navbar] menu OK —", items.length, "entrées");
         setMenuItems(items);
         setMenuStatus("ready");
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("[Navbar] menu ERREUR:", err);
         setMenuStatus("error");
       });
   }, []);
