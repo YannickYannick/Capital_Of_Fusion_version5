@@ -42,7 +42,7 @@ export const ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC = "/video/street-bachata
 
 /** Fallback = même passerelle billetterie que `GoAndDanceTicketsEmbed`. */
 const DEFAULT_STREET_BATTLE_REGISTER_URL =
-  "https://www.goandance.com/en/event-tickets/73c5a8cb-15a5-41bf-8903-6c76f3cc0bfa";
+  "https://my.weezevent.com/sbb-all-star";
 const DEFAULT_STREET_BATTLE_FESTIVAL_URL =
   "https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026";
 
