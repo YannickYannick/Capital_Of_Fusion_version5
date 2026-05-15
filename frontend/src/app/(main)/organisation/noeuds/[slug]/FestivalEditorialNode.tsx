@@ -59,6 +59,8 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
     ];
   }, [contentKey, t]);
 
+  const isStreetBattle = contentKey === "festivalAllStarStreetBattle";
+
   return (
     <div className="min-h-screen text-white px-4 md:px-8 py-16">
       <div className="max-w-4xl mx-auto">
@@ -70,12 +72,14 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
             initialValue={initialValue}
             field={field as any}
             emptyText={empty}
-            ctaAboveHero={streetBattleCtasAboveHero}
+            titleBeforeVideo={isStreetBattle}
+            ctaAfterHero={isStreetBattle ? streetBattleCtasAboveHero : undefined}
             heroVideo={
-              contentKey === "festivalAllStarStreetBattle"
+              isStreetBattle
                 ? {
                     src: ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
                     ariaLabel: title,
+                    controls: false,
                   }
                 : undefined
             }
