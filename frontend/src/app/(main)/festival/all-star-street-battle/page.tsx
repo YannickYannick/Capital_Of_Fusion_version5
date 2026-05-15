@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
+import { ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pages");
@@ -29,6 +30,10 @@ export default async function FestivalAllStarStreetBattlePage() {
       initialValue={initialValue}
       field="festival_all_star_street_battle_markdown"
       emptyText={t("festivalAllStarStreetBattle.empty")}
+      heroVideo={{
+        src: ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
+        ariaLabel: t("festivalAllStarStreetBattle.title"),
+      }}
     />
   );
 }

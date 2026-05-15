@@ -10,6 +10,11 @@ import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanc
 import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
 import { OverlayArtistsGrid } from "./OverlayArtistsGrid";
 import { OverlayIdentityAdnSection } from "./OverlayIdentityAdnSection";
+import {
+  ALL_STAR_STREET_BATTLE_NODE_HREF,
+  ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK,
+  type OverlayLocale,
+} from "@/data/allStarStreetBattlePlanetOverlayFallback";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -229,6 +234,25 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     return false;
   }, [node]);
 
+  /** Street Bachata Battle — slug admin parfois différent ; repli contenu + CTA si API vide. */
+  const isAllStarStreetBattleNode = useMemo(() => {
+    if (!node) return false;
+    const slug = (node.slug || "").toLowerCase();
+    const name = (node.name || "").toLowerCase();
+    if (slug === "all-star-street-bachata-battle") return true;
+    if (slug.includes("all-star") && slug.includes("battle")) return true;
+    if (slug.includes("all_star") && slug.includes("battle")) return true;
+    if (name.includes("all star") && name.includes("battle")) return true;
+    if (name.includes("street bachata battle")) return true;
+    const cta = (node.cta_url || "").trim().replace(/\/$/, "");
+    if (
+      cta === ALL_STAR_STREET_BATTLE_NODE_HREF ||
+      cta === "/festival/all-star-street-battle"
+    )
+      return true;
+    return false;
+  }, [node]);
+
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
   const [overlayMounted, setOverlayMounted] = useState(false);
@@ -276,6 +300,21 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     nodeName.includes("book your pass") ||
     nodeSlug.includes("book-your-pass") ||
     nodeSlug.includes("book_your_pass");
+
+  const overlayLocale: OverlayLocale =
+    locale === "fr" || locale === "en" || locale === "es" ? locale : "fr";
+  const allStarOverlayFallback = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[overlayLocale];
+  const displayShortForOverlay =
+    node.short_description || (isAllStarStreetBattleNode ? allStarOverlayFallback.hook : "");
+  const displayBodyDescription =
+    node.description ||
+    (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.description : "");
+  const displayAboutContent =
+    node.content ||
+    (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.rules : "");
+  const allStarPrimaryCtaHref = isAllStarStreetBattleNode
+    ? (node.cta_url || "").trim() || ALL_STAR_STREET_BATTLE_NODE_HREF
+    : "";
 
   return createPortal(
     <>
@@ -372,9 +411,9 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                   <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
                     {node.name}
                   </h1>
-                  {node.short_description && node.type !== "ROOT" && !isBookYourPassNode && (
+                  {displayShortForOverlay && node.type !== "ROOT" && !isBookYourPassNode && (
                     <p className="text-white/70 leading-[1.8em] text-sm">
-                      {node.short_description}
+                      {displayShortForOverlay}
                     </p>
                   )}
                   <div className="flex flex-wrap flex-col sm:flex-row gap-3 mt-4 w-full">
@@ -419,6 +458,16 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                       >
                         <span className="text-xl">🎤</span>
                         <span>{t("overlay.browseArtists")}</span>
+                      </Link>
+                    ) : isAllStarStreetBattleNode ? (
+                      <Link
+                        href={allStarPrimaryCtaHref}
+                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
+                      >
+                        <span className="text-xl">✨</span>
+                        <span>
+                          {(node.cta_text || "").trim() || allStarOverlayFallback.cta}
+                        </span>
                       </Link>
                     ) : node.cta_url ? (
                       node.cta_url.startsWith("/") ? (
@@ -477,7 +526,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               )}
 
               {/* Section billetterie Root ou description du nœud */}
-              {(showCenterTeaser || node.description || showEditForm) && (
+              {(showCenterTeaser || displayBodyDescription || showEditForm) && (
                 <div className="border-t border-white/10 px-8 py-6">
                   <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
                     {showCenterTeaser ? t("overlay.bookTickets") : t("overlay.description")}
@@ -539,7 +588,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     </div>
                   ) : (
                     <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-                      {node.description}
+                      {displayBodyDescription}
                     </p>
                   )}
                 </div>
@@ -620,6 +669,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               {canEditDescriptions &&
                 !node.description &&
                 !showEditForm &&
+                !isAllStarStreetBattleNode &&
                 !isOurArtistsNode &&
                 !isIdentityAdnNode &&
                 !isFaqNode && (
@@ -635,13 +685,13 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               )}
 
           {/* Section À propos (contenu détaillé) */}
-          {node.content && (
+          {displayAboutContent && (
             <div className="border-t border-white/10 px-8 py-6">
               <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
                 {t("overlay.about")}
               </h2>
               <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-                {node.content}
+                {displayAboutContent}
               </p>
             </div>
           )}

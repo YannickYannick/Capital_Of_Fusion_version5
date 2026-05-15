@@ -6,6 +6,7 @@ import { markdownToHtml } from "@/lib/markdownToHtml";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
 import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
+import { ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 
 const proseClasses =
   "text-white/90 leading-relaxed [&_a]:text-purple-400 [&_a:hover]:underline [&_h2]:mt-8 [&_h2]:text-xl [&_ul]:list-disc [&_ol]:list-decimal [&_pre]:bg-white/5 [&_pre]:p-4 [&_pre]:rounded-lg";
@@ -52,6 +53,14 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
             initialValue={initialValue}
             field={field as any}
             emptyText={empty}
+            heroVideo={
+              contentKey === "festivalAllStarStreetBattle"
+                ? {
+                    src: ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC,
+                    ariaLabel: title,
+                  }
+                : undefined
+            }
             preface={
               contentKey === "festivalNotreProgramme" ? (
                 <FestivalPlanningSchedule variant="page" />

@@ -27,6 +27,7 @@ export function EditableConfigMarkdownPage({
   ctaBelowSubtitle,
   preface,
   collapsibleMarkdown,
+  heroVideo,
 }: {
   eyebrow: string;
   title: string;
@@ -52,6 +53,13 @@ export function EditableConfigMarkdownPage({
     collapseLabel: string;
     /** Par défaut : replié. */
     defaultOpen?: boolean;
+  };
+  /** Bandeau vidéo au-dessus du panneau principal (ex. Street Bachata Battle). */
+  heroVideo?: {
+    src: string;
+    ariaLabel?: string;
+    /** Par défaut true : barre de lecture pour activer le son (l’autoplay reste muet). */
+    controls?: boolean;
   };
 }) {
   const markdownToggleId = useId();
@@ -82,6 +90,20 @@ export function EditableConfigMarkdownPage({
 
   return (
     <div className="text-white">
+      {heroVideo ? (
+        <div className="mb-8 overflow-hidden rounded-2xl border border-white/15 bg-black shadow-[0_16px_48px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/10">
+          <video
+            className="mx-auto w-full max-h-[min(72vh,680px)] bg-black object-contain"
+            src={heroVideo.src}
+            playsInline
+            muted
+            loop
+            autoPlay
+            controls={heroVideo.controls ?? true}
+            aria-label={heroVideo.ariaLabel || title}
+          />
+        </div>
+      ) : null}
       <div
         className={[
           "rounded-2xl border border-white/15",
