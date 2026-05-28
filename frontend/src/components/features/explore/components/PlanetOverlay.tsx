@@ -17,6 +17,10 @@ import {
   getStreetBattleRegistrationLinks,
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
+import {
+  organizationNodePageHref,
+  PARIS_BACHATA_GOANDANCE_EVENT_URL,
+} from "@/data/exploreOverlayCtas";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 
 interface PlanetOverlayProps {
@@ -90,6 +94,30 @@ function CardContent({
   );
 }
 
+const OVERLAY_CTA_CLASS =
+  "flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition";
+
+function OverlayPrimaryCta({ href, label, icon }: { href: string; label: string; icon: string }) {
+  const content = (
+    <>
+      <span className="text-xl">{icon}</span>
+      <span>{label}</span>
+    </>
+  );
+  if (href.startsWith("http://") || href.startsWith("https://")) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={OVERLAY_CTA_CLASS}>
+        {content}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={OVERLAY_CTA_CLASS}>
+      {content}
+    </Link>
+  );
+}
+
 /**
  * PlanetOverlay V5 — modal en portail (`document.body`, z-[100] au-dessus de la navbar).
  * Grille 2 colonnes : média (vidéo/image/lettrine) + titre/CTA.
@@ -97,6 +125,7 @@ function CardContent({
  */
 export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdated }: PlanetOverlayProps) {
   const t = useTranslations("explore");
+  const tPages = useTranslations("pages");
   const locale = useLocale();
   const [videoError, setVideoError] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -328,12 +357,49 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const displayAboutContent =
     node.content ||
     (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.rules : "");
-  const allStarPrimaryCtaHref = isAllStarStreetBattleNode
-    ? (node.cta_url || "").trim() || ALL_STAR_STREET_BATTLE_NODE_HREF
-    : "";
   const [streetBattleRegisterHref, streetBattleFestivalHref] = isAllStarStreetBattleNode
     ? getStreetBattleRegistrationLinks()
     : ["", ""];
+
+  const ctaUrl = (node.cta_url || "").trim();
+  const ctaText = (node.cta_text || "").trim();
+
+  let primaryCta: { href: string; label: string; icon: string };
+  if (String(node.type || "").toLowerCase() === "root") {
+    primaryCta = { href: PARIS_BACHATA_GOANDANCE_EVENT_URL, label: t("overlay.bookGoAndDance"), icon: "🎟️" };
+  } else if (isBookYourHotelNode) {
+    primaryCta = { href: "/festival/book-your-hotel", label: t("overlay.bookHotel"), icon: "🏨" };
+  } else if (isBookYourPassNode) {
+    primaryCta = {
+      href: ctaUrl || PARIS_BACHATA_GOANDANCE_EVENT_URL,
+      label: ctaText || t("overlay.bookYourPass"),
+      icon: "🎟️",
+    };
+  } else if (isFaqNode) {
+    primaryCta = { href: "/support/faq", label: t("overlay.openFaqFullPage"), icon: "❓" };
+  } else if (isIdentityAdnNode) {
+    primaryCta = {
+      href: "/identite-cof/adn-du-festival",
+      label: t("overlay.openIdentityFullPage"),
+      icon: "✨",
+    };
+  } else if (isOurArtistsNode) {
+    primaryCta = { href: "/artistes", label: t("overlay.browseArtists"), icon: "🎤" };
+  } else if (isNotreProgrammePlanet) {
+    primaryCta = {
+      href: ctaUrl || "/festival/notre-programme",
+      label: ctaText || t("overlay.learnMore"),
+      icon: "📅",
+    };
+  } else if (ctaUrl) {
+    primaryCta = { href: ctaUrl, label: ctaText || t("overlay.learnMore"), icon: "✨" };
+  } else {
+    primaryCta = {
+      href: organizationNodePageHref(node.slug),
+      label: t("overlay.learnMore"),
+      icon: "✨",
+    };
+  }
 
   const overlayBodyDescriptionHtml =
     displayBodyDescription.trim() &&
@@ -455,49 +521,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     </p>
                   )}
                   <div className="flex flex-wrap flex-col sm:flex-row gap-3 mt-4 w-full">
-                    {node.type === "ROOT" ? (
-                      <a
-                        href="https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnprgCFDBKaBIcXNxli3o4eSeZW2PkudBsk3Noz0zPCH1myeSa1TemsZFcRKo_aem_IPghO3-MUFniUMOa5ucZUg"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                      >
-                        <span className="text-xl">🎟️</span>
-                        <span>{t("overlay.bookGoAndDance")}</span>
-                      </a>
-                    ) : isBookYourHotelNode ? (
-                      <Link
-                        href="/festival/book-your-hotel"
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                      >
-                        <span className="text-xl">🏨</span>
-                        <span>{t("overlay.bookHotel")}</span>
-                      </Link>
-                    ) : isFaqNode ? (
-                      <Link
-                        href="/support/faq"
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                      >
-                        <span className="text-xl">❓</span>
-                        <span>{t("overlay.openFaqFullPage")}</span>
-                      </Link>
-                    ) : isIdentityAdnNode ? (
-                      <Link
-                        href="/identite-cof/adn-du-festival"
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                      >
-                        <span className="text-xl">✨</span>
-                        <span>{t("overlay.openIdentityFullPage")}</span>
-                      </Link>
-                    ) : isOurArtistsNode ? (
-                      <Link
-                        href="/artistes"
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                      >
-                        <span className="text-xl">🎤</span>
-                        <span>{t("overlay.browseArtists")}</span>
-                      </Link>
-                    ) : isAllStarStreetBattleNode ? (
+                    {isAllStarStreetBattleNode ? (
                       <>
                         <a
                           href={streetBattleRegisterHref}
@@ -505,7 +529,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                           rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center text-center px-4 py-3 h-12 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black text-sm font-bold transition"
                         >
-                          Inscris-toi
+                          {tPages("festivalAllStarStreetBattle.registerCtaPrimary")}
                         </a>
                         <a
                           href={streetBattleFestivalHref}
@@ -513,40 +537,15 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                           rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center text-center px-4 py-3 h-12 rounded-xl border-2 border-white/30 bg-white/10 hover:bg-white/15 text-white text-sm font-bold transition"
                         >
-                          Billets &amp; pass festival
+                          {tPages("festivalAllStarStreetBattle.registerCtaSecondary")}
                         </a>
                       </>
-                    ) : node.cta_url ? (
-                      node.cta_url.startsWith("/") ? (
-                        <Link
-                          href={node.cta_url}
-                          className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                        >
-                          <span className="text-xl">✨</span>
-                          <span>{node.cta_text || t("overlay.learnMore")}</span>
-                        </Link>
-                      ) : (
-                        <a
-                          href={node.cta_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-[#f3ac41] border border-[#f3ac41] hover:brightness-110 text-black font-bold transition"
-                        >
-                          <span className="text-xl">✨</span>
-                          <span>{node.cta_text || t("overlay.learnMore")}</span>
-                        </a>
-                      )
-                      ) : (
-                      <button
-                        type="button"
-                        disabled
-                        className="flex-1 flex items-center justify-center gap-2 text-center px-6 py-3 rounded-xl bg-white/10 text-white/60 font-bold shadow-[0_0_20px_-5px_rgba(255,255,255,0.10)] border border-white/15 cursor-not-allowed"
-                        aria-disabled="true"
-                        title={t("overlay.comingSoon")}
-                      >
-                        <span className="text-xl">⏳</span>
-                        <span>{t("overlay.comingSoon")}</span>
-                      </button>
+                    ) : (
+                      <OverlayPrimaryCta
+                        href={primaryCta.href}
+                        label={primaryCta.label}
+                        icon={primaryCta.icon}
+                      />
                     )}
                   </div>
                 </div>

@@ -145,6 +145,8 @@ class OrganizationNodeLightSerializer(serializers.ModelSerializer):
             "type",
             "parent_slug",
             "short_description",
+            "cta_text",
+            "cta_url",
             "profile_image",
             "cover_image",
             "visual_source",

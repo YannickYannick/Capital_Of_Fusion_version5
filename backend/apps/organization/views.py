@@ -69,8 +69,6 @@ class OrganizationNodeListAPIView(APIView):
                 .defer(
                     "description",
                     "content",
-                    "cta_text",
-                    "cta_url",
                     "video_url",
                     "music_type",
                     "music_youtube_url",

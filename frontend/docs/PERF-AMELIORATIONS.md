@@ -85,7 +85,7 @@ fetch('http://localhost:8000/api/organization/nodes/')
 ### 1. Endpoint list allégé
 
 - **Backend** :
-  - Ajout de `OrganizationNodeLightSerializer` (26 champs vs 35) qui exclut les champs lourds d’overlay : `description`, `content`, `cta_text`, `cta_url`, `video_url`, `music_type`, `music_youtube_url`, `music_file`.
+  - Ajout de `OrganizationNodeLightSerializer` qui exclut les champs lourds d’overlay : `description`, `content`, `video_url`, `music_type`, `music_youtube_url`, `music_file`. **`cta_text` et `cta_url` restent dans la liste light** pour éviter le flash « Coming soon » à l’ouverture de l’overlay.
   - `GET /api/organization/nodes/` (sans `?for_structure`) utilise ce serializer + `.defer()` sur ces 8 colonnes → moins d’E/S disque et moins de JSON renvoyé.
   - `GET /api/organization/nodes/?for_structure=1` reste inchangé (organigramme : serializer complet).
 
@@ -97,9 +97,10 @@ fetch('http://localhost:8000/api/organization/nodes/')
 - **Page `/explore`** :
   - `getOrganizationNodes()` consomme désormais la réponse **light** (par défaut).
   - Lorsqu’on ouvre l’overlay (`handleOpenOverlay`) :
-    1. On affiche immédiatement l’overlay avec les données légères (nom, image, accroche courte, type, événements).
+    1. On affiche immédiatement l’overlay avec les données légères (nom, image, accroche courte, **CTA**, type, événements).
     2. En parallèle, on fetch le détail complet via `getOrganizationNodeBySlug(slug)`.
-    3. Dès que la réponse arrive, on remplace le noeud actuel par la version complète (overlay + liste `nodes`).
+    3. Dès que la réponse arrive, on remplace le noeud actuel par la version complète (description longue, markdown, musique, etc.).
+    4. Le CTA principal est toujours un lien actif (jamais « Coming soon ») : règles par type de planète + `cta_url` dans la liste light.
 
 - **Effet UX** :
   - L’ouverture de l’overlay reste **instantanée**.
