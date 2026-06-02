@@ -3,6 +3,10 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@google/model-viewer"],
+  outputFileTracingIncludes: {
+    "/festival/giveaway": ["./content/festival-giveaway/**/*"],
+    "/festival/book-your-hotel": ["./content/festival-book-hotel/**/*"],
+  },
   images: {
     remotePatterns: [
       {

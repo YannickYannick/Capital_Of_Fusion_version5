@@ -1,5 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
+import { markdownToHtml } from "@/lib/markdownToHtml";
+
 const proseGiveaway =
   "mt-10 leading-relaxed text-white/95 [&_p]:text-white/95 [&_li]:text-white/95 " +
   "[&_a]:text-purple-300 [&_a]:font-medium [&_a:hover]:underline [&_a:hover]:text-purple-200 " +
@@ -12,7 +15,7 @@ export interface FestivalGiveawayClientProps {
   subtitle: string;
   instagramCta: string;
   instagramHref: string;
-  bodyHtml: string;
+  initialMarkdown: string;
 }
 
 export function FestivalGiveawayClient({
@@ -21,8 +24,10 @@ export function FestivalGiveawayClient({
   subtitle,
   instagramCta,
   instagramHref,
-  bodyHtml,
+  initialMarkdown,
 }: FestivalGiveawayClientProps) {
+  const bodyHtml = useMemo(() => markdownToHtml(initialMarkdown), [initialMarkdown]);
+
   return (
     <div className="text-white">
       <div
