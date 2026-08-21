@@ -3,6 +3,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@google/model-viewer"],
+  /** Build Vercel : pages SSG qui appellent l’API (sitemap, artistes…) — défaut Next = 60s. */
+  staticPageGenerationTimeout: 180,
   outputFileTracingIncludes: {
     "/festival/giveaway": ["./content/festival-giveaway/**/*"],
     "/festival/book-your-hotel": ["./content/festival-book-hotel/**/*"],

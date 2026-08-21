@@ -83,6 +83,20 @@ function addLangParam(url: string, lang: ApiLocale | null): string {
 }
 
 /**
+ * Pendant `next build`, coupe les fetch API qui restent pendus
+ * (API down / localhost injoignable sur Vercel → timeout 60s sinon).
+ */
+function apiFetchInit(init?: RequestInit, timeoutMs = 12_000): RequestInit {
+  if (process.env.NEXT_PHASE !== "phase-production-build") {
+    return init ?? {};
+  }
+  return {
+    ...init,
+    signal: init?.signal ?? AbortSignal.timeout(timeoutMs),
+  };
+}
+
+/**
  * Récupère les entrées de menu racine (avec children récursifs).
  * GET /api/menu/items/
  */
@@ -95,7 +109,7 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
   }
   let res: Response;
   try {
-    res = await fetch(url, { next: { revalidate: 60 } });
+    res = await fetch(url, apiFetchInit({ next: { revalidate: 60 } }));
   } catch (err) {
     console.error("[API] getMenuItems fetch FAILED (réseau/CORS):", err);
     throw err;
@@ -123,7 +137,7 @@ export async function getSiteConfig(): Promise<SiteConfigurationApi> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/config/`, lang);
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await fetch(url, apiFetchInit({ next: { revalidate: 60 } }));
   if (!res.ok) throw new Error(`Config API error: ${res.status}`);
   return res.json();
 }
@@ -363,7 +377,7 @@ export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]
   if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/?${qs}` : `${base}/api/courses/`;
-  const res = await fetch(url);
+  const res = await fetch(url, apiFetchInit());
   if (!res.ok) throw new Error(`Courses API error: ${res.status}`);
   return res.json();
 }
@@ -425,7 +439,7 @@ export async function getEvents(params?: EventsQuery): Promise<EventApi[]> {
   if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/events/?${qs}` : `${base}/api/events/`;
-  const res = await fetch(url);
+  const res = await fetch(url, apiFetchInit());
   if (!res.ok) throw new Error(`Events API error: ${res.status}`);
   return res.json();
 }
@@ -978,9 +992,10 @@ export async function getArtistsForArtistsPage(): Promise<{
 }> {
   const base = getApiBaseUrl();
   try {
-    const res = await fetch(`${base}/api/users/artists/`, {
-      next: { revalidate: ARTISTS_PAGE_REVALIDATE_SEC },
-    });
+    const res = await fetch(
+      `${base}/api/users/artists/`,
+      apiFetchInit({ next: { revalidate: ARTISTS_PAGE_REVALIDATE_SEC } }),
+    );
     if (!res.ok) {
       return { error: `Artists API error: ${res.status}`, artists: [] };
     }

@@ -95,3 +95,4 @@
 | [2026-08-21 17:17] Completed Task | Accès & Venue — contenu Officiel | Outcome: fallback FR/EN/ES + images area1/area2, page avec repli locale, seed migration 0032, titres i18n mis à jour. |
 | [2026-08-21 17:36] Completed Task | Overlay Explore Access & Venue | Outcome: PlanetOverlay affiche le Markdown FR/EN/ES (fallback) + CTA /festival/acces-venue ; detection par nom/slug/cta. |
 | [2026-08-21 17:41] Completed Task | Teaser Access & Venue overlay | Outcome: MP4 public/video/acces-venue-teaser.mp4 remplace le cover plan dans PlanetOverlay. |
+| [2026-08-21 17:55] Completed Task | Fix build Vercel SSG timeout | Outcome: AbortSignal build + sitemap race + staticPageGenerationTimeout 180. |
