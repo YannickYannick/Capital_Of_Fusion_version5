@@ -18,6 +18,12 @@ import {
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 import {
+  FESTIVAL_ACCES_VENUE_OVERLAY_HOOK,
+  FESTIVAL_ACCES_VENUE_PAGE_HREF,
+  FESTIVAL_ACCES_VENUE_TEASER_VIDEO_SRC,
+  getFestivalAccesVenueFallback,
+} from "@/data/festivalAccesVenueFallback";
+import {
   organizationNodePageHref,
   PARIS_BACHATA_GOANDANCE_EVENT_URL,
 } from "@/data/exploreOverlayCtas";
@@ -285,6 +291,27 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     return false;
   }, [node]);
 
+  /**
+   * Access & Venue — nom affiché « Access & Venue » ; slug legacy parfois
+   * `social-world-cup`. Repli = même Markdown que /festival/acces-venue.
+   */
+  const isAccesVenueNode = useMemo(() => {
+    if (!node) return false;
+    const slug = (node.slug || "").toLowerCase();
+    const name = (node.name || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    if (slug === "acces-venue" || slug === "access-venue") return true;
+    if (slug.includes("acces-venue") || slug.includes("access-venue")) return true;
+    if (name.includes("access") && name.includes("venue")) return true;
+    if (name.includes("acces") && name.includes("venue")) return true;
+    if (name.includes("acceso") && name.includes("venue")) return true;
+    const cta = (node.cta_url || "").trim().replace(/\/$/, "");
+    if (cta === FESTIVAL_ACCES_VENUE_PAGE_HREF) return true;
+    return false;
+  }, [node]);
+
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
   const [overlayMounted, setOverlayMounted] = useState(false);
@@ -348,12 +375,19 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const overlayLocale: OverlayLocale =
     locale === "fr" || locale === "en" || locale === "es" ? locale : "fr";
   const allStarOverlayFallback = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[overlayLocale];
+  const accesVenueOverlayHook = FESTIVAL_ACCES_VENUE_OVERLAY_HOOK[overlayLocale];
+  const accesVenueFallbackMarkdown = getFestivalAccesVenueFallback(overlayLocale);
+
   const displayShortForOverlay =
-    node.short_description || (isAllStarStreetBattleNode ? allStarOverlayFallback.hook : "");
+    node.short_description ||
+    (isAllStarStreetBattleNode ? allStarOverlayFallback.hook : "") ||
+    (isAccesVenueNode ? accesVenueOverlayHook : "");
   const displayBodyDescription =
-    (isAllStarStreetBattleNode && !showEditForm)
+    isAllStarStreetBattleNode && !showEditForm
       ? allStarOverlayFallback.description
-      : (node.description || "");
+      : isAccesVenueNode && !showEditForm
+        ? accesVenueFallbackMarkdown
+        : node.description || "";
   const displayAboutContent =
     node.content ||
     (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.rules : "");
@@ -390,6 +424,12 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
       href: ctaUrl || "/festival/notre-programme",
       label: ctaText || t("overlay.learnMore"),
       icon: "📅",
+    };
+  } else if (isAccesVenueNode) {
+    primaryCta = {
+      href: ctaUrl || FESTIVAL_ACCES_VENUE_PAGE_HREF,
+      label: ctaText || t("overlay.learnMore"),
+      icon: "📍",
     };
   } else if (ctaUrl) {
     primaryCta = { href: ctaUrl, label: ctaText || t("overlay.learnMore"), icon: "✨" };
@@ -444,7 +484,20 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 {/* Gauche — Média */}
                 <div className="relative min-h-[220px] bg-black/40 rounded-tl-2xl rounded-bl-2xl overflow-hidden flex items-center justify-center">
-                  {isAllStarStreetBattleNode && showAllStarOverlayHeroVideo ? (
+                  {isAccesVenueNode ? (
+                    <div className="relative h-full min-h-[260px] w-full bg-black md:min-h-[300px]">
+                      <video
+                        src={FESTIVAL_ACCES_VENUE_TEASER_VIDEO_SRC}
+                        className="absolute inset-0 h-full w-full object-contain bg-black"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="auto"
+                        aria-label={node.name}
+                      />
+                    </div>
+                  ) : isAllStarStreetBattleNode && showAllStarOverlayHeroVideo ? (
                     <div className="relative h-full min-h-[260px] w-full bg-black md:min-h-[300px]">
                       <video
                         src={ALL_STAR_STREET_BATTLE_PAGE_HERO_VIDEO_SRC}
@@ -636,6 +689,11 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                     <div
                       className={
                         "text-white/70 text-sm leading-relaxed space-y-3 " +
+                        "[&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-white " +
+                        "[&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-white/90 " +
+                        "[&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:marker:text-purple-300/90 " +
+                        "[&_hr]:my-6 [&_hr]:border-0 [&_hr]:h-px [&_hr]:bg-white/20 " +
+                        "[&_strong]:text-white [&_strong]:font-semibold " +
                         "[&_img]:rounded-xl [&_img]:border [&_img]:border-white/15 [&_img]:max-h-[min(52vh,520px)] [&_img]:w-auto [&_img]:max-w-full [&_img]:mx-auto [&_img]:my-4 [&_img]:block [&_img]:object-contain [&_img]:shadow-lg " +
                         "[&_p]:mb-3 [&_p:last-child]:mb-0"
                       }
@@ -725,6 +783,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                 !node.description &&
                 !showEditForm &&
                 !isAllStarStreetBattleNode &&
+                !isAccesVenueNode &&
                 !isOurArtistsNode &&
                 !isIdentityAdnNode &&
                 !isFaqNode && (

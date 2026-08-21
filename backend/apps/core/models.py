@@ -297,7 +297,11 @@ class SiteConfiguration(models.Model):
         blank=True,
         default="",
         verbose_name="Festival — Accès & Venue (Markdown)",
-        help_text="Contenu de la page Festival → Accès & Venue (format Markdown).",
+        help_text=(
+            "Contenu de la page Festival → Accès & Venue (Markdown). "
+            "Onglets FR/EN/ES. Si vide, le frontend affiche le fallback "
+            "(festivalAccesVenueFallback.ts)."
+        ),
     )
     festival_jack_n_jill_markdown = models.TextField(
         blank=True,

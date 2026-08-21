@@ -90,3 +90,8 @@
 | [2026-05-05] Completed Task | OrganizationNode â€” ordre Explore | Champ `explore_order`, migration `0008`, API triÃ©e ; serializers + PATCH admin ; admin list editable ; type TS ; `03-api_docs.md`. |
 
 *DerniÃ¨re mise Ã  jour : 2026-05-05*
+
+| [2026-08-21 17:16] Starting Task | Accès & Venue — contenu Officiel | Objectif : page /festival/acces-venue avec Markdown FR/EN/ES (maps Area 1/2), même pattern fallback que Notre programme / All Star. |
+| [2026-08-21 17:17] Completed Task | Accès & Venue — contenu Officiel | Outcome: fallback FR/EN/ES + images area1/area2, page avec repli locale, seed migration 0032, titres i18n mis à jour. |
+| [2026-08-21 17:36] Completed Task | Overlay Explore Access & Venue | Outcome: PlanetOverlay affiche le Markdown FR/EN/ES (fallback) + CTA /festival/acces-venue ; detection par nom/slug/cta. |
+| [2026-08-21 17:41] Completed Task | Teaser Access & Venue overlay | Outcome: MP4 public/video/acces-venue-teaser.mp4 remplace le cover plan dans PlanetOverlay. |
