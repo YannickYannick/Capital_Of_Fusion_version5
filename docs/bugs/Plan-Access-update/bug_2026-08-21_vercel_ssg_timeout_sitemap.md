@@ -25,12 +25,12 @@ Indépendant du contenu Accès & Venue : le pré-rendu SSG appelle l’API Djang
 
 ## ✅ The Solution
 
-1. `apiFetchInit()` : `AbortSignal.timeout(12s)` pendant `NEXT_PHASE=phase-production-build` (menu, config, courses, events, artists).
+1. `apiFetch()` centralisé : **tous** les appels de `api.ts` passent par un `AbortSignal.timeout(10s)` pendant `next build`.
 2. `sitemap.ts` : `Promise.race` 10s + pages statiques de repli.
-3. `next.config.ts` : `staticPageGenerationTimeout: 180`.
+3. `next.config.ts` : `staticPageGenerationTimeout: 120` (filet).
 
 Vérifier aussi sur Vercel : **`NEXT_PUBLIC_API_URL`** = URL Railway (Production + Preview).
 
 ## 🧠 Post-Mortem
 
-Toujours timeouter les fetch au build. Ne pas compter sur `try/catch` pour un réseau qui ne répond pas. Documenter `NEXT_PUBLIC_API_URL` comme prérequis de build Vercel.
+Toujours timeouter les fetch au build. Un correctif partiel (seulement sitemap/artistes) laisse échouer d’autres pages SSG (`/care/soins`, etc.). Documenter `NEXT_PUBLIC_API_URL` comme prérequis de build Vercel.

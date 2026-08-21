@@ -84,16 +84,24 @@ function addLangParam(url: string, lang: ApiLocale | null): string {
 
 /**
  * Pendant `next build`, coupe les fetch API qui restent pendus
- * (API down / localhost injoignable sur Vercel → timeout 60s sinon).
+ * (API down / localhost injoignable sur Vercel → timeout SSG sinon).
  */
-function apiFetchInit(init?: RequestInit, timeoutMs = 12_000): RequestInit {
-  if (process.env.NEXT_PHASE !== "phase-production-build") {
+function apiFetchInit(init?: RequestInit, timeoutMs = 10_000): RequestInit {
+  const isBuild =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.NEXT_PHASE === "phase-export";
+  if (!isBuild) {
     return init ?? {};
   }
   return {
     ...init,
     signal: init?.signal ?? AbortSignal.timeout(timeoutMs),
   };
+}
+
+/** Wrapper unique : tous les appels API passent ici (timeout auto au build). */
+function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  return fetch(input, apiFetchInit(init));
 }
 
 /**
@@ -109,7 +117,7 @@ export async function getMenuItems(): Promise<MenuItemApi[]> {
   }
   let res: Response;
   try {
-    res = await fetch(url, apiFetchInit({ next: { revalidate: 60 } }));
+    res = await apiFetch(url, { next: { revalidate: 60 } });
   } catch (err) {
     console.error("[API] getMenuItems fetch FAILED (réseau/CORS):", err);
     throw err;
@@ -137,7 +145,7 @@ export async function getSiteConfig(): Promise<SiteConfigurationApi> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/config/`, lang);
-  const res = await fetch(url, apiFetchInit({ next: { revalidate: 60 } }));
+  const res = await apiFetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Config API error: ${res.status}`);
   return res.json();
 }
@@ -149,7 +157,7 @@ export async function getBulletins(): Promise<BulletinApi[]> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/identite/bulletins/`, lang);
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await apiFetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Bulletins API error: ${res.status}`);
   return res.json();
 }
@@ -161,7 +169,7 @@ export async function getBulletinBySlug(slug: string): Promise<BulletinApi> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/identite/bulletins/${encodeURIComponent(slug)}/`, lang);
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await apiFetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Bulletin API error: ${res.status}`);
   return res.json();
 }
@@ -177,7 +185,7 @@ export async function patchSiteConfigVision(visionMarkdown: string): Promise<Sit
   if (!token) throw new Error("Authentification requise");
   const lang = (await getLocaleFromCookie()) ?? "fr";
   const url = addLangParam(`${base}/api/admin/config/`, lang);
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -203,7 +211,7 @@ export async function patchSiteConfigHistory(historyMarkdown: string): Promise<S
   if (!token) throw new Error("Authentification requise");
   const lang = (await getLocaleFromCookie()) ?? "fr";
   const url = addLangParam(`${base}/api/admin/config/`, lang);
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -240,7 +248,7 @@ export async function patchSiteConfigMarkdownField(payload: Partial<Pick<
   if (!token) throw new Error("Authentification requise");
   const lang = (await getLocaleFromCookie()) ?? "fr";
   const url = addLangParam(`${base}/api/admin/config/`, lang);
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -267,7 +275,7 @@ export async function getAdminBulletins(): Promise<BulletinAdminApi[]> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/identite/bulletins/`, {
+  const res = await apiFetch(`${base}/api/admin/identite/bulletins/`, {
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Admin bulletins API error: ${res.status}`);
@@ -287,7 +295,7 @@ export async function getAdminBulletinBySlug(slug: string): Promise<BulletinAdmi
     `${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`,
     lang
   );
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Admin bulletin API error: ${res.status}`);
@@ -308,7 +316,7 @@ export async function createBulletin(data: {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/identite/bulletins/`, {
+  const res = await apiFetch(`${base}/api/admin/identite/bulletins/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -340,7 +348,7 @@ export async function patchBulletin(
     `${base}/api/admin/identite/bulletins/${encodeURIComponent(slug)}/`,
     lang
   );
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -377,7 +385,7 @@ export async function getCourses(params?: CoursesQuery): Promise<CourseListApi[]
   if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/?${qs}` : `${base}/api/courses/`;
-  const res = await fetch(url, apiFetchInit());
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Courses API error: ${res.status}`);
   return res.json();
 }
@@ -389,7 +397,7 @@ export async function getCourseBySlug(slug: string): Promise<CourseApi> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/courses/${encodeURIComponent(slug)}/`, lang);
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Course API error: ${res.status}`);
   return res.json();
 }
@@ -414,7 +422,7 @@ export async function getCourseSchedules(params?: SchedulesQuery): Promise<Sched
   if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/schedules/?${qs}` : `${base}/api/courses/schedules/`;
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Schedules API error: ${res.status}`);
   return res.json();
 }
@@ -439,7 +447,7 @@ export async function getEvents(params?: EventsQuery): Promise<EventApi[]> {
   if (lang) search.set("lang", lang);
   const qs = search.toString();
   const url = qs ? `${base}/api/events/?${qs}` : `${base}/api/events/`;
-  const res = await fetch(url, apiFetchInit());
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Events API error: ${res.status}`);
   return res.json();
 }
@@ -451,7 +459,7 @@ export async function getEventBySlug(slug: string): Promise<EventApi> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/events/${encodeURIComponent(slug)}/`, lang);
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Event API error: ${res.status}`);
   return res.json();
 }
@@ -473,7 +481,7 @@ export async function getOrganizationNodes(): Promise<import("@/types/organizati
     return _nodesCacheData;
   }
 
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await apiFetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization nodes API error: ${res.status}`);
   const data = await res.json();
   _nodesCacheData = data;
@@ -495,7 +503,7 @@ export async function getOrganizationNodesForStructure(): Promise<OrganizationNo
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/organization/nodes/?for_structure=1`, lang);
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await apiFetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Organization structure API error: ${res.status}`);
   return res.json();
 }
@@ -507,7 +515,7 @@ export async function getPoles(): Promise<PoleApi[]> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/organization/poles/`, lang);
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await apiFetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Poles API error: ${res.status}`);
   return res.json();
 }
@@ -522,7 +530,7 @@ export async function getStaffMembers(poleSlug?: string): Promise<StaffMemberApi
   const url = poleSlug
     ? `${base}/api/organization/staff/?pole=${encodeURIComponent(poleSlug)}`
     : `${base}/api/organization/staff/`;
-  const res = await fetch(addLangParam(url, lang), { cache: "no-store" });
+  const res = await apiFetch(addLangParam(url, lang), { cache: "no-store" });
   if (!res.ok) throw new Error(`Staff API error: ${res.status}`);
   return res.json();
 }
@@ -535,7 +543,7 @@ export async function getOrganizationNodeBySlug(
 ): Promise<OrganizationNodeApi> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
-  const res = await fetch(
+  const res = await apiFetch(
     addLangParam(
       `${base}/api/organization/nodes/${encodeURIComponent(slug)}/`,
       lang
@@ -566,7 +574,7 @@ export interface PartnerCoursesQuery {
  */
 export async function getPartnerNodes(): Promise<PartnerNodeApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/nodes/`, { cache: "no-store" });
+  const res = await apiFetch(`${base}/api/partners/nodes/`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Partner nodes API error: ${res.status}`);
   return res.json();
 }
@@ -576,7 +584,7 @@ export async function getPartnerNodes(): Promise<PartnerNodeApi[]> {
  */
 export async function getPartnerNodesForStructure(): Promise<PartnerNodeApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/nodes/?for_structure=1`, { cache: "no-store" });
+  const res = await apiFetch(`${base}/api/partners/nodes/?for_structure=1`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Partner structure API error: ${res.status}`);
   return res.json();
 }
@@ -586,7 +594,7 @@ export async function getPartnerNodesForStructure(): Promise<PartnerNodeApi[]> {
  */
 export async function getPartnerNodeBySlug(slug: string): Promise<PartnerNodeApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/nodes/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/partners/nodes/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Partner node API error: ${res.status}`);
@@ -604,7 +612,7 @@ export async function getPartnerEvents(params?: PartnerEventsQuery): Promise<Par
   if (params?.upcoming) search.set("upcoming", "1");
   const qs = search.toString();
   const url = qs ? `${base}/api/partners/events/?${qs}` : `${base}/api/partners/events/`;
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await apiFetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Partner events API error: ${res.status}`);
   return res.json();
 }
@@ -614,7 +622,7 @@ export async function getPartnerEvents(params?: PartnerEventsQuery): Promise<Par
  */
 export async function getPartnerEventBySlug(slug: string): Promise<PartnerEventApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/events/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/partners/events/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Partner event API error: ${res.status}`);
@@ -632,7 +640,7 @@ export async function getPartnerCourses(params?: PartnerCoursesQuery): Promise<P
   if (params?.node) search.set("node", params.node);
   const qs = search.toString();
   const url = qs ? `${base}/api/partners/courses/?${qs}` : `${base}/api/partners/courses/`;
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await apiFetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Partner courses API error: ${res.status}`);
   return res.json();
 }
@@ -642,7 +650,7 @@ export async function getPartnerCourses(params?: PartnerCoursesQuery): Promise<P
  */
 export async function getPartnerCourseBySlug(slug: string): Promise<PartnerCourseApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/partners/courses/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/partners/courses/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Partner course API error: ${res.status}`);
@@ -654,7 +662,7 @@ export async function getAdminPartners(): Promise<PartnerMinimalApi[]> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/`, {
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Admin partners API error: ${res.status}`);
@@ -670,7 +678,7 @@ export async function createAdminPartner(data: {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -688,7 +696,7 @@ export async function getPartnerCourseMeta(): Promise<PartnerCourseMetaApi> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/course-meta/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/course-meta/`, {
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Partner course meta API error: ${res.status}`);
@@ -700,7 +708,7 @@ export async function getPartnerNodeAdmin(slug: string): Promise<PartnerNodeApi>
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/nodes/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/nodes/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
     headers: { Authorization: `Token ${token}` },
   });
@@ -713,7 +721,7 @@ export async function patchPartnerNodeAdmin(slug: string, formData: FormData): P
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/nodes/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/nodes/${encodeURIComponent(slug)}/`, {
     method: "PATCH",
     headers: { Authorization: `Token ${token}` },
     body: formData,
@@ -728,7 +736,7 @@ export async function createPartnerNodeAdmin(payload: Record<string, unknown>): 
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/nodes/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/nodes/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -746,7 +754,7 @@ export async function createPartnerEventAdmin(payload: Record<string, unknown>):
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/events/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/events/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -764,7 +772,7 @@ export async function createPartnerCourseAdmin(payload: Record<string, unknown>)
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/courses/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/courses/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -782,7 +790,7 @@ export async function getPartnerEventAdmin(slug: string): Promise<PartnerEventAp
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/events/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/events/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
     headers: { Authorization: `Token ${token}` },
   });
@@ -795,7 +803,7 @@ export async function patchPartnerEventAdmin(slug: string, formData: FormData): 
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/events/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/events/${encodeURIComponent(slug)}/`, {
     method: "PATCH",
     headers: { Authorization: `Token ${token}` },
     body: formData,
@@ -810,7 +818,7 @@ export async function getPartnerCourseAdmin(slug: string): Promise<PartnerCourse
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/courses/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/courses/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
     headers: { Authorization: `Token ${token}` },
   });
@@ -823,7 +831,7 @@ export async function patchPartnerCourseAdmin(slug: string, formData: FormData):
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/courses/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/courses/${encodeURIComponent(slug)}/`, {
     method: "PATCH",
     headers: { Authorization: `Token ${token}` },
     body: formData,
@@ -838,7 +846,7 @@ export async function getPartnerBrandAdmin(slug: string): Promise<PartnerBrandAd
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/brands/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/brands/${encodeURIComponent(slug)}/`, {
     cache: "no-store",
     headers: { Authorization: `Token ${token}` },
   });
@@ -851,7 +859,7 @@ export async function patchPartnerBrandAdmin(slug: string, formData: FormData): 
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/partners/brands/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/partners/brands/${encodeURIComponent(slug)}/`, {
     method: "PATCH",
     headers: { Authorization: `Token ${token}` },
     body: formData,
@@ -872,7 +880,7 @@ export async function patchOrganizationNode(
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(
+  const res = await apiFetch(
     `${base}/api/admin/organization/nodes/${encodeURIComponent(slug)}/`,
     {
       method: "PATCH",
@@ -920,7 +928,7 @@ export async function login(
   password: string
 ): Promise<LoginResponse> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/auth/login/`, {
+  const res = await apiFetch(`${base}/api/auth/login/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -938,7 +946,7 @@ export async function login(
  */
 export async function loginWithGoogle(idToken: string): Promise<LoginResponse> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/auth/google/`, {
+  const res = await apiFetch(`${base}/api/auth/google/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id_token: idToken }),
@@ -957,7 +965,7 @@ export async function logout(): Promise<void> {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) return;
-  await fetch(`${base}/api/auth/logout/`, {
+  await apiFetch(`${base}/api/auth/logout/`, {
     method: "POST",
     headers: { Authorization: `Token ${token}` },
   });
@@ -974,7 +982,7 @@ export async function getArtists(staffOnly?: boolean): Promise<ArtistApi[]> {
   if (staffOnly !== undefined) {
     url += `?staff_only=${staffOnly}`;
   }
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await apiFetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Artists API error: ${res.status}`);
   return res.json();
 }
@@ -992,10 +1000,7 @@ export async function getArtistsForArtistsPage(): Promise<{
 }> {
   const base = getApiBaseUrl();
   try {
-    const res = await fetch(
-      `${base}/api/users/artists/`,
-      apiFetchInit({ next: { revalidate: ARTISTS_PAGE_REVALIDATE_SEC } }),
-    );
+    const res = await apiFetch(`${base}/api/users/artists/`, { next: { revalidate: ARTISTS_PAGE_REVALIDATE_SEC } });
     if (!res.ok) {
       return { error: `Artists API error: ${res.status}`, artists: [] };
     }
@@ -1014,7 +1019,7 @@ export async function getArtistsForArtistsPage(): Promise<{
  */
 export async function getArtistByUsername(username: string): Promise<ArtistApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/users/artists/${encodeURIComponent(username)}/`, {
+  const res = await apiFetch(`${base}/api/users/artists/${encodeURIComponent(username)}/`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Artist API error: ${res.status}`);
@@ -1035,7 +1040,7 @@ export async function getArtistAdmin(username: string): Promise<{
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+  const res = await apiFetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
     cache: "no-store",
     headers: { Authorization: `Token ${token}` },
   });
@@ -1065,7 +1070,7 @@ export async function patchArtistAdmin(
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+  const res = await apiFetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -1099,7 +1104,7 @@ async function uploadArtistImageField(
   if (!token) throw new Error("Authentification requise");
   const formData = new FormData();
   formData.append(field, file);
-  const res = await fetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
+  const res = await apiFetch(`${base}/api/admin/users/artists/${encodeURIComponent(username)}/`, {
     method: "PATCH",
     headers: {
       Authorization: `Token ${token}`,
@@ -1145,7 +1150,7 @@ export async function createArtistAdmin(payload: {
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/users/artists/`, {
+  const res = await apiFetch(`${base}/api/admin/users/artists/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1173,7 +1178,7 @@ export async function getDanceProfessionsAdmin(): Promise<DanceProfessionApi[]> 
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/admin/users/artists/professions/`, {
+  const res = await apiFetch(`${base}/api/admin/users/artists/professions/`, {
     headers: { Authorization: `Token ${token}` },
   });
   if (!res.ok) throw new Error(`Professions API error: ${res.status}`);
@@ -1191,7 +1196,7 @@ export async function patchOrganizationNodeAdmin(
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
   const isForm = typeof FormData !== "undefined" && payload instanceof FormData;
-  const res = await fetch(`${base}/api/admin/organization/nodes/${encodeURIComponent(slug)}/`, {
+  const res = await apiFetch(`${base}/api/admin/organization/nodes/${encodeURIComponent(slug)}/`, {
     method: "PATCH",
     headers: isForm
       ? { Authorization: `Token ${token}` }
@@ -1229,7 +1234,7 @@ export async function getTheoryLessons(params?: TheoryQuery): Promise<TheoryLess
   if (params?.category) search.set("category", params.category);
   const qs = search.toString();
   const url = qs ? `${base}/api/courses/theory/?${qs}` : `${base}/api/courses/theory/`;
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Theory API error: ${res.status}`);
   return res.json();
 }
@@ -1239,7 +1244,7 @@ export async function getTheoryLessons(params?: TheoryQuery): Promise<TheoryLess
  */
 export async function getTheoryLessonBySlug(slug: string): Promise<TheoryLessonApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/courses/theory/${encodeURIComponent(slug)}/`);
+  const res = await apiFetch(`${base}/api/courses/theory/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Theory lesson API error: ${res.status}`);
   return res.json();
 }
@@ -1255,7 +1260,7 @@ export async function getTheoryLessonBySlug(slug: string): Promise<TheoryLessonA
 /** Liste des catégories de produits. GET /api/shop/categories/ */
 export async function getProductCategories(): Promise<ProductCategoryApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/shop/categories/`);
+  const res = await apiFetch(`${base}/api/shop/categories/`);
   if (!res.ok) throw new Error(`Shop Categories API error: ${res.status}`);
   return res.json();
 }
@@ -1263,7 +1268,7 @@ export async function getProductCategories(): Promise<ProductCategoryApi[]> {
 /** Détail d'une catégorie par slug. GET /api/shop/categories/<slug>/ */
 export async function getProductCategoryBySlug(slug: string): Promise<ProductCategoryApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/shop/categories/${encodeURIComponent(slug)}/`);
+  const res = await apiFetch(`${base}/api/shop/categories/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Shop Category API error: ${res.status}`);
   return res.json();
 }
@@ -1281,7 +1286,7 @@ export async function getProducts(params?: ProductsQuery): Promise<ProductApi[]>
   if (params?.featured) search.set("featured", "1");
   const qs = search.toString();
   const url = qs ? `${base}/api/shop/products/?${qs}` : `${base}/api/shop/products/`;
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Shop Products API error: ${res.status}`);
   return res.json();
 }
@@ -1289,7 +1294,7 @@ export async function getProducts(params?: ProductsQuery): Promise<ProductApi[]>
 /** Détail d'un produit par slug. GET /api/shop/products/<slug>/ */
 export async function getProductBySlug(slug: string): Promise<ProductApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/shop/products/${encodeURIComponent(slug)}/`);
+  const res = await apiFetch(`${base}/api/shop/products/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Shop Product API error: ${res.status}`);
   return res.json();
 }
@@ -1299,7 +1304,7 @@ export async function getProductBySlug(slug: string): Promise<ProductApi> {
 /** Liste des catégories de soins. GET /api/care/categories/ */
 export async function getServiceCategories(): Promise<ServiceCategoryApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/care/categories/`);
+  const res = await apiFetch(`${base}/api/care/categories/`);
   if (!res.ok) throw new Error(`Care Categories API error: ${res.status}`);
   return res.json();
 }
@@ -1307,7 +1312,7 @@ export async function getServiceCategories(): Promise<ServiceCategoryApi[]> {
 /** Liste des praticiens. GET /api/care/practitioners/ */
 export async function getPractitioners(): Promise<PractitionerListApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/care/practitioners/`);
+  const res = await apiFetch(`${base}/api/care/practitioners/`);
   if (!res.ok) throw new Error(`Care Practitioners API error: ${res.status}`);
   return res.json();
 }
@@ -1315,7 +1320,7 @@ export async function getPractitioners(): Promise<PractitionerListApi[]> {
 /** Détail d'un praticien par slug. GET /api/care/practitioners/<slug>/ */
 export async function getPractitionerBySlug(slug: string): Promise<PractitionerApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/care/practitioners/${encodeURIComponent(slug)}/`);
+  const res = await apiFetch(`${base}/api/care/practitioners/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Care Practitioner API error: ${res.status}`);
   return res.json();
 }
@@ -1333,7 +1338,7 @@ export async function getCareServices(params?: CareServicesQuery): Promise<CareS
   if (params?.practitioner) search.set("practitioner", params.practitioner);
   const qs = search.toString();
   const url = qs ? `${base}/api/care/services/?${qs}` : `${base}/api/care/services/`;
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Care Services API error: ${res.status}`);
   return res.json();
 }
@@ -1343,7 +1348,7 @@ export async function getCareServices(params?: CareServicesQuery): Promise<CareS
 /** Liste des catégories de projets. GET /api/projects/categories/ */
 export async function getProjectCategories(): Promise<ProjectCategoryApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/projects/categories/`);
+  const res = await apiFetch(`${base}/api/projects/categories/`);
   if (res.status === 404) return [];
   if (!res.ok) throw new Error(`Project Categories API error: ${res.status}`);
   return res.json();
@@ -1362,7 +1367,7 @@ export async function getProjects(params?: ProjectsQuery): Promise<ProjectApi[]>
   if (params?.category) search.set("category", params.category);
   const qs = search.toString();
   const url = qs ? `${base}/api/projects/projects/?${qs}` : `${base}/api/projects/projects/`;
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (res.status === 404) return [];
   if (!res.ok) throw new Error(`Projects API error: ${res.status}`);
   return res.json();
@@ -1371,7 +1376,7 @@ export async function getProjects(params?: ProjectsQuery): Promise<ProjectApi[]>
 /** Détail d'un projet par slug. GET /api/projects/projects/<slug>/ */
 export async function getProjectBySlug(slug: string): Promise<ProjectApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/projects/projects/${encodeURIComponent(slug)}/`);
+  const res = await apiFetch(`${base}/api/projects/projects/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Project API error: ${res.status}`);
   return res.json();
 }
@@ -1381,7 +1386,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectApi> {
 /** Liste des pass d'abonnement. GET /api/trainings/passes/ */
 export async function getSubscriptionPasses(): Promise<SubscriptionPassApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/trainings/passes/`);
+  const res = await apiFetch(`${base}/api/trainings/passes/`);
   if (!res.ok) throw new Error(`Trainings Passes API error: ${res.status}`);
   return res.json();
 }
@@ -1399,7 +1404,7 @@ export async function getTrainingSessions(params?: TrainingSessionsQuery): Promi
   if (params?.level) search.set("level", params.level);
   const qs = search.toString();
   const url = qs ? `${base}/api/trainings/sessions/?${qs}` : `${base}/api/trainings/sessions/`;
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) throw new Error(`Trainings Sessions API error: ${res.status}`);
   return res.json();
 }
@@ -1407,7 +1412,7 @@ export async function getTrainingSessions(params?: TrainingSessionsQuery): Promi
 /** Détail d'une session par slug. GET /api/trainings/sessions/<slug>/ */
 export async function getTrainingSessionBySlug(slug: string): Promise<TrainingSessionApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/trainings/sessions/${encodeURIComponent(slug)}/`);
+  const res = await apiFetch(`${base}/api/trainings/sessions/${encodeURIComponent(slug)}/`);
   if (!res.ok) throw new Error(`Training Session API error: ${res.status}`);
   return res.json();
 }
@@ -1417,7 +1422,7 @@ export async function registerToTrainingSession(slug: string): Promise<TrainingR
   const base = getApiBaseUrl();
   const token = getStoredToken();
   if (!token) throw new Error("Authentification requise");
-  const res = await fetch(`${base}/api/trainings/sessions/${encodeURIComponent(slug)}/register/`, {
+  const res = await apiFetch(`${base}/api/trainings/sessions/${encodeURIComponent(slug)}/register/`, {
     method: "POST",
     headers: { Authorization: `Token ${token}` },
   });
@@ -1433,7 +1438,7 @@ export async function registerToTrainingSession(slug: string): Promise<TrainingR
 /** Liste des presets Explore. GET /api/core/presets/ */
 export async function getExplorePresets(): Promise<ExplorePresetApi[]> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/core/presets/`);
+  const res = await apiFetch(`${base}/api/core/presets/`);
   if (!res.ok) throw new Error(`Explore Presets API error: ${res.status}`);
   return res.json();
 }
@@ -1441,7 +1446,7 @@ export async function getExplorePresets(): Promise<ExplorePresetApi[]> {
 /** Détail d'un preset Explore. GET /api/core/presets/<id>/ */
 export async function getExplorePresetById(id: string): Promise<ExplorePresetApi> {
   const base = getApiBaseUrl();
-  const res = await fetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`);
+  const res = await apiFetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`);
   if (!res.ok) throw new Error(`Explore Preset API error: ${res.status}`);
   return res.json();
 }
@@ -1453,7 +1458,7 @@ export async function createExplorePreset(data: Partial<ExplorePresetApi>): Prom
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Token ${token}`;
 
-  const res = await fetch(`${base}/api/core/presets/`, {
+  const res = await apiFetch(`${base}/api/core/presets/`, {
     method: "POST",
     headers,
     body: JSON.stringify(data),
@@ -1475,7 +1480,7 @@ export async function updateExplorePreset(
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Token ${token}`;
 
-  const res = await fetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`, {
+  const res = await apiFetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`, {
     method: "PATCH",
     headers,
     body: JSON.stringify(data),
@@ -1494,7 +1499,7 @@ export async function deleteExplorePreset(id: string): Promise<void> {
   const headers: HeadersInit = {};
   if (token) headers["Authorization"] = `Token ${token}`;
 
-  const res = await fetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`, {
+  const res = await apiFetch(`${base}/api/core/presets/${encodeURIComponent(id)}/`, {
     method: "DELETE",
     headers,
   });
@@ -1520,7 +1525,7 @@ export async function getFaqItems(): Promise<FaqItemApi[]> {
   const base = getApiBaseUrl();
   const lang = await getLocaleFromCookie();
   const url = addLangParam(`${base}/api/faq/`, lang);
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await apiFetch(url, { next: { revalidate: 60 } });
   if (!res.ok) return [];
   return res.json();
 }

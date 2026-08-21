@@ -96,3 +96,4 @@
 | [2026-08-21 17:36] Completed Task | Overlay Explore Access & Venue | Outcome: PlanetOverlay affiche le Markdown FR/EN/ES (fallback) + CTA /festival/acces-venue ; detection par nom/slug/cta. |
 | [2026-08-21 17:41] Completed Task | Teaser Access & Venue overlay | Outcome: MP4 public/video/acces-venue-teaser.mp4 remplace le cover plan dans PlanetOverlay. |
 | [2026-08-21 17:55] Completed Task | Fix build Vercel SSG timeout | Outcome: AbortSignal build + sitemap race + staticPageGenerationTimeout 180. |
+| [2026-08-21 18:21] Completed Task | Fix SSG timeout généralisé | Outcome: apiFetch sur tous les appels api.ts (care/soins inclus). |
