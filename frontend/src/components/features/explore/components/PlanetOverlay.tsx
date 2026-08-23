@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import type { OrganizationNodeApi, NodeEventApi } from "@/types/organization";
-import { getFaqItems, patchOrganizationNode, type FaqItemApi } from "@/lib/api";
+import { getFaqItems, getSiteConfig, patchOrganizationNode, type FaqItemApi } from "@/lib/api";
 import { GoAndDanceTicketsEmbed } from "@/components/features/festival/GoAndDanceTicketsEmbed";
 import { FestivalPlanningSchedule } from "@/components/features/festival/FestivalPlanningSchedule";
 import { OverlayArtistsGrid } from "./OverlayArtistsGrid";
@@ -31,6 +31,7 @@ import { SiteEntryPlanMedia } from "@/components/features/festival/SiteEntryPlan
 import { renderMarkdownWithEmbed } from "@/components/shared/MarkdownWithEmbed";
 import {
   FESTIVAL_JACK_N_JILL_PAGE_HREF,
+  getFestivalJackNJillFallback,
   getFestivalJackNJillOverlayDescription,
 } from "@/data/festivalJackNJillFallback";
 import {
@@ -45,8 +46,21 @@ const OVERLAY_BODY_PROSE_CLASS =
   "[&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:marker:text-purple-300/90 " +
   "[&_hr]:my-6 [&_hr]:border-0 [&_hr]:h-px [&_hr]:bg-white/20 " +
   "[&_strong]:text-white [&_strong]:font-semibold " +
+  "[&_a]:text-purple-300 [&_a]:font-medium [&_a:hover]:underline [&_a:hover]:text-purple-200 " +
   "[&_img]:rounded-xl [&_img]:border [&_img]:border-white/15 [&_img]:max-h-[min(52vh,520px)] [&_img]:w-auto [&_img]:max-w-full [&_img]:mx-auto [&_img]:my-4 [&_img]:block [&_img]:object-contain [&_img]:shadow-lg " +
   "[&_p]:mb-3 [&_p:last-child]:mb-0";
+
+/** True si le texte ressemble à du Markdown éditorial (titres, images, token embed). */
+function overlayBodyLooksLikeMarkdown(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (t.includes(SITE_ENTRY_PLAN_MARKDOWN_TOKEN)) return true;
+  if (/\!\[[^\]]*\]\([^)]+\)/.test(t)) return true;
+  if (/^#{2,3}\s/m.test(t)) return true;
+  if (/^---$/m.test(t)) return true;
+  if (/^https?:\/\//m.test(t)) return true;
+  return false;
+}
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -331,14 +345,20 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     return false;
   }, [node]);
 
-  /** Jack n' Jill Vibe — catégorie amateur ; repli description i18n si API vide ou legacy EN. */
+  /** Jack n' Jill / Social French Cup — repli = même Markdown que /festival/jack-n-jill et le nœud editorial. */
   const isJackNJillNode = useMemo(() => {
     if (!node) return false;
     const slug = (node.slug || "").toLowerCase();
-    const name = (node.name || "").toLowerCase();
+    const name = (node.name || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     if (slug === "jack-n-jill-vibe") return true;
     if (slug.includes("jack") && slug.includes("jill")) return true;
+    if (slug.includes("social-french-cup") || slug.includes("social-world-cup")) return true;
     if (name.includes("jack") && name.includes("jill")) return true;
+    if (name.includes("social french cup")) return true;
+    if (name.includes("j&j") || name.includes("j j")) return true;
     const cta = (node.cta_url || "").trim().replace(/\/$/, "");
     if (cta === FESTIVAL_JACK_N_JILL_PAGE_HREF) return true;
     return false;
@@ -346,6 +366,8 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
 
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
+  /** Markdown Jack n' Jill depuis l'API (prioritaire sur le fallback statique). */
+  const [jackNJillMarkdownFromApi, setJackNJillMarkdownFromApi] = useState("");
   const [overlayMounted, setOverlayMounted] = useState(false);
   /** Après ouverture overlay All Star : logo/cover 3 s puis vidéo hero à la place. */
   const [showAllStarOverlayHeroVideo, setShowAllStarOverlayHeroVideo] = useState(false);
@@ -386,6 +408,25 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     };
   }, [isFaqNode, locale]);
 
+  useEffect(() => {
+    if (!isJackNJillNode) {
+      setJackNJillMarkdownFromApi("");
+      return;
+    }
+    let cancelled = false;
+    getSiteConfig()
+      .then((cfg) => {
+        const fromApi = (cfg.festival_jack_n_jill_markdown ?? "").trim();
+        if (!cancelled) setJackNJillMarkdownFromApi(fromApi);
+      })
+      .catch(() => {
+        if (!cancelled) setJackNJillMarkdownFromApi("");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isJackNJillNode, locale]);
+
   // Early return APRÈS tous les hooks
   if (!node) return null;
   if (!overlayMounted) return null;
@@ -409,19 +450,22 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const allStarOverlayFallback = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[overlayLocale];
   const accesVenueOverlayHook = FESTIVAL_ACCES_VENUE_OVERLAY_HOOK[overlayLocale];
   const accesVenueFallbackMarkdown = getFestivalAccesVenueFallback(overlayLocale);
-  const jackNJillOverlayDescription = getFestivalJackNJillOverlayDescription(overlayLocale);
+  const jackNJillOverlayHook = getFestivalJackNJillOverlayDescription(overlayLocale);
+  const jackNJillFallbackMarkdown = getFestivalJackNJillFallback(overlayLocale);
+  const jackNJillBodyMarkdown = jackNJillMarkdownFromApi || jackNJillFallbackMarkdown;
 
   const displayShortForOverlay =
     node.short_description ||
     (isAllStarStreetBattleNode ? allStarOverlayFallback.hook : "") ||
-    (isAccesVenueNode ? accesVenueOverlayHook : "");
+    (isAccesVenueNode ? accesVenueOverlayHook : "") ||
+    (isJackNJillNode ? jackNJillOverlayHook : "");
   const displayBodyDescription =
     isAllStarStreetBattleNode && !showEditForm
       ? allStarOverlayFallback.description
       : isAccesVenueNode && !showEditForm
         ? accesVenueFallbackMarkdown
         : isJackNJillNode && !showEditForm
-          ? jackNJillOverlayDescription
+          ? jackNJillBodyMarkdown
           : node.description || "";
   const displayAboutContent =
     node.content ||
@@ -488,8 +532,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
    */
   const overlayBodyIsMarkdown =
     Boolean(displayBodyDescription.trim()) &&
-    (/\!\[[^\]]*\]\([^)]+\)/.test(displayBodyDescription) ||
-      displayBodyDescription.includes(SITE_ENTRY_PLAN_MARKDOWN_TOKEN));
+    overlayBodyLooksLikeMarkdown(displayBodyDescription);
   const overlayBodyNode = overlayBodyIsMarkdown
     ? renderMarkdownWithEmbed(displayBodyDescription, OVERLAY_BODY_PROSE_CLASS, {
         token: SITE_ENTRY_PLAN_MARKDOWN_TOKEN,

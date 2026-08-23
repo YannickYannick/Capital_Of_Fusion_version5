@@ -42,8 +42,6 @@ También una apertura a la fusión con influencias de las grandes metrópolis: h
 - ✅ 50 % clásicos de la bachata moderna
 - ✅ 50 % hits actuales
 
-🔥 **+ Concierto en vivo de bachata (formación completa)**
-
 ---
 
 ## 🌊 Sábado — Capital of Fusion + XXL Pool Party (Amarillo y azul)

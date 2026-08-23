@@ -42,8 +42,6 @@ Plus an opening to fusion with influences from big cities: hip-hop, reggaeton, a
 - ✅ 50% moderna bachata classics
 - ✅ 50% current hits
 
-🔥 **+ Live bachata concert (full band)**
-
 ---
 
 ## 🌊 Saturday — Capital of Fusion + XXL Pool Party (Yellow & Blue)

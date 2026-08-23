@@ -42,8 +42,6 @@ En majorité les sons actuels de la bachata en Europe.
 - ✅ 50 % classiques de la bachata moderna
 - ✅ 50 % hits actuels
 
-🔥 **+ Concert live bachata (formation complète)**
-
 ---
 
 ## 🌊 Samedi — Capital of Fusion + XXL Pool Party (Jaune & Bleu)
