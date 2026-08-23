@@ -25,6 +25,40 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
   const [apiReady, setApiReady] = useState(false);
   const [scale, setScale] = useState(1);
   const [useMp4Fallback, setUseMp4Fallback] = useState(false);
+  /** L'iframe reste invisible avant le début de lecture (indicateur pause/play central de YouTube). */
+  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
+
+  /**
+   * Un lecteur dont l'autoplay est refusé reste « non démarré » sans émettre
+   * d'événement, tout en affichant l'indicateur pause/play central : on surveille
+   * l'état réel (visible en lecture seulement) et on relance sinon.
+   */
+  useEffect(() => {
+    if (useMp4Fallback) return;
+    const timer = window.setInterval(() => {
+      const player = playerRef.current;
+      if (!player?.getPlayerState) return;
+      let state: number;
+      try {
+        state = player.getPlayerState();
+      } catch {
+        return;
+      }
+      if (state === 1) {
+        setHasStartedPlaying(true);
+        return;
+      }
+      if (state === 3) return;
+      setHasStartedPlaying(false);
+      try {
+        if (state === 0) player.seekTo?.(0, true);
+        player.playVideo?.();
+      } catch {
+        /* ignore */
+      }
+    }, 500);
+    return () => window.clearInterval(timer);
+  }, [useMp4Fallback]);
 
   // Adapter la taille du lecteur à la fenêtre (cover)
   useEffect(() => {
@@ -100,9 +134,12 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
       playerVars: {
         autoplay: 1,
         mute: 1, // Obligatoire pour l'autoplay (navigateurs bloquent le son sans interaction)
-        loop: 1,
-        playlist: videoId,
         controls: 0,
+        disablekb: 1,
+        fs: 0,
+        modestbranding: 1,
+        iv_load_policy: 3,
+        cc_load_policy: 0,
         rel: 0,
         showinfo: 0,
         playsinline: 1,
@@ -111,6 +148,28 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
         onReady: (e: { target: YTPlayer }) => {
           playerRef.current = e.target;
           e.target.setPlaybackQuality("hd720");
+        },
+        onStateChange: (e: { target: YTPlayer; data: number }) => {
+          // 0 = terminé (boucle manuelle), 1 = lecture, 2 = en pause : on relance pour éviter
+          // l'indicateur pause/play central de YouTube sur ce fond décoratif.
+          if (e.data === 1) {
+            setHasStartedPlaying(true);
+          }
+          if (e.data === 0) {
+            try {
+              e.target.seekTo?.(0, true);
+              e.target.playVideo?.();
+            } catch {
+              /* ignore */
+            }
+          }
+          if (e.data === 2) {
+            try {
+              e.target.playVideo?.();
+            } catch {
+              /* ignore */
+            }
+          }
         },
       },
     });
@@ -142,7 +201,7 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
 
   return (
     <>
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+      <div className="ambient-video-layer fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         {useMp4Fallback ? (
           <video
             className="absolute inset-0 w-full h-full object-cover"
@@ -151,17 +210,23 @@ export function YouTubeVideoBackground({ videoId }: { videoId: string }) {
             playsInline
             loop
             preload="metadata"
+            disablePictureInPicture
+            controlsList="nodownload nofullscreen noremoteplayback"
           >
             <source src={FALLBACK_MP4_SRC} type="video/mp4" />
           </video>
         ) : (
+          // Wrapper porteur de l'opacité : l'API YT remplace `containerRef` par son iframe.
           <div
-            ref={containerRef}
-            className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
-            style={{
-              transform: `translate(-50%, -50%) scale(${scale})`,
-            }}
-          />
+            className="absolute inset-0"
+            style={{ opacity: hasStartedPlaying ? 1 : 0, transition: "opacity 0.4s" }}
+          >
+            <div
+              ref={containerRef}
+              className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
+              style={{ transform: `translate(-50%, -50%) scale(${scale})` }}
+            />
+          </div>
         )}
         <div className="absolute inset-0 bg-background/60" />
       </div>

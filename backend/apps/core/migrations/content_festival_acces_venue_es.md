@@ -18,6 +18,10 @@ Consulta el horario oficial, el mapa del venue y la señalización in situ para 
 
 📱 También te recomendamos encarecidamente descargar la app móvil oficial **Paris Bachata Vibe Festival** antes del festival (disponible la primera semana de septiembre). Te ayudará a acceder a horarios e información práctica y a moverte con más facilidad durante el fin de semana.
 
+### 🚪 Cómo entrar en el recinto
+
+[SITE_ENTRY_PLAN]
+
 ---
 
 ## 🌴 ÁREA 1 — LA PALMERAIE
@@ -39,10 +43,7 @@ El Área 1 es el espacio indoor principal del festival: workshops, competiciones
 **VIERNES**  
 🔥 Street Bachata Battle All Stars
 
-**SÁBADO**  
-🇫🇷 Social French Cup — Preselección
-
-**DOMINGO**  
+**DOMINGO**
 🏆 Social French Cup — Final  
 🌍 World Cup Qualifier
 

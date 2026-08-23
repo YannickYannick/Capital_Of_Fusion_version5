@@ -3,6 +3,7 @@
  * et l’overlay Explore de la planète Access & Venue
  * lorsque `festival_acces_venue_markdown` / description nœud sont vides.
  * Images : `public/images/area1.png`, `public/images/area2.png`, `public/images/area1-2.png`.
+ * Plan entrée site : `public/images/acces-venue-site-entry.jpg`, `public/video/acces-venue-site-entry.mp4`.
  */
 
 export type AccesVenueLocale = "fr" | "en" | "es";
@@ -12,6 +13,12 @@ export const FESTIVAL_ACCES_VENUE_PAGE_HREF = "/festival/acces-venue";
 
 /** Teaser vidéo overlay / hero (converti depuis le .mov source, portrait). */
 export const FESTIVAL_ACCES_VENUE_TEASER_VIDEO_SRC = "/video/acces-venue-teaser.mp4";
+
+/** Plan « comment entrer sur le site » — photo + vidéo (même cadre carré). */
+export const ACCES_VENUE_SITE_ENTRY_IMAGE_SRC = "/images/acces-venue-site-entry.jpg";
+export const ACCES_VENUE_SITE_ENTRY_VIDEO_SRC = "/video/acces-venue-site-entry.mp4";
+export const SITE_ENTRY_PLAN_MARKDOWN_TOKEN = "[SITE_ENTRY_PLAN]";
+export const ACCES_VENUE_SITE_ENTRY_ASPECT = { width: 1, height: 1 } as const;
 
 /** Accroche courte pour l’overlay Explore (colonne droite). */
 export const FESTIVAL_ACCES_VENUE_OVERLAY_HOOK: Record<AccesVenueLocale, string> = {
@@ -41,6 +48,10 @@ Please check the official schedule, venue map and on-site signage to find your w
 
 📱 We also strongly recommend downloading the official **Paris Bachata Vibe Festival** mobile app before the festival (available first week of September). It will help you access schedules and practical information and navigate the festival more easily throughout the weekend.
 
+### 🚪 How to enter the site
+
+[SITE_ENTRY_PLAN]
+
 ---
 
 ## 🌴 AREA 1 — LA PALMERAIE
@@ -62,10 +73,7 @@ Area 1 is the main indoor festival space, hosting workshops, competitions, speci
 **FRIDAY**  
 🔥 Street Bachata Battle All Stars
 
-**SATURDAY**  
-🇫🇷 Social French Cup — Pre-Selection
-
-**SUNDAY**  
+**SUNDAY**
 🏆 Social French Cup — Final  
 🌍 World Cup Qualifier
 
@@ -160,6 +168,10 @@ Consulte le programme officiel, le plan du venue et la signalétique sur place p
 
 📱 On te recommande aussi fortement de télécharger l'application mobile officielle **Paris Bachata Vibe Festival** avant le festival (disponible la première semaine de septembre). Elle t'aidera à accéder aux horaires et infos pratiques, et à te déplacer plus facilement tout le week-end.
 
+### 🚪 Comment entrer sur le site
+
+[SITE_ENTRY_PLAN]
+
 ---
 
 ## 🌴 ZONE 1 — LA PALMERAIE
@@ -180,9 +192,6 @@ La Zone 1 est l'espace indoor principal du festival : workshops, compétitions, 
 
 **VENDREDI**  
 🔥 Street Bachata Battle All Stars
-
-**SAMEDI**  
-🇫🇷 Social French Cup — Pré-sélections
 
 **DIMANCHE**  
 🏆 Social French Cup — Finale  
@@ -279,6 +288,10 @@ Consulta el horario oficial, el mapa del venue y la señalización in situ para 
 
 📱 También te recomendamos encarecidamente descargar la app móvil oficial **Paris Bachata Vibe Festival** antes del festival (disponible la primera semana de septiembre). Te ayudará a acceder a horarios e información práctica y a moverte con más facilidad durante el fin de semana.
 
+### 🚪 Cómo entrar en el recinto
+
+[SITE_ENTRY_PLAN]
+
 ---
 
 ## 🌴 ÁREA 1 — LA PALMERAIE
@@ -300,10 +313,7 @@ El Área 1 es el espacio indoor principal del festival: workshops, competiciones
 **VIERNES**  
 🔥 Street Bachata Battle All Stars
 
-**SÁBADO**  
-🇫🇷 Social French Cup — Preselección
-
-**DOMINGO**  
+**DOMINGO**
 🏆 Social French Cup — Final  
 🌍 World Cup Qualifier
 

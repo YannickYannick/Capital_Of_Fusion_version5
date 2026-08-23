@@ -18,16 +18,35 @@ import {
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
 import {
+  ACCES_VENUE_SITE_ENTRY_ASPECT,
+  ACCES_VENUE_SITE_ENTRY_IMAGE_SRC,
+  ACCES_VENUE_SITE_ENTRY_VIDEO_SRC,
   FESTIVAL_ACCES_VENUE_OVERLAY_HOOK,
   FESTIVAL_ACCES_VENUE_PAGE_HREF,
   FESTIVAL_ACCES_VENUE_TEASER_VIDEO_SRC,
+  SITE_ENTRY_PLAN_MARKDOWN_TOKEN,
   getFestivalAccesVenueFallback,
 } from "@/data/festivalAccesVenueFallback";
+import { SiteEntryPlanMedia } from "@/components/features/festival/SiteEntryPlanMedia";
+import { renderMarkdownWithEmbed } from "@/components/shared/MarkdownWithEmbed";
+import {
+  FESTIVAL_JACK_N_JILL_PAGE_HREF,
+  getFestivalJackNJillOverlayDescription,
+} from "@/data/festivalJackNJillFallback";
 import {
   organizationNodePageHref,
   PARIS_BACHATA_GOANDANCE_EVENT_URL,
 } from "@/data/exploreOverlayCtas";
-import { markdownToHtml } from "@/lib/markdownToHtml";
+/** Classes prose du corps Markdown de l'overlay (typo compacte sur fond sombre). */
+const OVERLAY_BODY_PROSE_CLASS =
+  "text-white/70 text-sm leading-relaxed space-y-3 " +
+  "[&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-white " +
+  "[&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-white/90 " +
+  "[&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:marker:text-purple-300/90 " +
+  "[&_hr]:my-6 [&_hr]:border-0 [&_hr]:h-px [&_hr]:bg-white/20 " +
+  "[&_strong]:text-white [&_strong]:font-semibold " +
+  "[&_img]:rounded-xl [&_img]:border [&_img]:border-white/15 [&_img]:max-h-[min(52vh,520px)] [&_img]:w-auto [&_img]:max-w-full [&_img]:mx-auto [&_img]:my-4 [&_img]:block [&_img]:object-contain [&_img]:shadow-lg " +
+  "[&_p]:mb-3 [&_p:last-child]:mb-0";
 
 interface PlanetOverlayProps {
   node: OrganizationNodeApi | null;
@@ -312,6 +331,19 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     return false;
   }, [node]);
 
+  /** Jack n' Jill Vibe — catégorie amateur ; repli description i18n si API vide ou legacy EN. */
+  const isJackNJillNode = useMemo(() => {
+    if (!node) return false;
+    const slug = (node.slug || "").toLowerCase();
+    const name = (node.name || "").toLowerCase();
+    if (slug === "jack-n-jill-vibe") return true;
+    if (slug.includes("jack") && slug.includes("jill")) return true;
+    if (name.includes("jack") && name.includes("jill")) return true;
+    const cta = (node.cta_url || "").trim().replace(/\/$/, "");
+    if (cta === FESTIVAL_JACK_N_JILL_PAGE_HREF) return true;
+    return false;
+  }, [node]);
+
   const [faqItems, setFaqItems] = useState<FaqItemApi[] | null>(null);
   const [faqLoading, setFaqLoading] = useState(false);
   const [overlayMounted, setOverlayMounted] = useState(false);
@@ -377,6 +409,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const allStarOverlayFallback = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[overlayLocale];
   const accesVenueOverlayHook = FESTIVAL_ACCES_VENUE_OVERLAY_HOOK[overlayLocale];
   const accesVenueFallbackMarkdown = getFestivalAccesVenueFallback(overlayLocale);
+  const jackNJillOverlayDescription = getFestivalJackNJillOverlayDescription(overlayLocale);
 
   const displayShortForOverlay =
     node.short_description ||
@@ -387,7 +420,9 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
       ? allStarOverlayFallback.description
       : isAccesVenueNode && !showEditForm
         ? accesVenueFallbackMarkdown
-        : node.description || "";
+        : isJackNJillNode && !showEditForm
+          ? jackNJillOverlayDescription
+          : node.description || "";
   const displayAboutContent =
     node.content ||
     (isAllStarStreetBattleNode && !showEditForm ? allStarOverlayFallback.rules : "");
@@ -431,6 +466,12 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
       label: ctaText || t("overlay.learnMore"),
       icon: "📍",
     };
+  } else if (isJackNJillNode) {
+    primaryCta = {
+      href: ctaUrl || FESTIVAL_JACK_N_JILL_PAGE_HREF,
+      label: ctaText || t("overlay.learnMore"),
+      icon: "🏆",
+    };
   } else if (ctaUrl) {
     primaryCta = { href: ctaUrl, label: ctaText || t("overlay.learnMore"), icon: "✨" };
   } else {
@@ -441,11 +482,34 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
     };
   }
 
-  const overlayBodyDescriptionHtml =
-    displayBodyDescription.trim() &&
-    /\!\[[^\]]*\]\([^)]+\)/.test(displayBodyDescription)
-      ? markdownToHtml(displayBodyDescription)
-      : "";
+  /**
+   * Corps Markdown de l'overlay : rendu HTML dès qu'il contient une image ou le
+   * token du plan d'accès (sinon on garde le texte brut pré-formaté).
+   */
+  const overlayBodyIsMarkdown =
+    Boolean(displayBodyDescription.trim()) &&
+    (/\!\[[^\]]*\]\([^)]+\)/.test(displayBodyDescription) ||
+      displayBodyDescription.includes(SITE_ENTRY_PLAN_MARKDOWN_TOKEN));
+  const overlayBodyNode = overlayBodyIsMarkdown
+    ? renderMarkdownWithEmbed(displayBodyDescription, OVERLAY_BODY_PROSE_CLASS, {
+        token: SITE_ENTRY_PLAN_MARKDOWN_TOKEN,
+        node: (
+          // Même cadre que les images de l'overlay (plafonnées à 52vh) pour éviter un carré géant.
+          <div className="mx-auto w-full max-w-[min(52vh,520px)]">
+            <SiteEntryPlanMedia
+              imageSrc={ACCES_VENUE_SITE_ENTRY_IMAGE_SRC}
+              videoSrc={ACCES_VENUE_SITE_ENTRY_VIDEO_SRC}
+              imageAlt={tPages("festivalVenue.siteEntryPlanImageAlt")}
+              videoAriaLabel={tPages("festivalVenue.siteEntryPlanVideoAria")}
+              showVideoLabel={tPages("festivalVenue.siteEntryPlanShowVideo")}
+              showPhotoLabel={tPages("festivalVenue.siteEntryPlanShowPhoto")}
+              aspectWidth={ACCES_VENUE_SITE_ENTRY_ASPECT.width}
+              aspectHeight={ACCES_VENUE_SITE_ENTRY_ASPECT.height}
+            />
+          </div>
+        ),
+      })
+    : null;
 
   return createPortal(
     <>
@@ -685,20 +749,8 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                         </button>
                       </div>
                     </div>
-                  ) : overlayBodyDescriptionHtml ? (
-                    <div
-                      className={
-                        "text-white/70 text-sm leading-relaxed space-y-3 " +
-                        "[&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-white " +
-                        "[&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-white/90 " +
-                        "[&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:marker:text-purple-300/90 " +
-                        "[&_hr]:my-6 [&_hr]:border-0 [&_hr]:h-px [&_hr]:bg-white/20 " +
-                        "[&_strong]:text-white [&_strong]:font-semibold " +
-                        "[&_img]:rounded-xl [&_img]:border [&_img]:border-white/15 [&_img]:max-h-[min(52vh,520px)] [&_img]:w-auto [&_img]:max-w-full [&_img]:mx-auto [&_img]:my-4 [&_img]:block [&_img]:object-contain [&_img]:shadow-lg " +
-                        "[&_p]:mb-3 [&_p:last-child]:mb-0"
-                      }
-                      dangerouslySetInnerHTML={{ __html: overlayBodyDescriptionHtml }}
-                    />
+                  ) : overlayBodyNode ? (
+                    <div className="space-y-3">{overlayBodyNode}</div>
                   ) : (
                     <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
                       {displayBodyDescription}
@@ -784,6 +836,7 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
                 !showEditForm &&
                 !isAllStarStreetBattleNode &&
                 !isAccesVenueNode &&
+                !isJackNJillNode &&
                 !isOurArtistsNode &&
                 !isIdentityAdnNode &&
                 !isFaqNode && (

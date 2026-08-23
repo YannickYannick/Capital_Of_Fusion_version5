@@ -65,11 +65,48 @@ function computeExploreVideoCrossfade(
     return { main: u, cycle: 1 - u };
 }
 
+const YT_STATE_ENDED = 0;
+const YT_STATE_PLAYING = 1;
+const YT_STATE_PAUSED = 2;
+const YT_STATE_BUFFERING = 3;
+
+/**
+ * Boucle manuelle sans `playlist` (évite les boutons prev/next au centre du lecteur YT).
+ * La pause est également relancée : le fond est purement décoratif et YouTube affiche
+ * son gros indicateur pause/play au centre de l'iframe (non stylable, cross-origin).
+ */
+function handleAmbientYoutubeStateChange(
+    e: { target: YTPlayer; data: number },
+    onPlaying?: (target: YTPlayer) => void
+) {
+    if (e.data === YT_STATE_PLAYING) {
+        onPlaying?.(e.target);
+    }
+    if (e.data === YT_STATE_ENDED) {
+        try {
+            e.target.seekTo?.(0, true);
+            e.target.playVideo?.();
+        } catch {
+            /* ignore */
+        }
+    }
+    if (e.data === YT_STATE_PAUSED) {
+        try {
+            e.target.playVideo?.();
+        } catch {
+            /* ignore */
+        }
+    }
+}
+
 function getYoutubeVideoId(url: string): string | null {
     if (!url) return null;
     const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     return m ? m[1] : null;
 }
+
+/** Fréquence de surveillance de l'état des lecteurs d'ambiance. */
+const AMBIENT_STATE_POLL_MS = 500;
 
 /** Valeur initiale suggérée selon la route (premier rendu seulement) ; ensuite la qualité reste « collante » pour ne pas relancer le buffer au changement de page. */
 const YT_QUALITY_HERO = "hd1080";
@@ -87,6 +124,12 @@ function useYTPlayer(
 ) {
     const containerRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<YTPlayer | null>(null);
+    /**
+     * Tant que la lecture n'a pas démarré, l'iframe reste invisible : YouTube y affiche
+     * sa première image accompagnée de l'indicateur pause/play central, qu'on ne peut pas
+     * masquer en CSS (iframe cross-origin).
+     */
+    const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
     const preferUnmutedRef = useRef(preferUnmuted);
     preferUnmutedRef.current = preferUnmuted;
     const playbackQualityRef = useRef(playbackQuality);
@@ -96,6 +139,8 @@ function useYTPlayer(
     // (sinon accueil ↔ menu relance la piste depuis le début).
     useEffect(() => {
         if (!active || !ready || !containerRef.current || !videoId) return;
+
+        setHasStartedPlaying(false);
 
         // Marqueur: début d'initialisation du player
         if (typeof performance !== "undefined") {
@@ -113,9 +158,12 @@ function useYTPlayer(
             playerVars: {
                 autoplay: 1,
                 mute: preferUnmutedRef.current ? 0 : 1,
-                loop: 1,
-                playlist: videoId,
                 controls: 0,
+                disablekb: 1,
+                fs: 0,
+                modestbranding: 1,
+                iv_load_policy: 3,
+                cc_load_policy: 0,
                 rel: 0,
                 playsinline: 1,
                 vq: playbackQualityRef.current,
@@ -174,9 +222,10 @@ function useYTPlayer(
                     }
                 },
                 onStateChange: (e: { target: YTPlayer; data: number }) => {
-                    if (e.data === 1) {
-                        try { e.target.setPlaybackQuality(playbackQualityRef.current); } catch (err) { }
-                    }
+                    handleAmbientYoutubeStateChange(e, (target) => {
+                        setHasStartedPlaying(true);
+                        try { target.setPlaybackQuality(playbackQualityRef.current); } catch (err) { }
+                    });
                 }
             }
         });
@@ -186,7 +235,41 @@ function useYTPlayer(
         };
     }, [ready, videoId, active]);
 
-    return { containerRef, playerRef };
+    /**
+     * `onStateChange` ne suffit pas : un lecteur dont l'autoplay est refusé reste
+     * en « non démarré » sans jamais émettre d'événement, tout en affichant sa
+     * première image et l'indicateur pause/play central. On surveille donc l'état
+     * réel : visible uniquement en lecture, et relance tant que ce n'est pas le cas.
+     */
+    useEffect(() => {
+        if (!active || !ready) return;
+        const timer = window.setInterval(() => {
+            const player = playerRef.current;
+            if (!player?.getPlayerState) return;
+            let state: number;
+            try {
+                state = player.getPlayerState();
+            } catch {
+                return;
+            }
+            if (state === YT_STATE_PLAYING) {
+                setHasStartedPlaying(true);
+                return;
+            }
+            // Mémoire tampon / fin de boucle : on ne masque pas (évite un clignotement).
+            if (state === YT_STATE_BUFFERING) return;
+            setHasStartedPlaying(false);
+            try {
+                if (state === YT_STATE_ENDED) player.seekTo?.(0, true);
+                player.playVideo?.();
+            } catch {
+                /* ignore */
+            }
+        }, AMBIENT_STATE_POLL_MS);
+        return () => window.clearInterval(timer);
+    }, [active, ready, videoId]);
+
+    return { containerRef, playerRef, hasStartedPlaying };
 }
 
 export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi | null }) {
@@ -459,6 +542,34 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
         return () => window.removeEventListener("resize", update);
     }, []);
 
+    /** Évite les overlays navigateur (prev/pause/next) liés à Media Session sur fond vidéo. */
+    useEffect(() => {
+        if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+        const ms = navigator.mediaSession;
+        try {
+            ms.metadata = null;
+            (
+                [
+                    "play",
+                    "pause",
+                    "previoustrack",
+                    "nexttrack",
+                    "seekbackward",
+                    "seekforward",
+                    "seekto",
+                ] as const
+            ).forEach((action) => {
+                try {
+                    ms.setActionHandler(action, null);
+                } catch {
+                    /* ignore */
+                }
+            });
+        } catch {
+            /* ignore */
+        }
+    }, []);
+
     // Load YT API conditionally — DEFERRED by 1.5s to improve FCP
     // Skip loading entirely if YouTube iframes are disabled
     useEffect(() => {
@@ -640,7 +751,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
             {/* /explore : vidéo cycle (admin), derrière la principale */}
             {exploreCycleWanted && (
                 <div
-                    className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
+                    className="ambient-video-layer fixed inset-0 -z-10 overflow-hidden pointer-events-none"
                     style={{
                         filter: grayscale,
                         opacity: exploreLayerOpacities.cycle,
@@ -650,10 +761,18 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 >
                     {cycleType === "youtube" ? (
                         <div
-                            ref={cycleYT.containerRef}
-                            className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
-                            style={{ transform: playerTransform }}
-                        />
+                            className="absolute inset-0"
+                            style={{
+                                opacity: cycleYT.hasStartedPlaying ? 1 : 0,
+                                transition: "opacity 0.4s",
+                            }}
+                        >
+                            <div
+                                ref={cycleYT.containerRef}
+                                className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
+                                style={{ transform: playerTransform }}
+                            />
+                        </div>
                     ) : (
                         cycleMp4Url && (
                             <video
@@ -663,6 +782,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                                 loop
                                 muted
                                 playsInline
+                                disablePictureInPicture
+                                controlsList="nodownload nofullscreen noremoteplayback"
                                 className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover"
                                 style={{ transform: "translate(-50%, -50%)" }}
                             />
@@ -673,7 +794,7 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
             {/* Vidéo principale (masquée si option C active ou YouTube disabled) */}
             <div
-                className="fixed inset-0 -z-10 overflow-hidden"
+                className="ambient-video-layer fixed inset-0 -z-10 overflow-hidden pointer-events-none"
                 style={{
                     filter: grayscale,
                     transition:
@@ -688,7 +809,21 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                 }}
             >
                 {mainRenderType === "youtube" ? (
-                    <div ref={mainYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
+                    // Wrapper porteur de l'opacité : l'API YT remplace le div `containerRef`
+                    // par son iframe, donc React ne peut plus en modifier le style ensuite.
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            opacity: mainYT.hasStartedPlaying ? 1 : 0,
+                            transition: "opacity 0.4s",
+                        }}
+                    >
+                        <div
+                            ref={mainYT.containerRef}
+                            className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
+                            style={{ transform: playerTransform }}
+                        />
+                    </div>
                 ) : (
                     mainMp4Url && (
                         <video
@@ -699,6 +834,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                             muted={muted}
                             playsInline
                             preload="auto"
+                            disablePictureInPicture
+                            controlsList="nodownload nofullscreen noremoteplayback"
                             className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover"
                             style={{ transform: "translate(-50%, -50%)" }}
                         />
@@ -708,9 +845,21 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
 
             {/* Musique de fond planète / partenaire (override effectif) — prend le pas sur la vidéo d'accueil */}
             {effectiveOverride && (
-                <div className="fixed inset-0 -z-10 overflow-hidden" style={{ transition: "opacity 0.5s", opacity: showBlackBg ? 0 : 1 }}>
+                <div className="ambient-video-layer fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ transition: "opacity 0.5s", opacity: showBlackBg ? 0 : 1 }}>
                     {effectiveOverride.type === "youtube" && overrideYTId && (
-                        <div ref={overrideYT.containerRef} className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center" style={{ transform: playerTransform }} />
+                        <div
+                            className="absolute inset-0"
+                            style={{
+                                opacity: overrideYT.hasStartedPlaying ? 1 : 0,
+                                transition: "opacity 0.4s",
+                            }}
+                        >
+                            <div
+                                ref={overrideYT.containerRef}
+                                className="absolute top-1/2 left-1/2 w-[1920px] h-[1080px] origin-center"
+                                style={{ transform: playerTransform }}
+                            />
+                        </div>
                     )}
                     {effectiveOverride.type === "file" && effectiveOverride.fileUrl && (
                         <video
@@ -720,6 +869,8 @@ export function GlobalVideoBackground({ config }: { config: SiteConfigurationApi
                             loop
                             muted={muted}
                             playsInline
+                            disablePictureInPicture
+                            controlsList="nodownload nofullscreen noremoteplayback"
                             className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover"
                             style={{ transform: "translate(-50%, -50%)" }}
                         />

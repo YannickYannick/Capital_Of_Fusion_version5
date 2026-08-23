@@ -1,10 +1,24 @@
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import LandingPageClient from "./LandingPageClient";
 
-export const metadata = {
-  title: "Accueil",
-  description:
-    "Capital of Fusion — École nationale de danse. Bachata, salsa, kizomba. Découvrez nos cours, événements et l'expérience Explore 3D.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("landing");
+  const title = t("metaTitle");
+  const description = t("metaDescription");
+  return {
+    title: { absolute: title },
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+    twitter: {
+      title,
+      description,
+    },
+  };
+}
 
 /**
  * Landing — page d'accueil immersive.

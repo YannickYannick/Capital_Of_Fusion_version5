@@ -11,6 +11,7 @@ import {
   getStreetBattleRegistrationLinks,
   type OverlayLocale,
 } from "@/data/allStarStreetBattlePlanetOverlayFallback";
+import { getFestivalJackNJillFallback } from "@/data/festivalJackNJillFallback";
 import { useLocale } from "next-intl";
 import type { ExternalPageCta } from "@/components/shared/EditableConfigMarkdownPage";
 
@@ -47,9 +48,14 @@ export function FestivalEditorialNode({ contentKey }: { contentKey: string }) {
   }, [field]);
 
   const fallbackContent = useMemo(() => {
-    if (contentKey !== "festivalAllStarStreetBattle") return "";
-    const fb = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[locale];
-    return fb.description + "\n\n---\n\n" + fb.rules;
+    if (contentKey === "festivalAllStarStreetBattle") {
+      const fb = ALL_STAR_STREET_BATTLE_OVERLAY_FALLBACK[locale];
+      return fb.description + "\n\n---\n\n" + fb.rules;
+    }
+    if (contentKey === "festivalJackNJill") {
+      return getFestivalJackNJillFallback(locale);
+    }
+    return "";
   }, [contentKey, locale]);
 
   const displayValue = initialValue || fallbackContent;

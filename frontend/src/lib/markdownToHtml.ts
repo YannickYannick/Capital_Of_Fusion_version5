@@ -10,7 +10,7 @@ import DOMPurify from "isomorphic-dompurify";
  */
 export function markdownToHtml(markdown: string): string {
   if (!markdown || !markdown.trim()) return "";
-  const rawHtml = marked(markdown, { async: false }) as string;
+  const rawHtml = marked(markdown, { async: false, breaks: true }) as string;
   return DOMPurify.sanitize(rawHtml, {
     ALLOWED_TAGS: [
       "p", "br", "strong", "em", "u", "s", "a", "ul", "ol", "li",

@@ -25,22 +25,24 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://capitaloffusion.fr"
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Capital of Fusion",
+    default: "Paris Bachata Vibe Festival 2026 | Capital of Fusion",
     template: "%s — Capital of Fusion",
   },
   description:
-    "Bachata, cours et événements. Découvrez notre école et l'expérience Explore 3D.",
+    "Paris Bachata Vibe Festival 2026 : workshops, compétitions, pool party et soirées bachata à Paris.",
   openGraph: {
     type: "website",
     locale: "fr_FR",
     siteName: "Capital of Fusion",
-    title: "Capital of Fusion",
-    description: "Bachata, cours et événements. Découvrez notre école et l'expérience Explore 3D.",
+    title: "Paris Bachata Vibe Festival 2026 | Capital of Fusion",
+    description:
+      "Paris Bachata Vibe Festival 2026 : workshops, compétitions, pool party et soirées bachata à Paris.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Capital of Fusion",
-    description: "Bachata, cours et événements. Découvrez notre école et l'expérience Explore 3D.",
+    title: "Paris Bachata Vibe Festival 2026 | Capital of Fusion",
+    description:
+      "Paris Bachata Vibe Festival 2026 : workshops, compétitions, pool party et soirées bachata à Paris.",
   },
   robots: {
     index: true,

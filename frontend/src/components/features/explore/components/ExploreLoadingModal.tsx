@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 
 interface ExploreLoadingModalProps {
   onDismiss: () => void;
+  /** True lorsque la scène Explore est prête (1ère frame WebGL ou carrousel monté). */
+  isSceneReady?: boolean;
 }
 
 /**
@@ -12,7 +14,7 @@ interface ExploreLoadingModalProps {
  * Le panneau central a pointer-events-auto pour lecture / focus accessibilité.
  * La modale reste visible jusqu'à ce que l'utilisateur clique sur "Compris".
  */
-export function ExploreLoadingModal({ onDismiss }: ExploreLoadingModalProps) {
+export function ExploreLoadingModal({ onDismiss, isSceneReady = false }: ExploreLoadingModalProps) {
   const t = useTranslations("exploreTransition");
 
   return (
@@ -33,7 +35,13 @@ export function ExploreLoadingModal({ onDismiss }: ExploreLoadingModalProps) {
         >
           {t("title")}
         </h2>
-        <p className="text-sm text-purple-300/90 mb-4 animate-pulse">{t("loadingHint")}</p>
+        <p
+          className={`text-sm mb-4 ${
+            isSceneReady ? "text-emerald-300/90" : "text-purple-300/90 animate-pulse"
+          }`}
+        >
+          {isSceneReady ? t("readyHint") : t("loadingHint")}
+        </p>
         <ul className="text-sm text-white/80 space-y-1.5 leading-relaxed">
           <li>{t("lineRotate")}</li>
           <li>{t("linePan")}</li>
@@ -44,7 +52,12 @@ export function ExploreLoadingModal({ onDismiss }: ExploreLoadingModalProps) {
         <button
           type="button"
           onClick={onDismiss}
-          className="mt-6 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium transition-colors"
+          aria-busy={!isSceneReady}
+          className={`mt-6 w-full py-2.5 rounded-xl font-medium transition-all duration-500 ${
+            isSceneReady
+              ? "bg-[#f3ac41] hover:brightness-110 text-black shadow-[0_4px_14px_rgba(243,172,65,0.35)]"
+              : "explore-loading-btn-pending text-white/90 cursor-wait"
+          }`}
         >
           {t("dismissButton")}
         </button>

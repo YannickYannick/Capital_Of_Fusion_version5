@@ -89,9 +89,12 @@ export function CycleVideoOnly({ config }: { config: CycleVideoConfig | null }) 
       playerVars: {
         autoplay: 1,
         mute: 1,
-        loop: 1,
-        playlist: ytId,
         controls: 0,
+        disablekb: 1,
+        fs: 0,
+        modestbranding: 1,
+        iv_load_policy: 3,
+        cc_load_policy: 0,
         rel: 0,
         playsinline: 1,
         origin: typeof window !== "undefined" ? window.location.origin : "",
@@ -100,6 +103,30 @@ export function CycleVideoOnly({ config }: { config: CycleVideoConfig | null }) 
         onReady: (e: { target: YTPlayer }) => {
           playerRef.current = e.target;
           e.target.mute();
+          try {
+            e.target.playVideo?.();
+          } catch {
+            /* ignore */
+          }
+        },
+        onStateChange: (e: { target: YTPlayer; data: number }) => {
+          // 0 = terminé (boucle manuelle), 2 = en pause : on relance pour éviter
+          // l'indicateur pause/play central de YouTube sur ce fond décoratif.
+          if (e.data === 0) {
+            try {
+              e.target.seekTo?.(0, true);
+              e.target.playVideo?.();
+            } catch {
+              /* ignore */
+            }
+          }
+          if (e.data === 2) {
+            try {
+              e.target.playVideo?.();
+            } catch {
+              /* ignore */
+            }
+          }
         },
       },
     });

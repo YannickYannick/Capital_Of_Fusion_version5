@@ -4,8 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-const IMG_PART1 = "/images/festival/pbvf-2026-planning-part1.png";
-const IMG_PART2 = "/images/festival/pbvf-2026-planning-part2.png";
+const IMG_THURSDAY_FRIDAY = "/images/festival/pbvf-2026-planning-thursday-friday.png";
+const IMG_SATURDAY = "/images/festival/pbvf-2026-planning-saturday.png";
+const IMG_SUNDAY = "/images/festival/pbvf-2026-planning-sunday.png";
+
+const PLANNING_POSTER_WIDTH = 819;
+const PLANNING_POSTER_HEIGHT = 1024;
 
 type FestivalPlanningScheduleProps = {
   variant?: "page" | "overlay";
@@ -13,7 +17,7 @@ type FestivalPlanningScheduleProps = {
 };
 
 /**
- * Planning visuel PBVF 2026 en deux parties (jeu–ven puis sam–dim), avec textes d’accompagnement i18n.
+ * Planning visuel PBVF 2026 en trois affiches (jeu–ven, sam, dim), avec textes d’accompagnement i18n.
  */
 export function FestivalPlanningSchedule({
   variant = "page",
@@ -46,10 +50,10 @@ export function FestivalPlanningSchedule({
 
       <figure className={`rounded-xl overflow-hidden border ${border} bg-black/30 shadow-lg`}>
         <Image
-          src={IMG_PART1}
+          src={IMG_THURSDAY_FRIDAY}
           alt={t("planningImage1Alt")}
-          width={1920}
-          height={1080}
+          width={PLANNING_POSTER_WIDTH}
+          height={PLANNING_POSTER_HEIGHT}
           className="w-full h-auto object-contain"
           sizes="(max-width: 768px) 100vw, 896px"
           priority={isPage}
@@ -60,10 +64,23 @@ export function FestivalPlanningSchedule({
 
       <figure className={`rounded-xl overflow-hidden border ${border} bg-black/30 shadow-lg`}>
         <Image
-          src={IMG_PART2}
+          src={IMG_SATURDAY}
           alt={t("planningImage2Alt")}
-          width={1920}
-          height={1080}
+          width={PLANNING_POSTER_WIDTH}
+          height={PLANNING_POSTER_HEIGHT}
+          className="w-full h-auto object-contain"
+          sizes="(max-width: 768px) 100vw, 896px"
+        />
+      </figure>
+
+      <p className={["text-sm md:text-base leading-relaxed", textMuted].join(" ")}>{t("planningBetweenSunday")}</p>
+
+      <figure className={`rounded-xl overflow-hidden border ${border} bg-black/30 shadow-lg`}>
+        <Image
+          src={IMG_SUNDAY}
+          alt={t("planningImage3Alt")}
+          width={PLANNING_POSTER_WIDTH}
+          height={PLANNING_POSTER_HEIGHT}
           className="w-full h-auto object-contain"
           sizes="(max-width: 768px) 100vw, 896px"
         />

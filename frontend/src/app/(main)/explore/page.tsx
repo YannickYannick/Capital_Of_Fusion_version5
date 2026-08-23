@@ -98,6 +98,8 @@ function ExplorePageInner({ initialNodeSlug }: { initialNodeSlug: string | null 
 
   /** Desktop uniquement : canvas WebGL monté. */
   const [webglMounted, setWebglMounted] = useState(false);
+  /** Desktop : première frame WebGL rendue (scène visible). */
+  const [sceneFirstFrame, setSceneFirstFrame] = useState(false);
 
   const deferredNodes = useDeferredValue(nodes);
 
@@ -179,6 +181,16 @@ function ExplorePageInner({ initialNodeSlug }: { initialNodeSlug: string | null 
     !error &&
     nodes.length > 0 &&
     (layoutMode === "compact" || webglMounted);
+
+  /** État « scène prête » pour la modale d'aide (1ère frame desktop ou carrousel monté). */
+  const modalSceneReady =
+    exploreContentReady && (layoutMode === "compact" || sceneFirstFrame);
+
+  useEffect(() => {
+    if (!exploreContentReady) {
+      setSceneFirstFrame(false);
+    }
+  }, [exploreContentReady]);
 
   useEffect(() => {
     if (!exploreContentReady) return;
@@ -281,7 +293,7 @@ function ExplorePageInner({ initialNodeSlug }: { initialNodeSlug: string | null 
   return (
     <div className="fixed inset-0 z-10">
       {(showExploreLoadingModal || isTransitioningToExplore) && (
-        <ExploreLoadingModal onDismiss={handleDismissModal} />
+        <ExploreLoadingModal onDismiss={handleDismissModal} isSceneReady={modalSceneReady} />
       )}
 
       {!exploreContentReady && (
@@ -313,7 +325,10 @@ function ExplorePageInner({ initialNodeSlug }: { initialNodeSlug: string | null 
             onSelectedPlanetScreenPosition={handleSelectedPlanetScreenPosition}
             controlsRef={controlsRef}
             cameraRef={cameraRef}
-            onFirstFrame={perf.markFirstFrame}
+            onFirstFrame={() => {
+              perf.markFirstFrame();
+              setSceneFirstFrame(true);
+            }}
             onSceneReady={perf.markSceneReady}
             onPlanetsLoaded={(count) => perf.markPlanetsLoaded(count)}
             onAllPlanetsOnOrbit={perf.markAllPlanetsOnOrbit}

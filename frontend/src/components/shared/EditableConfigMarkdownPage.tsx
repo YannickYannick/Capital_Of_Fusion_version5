@@ -3,8 +3,8 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { markdownToHtml } from "@/lib/markdownToHtml";
 import { patchSiteConfigMarkdownField } from "@/lib/api";
+import { renderMarkdownWithEmbed, type MarkdownEmbed } from "@/components/shared/MarkdownWithEmbed";
 
 export type ExternalPageCta = {
   href: string;
@@ -60,7 +60,7 @@ function ExternalCtasRow({
 
 /** Prose lisible sur fond photo / vidéo (contraste + séparateurs visibles). */
 const proseClasses =
-  "leading-relaxed text-white/95 [&_p]:text-white/95 [&_li]:text-white/95 " +
+  "leading-relaxed text-white/95 [&_p]:mb-4 [&_p]:text-white/95 [&_p:last-child]:mb-0 [&_li]:text-white/95 " +
   "[&_a]:text-purple-300 [&_a]:font-medium [&_a:hover]:underline [&_a:hover]:text-purple-200 " +
   "[&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:text-xl md:[&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-white [&_h2]:drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] " +
   "[&_h3]:text-white [&_h3]:font-semibold [&_strong]:text-white [&_strong]:font-semibold " +
@@ -83,6 +83,7 @@ export function EditableConfigMarkdownPage({
   preface,
   collapsibleMarkdown,
   heroVideo,
+  markdownEmbed,
 }: {
   eyebrow: string;
   title: string;
@@ -122,6 +123,8 @@ export function EditableConfigMarkdownPage({
     /** Par défaut true : barre de lecture pour activer le son (l’autoplay reste muet). */
     controls?: boolean;
   };
+  /** Remplace un token dans le Markdown par un bloc React (ex. plan photo/vidéo). */
+  markdownEmbed?: MarkdownEmbed;
 }) {
   const markdownToggleId = useId();
   const markdownPanelId = useId();
@@ -146,8 +149,8 @@ export function EditableConfigMarkdownPage({
     }
   }, [initialValue, editing]);
 
-  const html = markdownToHtml(value);
-  const previewHtml = markdownToHtml(editValue);
+  const markdownBody = renderMarkdownWithEmbed(value, proseClasses, markdownEmbed);
+  const previewBody = renderMarkdownWithEmbed(editValue, proseClasses, markdownEmbed);
   const ctasAbove = normalizeExternalCtas(ctaAboveHero);
   const ctasAfter = normalizeExternalCtas(ctaAfterHero);
   const ctasBelowSubtitle = normalizeExternalCtas(ctaBelowSubtitle);
@@ -285,7 +288,7 @@ export function EditableConfigMarkdownPage({
         ) : null}
 
         {!editing ? (
-          html ? (
+          value.trim() ? (
             collapsibleMarkdown ? (
               <div className="mt-10">
                 <button
@@ -322,11 +325,11 @@ export function EditableConfigMarkdownPage({
                   aria-labelledby={markdownToggleId}
                   className={markdownExpanded ? "mt-5" : "hidden"}
                 >
-                  <div className={proseClasses} dangerouslySetInnerHTML={{ __html: html }} />
+                  {markdownBody}
                 </div>
               </div>
             ) : (
-              <div className={`mt-10 ${proseClasses}`} dangerouslySetInnerHTML={{ __html: html }} />
+              <div className="mt-10">{markdownBody}</div>
             )
           ) : preface ? null : (
             <p className="mt-10 text-white/70">{emptyText}</p>
@@ -344,8 +347,8 @@ export function EditableConfigMarkdownPage({
             </div>
             <div className="rounded-xl border border-white/12 bg-black/40 p-4 max-h-[70vh] overflow-y-auto">
               <p className="text-xs uppercase tracking-widest text-white/50 mb-2">Aperçu</p>
-              {previewHtml ? (
-                <div className={proseClasses} dangerouslySetInnerHTML={{ __html: previewHtml }} />
+              {editValue.trim() ? (
+                previewBody
               ) : (
                 <p className="text-white/60 text-sm">Aperçu…</p>
               )}

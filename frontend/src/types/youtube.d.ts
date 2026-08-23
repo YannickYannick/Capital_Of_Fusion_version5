@@ -12,6 +12,7 @@ interface YTPlayer {
   getPlayerState?: () => number;
   setPlaybackQuality: (quality: string) => void;
   getAvailableQualityLevels: () => string[];
+  seekTo?: (seconds: number, allowSeekAhead?: boolean) => void;
   destroy: () => void;
 }
 
