@@ -210,7 +210,12 @@
       "title": "Planning & Navettes",
       "subtitle": "Horaires, navettes et informations pratiques.",
       "contentMarkdown": "## À compléter\n\nAjoute ici le contenu (Markdown) de la page **Planning & Navettes**.\n",
-      "empty": "Contenu à venir."
+      "empty": "Contenu à venir.",
+      "shuttleSectionTitle": "Horaires des navettes",
+      "shuttleIntro": "Navettes entre La Palmeraie et les hôtels partenaires — horaires par jour et par sens (aller / retour).",
+      "shuttleBetween": "Week-end — samedi & dimanche :",
+      "shuttleImageThursdayFridayAlt": "Horaires navettes PBVF 2026 — jeudi et vendredi (Palmeraie ↔ hôtel)",
+      "shuttleImageSaturdaySundayAlt": "Horaires navettes PBVF 2026 — samedi et dimanche (Palmeraie ↔ hôtel)"
     },
     "festivalVenue": {
       "metaTitle": "Venue officiel & Zones | Festival",

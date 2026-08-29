@@ -114,3 +114,4 @@
 | [2026-08-23 17:50] Completed Task | SiteEntryPlan autoplay (2e essai) | Outcome: useEffect play() au passage en mode vid?o + repli muet si NotAllowedError. V?rifi? page et overlay : paused=false, muted=false, lecture avanc?e. |
 | [2026-08-23 17:47] Completed Task | Titre onglet Explore | Outcome: `(main)/explore/layout.tsx` title `{ absolute: "Festival PBVF Paris" }` (sans suffixe template). |
 | [2026-08-23 17:44] Completed Task | Token [SITE_ENTRY_PLAN] visible | Outcome: rendu partag? `MarkdownWithEmbed.renderMarkdownWithEmbed` ; EditableConfigMarkdownPage refactor? dessus ; PlanetOverlay rend SiteEntryPlanMedia (i18n pages.festivalVenue) au lieu du HTML brut. V?rifi? page + overlay, toggle photo/vid?o OK. |
+| [2026-08-29 18:25] Completed Task | Affiches navettes planning-navettes | Outcome: images jeudi?vendredi puis samedi?dimanche sur /festival/planning-navettes (`FestivalShuttleSchedule`), i18n FR/EN/ES, push main. |

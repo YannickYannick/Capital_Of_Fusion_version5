@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
+import { FestivalShuttleSchedule } from "@/components/features/festival/FestivalShuttleSchedule";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pages");
@@ -29,6 +30,7 @@ export default async function FestivalPlanningNavettesPage() {
       initialValue={initialValue}
       field="festival_planning_navettes_markdown"
       emptyText={t("festivalPlanning.empty")}
+      preface={<FestivalShuttleSchedule />}
     />
   );
 }
