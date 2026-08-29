@@ -210,7 +210,12 @@
       "title": "Horario y lanzaderas",
       "subtitle": "Horarios, lanzaderas e información práctica.",
       "contentMarkdown": "## Por completar\n\nAñade aquí el contenido (Markdown) de **Horario y lanzaderas**.\n",
-      "empty": "Contenido próximamente."
+      "empty": "Contenido próximamente.",
+      "shuttleSectionTitle": "Horarios de lanzaderas",
+      "shuttleIntro": "Lanzaderas entre La Palmeraie y los hoteles asociados — horarios por día y sentido (ida / vuelta).",
+      "shuttleBetween": "Fin de semana — sábado y domingo:",
+      "shuttleImageThursdayFridayAlt": "Horarios lanzaderas PBVF 2026 — jueves y viernes (Palmeraie ↔ hotel)",
+      "shuttleImageSaturdaySundayAlt": "Horarios lanzaderas PBVF 2026 — sábado y domingo (Palmeraie ↔ hotel)"
     },
     "festivalVenue": {
       "metaTitle": "Venue oficial y áreas | Festival",

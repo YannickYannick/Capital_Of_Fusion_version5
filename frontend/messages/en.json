@@ -210,7 +210,12 @@
       "title": "Schedule & Shuttles",
       "subtitle": "Timetable, shuttles and practical information.",
       "contentMarkdown": "## To fill\n\nAdd the **Schedule & Shuttles** page content here (Markdown).\n",
-      "empty": "Content coming soon."
+      "empty": "Content coming soon.",
+      "shuttleSectionTitle": "Shuttle timetable",
+      "shuttleIntro": "Shuttles between La Palmeraie and partner hotels — times by day and direction (outbound / return).",
+      "shuttleBetween": "Weekend — Saturday & Sunday:",
+      "shuttleImageThursdayFridayAlt": "PBVF 2026 shuttle times — Thursday and Friday (Palmeraie ↔ hotel)",
+      "shuttleImageSaturdaySundayAlt": "PBVF 2026 shuttle times — Saturday and Sunday (Palmeraie ↔ hotel)"
     },
     "festivalVenue": {
       "metaTitle": "Official Venue & Areas | Festival",
