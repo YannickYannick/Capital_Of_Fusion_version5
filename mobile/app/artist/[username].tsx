@@ -10,6 +10,24 @@ import { artistLinkRows } from '@/src/lib/profileLinks';
 import { CtaRow } from '@/src/components/ui/CtaRow';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { useArtist } from '@/src/hooks/useArtist';
+import { PRODUCTION_API_URL } from '@/src/lib/api';
+
+/** Pré-génère les fiches artistes pour l'export PWA (static). */
+export async function generateStaticParams(): Promise<{ username: string }[]> {
+  try {
+    const res = await fetch(`${PRODUCTION_API_URL}/api/users/artists/`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (!res.ok) return [];
+    const artists = (await res.json()) as { username?: string }[];
+    return artists
+      .map((a) => a.username)
+      .filter((u): u is string => Boolean(u))
+      .map((username) => ({ username }));
+  } catch {
+    return [];
+  }
+}
 
 export default function ArtistDetailScreen() {
   const router = useRouter();

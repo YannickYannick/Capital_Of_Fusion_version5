@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 
-import { CACHE_TTL_MS, isTtlExpired } from '@/src/lib/offlineCache';
+import { isTtlExpired } from '@/src/lib/offlineCache';
 
 const META_PREFIX = 'pbvf-cache:video:';
 
@@ -48,14 +48,10 @@ export async function getCachedVideoUri(cacheKey: string, remoteUrl: string): Pr
 
   const info = await FileSystem.getInfoAsync(path);
   if (!info.exists) return null;
-
   return path;
 }
 
-/**
- * Télécharge la vidéo en cache (7 j) et retourne l'URI locale.
- * Si le cache est valide, retour immédiat sans réseau.
- */
+/** Télécharge la vidéo en cache (7 j) et retourne l'URI locale. */
 export async function resolveCachedVideoUri(cacheKey: string, remoteUrl: string): Promise<string> {
   const cached = await getCachedVideoUri(cacheKey, remoteUrl);
   if (cached) return cached;

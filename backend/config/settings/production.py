@@ -82,7 +82,10 @@ _cors_hardcoded = [
 ]
 CORS_ALLOWED_ORIGINS = list({*_cors_hardcoded, *_cors_from_env})
 # Autorise tout sous-domaine Vercel (preview + prod) pour éviter de mettre à jour CORS à chaque déploiement.
-CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://[\w-]+\.vercel\.app$"]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://[\w-]+\.vercel\.app$",
+    r"^https://[\w.-]+\.netlify\.app$",
+]
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF : origines de confiance pour les formulaires POST (admin, login, etc.). Format: https://domaine (sans slash final).

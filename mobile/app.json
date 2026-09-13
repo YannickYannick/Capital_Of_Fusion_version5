@@ -24,7 +24,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "Paris Bachata Vibe Festival",
+      "shortName": "PBVF",
+      "description": "Planning, artistes, navettes et infos PBVF",
+      "lang": "fr",
+      "themeColor": "#0a0e27",
+      "backgroundColor": "#0a0e27",
+      "display": "standalone"
     },
     "plugins": [
       "expo-router",

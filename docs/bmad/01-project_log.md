@@ -110,6 +110,7 @@
 | [2026-08-23 17:38] Starting Task | Token [SITE_ENTRY_PLAN] visible | Objectif : le token s'affiche brut dans l'overlay Explore Access & Venue (page OK). |
 | [2026-08-31 19:20] Starting Task | Mobile artistes API prod | Objectif : charger les artistes sur téléphone Expo Go via Railway (Supabase via Django). |
 | [2026-08-31 20:05] Completed Task | Planning cours mobile + DB | Outcome: modèle FestivalProgramSlot, 64 créneaux seed affiches, API /api/festival/program/, app mobile branchée. |
+| [2026-09-13 22:50] Completed Task | PWA Expo export | Outcome: manifest + SW, build:pwa → dist/, generateStaticParams artistes, videoCache.web, CORS netlify. |
 | [2026-08-23 20:16] Completed Task | Retrait concert live A?ejo Vibe | Outcome: ligne supprim?e FR/EN/ES (messages + sidecars notre_programme) ; migration 0039 refresh DB. |
 | [2026-08-23 18:06] Completed Task | Indicateur pause au lancement | Outcome: iframe YT r?v?l?e seulement ? l'?tat PLAYING (fondu 0.4s) + filet de s?curit? 2500 ms si l'autoplay est refus?. Pi?ge trouv? : `YT.Player` REMPLACE le div `containerRef` par son iframe, donc React ne peut plus modifier son style ; l'opacit? doit ?tre port?e par un wrapper parent. Appliqu? aux 3 lecteurs ExploreVideos + YouTubeVideoBackground. |
 | [2026-08-23 17:53] Completed Task | Indicateur pause vid?o de fond | Outcome: reprise auto sur ?tat PAUSED (2) dans ExploreVideos / YouTubeVideoBackground / CycleVideoOnly + CSS webkit overlay-play-button. L'iframe YT ?tant cross-origin, l'indicateur central n'est pas stylable : on ?vite l'?tat pause. |
