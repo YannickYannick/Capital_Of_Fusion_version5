@@ -75,3 +75,85 @@ class Registration(BaseModel):
 
     def __str__(self):
         return f"{self.user} → {self.event_pass}"
+
+
+class FestivalShuttleDeparture(BaseModel):
+    """
+    Départ navette festival (Palmeraie ↔ hôtel).
+    Source : affiches officielles PBVF 2026.
+    """
+
+    class Direction(models.TextChoices):
+        TO_HOTEL = "to_hotel", "Palmeraie → Hôtel"
+        TO_PALMERAIE = "to_palmeraie", "Hôtel → Palmeraie"
+
+    edition = models.CharField(max_length=8, default="2026", db_index=True)
+    day_id = models.CharField(max_length=8, help_text="jeu, ven, sam, dim")
+    day_label = models.CharField(max_length=32)
+    day_date = models.CharField(max_length=32, help_text="ex. 17 sept.")
+    iso_date = models.DateField()
+    direction = models.CharField(max_length=16, choices=Direction.choices)
+    departure_time = models.CharField(max_length=5, help_text="HH:MM")
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Départ navette festival"
+        verbose_name_plural = "Départs navettes festival"
+        ordering = ["iso_date", "direction", "sort_order"]
+        indexes = [
+            models.Index(fields=["edition", "day_id", "direction"]),
+        ]
+
+    def __str__(self):
+        return f"{self.day_label} {self.departure_time} — {self.get_direction_display()}"
+
+
+class FestivalProgramSlot(BaseModel):
+    """
+    Créneau planning festival (workshops, soirées, compétitions).
+    Source : affiches officielles PBVF 2026 (notre-programme).
+    """
+
+    class Category(models.TextChoices):
+        WORKSHOP = "workshop", "Workshop"
+        PARTY = "party", "Soirée"
+        BREAK = "break", "Pause"
+        COMPETITION = "competition", "Compétition"
+        SOCIAL = "social", "Social"
+        INFO = "info", "Info"
+        CONCERT = "concert", "Concert"
+
+    class Level(models.TextChoices):
+        OPEN = "open", "Open"
+        BEGINNER = "beginner", "Beginner"
+        INTERMEDIATE = "intermediate", "Intermediate"
+        ADVANCED = "advanced", "Advanced"
+        NONE = "", "—"
+
+    edition = models.CharField(max_length=8, default="2026", db_index=True)
+    day_id = models.CharField(max_length=8, help_text="jeu, ven, sam, dim")
+    day_label = models.CharField(max_length=32)
+    day_date = models.CharField(max_length=32, help_text="ex. 17 sept.")
+    iso_date = models.DateField()
+    room = models.CharField(max_length=64, help_text="La Casa Room, La Escuela, …")
+    start_time = models.CharField(max_length=5, help_text="HH:MM")
+    end_time = models.CharField(max_length=5, help_text="HH:MM")
+    title = models.CharField(max_length=255)
+    style = models.CharField(max_length=255, blank=True, help_text="Style / sous-titre")
+    level = models.CharField(max_length=16, choices=Level.choices, blank=True, default="")
+    category = models.CharField(max_length=16, choices=Category.choices, default=Category.WORKSHOP)
+    is_live = models.BooleanField(default=False)
+    not_in_full_pass = models.BooleanField(default=False)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Créneau planning festival"
+        verbose_name_plural = "Créneaux planning festival"
+        ordering = ["iso_date", "room", "sort_order", "start_time"]
+        indexes = [
+            models.Index(fields=["edition", "day_id"]),
+            models.Index(fields=["edition", "room"]),
+        ]
+
+    def __str__(self):
+        return f"{self.day_label} {self.start_time} — {self.title} ({self.room})"

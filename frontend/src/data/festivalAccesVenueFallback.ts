@@ -148,7 +148,7 @@ And most importantly…
 Enjoy the full Paris Bachata Vibe Festival experience. 🔥🌴🌊
 `,
 
-  fr: `## VENUE OFFICIEL & ZONES
+  fr: `## VENUE OFFICIELLE & ZONES
 
 Prépare-toi pour une expérience festival unique au cœur de Paris ! 🔥
 

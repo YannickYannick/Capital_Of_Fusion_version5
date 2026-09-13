@@ -10,6 +10,9 @@ import os
 
 DEBUG = True
 
+# Émulateur Android Expo : Host header = 10.0.2.2 (alias machine hôte).
+ALLOWED_HOSTS = list(dict.fromkeys([*ALLOWED_HOSTS, "10.0.2.2"]))
+
 # Front ouvert depuis la LAN (ex. Next affiche http://192.168.x.x:3000 pour le mobile).
 # Utiliser : python manage.py runserver 0.0.0.0:8000
 CORS_ALLOWED_ORIGIN_REGEXES = [

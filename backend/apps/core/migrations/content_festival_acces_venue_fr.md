@@ -1,4 +1,4 @@
-## VENUE OFFICIEL & ZONES
+## VENUE OFFICIELLE & ZONES
 
 Prépare-toi pour une expérience festival unique au cœur de Paris ! 🔥
 

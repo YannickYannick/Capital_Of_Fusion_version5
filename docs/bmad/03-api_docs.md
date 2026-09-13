@@ -49,6 +49,17 @@
 
 **Hors API (Django admin) :** `https://capitaloffusionversion5-production.up.railway.app/admin/`
 
+**Festival — app mobile (lecture publique, données Supabase via Django) :**
+
+| Méthode | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/festival/cache-manifest/?edition=2026` | Horodatages max (`updated_at`) pour cache mobile 7 j |
+| GET | `/api/festival/program/?edition=2026` | Planning workshops / soirées (64 créneaux PBVF 2026) |
+| GET | `/api/festival/shuttles/?edition=2026` | Navettes groupées par jour (`toHotel`, `toPalmeraie`) |
+| GET | `/api/festival/shuttles/flat/?edition=2026` | Liste plate des départs (filtres `day_id`, `direction`) |
+| GET | `/api/festival/artists/` | Artistes (alias `/api/users/artists/`) |
+| GET | `/api/festival/artists/<username>/` | Détail artiste |
+
 ---
 
 ## 2. Endpoints Phase 1

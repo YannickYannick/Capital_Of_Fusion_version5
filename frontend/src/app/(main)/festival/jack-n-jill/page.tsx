@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
-import { getFestivalJackNJillFallback } from "@/data/festivalJackNJillFallback";
+import { getFestivalJackNJillFallback, withJackNJillPosters } from "@/data/festivalJackNJillFallback";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pages");
@@ -25,9 +25,9 @@ export default async function FestivalJackNJillPage() {
   try {
     const config = await getSiteConfig();
     const fromApi = (config.festival_jack_n_jill_markdown ?? "").trim();
-    initialValue = fromApi || fallback;
+    initialValue = withJackNJillPosters(fromApi || fallback, locale);
   } catch {
-    initialValue = fallback;
+    initialValue = withJackNJillPosters(fallback, locale);
   }
 
   return (

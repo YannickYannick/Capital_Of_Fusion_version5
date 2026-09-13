@@ -25,6 +25,8 @@ Esta es tu última oportunidad para clasificarte para la Final Nacional del domi
 
 Los **5 primeros** bailarines clasificados el sábado accederán a la Final Nacional del domingo.
 
+![Jack and Jill Pre-Selection Final — Sábado 19 de septiembre](/images/festival/jack-n-jill-pre-selection-final-saturday.png)
+
 ---
 
 ## 🏆 DOMINGO — FINALES NACIONALES
@@ -42,6 +44,8 @@ El acceso a la competición está reservado exclusivamente a bailarines clasific
 - mediante las clasificatorias del sábado en el Paris Bachata Vibe Festival.
 
 Si aún no estás clasificado, **el sábado es tu ÚLTIMA OPORTUNIDAD**.
+
+![Bachata French Social Cup Final — Domingo 20 de septiembre](/images/festival/jack-n-jill-french-social-cup-final-sunday.png)
 
 ---
 

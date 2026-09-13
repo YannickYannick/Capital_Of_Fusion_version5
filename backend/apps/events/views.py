@@ -5,12 +5,16 @@ Vues admin — créer, modifier, supprimer (éservé IsSuperUser).
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
+from django.db.models import Max
+import hashlib
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from apps.core.permissions import IsSuperUser, IsStaffOrSuperUser
 from apps.core.models import PendingContentEdit
-from .models import Event
-from .serializers import EventSerializer, EventWriteSerializer
+from .models import Event, FestivalShuttleDeparture, FestivalProgramSlot
+from .serializers import EventSerializer, EventWriteSerializer, FestivalShuttleDepartureSerializer, FestivalProgramSlotSerializer
 
 
 
@@ -54,6 +58,160 @@ class EventDetailAPIView(APIView):
         )
         serializer = EventSerializer(event)
         return Response(serializer.data)
+
+
+User = get_user_model()
+
+
+def _artists_cache_token() -> str | None:
+    """Empreinte légère du catalogue artistes (User sans updated_at)."""
+    rows = (
+        User.objects.filter(professions__isnull=False)
+        .order_by("username")
+        .values_list("username", "first_name", "last_name", "artist_display_order", "bio")
+    )
+    if not rows:
+        return None
+    payload = "|".join(":".join(str(x) for x in row) for row in rows)
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+
+class FestivalCacheManifestAPIView(APIView):
+    """
+    GET /api/festival/cache-manifest/?edition=2026
+  Horodatages max (updated_at) pour cache mobile — rechargement partiel.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        edition = request.query_params.get("edition", "2026")
+
+        artists_ts = _artists_cache_token()
+        program_ts = FestivalProgramSlot.objects.filter(edition=edition).aggregate(
+            m=Max("updated_at")
+        )["m"]
+        shuttle_ts = FestivalShuttleDeparture.objects.filter(edition=edition).aggregate(
+            m=Max("updated_at")
+        )["m"]
+
+        def iso(dt):
+            if dt is None:
+                return None
+            s = dt.isoformat()
+            if s.endswith("+00:00"):
+                return s[:-6] + "Z"
+            return s
+
+        return Response(
+            {
+                "edition": edition,
+                "artists": artists_ts if isinstance(artists_ts, str) else iso(artists_ts),
+                "program": iso(program_ts),
+                "shuttles": iso(shuttle_ts),
+            }
+        )
+
+
+class FestivalShuttleListAPIView(APIView):
+    """
+    GET /api/festival/shuttles/?edition=2026
+    Horaires navettes groupés par jour (format app mobile).
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        edition = request.query_params.get("edition", "2026")
+        qs = FestivalShuttleDeparture.objects.filter(edition=edition).order_by(
+            "iso_date", "direction", "sort_order"
+        )
+
+        days: dict[str, dict] = {}
+        for dep in qs:
+            bucket = days.setdefault(
+                dep.day_id,
+                {
+                    "id": dep.day_id,
+                    "label": dep.day_label,
+                    "date": dep.day_date,
+                    "isoDate": dep.iso_date.isoformat(),
+                    "toHotel": [],
+                    "toPalmeraie": [],
+                },
+            )
+            if dep.direction == FestivalShuttleDeparture.Direction.TO_HOTEL:
+                bucket["toHotel"].append(dep.departure_time)
+            else:
+                bucket["toPalmeraie"].append(dep.departure_time)
+
+        return Response(list(days.values()))
+
+
+class FestivalShuttleFlatListAPIView(APIView):
+    """
+    GET /api/festival/shuttles/flat/?edition=2026&day_id=sam&direction=to_hotel
+    Liste plate des départs (admin / debug).
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        edition = request.query_params.get("edition", "2026")
+        qs = FestivalShuttleDeparture.objects.filter(edition=edition).order_by(
+            "iso_date", "direction", "sort_order"
+        )
+        day_id = request.query_params.get("day_id")
+        if day_id:
+            qs = qs.filter(day_id=day_id)
+        direction = request.query_params.get("direction")
+        if direction:
+            qs = qs.filter(direction=direction)
+        serializer = FestivalShuttleDepartureSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+class FestivalProgramAPIView(APIView):
+    """
+    GET /api/festival/program/?edition=2026
+    Planning workshops / soirées — format app mobile.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        edition = request.query_params.get("edition", "2026")
+        qs = FestivalProgramSlot.objects.filter(edition=edition).order_by(
+            "iso_date", "sort_order", "start_time"
+        )
+
+        day_id = request.query_params.get("day_id")
+        if day_id:
+            qs = qs.filter(day_id=day_id)
+        room = request.query_params.get("room")
+        if room:
+            qs = qs.filter(room=room)
+
+        slots = FestivalProgramSlotSerializer(qs, many=True).data
+
+        days_seen: dict[str, dict] = {}
+        stages_seen: set[str] = set()
+        for slot in qs:
+            days_seen.setdefault(
+                slot.day_id,
+                {
+                    "id": slot.day_id,
+                    "label": slot.day_label,
+                    "date": slot.day_date,
+                    "isoDate": slot.iso_date.isoformat(),
+                },
+            )
+            stages_seen.add(slot.room)
+
+        days = list(days_seen.values())
+        stages = sorted(stages_seen)
+
+        return Response({"edition": edition, "days": days, "stages": stages, "slots": slots})
 
 
 # ─── Admin views ──────────────────────────────────────────────────────────────

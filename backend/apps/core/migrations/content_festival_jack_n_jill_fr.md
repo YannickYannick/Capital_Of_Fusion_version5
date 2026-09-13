@@ -25,6 +25,8 @@ C'est votre dernière opportunité de vous qualifier pour la Finale Nationale du
 
 Les **5 premiers** danseurs qualifiés le samedi accéderont à la Finale Nationale du dimanche.
 
+![Jack and Jill Pré-sélection Finale — Samedi 19 septembre](/images/festival/jack-n-jill-pre-selection-final-saturday.png)
+
 ---
 
 ## 🏆 DIMANCHE — FINALES NATIONALES
@@ -42,6 +44,8 @@ L'accès à la compétition est exclusivement réservé aux danseurs qualifiés 
 - via les qualificatives du samedi au Paris Bachata Vibe Festival.
 
 Si vous n'êtes pas encore qualifié, **le samedi est votre DERNIÈRE CHANCE**.
+
+![Bachata French Social Cup Final — Dimanche 20 septembre](/images/festival/jack-n-jill-french-social-cup-final-sunday.png)
 
 ---
 

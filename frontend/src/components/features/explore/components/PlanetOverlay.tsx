@@ -33,6 +33,7 @@ import {
   FESTIVAL_JACK_N_JILL_PAGE_HREF,
   getFestivalJackNJillFallback,
   getFestivalJackNJillOverlayDescription,
+  withJackNJillPosters,
 } from "@/data/festivalJackNJillFallback";
 import {
   organizationNodePageHref,
@@ -452,7 +453,10 @@ export function PlanetOverlay({ node, onClose, canEditDescriptions, onNodeUpdate
   const accesVenueFallbackMarkdown = getFestivalAccesVenueFallback(overlayLocale);
   const jackNJillOverlayHook = getFestivalJackNJillOverlayDescription(overlayLocale);
   const jackNJillFallbackMarkdown = getFestivalJackNJillFallback(overlayLocale);
-  const jackNJillBodyMarkdown = jackNJillMarkdownFromApi || jackNJillFallbackMarkdown;
+  const jackNJillBodyMarkdown = withJackNJillPosters(
+    jackNJillMarkdownFromApi || jackNJillFallbackMarkdown,
+    overlayLocale,
+  );
 
   const displayShortForOverlay =
     node.short_description ||

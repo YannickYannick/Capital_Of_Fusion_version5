@@ -64,6 +64,8 @@ This is your last opportunity to qualify for Sunday's National Final.
 
 The **TOP 5** dancers qualified on Saturday will earn their place in the National Final on Sunday.
 
+![Jack and Jill Pre-Selection Final — Saturday 19 September](/images/festival/jack-n-jill-pre-selection-final-saturday.png)
+
 ---
 
 ## 🏆 SUNDAY — NATIONAL FINALS
@@ -81,6 +83,8 @@ Access to the competition is exclusively for dancers who have qualified:
 - Through the Saturday qualifiers at Paris Bachata Vibe Festival.
 
 If you are not qualified yet, **Saturday is your LAST CHANCE**.
+
+![Bachata French Social Cup Final — Sunday 20 September](/images/festival/jack-n-jill-french-social-cup-final-sunday.png)
 
 ---
 
@@ -121,6 +125,8 @@ C'est votre dernière opportunité de vous qualifier pour la Finale Nationale du
 
 Les **5 premiers** danseurs qualifiés le samedi accéderont à la Finale Nationale du dimanche.
 
+![Jack and Jill Pré-sélection Finale — Samedi 19 septembre](/images/festival/jack-n-jill-pre-selection-final-saturday.png)
+
 ---
 
 ## 🏆 DIMANCHE — FINALES NATIONALES
@@ -138,6 +144,8 @@ L'accès à la compétition est exclusivement réservé aux danseurs qualifiés 
 - via les qualificatives du samedi au Paris Bachata Vibe Festival.
 
 Si vous n'êtes pas encore qualifié, **le samedi est votre DERNIÈRE CHANCE**.
+
+![Bachata French Social Cup Final — Dimanche 20 septembre](/images/festival/jack-n-jill-french-social-cup-final-sunday.png)
 
 ---
 
@@ -178,6 +186,8 @@ Esta es tu última oportunidad para clasificarte para la Final Nacional del domi
 
 Los **5 primeros** bailarines clasificados el sábado accederán a la Final Nacional del domingo.
 
+![Jack and Jill Pre-Selection Final — Sábado 19 de septiembre](/images/festival/jack-n-jill-pre-selection-final-saturday.png)
+
 ---
 
 ## 🏆 DOMINGO — FINALES NACIONALES
@@ -196,6 +206,8 @@ El acceso a la competición está reservado exclusivamente a bailarines clasific
 
 Si aún no estás clasificado, **el sábado es tu ÚLTIMA OPORTUNIDAD**.
 
+![Bachata French Social Cup Final — Domingo 20 de septiembre](/images/festival/jack-n-jill-french-social-cup-final-sunday.png)
+
 ---
 
 ## 🔥 INSCRIPCIÓN
@@ -208,6 +220,54 @@ ${JACK_N_JILL_REGISTRATION_LINKS.amateur}
 
 Dos divisiones. Dos competiciones. Un fin de semana final. 🏆`,
 };
+
+export const JACK_N_JILL_POSTER_SRC = {
+  saturday: "/images/festival/jack-n-jill-pre-selection-final-saturday.png",
+  sunday: "/images/festival/jack-n-jill-french-social-cup-final-sunday.png",
+} as const;
+
+const JACK_N_JILL_POSTER_MARKDOWN: Record<JackNJillLocale, { saturday: string; sunday: string }> = {
+  fr: {
+    saturday: `![Jack and Jill Pré-sélection Finale — Samedi 19 septembre](${JACK_N_JILL_POSTER_SRC.saturday})`,
+    sunday: `![Bachata French Social Cup Final — Dimanche 20 septembre](${JACK_N_JILL_POSTER_SRC.sunday})`,
+  },
+  en: {
+    saturday: `![Jack and Jill Pre-Selection Final — Saturday 19 September](${JACK_N_JILL_POSTER_SRC.saturday})`,
+    sunday: `![Bachata French Social Cup Final — Sunday 20 September](${JACK_N_JILL_POSTER_SRC.sunday})`,
+  },
+  es: {
+    saturday: `![Jack and Jill Pre-Selection Final — Sábado 19 de septiembre](${JACK_N_JILL_POSTER_SRC.saturday})`,
+    sunday: `![Bachata French Social Cup Final — Domingo 20 de septiembre](${JACK_N_JILL_POSTER_SRC.sunday})`,
+  },
+};
+
+/**
+ * Garantit les affiches dans le corps Markdown (overlay Explore + page éditoriale).
+ * Purpose: l'API peut servir un markdown sans images ; on injecte aux bons emplacements.
+ */
+export function withJackNJillPosters(markdown: string, locale: string): string {
+  const body = (markdown ?? "").trim();
+  if (!body || body.includes(JACK_N_JILL_POSTER_SRC.saturday)) return body;
+
+  const loc: JackNJillLocale =
+    locale === "fr" || locale === "en" || locale === "es" ? locale : "en";
+  const posters = JACK_N_JILL_POSTER_MARKDOWN[loc];
+
+  let result = body.replace(
+    /(\n---\n\n## 🏆 (?:DIMANCHE|SUNDAY|DOMINGO))/,
+    `\n\n${posters.saturday}\n$1`,
+  );
+  result = result.replace(
+    /(\n---\n\n## 🔥 (?:INSCRIPTIONS|REGISTRATION|INSCRIPCIÓN))/i,
+    `\n\n${posters.sunday}\n$1`,
+  );
+
+  if (!result.includes(JACK_N_JILL_POSTER_SRC.saturday)) {
+    result = `${result}\n\n${posters.saturday}\n\n${posters.sunday}`;
+  }
+
+  return result;
+}
 
 /** Resolve locale → markdown de repli (défaut EN). */
 export function getFestivalJackNJillFallback(locale: string): string {

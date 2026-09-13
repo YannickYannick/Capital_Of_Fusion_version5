@@ -31,6 +31,10 @@ from apps.courses.views import (
 from apps.events.views import (
     EventListAPIView, EventDetailAPIView,
     EventAdminAPIView, EventAdminDetailAPIView,
+    FestivalShuttleListAPIView,
+    FestivalShuttleFlatListAPIView,
+    FestivalProgramAPIView,
+    FestivalCacheManifestAPIView,
 )
 from apps.organization.views import (
     OrganizationNodeListAPIView,
@@ -112,6 +116,14 @@ urlpatterns = [
     # ── Events (lecture) ─────────────────────────────────────────────────────
     path("events/", EventListAPIView.as_view()),
     path("events/<slug:slug>/", EventDetailAPIView.as_view()),
+
+    # ── Festival mobile (lecture) ───────────────────────────────────────────
+    path("festival/shuttles/", FestivalShuttleListAPIView.as_view()),
+    path("festival/shuttles/flat/", FestivalShuttleFlatListAPIView.as_view()),
+    path("festival/program/", FestivalProgramAPIView.as_view()),
+    path("festival/cache-manifest/", FestivalCacheManifestAPIView.as_view()),
+    path("festival/artists/", ArtistListAPIView.as_view()),
+    path("festival/artists/<str:username>/", ArtistDetailAPIView.as_view()),
 
     # ── Organization (lecture) ───────────────────────────────────────────────
     path("organization/nodes/", OrganizationNodeListAPIView.as_view()),
