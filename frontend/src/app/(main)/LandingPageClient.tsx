@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { usePlanetsOptions } from "@/contexts/PlanetsOptionsContext";
 import { prefetchExploreModules, usePrefetchExplore } from "@/hooks/usePrefetchExplore";
 import FestivalCountdown from "@/components/features/festival/FestivalCountdown";
+import { getPwaUrl } from "@/lib/pwaUrl";
 
 const ctaExploreFont = Bebas_Neue({
   weight: "400",
@@ -89,6 +90,14 @@ export default function LandingPageClient() {
                             >
                                 {t("ctaProgram")}
                             </Link>
+                            <a
+                                href={getPwaUrl()}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-6 py-3 rounded-lg border border-[#f3ac41] hover:bg-[#f3ac41]/10 text-white font-medium transition text-center"
+                            >
+                                {t("ctaAppFestival")}
+                            </a>
                         </div>
                         <Link
                             href="/festival/giveaway"

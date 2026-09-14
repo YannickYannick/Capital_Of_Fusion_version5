@@ -146,3 +146,5 @@
 | [2026-09-14 23:35] Completed Task | Passes format carrousel | Outcome: `/passes` aligné Code de conduite (swipe, dots, flèches, lightbox) ; intro + formules. |
 | [2026-09-15 00:10] Completed Task | Annonces urgent + accueil | Outcome: modèle `FestivalAnnouncement` + API + admin ; bandeau urgent global ; fil normal sur accueil ; seed + dismiss AsyncStorage. Push OS = phase suivante. |
 | [2026-09-15 00:15] Completed Task | Bandeau urgent ticker | Outcome: `UrgentBanner` en marquee défilant (reanimated) ; ✕ ferme toutes les urgentes. |
+| [2026-09-15 00:45] Starting Task | PWA b+c URL + lien site | Objectif : URL canonique `app.capitaloffusion.com` + liens menu/landing/festival. |
+| [2026-09-15 00:50] Completed Task | PWA b+c URL + lien site | Outcome: `getPwaUrl` + `NEXT_PUBLIC_PWA_URL` ; menu Festival injecté ; CTA landing + carte `/festival` ; CORS `app.capitaloffusion.com` ; doc `docs/bmad/11-pwa-deploy.md`. Deploy prod Vercel bloqué (CLI logout) → claim temporaire si besoin. |

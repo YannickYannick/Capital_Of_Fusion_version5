@@ -79,6 +79,7 @@ _cors_from_env = [o.strip() for o in _cors.split(",") if o.strip()]
 _cors_hardcoded = [
     "https://capitaloffusion.com",
     "https://www.capitaloffusion.com",
+    "https://app.capitaloffusion.com",
 ]
 CORS_ALLOWED_ORIGINS = list({*_cors_hardcoded, *_cors_from_env})
 # Autorise tout sous-domaine Vercel (preview + prod) pour éviter de mettre à jour CORS à chaque déploiement.

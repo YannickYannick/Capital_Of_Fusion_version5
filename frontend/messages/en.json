@@ -56,7 +56,8 @@
       "notreProgramme": "Our programme",
       "jackNJill": "Jack N Jill",
       "allStarStreetBattle": "All Star Street Battle",
-      "nosArtistes": "Our artists"
+      "nosArtistes": "Our artists",
+      "appFestival": "Festival app"
     }
   },
   "landing": {
@@ -71,6 +72,7 @@
     "ctaBookHotel": "Book your hotel",
     "ctaBookPass": "Book your pass",
     "ctaProgram": "Our program",
+    "ctaAppFestival": "Festival app",
     "ctaGiveaway": "GIVEAWAY",
     "footerLine": "Paris, France",
     "countdown": {
@@ -192,6 +194,10 @@
         "jackNJill": {
           "title": "Jack N Jill",
           "desc": "Social French Cup & European Qualifier."
+        },
+        "appFestival": {
+          "title": "Festival app",
+          "desc": "Schedule, map, artists and info on your phone."
         },
         "allStarBattle": {
           "title": "All Star Street Battle",
