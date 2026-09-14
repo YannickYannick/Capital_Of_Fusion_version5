@@ -1,16 +1,18 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { radius, space, theme } from '@/constants/theme';
 import { fonts, type } from '@/constants/typography';
 import { artistDisplayName, artistSubtitle } from '@/src/lib/api/artists';
 import { artistLinkRows } from '@/src/lib/profileLinks';
+import { BackButton } from '@/src/components/BackButton';
 import { CtaRow } from '@/src/components/ui/CtaRow';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { useArtist } from '@/src/hooks/useArtist';
 import { PRODUCTION_API_URL } from '@/src/lib/api';
+import { fixMojibake } from '@/src/lib/textEncoding';
 
 /** Pré-génère les fiches artistes pour l'export PWA (static). */
 export async function generateStaticParams(): Promise<{ username: string }[]> {
@@ -30,7 +32,6 @@ export async function generateStaticParams(): Promise<{ username: string }[]> {
 }
 
 export default function ArtistDetailScreen() {
-  const router = useRouter();
   const { username } = useLocalSearchParams<{ username: string }>();
   const resolvedUsername = typeof username === 'string' ? username : undefined;
   const { artist, loading, error } = useArtist(resolvedUsername);
@@ -38,90 +39,100 @@ export default function ArtistDetailScreen() {
   const name = artist ? artistDisplayName(artist) : '';
   const subtitle = artist ? artistSubtitle(artist) : '';
   const links = artist ? artistLinkRows(artist.external_links) : [];
+  const heroUri = artist?.cover_image || artist?.profile_picture || null;
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} accessibilityRole="button">
-          <Text style={styles.back}>← Retour</Text>
-        </Pressable>
+    <View style={styles.screen}>
+      <View style={styles.backLayer} pointerEvents="box-none">
+        <BackButton floating fallbackHref="/(tabs)/lineup" />
       </View>
 
-      {loading && (
-        <View style={styles.center}>
-          <ActivityIndicator color={theme.gold} size="large" />
-        </View>
-      )}
-
-      {error && !loading && (
-        <Text style={styles.error}>{error}</Text>
-      )}
-
-      {artist && !loading && (
-        <>
-          <View style={styles.heroWrap}>
-            {artist.cover_image ? (
-              <Image source={{ uri: artist.cover_image }} style={styles.heroImage} contentFit="cover" />
-            ) : artist.profile_picture ? (
-              <Image source={{ uri: artist.profile_picture }} style={styles.heroImage} contentFit="cover" />
-            ) : (
-              <View style={styles.heroFallback}>
-                <Text style={styles.heroInitial}>{name.charAt(0).toUpperCase()}</Text>
-              </View>
-            )}
-            <LinearGradient colors={['transparent', theme.background]} style={StyleSheet.absoluteFill} />
-            {artist.profile_picture && artist.cover_image ? (
-              <Image source={{ uri: artist.profile_picture }} style={styles.avatarOverlay} contentFit="cover" />
-            ) : null}
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+        {loading && (
+          <View style={styles.center}>
+            <ActivityIndicator color={theme.gold} size="large" />
           </View>
+        )}
 
-          <View style={styles.header}>
-            <Text style={styles.name}>{name}</Text>
-            <Text style={styles.meta}>{subtitle}</Text>
-            {artist.is_staff_member ? (
-              <Text style={styles.badge}>Membre Team CoF</Text>
+        {error && !loading && <Text style={styles.error}>{error}</Text>}
+
+        {artist && !loading && (
+          <>
+            <View style={styles.heroWrap}>
+              {heroUri ? (
+                <Image
+                  source={{ uri: heroUri }}
+                  style={styles.heroImage}
+                  contentFit="cover"
+                  contentPosition="top"
+                />
+              ) : (
+                <View style={styles.heroFallback}>
+                  <Text style={styles.heroInitial}>{name.charAt(0).toUpperCase()}</Text>
+                </View>
+              )}
+              <LinearGradient colors={['transparent', theme.background]} style={StyleSheet.absoluteFill} />
+              {artist.profile_picture && artist.cover_image ? (
+                <Image
+                  source={{ uri: artist.profile_picture }}
+                  style={styles.avatarOverlay}
+                  contentFit="cover"
+                  contentPosition="top"
+                />
+              ) : null}
+            </View>
+
+            <View style={styles.header}>
+              <Text style={styles.name}>{name}</Text>
+              <Text style={styles.meta}>{subtitle}</Text>
+              {artist.is_staff_member ? <Text style={styles.badge}>Membre Team CoF</Text> : null}
+            </View>
+
+            {artist.bio ? (
+              <GlassCard style={styles.section}>
+                <Text style={styles.sectionTitle}>À propos</Text>
+                <Text style={styles.bio}>{fixMojibake(artist.bio).trim()}</Text>
+              </GlassCard>
             ) : null}
-          </View>
 
-          {artist.bio ? (
-            <GlassCard style={styles.section}>
-              <Text style={styles.sectionTitle}>À propos</Text>
-              <Text style={styles.bio}>{artist.bio.trim()}</Text>
-            </GlassCard>
-          ) : null}
+            {artist.linked_partner_structures && artist.linked_partner_structures.length > 0 ? (
+              <GlassCard style={styles.section}>
+                <Text style={styles.sectionTitle}>Structures partenaires</Text>
+                {artist.linked_partner_structures.map((s) => (
+                  <Text key={s.slug} style={styles.partner}>
+                    {s.name}
+                  </Text>
+                ))}
+              </GlassCard>
+            ) : null}
 
-          {artist.linked_partner_structures && artist.linked_partner_structures.length > 0 ? (
-            <GlassCard style={styles.section}>
-              <Text style={styles.sectionTitle}>Structures partenaires</Text>
-              {artist.linked_partner_structures.map((s) => (
-                <Text key={s.slug} style={styles.partner}>
-                  {s.name}
-                </Text>
-              ))}
-            </GlassCard>
-          ) : null}
-
-          {links.length > 0 ? (
-            <GlassCard style={styles.linksCard}>
-              <Text style={styles.sectionTitle}>Liens</Text>
-              {links.map((link) => (
-                <CtaRow key={link.key} label={link.label} onPress={() => Linking.openURL(link.url)} />
-              ))}
-            </GlassCard>
-          ) : null}
-        </>
-      )}
-    </ScrollView>
+            {links.length > 0 ? (
+              <GlassCard style={styles.linksCard}>
+                <Text style={styles.sectionTitle}>Liens</Text>
+                {links.map((link) => (
+                  <CtaRow key={link.key} label={link.label} onPress={() => Linking.openURL(link.url)} />
+                ))}
+              </GlassCard>
+            ) : null}
+          </>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.background },
-  topBar: { paddingHorizontal: space.card, paddingTop: 12, zIndex: 2 },
-  back: { ...type.meta, color: theme.gold, textTransform: 'none', letterSpacing: 0 },
-  center: { paddingVertical: 48, alignItems: 'center' },
-  error: { paddingHorizontal: space.card, ...type.body, color: theme.muted },
-  heroWrap: { height: 200, position: 'relative', marginTop: 4 },
+  backLayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
+  },
+  center: { paddingVertical: 120, alignItems: 'center' },
+  error: { paddingHorizontal: space.card, paddingTop: 100, ...type.body, color: theme.muted },
+  heroWrap: { height: 240, position: 'relative' },
   heroImage: { width: '100%', height: '100%' },
   heroFallback: {
     width: '100%',

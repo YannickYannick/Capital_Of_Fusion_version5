@@ -13,8 +13,14 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from apps.core.permissions import IsSuperUser, IsStaffOrSuperUser
 from apps.core.models import PendingContentEdit
-from .models import Event, FestivalShuttleDeparture, FestivalProgramSlot
-from .serializers import EventSerializer, EventWriteSerializer, FestivalShuttleDepartureSerializer, FestivalProgramSlotSerializer
+from .models import Event, FestivalShuttleDeparture, FestivalProgramSlot, FestivalAnnouncement
+from .serializers import (
+    EventSerializer,
+    EventWriteSerializer,
+    FestivalShuttleDepartureSerializer,
+    FestivalProgramSlotSerializer,
+    FestivalAnnouncementSerializer,
+)
 
 
 
@@ -212,6 +218,26 @@ class FestivalProgramAPIView(APIView):
         stages = sorted(stages_seen)
 
         return Response({"edition": edition, "days": days, "stages": stages, "slots": slots})
+
+
+class FestivalAnnouncementListAPIView(APIView):
+    """
+    GET /api/festival/announcements/?edition=2026
+    Annonces publiées actives (urgent + normal) pour l’app / PWA.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        edition = request.query_params.get("edition", "2026")
+        now = timezone.now()
+        qs = FestivalAnnouncement.objects.filter(
+            edition=edition,
+            is_published=True,
+        ).order_by("-priority", "sort_order", "-created_at")
+
+        active = [a for a in qs if a.is_active_at(now)]
+        return Response(FestivalAnnouncementSerializer(active, many=True).data)
 
 
 # ─── Admin views ──────────────────────────────────────────────────────────────

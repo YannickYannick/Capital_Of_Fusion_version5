@@ -1,16 +1,21 @@
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { BackButton } from '@/src/components/BackButton';
 import { PageHeader } from '@/src/components/PageHeader';
 import { Chip } from '@/src/components/ui/Chip';
+import { CtaRow } from '@/src/components/ui/CtaRow';
+import { SurfaceCard } from '@/src/components/ui/SurfaceCard';
 import { useShuttles } from '@/src/hooks/useShuttles';
+import { SHUTTLE_BOOKING } from '@/src/lib/festival-data';
 import { SHUTTLE_DIRECTION_LABEL, type ShuttleDirection } from '@/src/lib/shuttle-types';
 
+/**
+ * Horaires navettes + lien réservation Weezevent.
+ */
 export default function ShuttlesScreen() {
-  const router = useRouter();
   const { schedules, loading, error } = useShuttles();
   const [dayId, setDayId] = useState<string | null>(null);
   const [direction, setDirection] = useState<ShuttleDirection>('to_hotel');
@@ -21,13 +26,20 @@ export default function ShuttlesScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} accessibilityRole="button">
-          <Text style={styles.back}>← Retour</Text>
-        </Pressable>
-      </View>
+      <BackButton fallbackHref="/(tabs)/more" />
 
       <PageHeader eyebrow="Palmeraie ↔ hôtel" title="Navettes" compact />
+
+      <View style={styles.bookingWrap}>
+        <SurfaceCard style={styles.bookingCard}>
+          <Text style={styles.bookingTitle}>Réservation</Text>
+          <Text style={styles.bookingNote}>{SHUTTLE_BOOKING.fareNote}</Text>
+          <CtaRow
+            label={SHUTTLE_BOOKING.ctaLabel}
+            onPress={() => Linking.openURL(SHUTTLE_BOOKING.url)}
+          />
+        </SurfaceCard>
+      </View>
 
       {loading && (
         <View style={styles.center}>
@@ -83,8 +95,10 @@ export default function ShuttlesScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.background },
-  topBar: { paddingHorizontal: space.card, paddingTop: 12 },
-  back: { ...type.meta, color: theme.gold },
+  bookingWrap: { paddingHorizontal: space.card, marginBottom: space.gap },
+  bookingCard: { padding: space.card, gap: 10 },
+  bookingTitle: { ...type.title, color: theme.foreground },
+  bookingNote: { ...type.body, color: theme.muted },
   content: { paddingHorizontal: space.card, gap: space.gap },
   chips: { gap: 8, paddingBottom: 4 },
   dirRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

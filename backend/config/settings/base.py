@@ -130,6 +130,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3002",
     "http://localhost:3003",
     "http://127.0.0.1:3003",
+    # PWA locale (serve dist) + Expo web
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+    "http://localhost:8086",
+    "http://127.0.0.1:8086",
 ]
 CORS_ALLOW_CREDENTIALS = True
 

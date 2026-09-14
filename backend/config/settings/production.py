@@ -85,6 +85,9 @@ CORS_ALLOWED_ORIGINS = list({*_cors_hardcoded, *_cors_from_env})
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://[\w-]+\.vercel\.app$",
     r"^https://[\w.-]+\.netlify\.app$",
+    # PWA / Expo web en local contre l'API prod
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 

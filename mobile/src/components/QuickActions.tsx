@@ -34,7 +34,7 @@ function ActionTile({
   );
 }
 
-/** Raccourcis — surface plate, icône sans cercle décoratif. */
+/** Raccourcis — même forme que l’APK. */
 export function QuickActions() {
   const router = useRouter();
 
@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: space.gap,
-    paddingHorizontal: space.card,
     marginTop: space.gapLg,
     marginBottom: space.gap,
   },

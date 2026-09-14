@@ -35,6 +35,7 @@ from apps.events.views import (
     FestivalShuttleFlatListAPIView,
     FestivalProgramAPIView,
     FestivalCacheManifestAPIView,
+    FestivalAnnouncementListAPIView,
 )
 from apps.organization.views import (
     OrganizationNodeListAPIView,
@@ -122,6 +123,7 @@ urlpatterns = [
     path("festival/shuttles/flat/", FestivalShuttleFlatListAPIView.as_view()),
     path("festival/program/", FestivalProgramAPIView.as_view()),
     path("festival/cache-manifest/", FestivalCacheManifestAPIView.as_view()),
+    path("festival/announcements/", FestivalAnnouncementListAPIView.as_view()),
     path("festival/artists/", ArtistListAPIView.as_view()),
     path("festival/artists/<str:username>/", ArtistDetailAPIView.as_view()),
 

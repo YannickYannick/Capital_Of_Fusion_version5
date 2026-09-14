@@ -10,41 +10,54 @@ import { FESTIVAL, images } from '@/src/lib/festival-data';
 
 type HomeHeroProps = {
   topInset: number;
-  dayLabel: string;
+  /** Ligne du haut (ex. « Bientôt · 17–20 sept. »). */
+  eyebrow: string;
 };
 
-/** Hero accueil — aftermovie + logo PBVF PNG. */
-export function HomeHero({ topInset, dayLabel }: HomeHeroProps) {
+/** Hero accueil — même forme que l’APK (hauteur fixe 300, logo en bas). */
+export function HomeHero({ topInset, eyebrow }: HomeHeroProps) {
   return (
     <View style={styles.wrap}>
-      <AftermovieHeroBackground height={HOME_HERO_HEIGHT} />
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        <AftermovieHeroBackground height={HOME_HERO_HEIGHT} />
+      </View>
       <LinearGradient
         colors={['rgba(10,14,39,0.15)', 'rgba(10,14,39,0.6)', theme.background]}
-        locations={[0, 0.6, 1]}
+        locations={[0, 0.55, 1]}
         style={StyleSheet.absoluteFill}
+        pointerEvents="none"
       />
 
       <View style={[styles.content, { paddingTop: topInset + 8 }]}>
-        <Text style={styles.today}>Aujourd'hui · {dayLabel}</Text>
+        <Text style={styles.today}>{eyebrow}</Text>
         <Image
           source={images.pbvLogo}
           style={styles.logo}
           contentFit="contain"
           accessibilityLabel="Paris Bachata Vibe Festival"
         />
-        <Text style={styles.meta}>{FESTIVAL.location} · {FESTIVAL.edition}</Text>
+        <Text style={styles.meta}>
+          {FESTIVAL.location} · {FESTIVAL.edition}
+        </Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { height: HOME_HERO_HEIGHT, position: 'relative' },
+  wrap: {
+    height: HOME_HERO_HEIGHT,
+    width: '100%',
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: '#000',
+  },
   content: {
     position: 'absolute',
     left: space.screen,
     right: space.screen,
     bottom: 16,
+    zIndex: 2,
   },
   today: {
     ...type.meta,

@@ -10,9 +10,11 @@ import type { ArtistApi } from '@/src/types/api';
 
 type ArtistRowProps = {
   artist: ArtistApi;
+  /** Rang d’affichage (ordre page web). */
+  rank?: number;
 };
 
-export function ArtistRow({ artist }: ArtistRowProps) {
+export function ArtistRow({ artist, rank }: ArtistRowProps) {
   const router = useRouter();
   const name = artistDisplayName(artist);
   const subtitle = artistSubtitle(artist);
@@ -25,8 +27,16 @@ export function ArtistRow({ artist }: ArtistRowProps) {
       accessibilityRole="button"
       accessibilityLabel={`Voir le profil de ${name}`}
     >
+      {typeof rank === 'number' ? (
+        <Text style={styles.rank}>{String(rank).padStart(2, '0')}</Text>
+      ) : null}
       {artist.profile_picture ? (
-        <Image source={{ uri: artist.profile_picture }} style={styles.avatar} contentFit="cover" />
+        <Image
+          source={{ uri: artist.profile_picture }}
+          style={styles.avatar}
+          contentFit="cover"
+          contentPosition="top"
+        />
       ) : (
         <View style={styles.avatarFallback}>
           <Text style={styles.initial}>{initial}</Text>
@@ -38,6 +48,7 @@ export function ArtistRow({ artist }: ArtistRowProps) {
         </Text>
         <Text style={styles.meta} numberOfLines={1}>
           {subtitle}
+          {artist.is_staff_member ? ' · Team CoF' : ''}
         </Text>
       </View>
       <ChevronRight size={18} color={theme.muted} strokeWidth={2} />
@@ -54,6 +65,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: theme.surface,
     borderRadius: radius.card,
+  },
+  rank: {
+    ...type.meta,
+    width: 28,
+    color: theme.gold,
+    fontSize: 12,
   },
   avatar: { width: 56, height: 56, borderRadius: radius.card },
   avatarFallback: {

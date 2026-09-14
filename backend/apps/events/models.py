@@ -2,6 +2,7 @@
 Modèles Events — Event, EventPass, Registration. Alignés MCD Phase 1 section 1.5.
 """
 from django.db import models
+from django.utils import timezone
 from apps.core.models import BaseModel
 
 
@@ -157,3 +158,61 @@ class FestivalProgramSlot(BaseModel):
 
     def __str__(self):
         return f"{self.day_label} {self.start_time} — {self.title} ({self.room})"
+
+
+class FestivalAnnouncement(BaseModel):
+    """
+    Annonce festival mobile/PWA.
+    urgent = bandeau toutes pages ; normal = fil accueil.
+    """
+
+    class Priority(models.TextChoices):
+        URGENT = "urgent", "Urgent (bandeau)"
+        NORMAL = "normal", "Normal (accueil)"
+
+    edition = models.CharField(max_length=16, default="2026", db_index=True)
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    priority = models.CharField(
+        max_length=16,
+        choices=Priority.choices,
+        default=Priority.NORMAL,
+        db_index=True,
+    )
+    is_published = models.BooleanField(default=True)
+    starts_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Vide = visible dès publication",
+    )
+    ends_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Vide = pas de fin automatique",
+    )
+    link_url = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="URL absolue ou chemin app (/passes, /code-of-conduct…)",
+    )
+    link_label = models.CharField(max_length=80, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Annonce festival"
+        verbose_name_plural = "Annonces festival"
+        ordering = ["-priority", "sort_order", "-created_at"]
+
+    def __str__(self):
+        return f"[{self.priority}] {self.title}"
+
+    def is_active_at(self, moment=None) -> bool:
+        """True si publiée et dans la fenêtre starts_at / ends_at."""
+        if not self.is_published:
+            return False
+        now = moment or timezone.now()
+        if self.starts_at and now < self.starts_at:
+            return False
+        if self.ends_at and now > self.ends_at:
+            return False
+        return True

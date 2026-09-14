@@ -275,6 +275,9 @@
       "eyebrow": "Festival",
       "title": "Jack N Jill Social French Cup & European Qualifier",
       "subtitle": "Information, rules, schedule and registration.",
+      "tabInfos": "Info",
+      "tabJudges": "Judges",
+      "judgesIntro": "Official Jack & Jill panels — Saturday, Sunday rounds and final.",
       "contentMarkdown": "## To fill\n\nAdd the **Jack N Jill** page content here (Markdown).\n",
       "empty": "Content coming soon."
     },

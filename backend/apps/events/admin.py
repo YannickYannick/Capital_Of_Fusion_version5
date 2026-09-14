@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Event, EventPass, FestivalShuttleDeparture, FestivalProgramSlot, Registration
+from .models import (
+    Event,
+    EventPass,
+    FestivalAnnouncement,
+    FestivalShuttleDeparture,
+    FestivalProgramSlot,
+    Registration,
+)
 
 
 @admin.register(Event)
@@ -33,3 +40,19 @@ class FestivalProgramSlotAdmin(admin.ModelAdmin):
     list_filter = ("edition", "day_id", "room", "category", "level")
     search_fields = ("title", "style", "room")
     ordering = ("iso_date", "sort_order", "start_time")
+
+
+@admin.register(FestivalAnnouncement)
+class FestivalAnnouncementAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "priority",
+        "edition",
+        "is_published",
+        "starts_at",
+        "ends_at",
+        "sort_order",
+    )
+    list_filter = ("priority", "edition", "is_published")
+    search_fields = ("title", "body")
+    ordering = ("-priority", "sort_order", "-created_at")

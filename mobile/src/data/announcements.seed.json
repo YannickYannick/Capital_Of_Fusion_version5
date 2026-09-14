@@ -1,0 +1,38 @@
+[
+  {
+    "id": "seed-urgent-welcome",
+    "edition": "2026",
+    "title": "Bienvenue sur l’app PBVF",
+    "body": "Les annonces urgentes s’affichent ici, sur tous les écrans. Tu peux fermer ce bandeau.",
+    "priority": "urgent",
+    "starts_at": null,
+    "ends_at": null,
+    "link_url": "",
+    "link_label": "",
+    "sort_order": 0
+  },
+  {
+    "id": "seed-normal-passes",
+    "edition": "2026",
+    "title": "Vérifie ton pass",
+    "body": "Consulte le détail inclus / non inclus de chaque formule avant d’acheter des options.",
+    "priority": "normal",
+    "starts_at": null,
+    "ends_at": null,
+    "link_url": "/passes",
+    "link_label": "Voir les passes",
+    "sort_order": 1
+  },
+  {
+    "id": "seed-normal-coc",
+    "edition": "2026",
+    "title": "Code de conduite",
+    "body": "Prends connaissance des règles Capital of Fusion avant le festival.",
+    "priority": "normal",
+    "starts_at": null,
+    "ends_at": null,
+    "link_url": "/code-of-conduct",
+    "link_label": "Lire",
+    "sort_order": 2
+  }
+]

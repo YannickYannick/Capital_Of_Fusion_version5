@@ -51,7 +51,7 @@ export async function apiGet<T>(path: string, options: ApiGetOptions = {}): Prom
 
   const urlString = url.toString();
 
-  const timeoutMs = 25_000;
+  const timeoutMs = Platform.OS === 'web' ? 6_000 : 25_000;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 

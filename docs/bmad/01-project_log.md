@@ -126,3 +126,23 @@
 | [2026-08-30 20:35] Completed Task | Polish mobile formes + typo | Outcome: radius 12/8px, surfaces plates, Urbane titre seul, Inter UI, tab bar sans glow, chips sans bordures, DESIGN.md mis a jour. |
 | [2026-08-31 15:50] Completed Task | Horaires navettes app mobile | Outcome: extraction 132 departs (jeu-dim), shuttles.seed.json, SQLite expo-sqlite, modele Django FestivalShuttleDeparture + migration seed. |
 | [2026-08-31 16:05] Completed Task | API festival mobile Supabase | Outcome: GET /api/festival/shuttles/ + /api/festival/artists/, migrate 132 navettes Supabase, app mobile branchee (hooks API), SQLite retire. |
+| [2026-09-14 20:40] Completed Task | PWA bouton retour + classement artistes | Outcome: `BackButton` pastille or + chevron (détail artiste flottant, navettes, J&J) ; tri `artist_display_order` comme le web + filtres Tous/Team CoF/Invités + rang 01… ; rebuild PWA sur http://localhost:4173. |
+| [2026-09-14 20:55] Starting Task | Carte venue réelle + sous-areas | Objectif : remplacer le placeholder Voyager par area1/area2/area1-2 + accordéons sous-espaces. |
+| [2026-09-14 21:00] Completed Task | Carte venue réelle + sous-areas | Outcome: images officielles dans `mobile/assets/images/festival/` ; `VENUE_AREAS` + accordéons Zone 1/2 sur `map.tsx` ; rebuild PWA. |
+| [2026-09-14 21:10] Completed Task | Overview carte + vidéo entrée | Outcome: overview utilisateur `venue-overview.jpg` en premier ; onglet final Plan d’entrée avec `acces-venue-site-entry.mp4` ; rebuild PWA. |
+| [2026-09-14 21:30] Completed Task | Lightbox cartes plein écran | Outcome: `FullscreenImageModal` + clic sur overview / Zones 1&2 / plans zone pour agrandir. |
+| [2026-09-14 21:40] Completed Task | Update planning affiches + seed | Outcome: PNG `pbvf-2026-planning-*` remplacés ; seed + migration `0007` ; `program.seed.json` mobile (65 slots). |
+| [2026-09-14 22:30] Completed Task | Onglet Juges J&J app + web | Outcome: 3 affiches panels ; onglets Infos/Juges mobile + `FestivalJackNJillTabs` sur `/festival/jack-n-jill`. |
+| [2026-09-14 22:45] Completed Task | Section Passes app mobile | Outcome: page `/passes` (10 formules + affiches), lien depuis Infos ; rebuild PWA. |
+| [2026-09-14 21:25] Completed Task | area1-2 + teaser Accès Venue | Outcome: image `area1-2` remise sous l’overview ; onglet final teaser `acces-venue-teaser.mp4` (hero page web) ; rebuild PWA. |
+| [2026-09-14 22:50] Completed Task | Infos — retrait cartes venue | Outcome: suppressé cartes Venue/Aquaboulevard/Accès (doublons Carte) + `INFOS` ; Infos = Passes / Navettes / J&J. |
+| [2026-09-14 23:00] Starting Task | Code de conduite PWA | Objectif : page Infos → carrousel horizontal 19 affiches CoC + lightbox. |
+| [2026-09-14 23:05] Completed Task | Code de conduite PWA | Outcome: `/code-of-conduct` pager swipe + dots + flèches ; 19 PNG ; lien Infos ; rebuild PWA. |
+| [2026-09-14 23:10] Completed Task | Planning Favoris multi-jours | Outcome: ★ Favoris ignore le filtre jour, liste groupée sur les 4 jours ; clic jour désactive Favoris. |
+| [2026-09-14 23:15] Completed Task | Accueil compteur live | Outcome: `LivePill` = temps restant H:MM:SS jusqu’à fin créneau (tick 1s) à la place de « En direct ». |
+| [2026-09-14 23:20] Completed Task | Accueil pré-festival | Outcome: plus de faux « En ce moment » ; compteur « Avant le festival » jusqu’au 17 sept. ; live réel uniquement pendant un créneau. |
+| [2026-09-14 23:25] Completed Task | Compteur ouverture 18h | Outcome: cible = jeudi 17 sept. 18h00. |
+| [2026-09-14 23:30] Completed Task | Artistes chargement rapide | Outcome: seed immédiat + API en fond ; timeout web 6s ; PWA → `localhost:8000` (évite CORS Railway). |
+| [2026-09-14 23:35] Completed Task | Passes format carrousel | Outcome: `/passes` aligné Code de conduite (swipe, dots, flèches, lightbox) ; intro + formules. |
+| [2026-09-15 00:10] Completed Task | Annonces urgent + accueil | Outcome: modèle `FestivalAnnouncement` + API + admin ; bandeau urgent global ; fil normal sur accueil ; seed + dismiss AsyncStorage. Push OS = phase suivante. |
+| [2026-09-15 00:15] Completed Task | Bandeau urgent ticker | Outcome: `UrgentBanner` en marquee défilant (reanimated) ; ✕ ferme toutes les urgentes. |

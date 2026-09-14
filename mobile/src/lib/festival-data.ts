@@ -55,22 +55,65 @@ export const NEWS = [
   },
 ];
 
-export const INFOS = [
-  { title: 'Passes & billetterie', body: "Réserve ton pass sur le site officiel Capital of Fusion avant l'événement." },
-  { title: 'Navettes', body: 'Navettes Palmeraie ↔ hôtel — jeudi–vendredi et week-end (voir affiches horaires).' },
-  { title: 'Venue — La Palmeraie', body: 'La Casa Room, El Patio et Vibe Room : workshops, battles et soirées.' },
-  { title: 'Aquaboulevard', body: 'Pool party, Kompa Party et Capital of Fusion Party le samedi.' },
-  { title: 'Accès & venue', body: "Plan d'entrée sur site, zones Area 1 / Area 2 et infos pratiques sur le site web." },
+/** Sous-espace d’une zone venue (salle / plage / bassin). */
+export type VenueSubArea = {
+  name: string;
+  detail: string;
+};
+
+/** Zone venue avec plan officiel + sous-areas (aligné page Accès & Venue). */
+export type VenueArea = {
+  id: string;
+  name: string;
+  detail: string;
+  /** Clé dans `images` pour le plan de la zone. */
+  mapKey: 'venueOverview' | 'venueArea1' | 'venueArea2';
+  subAreas: VenueSubArea[];
+};
+
+/**
+ * Zones & sous-areas — même structure que le site web (La Palmeraie / Aquaboulevard).
+ */
+export const VENUE_AREAS: VenueArea[] = [
+  {
+    id: 'palmeraie',
+    name: 'Zone 1 — La Palmeraie',
+    detail: 'Indoor · workshops, battles & soirées',
+    mapKey: 'venueArea1',
+    subAreas: [
+      { name: 'La Casa Room', detail: 'Workshops, battles & night parties' },
+      { name: 'La Escuela Room', detail: 'Cours & stages' },
+      { name: 'La Vibe Room', detail: 'Stages & Vibe Room party' },
+    ],
+  },
+  {
+    id: 'aquaboulevard',
+    name: 'Zone 2 — Aquaboulevard',
+    detail: 'Pool party, social & espaces aquatiques',
+    mapKey: 'venueArea2',
+    subAreas: [
+      { name: 'El Patio Room', detail: 'Workshops & social open air' },
+      { name: 'Antille Beach', detail: 'Espace plage' },
+      { name: 'Mangrove Area', detail: 'Espace détente' },
+      { name: 'Caribbean Beach', detail: 'Espace plage' },
+      { name: 'Surf Pool', detail: 'Bassin / pool party' },
+      { name: 'Jonas', detail: 'Espace événement' },
+    ],
+  },
 ];
 
-export const MAP_POINTS = [
-  { name: 'La Casa Room', detail: 'Workshops & soirées — Palmeraie' },
-  { name: 'El Patio', detail: 'Social day & battles — Palmeraie' },
-  { name: 'Vibe Room', detail: 'Stages & Vibe Room party' },
-  { name: 'Aquaboulevard', detail: 'Pool party & soirées week-end' },
-  { name: 'Navettes', detail: 'Arrêts Palmeraie ↔ hôtel partenaire' },
-  { name: 'Accueil & billetterie', detail: 'Entrée principale — voir plan site' },
-];
+/** @deprecated Préférer VENUE_AREAS — conservé pour compat. */
+export const MAP_POINTS = VENUE_AREAS.flatMap((area) =>
+  area.subAreas.map((s) => ({ name: s.name, detail: `${s.detail} — ${area.name}` })),
+);
+
+/** Réservation navettes — Weezevent + tarif à bord. */
+export const SHUTTLE_BOOKING = {
+  url: 'https://my.weezevent.com/shuttle-paris-bachata-vibes-festival',
+  ctaLabel: 'Réserver une navette',
+  fareNote:
+    'Comptez 2 € à régler dans la navette — paiement possible avec la carte Vibe.',
+} as const;
 
 export const JACK_N_JILL = {
   intro:
@@ -88,6 +131,27 @@ export const JACK_N_JILL = {
     'https://bachatasocialworldcup.com/qualifiers/pre-selection-finale-amateur-2026',
   registrationPro:
     'https://bachatasocialworldcup.com/qualifiers/pre-selection-finale-pro-2026',
+  judgesIntro: 'Panels officiels Jack & Jill — samedi, dimanche tours et finale.',
+  judgesPanels: [
+    {
+      id: 'saturday',
+      title: 'Samedi — 1er & 2e tours',
+      imageKey: 'jackNJillJudgesSaturday' as const,
+      judges: ['Owen & Eva', 'Diger & Marie', 'Manue & Mika', 'Christina & Rebecca', 'Dim & Mathilde'],
+    },
+    {
+      id: 'sunday-rounds',
+      title: 'Dimanche — 1er & 2e tours',
+      imageKey: 'jackNJillJudgesSundayRounds' as const,
+      judges: ['Melonito & Eva', 'Dario & Christina', 'Dim & Mathilde', 'Manue & Mika', 'Amelie & Bastien'],
+    },
+    {
+      id: 'sunday-final',
+      title: 'Dimanche — Finale',
+      imageKey: 'jackNJillJudgesSundayFinal' as const,
+      judges: ['Melvin & Gatica', 'Diger & Marie', 'Dario & Christina', 'Dim & Mathilde', 'Amelie & Bastien'],
+    },
+  ],
 } as const;
 
 export const images = {
@@ -95,7 +159,16 @@ export const images = {
   pbvLogo: require('@/assets/images/pbv-logo.png'),
   news: require('@/assets/images/festival/news-dance.jpg'),
   bracelet: require('@/assets/images/festival/bracelet.jpg'),
+  /** @deprecated Placeholder — préférer venueOverview / venueArea1 / venueArea2 */
   siteMap: require('@/assets/images/festival/site-map.jpg'),
+  venueOverview: require('@/assets/images/festival/venue-overview.jpg'),
+  /** Plan Zones 1 & 2 (La Palmeraie + Aquaboulevard) — page Accès & Venue. */
+  venueAreas12: require('@/assets/images/festival/area1-2.png'),
+  venueArea1: require('@/assets/images/festival/area1.png'),
+  venueArea2: require('@/assets/images/festival/area2.png'),
   jackNJillSaturday: require('@/assets/images/festival/jack-n-jill-pre-selection-final-saturday.png'),
   jackNJillSunday: require('@/assets/images/festival/jack-n-jill-french-social-cup-final-sunday.png'),
+  jackNJillJudgesSaturday: require('@/assets/images/festival/jack-n-jill-judges-saturday.png'),
+  jackNJillJudgesSundayRounds: require('@/assets/images/festival/jack-n-jill-judges-sunday-rounds.png'),
+  jackNJillJudgesSundayFinal: require('@/assets/images/festival/jack-n-jill-judges-sunday-final.png'),
 };

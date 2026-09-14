@@ -91,7 +91,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-4",
+      "id": "ven-0",
       "day": "ven",
       "artist": "Open Doors",
       "genre": "Toutes salles",
@@ -105,7 +105,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-5",
+      "id": "ven-1",
       "day": "ven",
       "artist": "Mika",
       "genre": "Masterclass Musicality · Open",
@@ -119,21 +119,21 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-6",
+      "id": "ven-2",
       "day": "ven",
-      "artist": "Diger & Marie",
-      "genre": "Sensual Bachata · Advanced",
+      "artist": "Jerem & Jade",
+      "genre": "Bachazouk · Advanced",
       "stage": "La Casa Room",
       "start": "16:00",
       "end": "16:55",
       "live": false,
       "category": "workshop",
       "level": "advanced",
-      "style": "Sensual Bachata",
+      "style": "Bachazouk",
       "notInFullPass": false
     },
     {
-      "id": "ven-7",
+      "id": "ven-3",
       "day": "ven",
       "artist": "Battle Pre-Selections",
       "genre": "Street Bachata Battle · Intermediate",
@@ -147,7 +147,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-8",
+      "id": "ven-4",
       "day": "ven",
       "artist": "Break",
       "genre": "break",
@@ -161,7 +161,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-9",
+      "id": "ven-5",
       "day": "ven",
       "artist": "Luis & Andrea",
       "genre": "Sensual Bachata · Open",
@@ -175,7 +175,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-10",
+      "id": "ven-6",
       "day": "ven",
       "artist": "Street Bachata Battle",
       "genre": "All Stars Finale · Intermediate",
@@ -189,7 +189,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-11",
+      "id": "ven-7",
       "day": "ven",
       "artist": "Official Festival Launch",
       "genre": "XXL Vibe Room",
@@ -203,7 +203,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-12",
+      "id": "ven-8",
       "day": "ven",
       "artist": "Añejo Vibe Party",
       "genre": "50% classics · 50% hits · no remix",
@@ -217,7 +217,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-13",
+      "id": "ven-9",
       "day": "ven",
       "artist": "Open Air Social Day",
       "genre": "social",
@@ -231,7 +231,7 @@
       "notInFullPass": false
     },
     {
-      "id": "ven-14",
+      "id": "ven-10",
       "day": "ven",
       "artist": "Boiler Room DJ Set",
       "genre": "Live Instagram 01h–02h Mix World Wide",
@@ -245,7 +245,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-15",
+      "id": "sam-0",
       "day": "sam",
       "artist": "Open Doors",
       "genre": "Toutes salles",
@@ -259,7 +259,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-16",
+      "id": "sam-1",
       "day": "sam",
       "artist": "Brice & Manue",
       "genre": "Bachata Fusion · Open",
@@ -273,7 +273,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-17",
+      "id": "sam-2",
       "day": "sam",
       "artist": "Pablo & Andrea",
       "genre": "Sensual Bachata · Beginner",
@@ -287,21 +287,21 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-18",
+      "id": "sam-3",
       "day": "sam",
-      "artist": "Ezo & Hugo",
-      "genre": "Bachata Influence · Intermediate",
+      "artist": "Dario & Sara",
+      "genre": "Bachata Fusion · Intermediate",
       "stage": "La Casa Room",
       "start": "11:00",
       "end": "11:55",
       "live": false,
       "category": "workshop",
       "level": "intermediate",
-      "style": "Bachata Influence",
+      "style": "Bachata Fusion",
       "notInFullPass": false
     },
     {
-      "id": "sam-19",
+      "id": "sam-4",
       "day": "sam",
       "artist": "Dim & Laure",
       "genre": "Bachazouk · Beginner",
@@ -315,21 +315,21 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-20",
+      "id": "sam-5",
       "day": "sam",
-      "artist": "Jerem & Jade",
-      "genre": "Bachazouk · Open",
+      "artist": "Diger & Marie",
+      "genre": "Sensual Bachata · Intermediate",
       "stage": "La Casa Room",
       "start": "12:00",
       "end": "12:55",
       "live": false,
       "category": "workshop",
-      "level": "open",
-      "style": "Bachazouk",
+      "level": "intermediate",
+      "style": "Sensual Bachata",
       "notInFullPass": false
     },
     {
-      "id": "sam-21",
+      "id": "sam-6",
       "day": "sam",
       "artist": "Tedy & Chun",
       "genre": "Bachata Influence Meet Bachazouk · Open",
@@ -343,7 +343,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-22",
+      "id": "sam-7",
       "day": "sam",
       "artist": "Lunch Break",
       "genre": "Toutes salles",
@@ -357,7 +357,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-23",
+      "id": "sam-8",
       "day": "sam",
       "artist": "Owen & Eva",
       "genre": "Dynamic Bachata · Intermediate",
@@ -371,7 +371,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-24",
+      "id": "sam-9",
       "day": "sam",
       "artist": "Evan & Eugenia",
       "genre": "Role Rotation · Open",
@@ -385,7 +385,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-25",
+      "id": "sam-10",
       "day": "sam",
       "artist": "Luis & Andrea",
       "genre": "Sensual Bachata Masterclass · Advanced",
@@ -399,7 +399,7 @@
       "notInFullPass": true
     },
     {
-      "id": "sam-26",
+      "id": "sam-11",
       "day": "sam",
       "artist": "Luis & Andrea",
       "genre": "Sensual Bachata · Intermediate",
@@ -413,7 +413,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-27",
+      "id": "sam-12",
       "day": "sam",
       "artist": "Melonito & Laure",
       "genre": "Brazilian Zouk for Bachata · Beginner",
@@ -427,7 +427,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-28",
+      "id": "sam-13",
       "day": "sam",
       "artist": "Didi Backstage",
       "genre": "Hip Work · Open",
@@ -441,7 +441,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-29",
+      "id": "sam-14",
       "day": "sam",
       "artist": "Dario & Sara",
       "genre": "Bachata Fusion · Open",
@@ -455,7 +455,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-30",
+      "id": "sam-15",
       "day": "sam",
       "artist": "Christina & Rebeca",
       "genre": "Sensual Bachata · Intermediate",
@@ -469,7 +469,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-31",
+      "id": "sam-16",
       "day": "sam",
       "artist": "Fanny",
       "genre": "Traditional Bachata · Open",
@@ -483,7 +483,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-32",
+      "id": "sam-17",
       "day": "sam",
       "artist": "Melvin & Gatica",
       "genre": "Bachata Influence · Intermediate",
@@ -497,7 +497,21 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-33",
+      "id": "sam-18",
+      "day": "sam",
+      "artist": "Sarah La Morena",
+      "genre": "Partnerwork Traditional Bachata · Open",
+      "stage": "El Patio Room",
+      "start": "17:00",
+      "end": "17:55",
+      "live": false,
+      "category": "workshop",
+      "level": "open",
+      "style": "Partnerwork Traditional Bachata",
+      "notInFullPass": false
+    },
+    {
+      "id": "sam-19",
       "day": "sam",
       "artist": "Break",
       "genre": "Toutes salles",
@@ -511,7 +525,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-34",
+      "id": "sam-20",
       "day": "sam",
       "artist": "Jack & Jill",
       "genre": "Pre-Selections IDF",
@@ -525,7 +539,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-35",
+      "id": "sam-21",
       "day": "sam",
       "artist": "Open Air Social Day",
       "genre": "social",
@@ -539,7 +553,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-36",
+      "id": "sam-22",
       "day": "sam",
       "artist": "100% Kompa Party",
       "genre": "Live concert · tickets séparés",
@@ -553,7 +567,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-37",
+      "id": "sam-23",
       "day": "sam",
       "artist": "Bachata After-Party",
       "genre": "Deep connexion · BPM dégressif",
@@ -567,7 +581,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-38",
+      "id": "sam-24",
       "day": "sam",
       "artist": "Opening Doors",
       "genre": "Complexe aquatique 7 000 m²",
@@ -581,7 +595,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-39",
+      "id": "sam-25",
       "day": "sam",
       "artist": "Pre-Party",
       "genre": "Capital of Fusion",
@@ -595,7 +609,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-40",
+      "id": "sam-26",
       "day": "sam",
       "artist": "Artist Presentation",
       "genre": "XXL Vibe Pool Party",
@@ -609,7 +623,7 @@
       "notInFullPass": false
     },
     {
-      "id": "sam-41",
+      "id": "sam-27",
       "day": "sam",
       "artist": "Capital of Fusion Party",
       "genre": "Multi-Vibes 100% Bachata",
@@ -623,13 +637,13 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-42",
+      "id": "dim-0",
       "day": "dim",
       "artist": "Open Doors",
       "genre": "Toutes salles",
       "stage": "La Casa Room",
-      "start": "09:45",
-      "end": "09:45",
+      "start": "10:45",
+      "end": "10:45",
       "live": false,
       "category": "info",
       "level": "",
@@ -637,7 +651,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-43",
+      "id": "dim-1",
       "day": "dim",
       "artist": "Christina & Rebeca",
       "genre": "Sensual Bachata · Open",
@@ -651,21 +665,21 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-44",
+      "id": "dim-2",
       "day": "dim",
       "artist": "Oliver Chiro",
-      "genre": "Body Care for Dance · Advanced",
+      "genre": "Body Care for Dance · Beginner",
       "stage": "La Escuela",
       "start": "11:00",
       "end": "11:55",
       "live": false,
       "category": "workshop",
-      "level": "advanced",
+      "level": "beginner",
       "style": "Body Care for Dance",
       "notInFullPass": false
     },
     {
-      "id": "dim-45",
+      "id": "dim-3",
       "day": "dim",
       "artist": "Keymo & Lina",
       "genre": "Bachata Fusion · Intermediate",
@@ -679,7 +693,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-46",
+      "id": "dim-4",
       "day": "dim",
       "artist": "Salem & Monika",
       "genre": "Bachata Movement Contrast · Open",
@@ -693,7 +707,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-47",
+      "id": "dim-5",
       "day": "dim",
       "artist": "Lunch Break",
       "genre": "Toutes salles",
@@ -707,7 +721,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-48",
+      "id": "dim-6",
       "day": "dim",
       "artist": "Melvin & Gatica",
       "genre": "Bachata Influence · Intermediate",
@@ -721,7 +735,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-49",
+      "id": "dim-7",
       "day": "dim",
       "artist": "Meline",
       "genre": "Traditional Bachata Masterclass · Advanced",
@@ -735,7 +749,7 @@
       "notInFullPass": true
     },
     {
-      "id": "dim-50",
+      "id": "dim-8",
       "day": "dim",
       "artist": "Owen & Eva",
       "genre": "Dynamic Bachata · Intermediate",
@@ -749,7 +763,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-51",
+      "id": "dim-9",
       "day": "dim",
       "artist": "Bastien & Amélie",
       "genre": "Bachata Fusion · Open",
@@ -763,7 +777,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-52",
+      "id": "dim-10",
       "day": "dim",
       "artist": "Meline",
       "genre": "Traditional Bachata · Open",
@@ -777,7 +791,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-53",
+      "id": "dim-11",
       "day": "dim",
       "artist": "Melonito & Laure",
       "genre": "Bachazouk · Intermediate",
@@ -791,7 +805,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-54",
+      "id": "dim-12",
       "day": "dim",
       "artist": "Otko & Vika",
       "genre": "Bachata Influence · Open",
@@ -805,13 +819,13 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-55",
+      "id": "dim-13",
       "day": "dim",
       "artist": "Claudio",
       "genre": "DioStyle Masterclass (2h) · Advanced",
       "stage": "El Patio Room",
       "start": "16:00",
-      "end": "18:00",
+      "end": "17:55",
       "live": false,
       "category": "workshop",
       "level": "advanced",
@@ -819,21 +833,21 @@
       "notInFullPass": true
     },
     {
-      "id": "dim-56",
+      "id": "dim-14",
       "day": "dim",
-      "artist": "Dario & Sara",
-      "genre": "Bachata Fusion · Intermediate",
+      "artist": "Ezo & Hugo",
+      "genre": "Bachata Influence · Intermediate",
       "stage": "La Casa Room",
       "start": "17:00",
       "end": "17:55",
       "live": false,
       "category": "workshop",
       "level": "intermediate",
-      "style": "Bachata Fusion",
+      "style": "Bachata Influence",
       "notInFullPass": false
     },
     {
-      "id": "dim-57",
+      "id": "dim-15",
       "day": "dim",
       "artist": "Mathilde",
       "genre": "Solo Styling · Open",
@@ -847,7 +861,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-58",
+      "id": "dim-16",
       "day": "dim",
       "artist": "Melvin & Gatica",
       "genre": "Bachata Influence · Intermediate",
@@ -861,7 +875,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-59",
+      "id": "dim-17",
       "day": "dim",
       "artist": "Open Air Social Day",
       "genre": "social",
@@ -875,7 +889,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-60",
+      "id": "dim-18",
       "day": "dim",
       "artist": "Jack & Jill Finals",
       "genre": "French Social Cup & Selection World Cup",
@@ -889,7 +903,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-61",
+      "id": "dim-19",
       "day": "dim",
       "artist": "100% Brazilian Zouk Mix",
       "genre": "party",
@@ -903,7 +917,7 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-62",
+      "id": "dim-20",
       "day": "dim",
       "artist": "Smooth Vibe Party",
       "genre": "100% Bachata",
@@ -917,9 +931,9 @@
       "notInFullPass": false
     },
     {
-      "id": "dim-63",
+      "id": "dim-21",
       "day": "dim",
-      "artist": "Iconic Black Under The Stars",
+      "artist": "Iconic Blackout Under The Stars",
       "genre": "Low BPM · no videos/phones",
       "stage": "La Casa Room",
       "start": "03:45",

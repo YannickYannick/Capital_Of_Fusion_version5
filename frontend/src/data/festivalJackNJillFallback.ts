@@ -226,6 +226,71 @@ export const JACK_N_JILL_POSTER_SRC = {
   sunday: "/images/festival/jack-n-jill-french-social-cup-final-sunday.png",
 } as const;
 
+/** Affiches panels juges (Jack & Jill). */
+export const JACK_N_JILL_JUDGE_IMAGE_SRC = {
+  saturday: "/images/festival/jack-n-jill-judges-saturday.png",
+  sundayRounds: "/images/festival/jack-n-jill-judges-sunday-rounds.png",
+  sundayFinal: "/images/festival/jack-n-jill-judges-sunday-final.png",
+} as const;
+
+export type JackNJillJudgePanel = {
+  id: string;
+  imageSrc: string;
+  title: Record<JackNJillLocale, string>;
+  judges: string[];
+};
+
+export const JACK_N_JILL_JUDGE_PANELS: JackNJillJudgePanel[] = [
+  {
+    id: "saturday",
+    imageSrc: JACK_N_JILL_JUDGE_IMAGE_SRC.saturday,
+    title: {
+      fr: "Samedi — 1er & 2e tours",
+      en: "Saturday — 1st & 2nd rounds",
+      es: "Sábado — 1.ª y 2.ª rondas",
+    },
+    judges: [
+      "Owen & Eva",
+      "Diger & Marie",
+      "Manue & Mika",
+      "Christina & Rebecca",
+      "Dim & Mathilde",
+    ],
+  },
+  {
+    id: "sunday-rounds",
+    imageSrc: JACK_N_JILL_JUDGE_IMAGE_SRC.sundayRounds,
+    title: {
+      fr: "Dimanche — 1er & 2e tours",
+      en: "Sunday — 1st & 2nd rounds",
+      es: "Domingo — 1.ª y 2.ª rondas",
+    },
+    judges: [
+      "Melonito & Eva",
+      "Dario & Christina",
+      "Dim & Mathilde",
+      "Manue & Mika",
+      "Amelie & Bastien",
+    ],
+  },
+  {
+    id: "sunday-final",
+    imageSrc: JACK_N_JILL_JUDGE_IMAGE_SRC.sundayFinal,
+    title: {
+      fr: "Dimanche — Finale",
+      en: "Sunday — Final",
+      es: "Domingo — Final",
+    },
+    judges: [
+      "Melvin & Gatica",
+      "Diger & Marie",
+      "Dario & Christina",
+      "Dim & Mathilde",
+      "Amelie & Bastien",
+    ],
+  },
+];
+
 const JACK_N_JILL_POSTER_MARKDOWN: Record<JackNJillLocale, { saturday: string; sunday: string }> = {
   fr: {
     saturday: `![Jack and Jill Pré-sélection Finale — Samedi 19 septembre](${JACK_N_JILL_POSTER_SRC.saturday})`,

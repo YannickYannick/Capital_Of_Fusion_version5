@@ -6,7 +6,7 @@ import { radius, space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
 import { PageHeader } from '@/src/components/PageHeader';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
-import { FESTIVAL, INFOS, images } from '@/src/lib/festival-data';
+import { FESTIVAL, images } from '@/src/lib/festival-data';
 
 export default function MoreScreen() {
   const router = useRouter();
@@ -16,15 +16,19 @@ export default function MoreScreen() {
       <PageHeader eyebrow="Avant & pendant" title="Infos" compact />
 
       <View style={styles.list}>
-        <GlassCard style={styles.passCard}>
-          <View style={styles.passRow}>
-            <Image source={images.bracelet} style={styles.passImg} contentFit="cover" />
-            <View style={styles.passText}>
-              <Text style={styles.passTitle}>Passes & billetterie</Text>
-              <Text style={styles.passBody}>Réserve sur le site Capital of Fusion avant l'événement.</Text>
+        <Pressable onPress={() => router.push('/passes')} accessibilityRole="button">
+          <GlassCard style={styles.passCard}>
+            <View style={styles.passRow}>
+              <Image source={images.bracelet} style={styles.passImg} contentFit="cover" />
+              <View style={styles.passText}>
+                <Text style={styles.passTitle}>Passes</Text>
+                <Text style={styles.passBody}>
+                  Détail inclus / non inclus de chaque formule.
+                </Text>
+              </View>
             </View>
-          </View>
-        </GlassCard>
+          </GlassCard>
+        </Pressable>
 
         <Pressable onPress={() => router.push('/shuttles')} accessibilityRole="button">
           <GlassCard style={styles.card}>
@@ -40,12 +44,14 @@ export default function MoreScreen() {
           </GlassCard>
         </Pressable>
 
-        {INFOS.filter((i) => i.title !== 'Passes & billetterie' && i.title !== 'Navettes').map((i) => (
-          <GlassCard key={i.title} style={styles.card}>
-            <Text style={styles.title}>{i.title}</Text>
-            <Text style={styles.body}>{i.body}</Text>
+        <Pressable onPress={() => router.push('/code-of-conduct')} accessibilityRole="button">
+          <GlassCard style={styles.card}>
+            <Text style={styles.title}>Code de conduite</Text>
+            <Text style={styles.body}>
+              Capital of Fusion · version 3.0 — swipe entre les sections.
+            </Text>
           </GlassCard>
-        ))}
+        </Pressable>
       </View>
 
       <Text style={styles.footer}>

@@ -2,7 +2,7 @@
 Serializers Events — Event pour l’API calendrier.
 """
 from rest_framework import serializers
-from .models import Event, FestivalShuttleDeparture, FestivalProgramSlot
+from .models import Event, FestivalShuttleDeparture, FestivalProgramSlot, FestivalAnnouncement
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -106,4 +106,24 @@ class FestivalProgramSlotSerializer(serializers.ModelSerializer):
             if label and label != "—":
                 parts.append(label)
         return " · ".join(parts) if parts else obj.category
+
+
+class FestivalAnnouncementSerializer(serializers.ModelSerializer):
+    """Annonces festival pour PWA / app mobile."""
+
+    class Meta:
+        model = FestivalAnnouncement
+        fields = (
+            "id",
+            "edition",
+            "title",
+            "body",
+            "priority",
+            "starts_at",
+            "ends_at",
+            "link_url",
+            "link_label",
+            "sort_order",
+        )
+        read_only_fields = fields
 

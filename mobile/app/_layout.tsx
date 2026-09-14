@@ -7,11 +7,14 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { theme } from '@/constants/theme';
+import { UrgentBanner } from '@/src/components/UrgentBanner';
+import { AnnouncementsProvider } from '@/src/providers/AnnouncementsProvider';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -52,17 +55,24 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.background },
-        }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="artist/[username]" />
-        <Stack.Screen name="jack-n-jill" />
-        <Stack.Screen name="shuttles" />
-      </Stack>
+      <AnnouncementsProvider>
+        <View style={{ flex: 1, backgroundColor: theme.background }}>
+          <UrgentBanner />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: theme.background },
+            }}
+          >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="artist/[username]" />
+            <Stack.Screen name="jack-n-jill" />
+            <Stack.Screen name="shuttles" />
+            <Stack.Screen name="passes" />
+            <Stack.Screen name="code-of-conduct" />
+          </Stack>
+        </View>
+      </AnnouncementsProvider>
     </SafeAreaProvider>
   );
 }

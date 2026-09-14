@@ -5,6 +5,19 @@ export const VIBE_AFTERMOVIE_YOUTUBE_ID = 'eZhq_RMYRKQ';
 export const VIBE_AFTERMOVIE_MP4_SRC =
   'https://www.capitaloffusion.com/aftermovie-vibe-2025-fallback.mp4';
 
+/**
+ * Vidéos Accès & Venue.
+ * Web/PWA : fichiers locaux `public/video/` ; natif : CDN site.
+ */
+export const SITE_ENTRY_VIDEO_LOCAL = '/video/acces-venue-site-entry.mp4';
+export const SITE_ENTRY_VIDEO_REMOTE =
+  'https://www.capitaloffusion.com/video/acces-venue-site-entry.mp4';
+
+/** Teaser hero en haut de /festival/acces-venue (portrait). */
+export const ACCES_VENUE_TEASER_VIDEO_LOCAL = '/video/acces-venue-teaser.mp4';
+export const ACCES_VENUE_TEASER_VIDEO_REMOTE =
+  'https://www.capitaloffusion.com/video/acces-venue-teaser.mp4';
+
 export function youtubeEmbedUrl(videoId: string): string {
   const params = [
     'autoplay=1',

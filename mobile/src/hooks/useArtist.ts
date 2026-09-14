@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 
+import artistsSeed from '@/src/data/artists.seed.json';
 import { fetchFestivalArtist } from '@/src/lib/api/artists';
 import type { ArtistApi } from '@/src/types/api';
 
-/** Détail artiste par username (API Django). */
+/**
+ * Détail artiste — seed immédiat si dispo, puis refresh API.
+ */
 export function useArtist(username: string | undefined) {
-  const [artist, setArtist] = useState<ArtistApi | null>(null);
-  const [loading, setLoading] = useState(Boolean(username));
-  const [error, setError] = useState<string | null>(null);
+  const seedHit =
+    username != null
+      ? (artistsSeed as ArtistApi[]).find((a) => a.username === username) ?? null
+      : null;
+
+  const [artist, setArtist] = useState<ArtistApi | null>(seedHit);
+  const [loading, setLoading] = useState(Boolean(username) && !seedHit);
+  const [error, setError] = useState<string | null>(username ? null : 'Artiste introuvable');
 
   useEffect(() => {
     if (!username) {
@@ -18,21 +26,32 @@ export function useArtist(username: string | undefined) {
     }
 
     let cancelled = false;
-    setLoading(true);
-    setError(null);
+    const local = (artistsSeed as ArtistApi[]).find((a) => a.username === username) ?? null;
+    if (local) {
+      setArtist(local);
+      setLoading(false);
+      setError(null);
+    } else {
+      setLoading(true);
+      setError(null);
+    }
 
     fetchFestivalArtist(username)
       .then((data) => {
-        if (!cancelled) setArtist(data);
+        if (!cancelled) {
+          setArtist(data);
+          setError(null);
+        }
       })
       .catch((e: unknown) => {
-        if (!cancelled) {
+        if (cancelled) return;
+        if (!local) {
           setError(e instanceof Error ? e.message : 'Impossible de charger cet artiste');
           setArtist(null);
         }
       })
       .finally(() => {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       });
 
     return () => {

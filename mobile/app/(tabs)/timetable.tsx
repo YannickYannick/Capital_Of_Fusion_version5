@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 
 import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { LevelLegend } from '@/src/components/LevelLegend';
 import { PageHeader } from '@/src/components/PageHeader';
 import { SlotRow } from '@/src/components/SlotRow';
 import { Chip } from '@/src/components/ui/Chip';
@@ -18,14 +19,24 @@ export default function TimetableScreen() {
 
   const activeDay = day ?? days[0]?.id ?? 'jeu';
 
+  /**
+   * Favoris = les 4 jours (ignore le filtre jour). Sinon = jour actif.
+   */
   const visibleSlots = slots
     .filter(
       (s) =>
-        s.day === activeDay &&
+        (onlyFavs || s.day === activeDay) &&
         (stage === 'all' || s.stage === stage) &&
         (!onlyFavs || has(String(s.id))),
     )
-    .sort((a, b) => a.start.localeCompare(b.start));
+    .sort((a, b) => {
+      if (onlyFavs && a.day !== b.day) {
+        const ai = days.findIndex((d) => d.id === a.day);
+        const bi = days.findIndex((d) => d.id === b.day);
+        return ai - bi;
+      }
+      return a.start.localeCompare(b.start);
+    });
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -42,16 +53,24 @@ export default function TimetableScreen() {
       {!loading && !error && (
         <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+            <Chip
+              label="★ Favoris"
+              active={onlyFavs}
+              onPress={() => setOnlyFavs((v) => !v)}
+              variant="favorite"
+            />
             {days.map((d) => (
               <Chip
                 key={d.id}
                 label={`${d.label} ${d.date}`}
-                active={d.id === activeDay}
-                onPress={() => setDay(d.id)}
+                active={!onlyFavs && d.id === activeDay}
+                onPress={() => {
+                  setOnlyFavs(false);
+                  setDay(d.id);
+                }}
                 variant="day"
               />
             ))}
-            <Chip label="Favoris" active={onlyFavs} onPress={() => setOnlyFavs((v) => !v)} variant="toggle" />
           </ScrollView>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsStage}>
@@ -75,18 +94,32 @@ export default function TimetableScreen() {
 
           <View style={styles.list}>
             {visibleSlots.length === 0 ? (
-              <Text style={styles.empty}>Aucun créneau pour ces filtres.</Text>
+              <Text style={styles.empty}>
+                {onlyFavs ? 'Aucun favori pour l’instant.' : 'Aucun créneau pour ces filtres.'}
+              </Text>
             ) : (
-              visibleSlots.map((s, i) => (
-                <SlotRow
-                  key={String(s.id)}
-                  slot={s}
-                  favorite={has(String(s.id))}
-                  onToggle={(id) => toggle(id)}
-                  index={i}
-                />
-              ))
+              visibleSlots.map((s, i) => {
+                const dayMeta = days.find((d) => d.id === s.day);
+                const showDayHeader =
+                  onlyFavs && (i === 0 || visibleSlots[i - 1]?.day !== s.day);
+                return (
+                  <View key={String(s.id)}>
+                    {showDayHeader ? (
+                      <Text style={styles.dayHeading}>
+                        {dayMeta ? `${dayMeta.label} ${dayMeta.date}` : s.day}
+                      </Text>
+                    ) : null}
+                    <SlotRow
+                      slot={s}
+                      favorite={has(String(s.id))}
+                      onToggle={(id) => toggle(id)}
+                      index={i}
+                    />
+                  </View>
+                );
+              })
             )}
+            <LevelLegend />
           </View>
         </>
       )}
@@ -99,6 +132,21 @@ const styles = StyleSheet.create({
   chips: { paddingHorizontal: space.card, gap: 8, paddingBottom: 8 },
   chipsStage: { paddingHorizontal: space.card, gap: 8, paddingBottom: space.card },
   list: { paddingHorizontal: space.card, gap: space.gap },
+  dayHeading: {
+    ...type.meta,
+    fontSize: 12,
+    color: theme.gold,
+    marginTop: space.gap,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
   center: { paddingVertical: 48, alignItems: 'center' },
-  empty: { textAlign: 'center', paddingVertical: 32, paddingHorizontal: space.card, ...type.body, color: theme.muted },
+  empty: {
+    textAlign: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: space.card,
+    ...type.body,
+    color: theme.muted,
+  },
 });

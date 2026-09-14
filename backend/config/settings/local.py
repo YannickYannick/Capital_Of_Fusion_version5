@@ -16,8 +16,10 @@ ALLOWED_HOSTS = list(dict.fromkeys([*ALLOWED_HOSTS, "10.0.2.2"]))
 # Front ouvert depuis la LAN (ex. Next affiche http://192.168.x.x:3000 pour le mobile).
 # Utiliser : python manage.py runserver 0.0.0.0:8000
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://192\.168\.\d{1,3}\.\d{1,3}:(3000|3001|3002|3003)$",
-    r"^http://10\.\d{1,3}\.\d{1,3}\.\d{1,3}:(3000|3001|3002|3003)$",
+    r"^http://192\.168\.\d{1,3}\.\d{1,3}:(3000|3001|3002|3003|4173|8086)$",
+    r"^http://10\.\d{1,3}\.\d{1,3}\.\d{1,3}:(3000|3001|3002|3003|4173|8086)$",
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
 ]
 
 _cn = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()

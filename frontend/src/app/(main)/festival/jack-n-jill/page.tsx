@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getSiteConfig } from "@/lib/api";
 import { EditableConfigMarkdownPage } from "@/components/shared/EditableConfigMarkdownPage";
+import { FestivalJackNJillTabs } from "@/components/features/festival/FestivalJackNJillTabs";
 import { getFestivalJackNJillFallback, withJackNJillPosters } from "@/data/festivalJackNJillFallback";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,8 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Page Jack N Jill — Markdown éditable (API) avec repli FR/EN/ES
- * aligné sur le pattern Accès & Venue / All Star Street Battle.
+ * Page Jack N Jill — onglets Infos (Markdown) / Juges (affiches panels).
  */
 export default async function FestivalJackNJillPage() {
   const t = await getTranslations("pages");
@@ -31,13 +31,24 @@ export default async function FestivalJackNJillPage() {
   }
 
   return (
-    <EditableConfigMarkdownPage
+    <FestivalJackNJillTabs
+      locale={locale}
+      infosLabel={t("festivalJackNJill.tabInfos")}
+      judgesLabel={t("festivalJackNJill.tabJudges")}
+      judgesIntro={t("festivalJackNJill.judgesIntro")}
       eyebrow={t("festivalJackNJill.eyebrow")}
       title={t("festivalJackNJill.title")}
       subtitle={t("festivalJackNJill.subtitle")}
-      initialValue={initialValue}
-      field="festival_jack_n_jill_markdown"
-      emptyText={t("festivalJackNJill.empty")}
+      infos={
+        <EditableConfigMarkdownPage
+          eyebrow={t("festivalJackNJill.eyebrow")}
+          title={t("festivalJackNJill.title")}
+          subtitle={t("festivalJackNJill.subtitle")}
+          initialValue={initialValue}
+          field="festival_jack_n_jill_markdown"
+          emptyText={t("festivalJackNJill.empty")}
+        />
+      }
     />
   );
 }

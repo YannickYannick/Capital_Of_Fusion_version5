@@ -1,0 +1,1012 @@
+[
+  {
+    "id": 54,
+    "username": "carlos-y-paz",
+    "first_name": "Carlos y Paz",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "Carlos y Paz sont des artistes basés en Espagne 🇪🇸.\n\nArtistes internationaux reconnus, ils sont les créateurs du Bachazouk Official.\n\nUn style caractéristique, né de la fusion entre la bachata et le zouk brésilien, qui a profondément influencé la scène par sa technique et son identité unique.\n\nAujourd’hui, le bachazouk est devenu l’un des styles les plus populaires.\n\nParis Bachata Vibe aura l’honneur de les accueillir. 🔥",
+    "bio_en": "Carlos y Paz are artists based in Spain 🇪🇸.\n\nInternationally recognized, they are the creators of Bachazouk Official.\n\nA distinctive style born from the fusion of bachata and Brazilian zouk, which has deeply influenced the scene through its technique and unique identity.\n\nToday, bachazouk has become one of the most popular styles.\n\nParis Bachata Vibe will have the honor of welcoming them. 🔥",
+    "bio_es": "Carlos y Paz son artistas establecidos en España 🇪🇸.\n\nArtistas internacionales reconocidos, son los creadores de Bachazouk Official.\n\nUn estilo característico, nacido de la fusión entre la bachata y el zouk brasileño, que ha influido profundamente en la escena por su técnica y su identidad única.\n\nHoy en día, el bachazouk se ha convertido en uno de los estilos más populares.\n\nParis Bachata Vibe tendrá el honor de recibirlos. 🔥",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/carlos-y-paz_C%C3%B2pia_de_Carlos_Paz_1_smbkih",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [
+        "https://www.instagram.com/carlossegura.bachazouk?igsh=MW5namNlZ2Q1OTdtcQ==",
+        "https://www.instagram.com/carlosypaz?igsh=MWpvcjB3YXV2dnQ4NA==",
+        "https://www.instagram.com/pazmederos?igsh=MXU5aXlncWNmejZxYQ=="
+      ],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 55,
+    "username": "christina-rebeca",
+    "first_name": "Christina & Rebeca",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/christina-rebeca_0138cb51-2893-4772-ab47-5dc74bfffb1c_khs12p",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 56,
+    "username": "dario-sara",
+    "first_name": "Dario & sara",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/dario-sara_C%C3%B2pia_de_07CE2D99-3F64-4957-B656-738AF7D27F30_udbsvy",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 57,
+    "username": "luis-andrea",
+    "first_name": "Luis & Andrea",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/luis-andrea_image00002-2_bf0jet",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 58,
+    "username": "melonito",
+    "first_name": "Melonito",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/melonito_Picsart_24-01-01_11-54-56-176_ewvgkz",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 59,
+    "username": "melvin-gatica",
+    "first_name": "Melvin & gatica",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Capture_d%C3%A9cran_2026-04-15_190610_ejnxhv",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 60,
+    "username": "otko-vika",
+    "first_name": "Otko & vika",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/otko-vika_DSC05541-Edit_zpbkko",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 61,
+    "username": "owen-eva",
+    "first_name": "Owen & Eva",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/owen-eva_image00001_xoh79o",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 62,
+    "username": "teddy-chun",
+    "first_name": "Teddy & chun",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/teddy-chun_IMG_1498_copy_M_gic6gl",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 0,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 36,
+    "username": "alexis-sania",
+    "first_name": "Alexis & Sania",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/alexis-sania_Flyer_insta_VF_41_1_kwnlz2",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 42,
+    "username": "bastien-amelie",
+    "first_name": "Bastien & Amélie",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/bastien-amelie_BA_-_Photo_02_dcinoa",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 43,
+    "username": "brice-manue",
+    "first_name": "Brice",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/brice-manue_Brice_PNG_o6wwti",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 44,
+    "username": "claudio",
+    "first_name": "Claudio",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/claudio_dio-209_q7yv6d",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 37,
+    "username": "didi",
+    "first_name": "Didi_",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_mit3lz",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 45,
+    "username": "dim-laure",
+    "first_name": "Dim & Laure",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/dim-laure_Copie_de_DIM__LAURE_ojdhsi",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 38,
+    "username": "el-pequeno-fanny",
+    "first_name": "El pequeno & Fanny",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/el-pequeno-fanny_A7_04028-2_tl6vyr",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 46,
+    "username": "evan-eugenia",
+    "first_name": "Evan &eugenia",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_d33gpu",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 47,
+    "username": "ezo-hugo",
+    "first_name": "Ezo & Hugo",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_icddxk",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 48,
+    "username": "jerem-jade",
+    "first_name": "Jerem & jade",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/jerem-jade_Jerem__Jade_wnznay",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 49,
+    "username": "keymo-paris",
+    "first_name": "Keymo & Paris",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Photoroom_20260122_133531_t99ufw",
+    "cover_image": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/covers/Photoroom_20260122_133531_ikeikx",
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 50,
+    "username": "mathilde",
+    "first_name": "Mathilde",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/mathilde_IMG_5797_s7lfnj",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 39,
+    "username": "meline",
+    "first_name": "Meline",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/meline_Meline_fw8fsj",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 40,
+    "username": "michael-dori",
+    "first_name": "Michael & dori",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/michael-dori_D_M_070_WEB_xyfe8b",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 51,
+    "username": "mika-solene",
+    "first_name": "Mika & Solene",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/mika-solene_Copie_de_Copie_de_Mika__Solene__jtmlew",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 53,
+    "username": "salem-monika",
+    "first_name": "Monika",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/salem-monika_IMG_6533_xpxsmw",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 52,
+    "username": "pablo-andrea",
+    "first_name": "Pablo & Andrea",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/pablo-andrea_IMG-20230905-WA0008_eovoyo",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 41,
+    "username": "sarah-la-morena",
+    "first_name": "Sarah la morena",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_ojlkbx",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  }
+]
