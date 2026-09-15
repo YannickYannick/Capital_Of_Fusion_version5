@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { getPwaUrl } from "@/lib/pwaUrl";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pages.festivalIndex");
@@ -13,7 +12,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FestivalIndexPage() {
   const t = await getTranslations("pages.festivalIndex");
-  const pwaUrl = getPwaUrl();
   return (
     <div className="text-white">
       <p className="text-xs uppercase tracking-widest text-purple-300/90">
@@ -69,15 +67,6 @@ export default async function FestivalIndexPage() {
           <div className="text-sm font-semibold">{t("cards.jackNJill.title")}</div>
           <div className="mt-1 text-xs text-white/55">{t("cards.jackNJill.desc")}</div>
         </Link>
-        <a
-          href={pwaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-2xl border border-[#f3ac41]/40 bg-[#f3ac41]/10 p-5 hover:bg-[#f3ac41]/20 transition"
-        >
-          <div className="text-sm font-semibold">{t("cards.appFestival.title")}</div>
-          <div className="mt-1 text-xs text-white/55">{t("cards.appFestival.desc")}</div>
-        </a>
         <Link
           href="/festival/all-star-street-battle"
           className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition"
@@ -89,4 +78,3 @@ export default async function FestivalIndexPage() {
     </div>
   );
 }
-

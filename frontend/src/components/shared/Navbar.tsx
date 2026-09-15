@@ -9,18 +9,10 @@ import { MobileNav } from "./MobileNav";
 import { getMenuItems } from "@/lib/api";
 import { localizeMenuChildren, localizeMenuRootItem } from "@/lib/navMenuLabels";
 import type { MenuItemApi } from "@/types/menu";
-import { getPwaUrl } from "@/lib/pwaUrl";
 import { IconVolume, IconVolumeOff } from "@tabler/icons-react";
 import { ArtistProfileNavbarDock } from "@/components/shared/ArtistProfileNavbarDock";
 import { LocaleFlagEs, LocaleFlagFr, LocaleFlagGb } from "@/components/shared/LocaleFlagIcons";
 import { useAmbientVideoSound } from "@/contexts/AmbientVideoSoundContext";
-
-type NavLink = {
-  href: string;
-  label: string;
-  slug?: string;
-  children: MenuItemApi[];
-};
 
 function normPath(u: string): string {
   return (u || "").replace(/\/$/, "") || "/";
@@ -28,44 +20,6 @@ function normPath(u: string): string {
 
 function isExternalHref(href: string): boolean {
   return /^https?:\/\//i.test(href || "");
-}
-
-/**
- * Injecte le lien PWA sous Festival (et en racine si Festival absent).
- * Inputs: links (menu), label, url
- * Outputs: NavLink[] enrichi sans doublon
- */
-function withPwaFestivalLink(links: NavLink[], label: string, url: string): NavLink[] {
-  const child: MenuItemApi = {
-    id: "pwa-app-festival",
-    name: label,
-    url,
-    slug: "app-festival",
-    icon: "",
-    order: 999,
-    is_active: true,
-    children: [],
-  };
-
-  let festivalFound = false;
-  const next = links.map((link) => {
-    const isFestival =
-      link.slug === "festival" ||
-      normPath(link.href).toLowerCase() === "/festival";
-    if (!isFestival) return link;
-    festivalFound = true;
-    if (link.children.some((c) => c.slug === "app-festival" || c.url === url)) {
-      return link;
-    }
-    return { ...link, children: [...link.children, child] };
-  });
-
-  if (festivalFound) return next;
-  if (next.some((l) => l.slug === "app-festival" || l.href === url)) return next;
-  return [
-    ...next,
-    { href: url, label, slug: "app-festival", children: [] },
-  ];
 }
 
 function filterActiveMenuTree(items: MenuItemApi[]): MenuItemApi[] {
@@ -105,6 +59,13 @@ const EXCLUDED_ROOT_PATHS = new Set([
   "/shop",
   "/trainings",
 ]);
+
+type NavLink = {
+  href: string;
+  label: string;
+  slug?: string;
+  children: MenuItemApi[];
+};
 
 /**
  * Navbar — bandeau noir fixe, hauteur stable (pas de changement au scroll).
@@ -468,9 +429,9 @@ export function Navbar() {
      * l'API n'a pas échoué. Avant ça, on garde le menu vide (layout stable).
      */
     if (menuStatus === "loading") return [];
-    const base = menuStatus === "error" ? fallbackLinks : apiLinks;
-    return withPwaFestivalLink(base, t("menu.appFestival"), getPwaUrl());
-  }, [apiLinks, fallbackLinks, menuStatus, t]);
+    if (menuStatus === "error") return fallbackLinks;
+    return apiLinks;
+  }, [apiLinks, fallbackLinks, menuStatus]);
 
   const filteredLinks = links.filter((link) => normPath(link.href).toLowerCase() !== "/login");
 
