@@ -46,9 +46,7 @@ export default function HomeScreen() {
 
   const heroEyebrow = live && liveDay
     ? t('home.eyebrowLive', { day: liveDay.label, date: liveDay.date })
-    : beforeFestival
-      ? t('home.eyebrowSoon', { start: firstDay?.date ?? '', end: lastDay?.date ?? '' })
-      : t('home.eyebrowParis', { start: firstDay?.date ?? '', end: lastDay?.date ?? '' });
+    : '';
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
