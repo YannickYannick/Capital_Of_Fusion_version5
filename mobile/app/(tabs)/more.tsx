@@ -18,6 +18,13 @@ export default function MoreScreen() {
       <PageHeader eyebrow={t('more.eyebrow')} title={t('more.title')} compact />
 
       <View style={styles.list}>
+        <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
+          <GlassCard style={[styles.card, styles.rulesCard]}>
+            <Text style={styles.title}>{t('more.rulesTitle')}</Text>
+            <Text style={styles.body}>{t('more.rulesBody')}</Text>
+          </GlassCard>
+        </Pressable>
+
         <GlassCard style={styles.card}>
           <LanguageFlags />
         </GlassCard>
@@ -47,14 +54,6 @@ export default function MoreScreen() {
           <GlassCard style={styles.card}>
             <Text style={styles.title}>{t('more.battleTitle')}</Text>
             <Text style={styles.body}>{t('more.battleBody')}</Text>
-          </GlassCard>
-        </Pressable>
-
-        <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
-          <GlassCard style={[styles.card, styles.rulesCard]}>
-            <Text style={styles.rulesIcon}>⚠️</Text>
-            <Text style={styles.title}>{t('more.rulesTitle')}</Text>
-            <Text style={styles.body}>{t('more.rulesBody')}</Text>
           </GlassCard>
         </Pressable>
 
@@ -92,10 +91,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.gold + '50',
     backgroundColor: theme.gold + '08',
-  },
-  rulesIcon: {
-    fontSize: 24,
-    marginBottom: 8,
   },
   title: { ...type.title, fontSize: 16, color: theme.foreground },
   body: { marginTop: 4, ...type.body, fontSize: 14, color: theme.muted },
