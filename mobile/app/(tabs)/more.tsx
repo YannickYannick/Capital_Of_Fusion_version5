@@ -44,6 +44,13 @@ export default function MoreScreen() {
           </GlassCard>
         </Pressable>
 
+        <Pressable onPress={() => router.push('/all-star-street-battle')} accessibilityRole="button">
+          <GlassCard style={styles.card}>
+            <Text style={styles.title}>All Star Street Battle</Text>
+            <Text style={styles.body}>Format, règlement, affiche et inscriptions — 18 sept.</Text>
+          </GlassCard>
+        </Pressable>
+
         <Pressable onPress={() => router.push('/code-of-conduct')} accessibilityRole="button">
           <GlassCard style={styles.card}>
             <Text style={styles.title}>Code de conduite</Text>

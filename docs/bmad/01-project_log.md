@@ -149,3 +149,5 @@
 | [2026-09-15 00:45] Starting Task | PWA b+c URL + lien site | Objectif : URL canonique `app.capitaloffusion.com` + liens menu/landing/festival. |
 | [2026-09-15 00:50] Completed Task | PWA b+c URL + lien site | Outcome: `getPwaUrl` + `NEXT_PUBLIC_PWA_URL` ; menu Festival injecté ; CTA landing + carte `/festival` ; CORS `app.capitaloffusion.com` ; doc `docs/bmad/11-pwa-deploy.md`. Deploy prod Vercel bloqué (CLI logout) → claim temporaire si besoin. |
 | [2026-09-15 02:05] Completed Task | Retrait bouton App festival | Outcome: liens UI retirés (landing, menu, /festival) ; PWA reste sur app.capitaloffusion.com. |
+| [2026-09-15 20:15] Starting Task | Page All Star Street Battle app | Objectif : écran Infos + lien sous J&J, contenu aligné fiche web. |
+| [2026-09-15 20:20] Completed Task | Page All Star Street Battle app | Outcome: `/all-star-street-battle` (Infos/Règlement, affiche, CTAs Weezevent) ; carte Infos sous J&J ; asset JPG. |

@@ -154,6 +154,38 @@ export const JACK_N_JILL = {
   ],
 } as const;
 
+/** All Star Street Bachata Battle — aligné fiche web /organisation/noeuds/all-star-street-bachata-battle. */
+export const ALL_STAR_STREET_BATTLE = {
+  intro:
+    'Le clash ultime entre musicalité, attitude et créativité. Vendredi 18 septembre 2026 — 100 % impro, musiques aléatoires.',
+  overviewTitle: 'Le concept',
+  overviewBody:
+    'Les meilleurs danseurs s’affrontent dans une battle où la technique seule ne suffit pas. Style, caractère, interprétation… et une vraie identité. La bachata reste au cœur de chaque passage ; la fusion est autorisée.',
+  formatTitle: 'Format',
+  formatBullets: [
+    'Pré-sélections : 45 secondes devant les juges pour décrocher une place.',
+    'Tableau final : 8 danseurs sélectionnés affrontent les guests (8èmes → quarts → demis → finale).',
+    'Jusqu’aux demi-finales : 1 minute par danseur.',
+    'Finale : 2 passages de 1 minute par danseur.',
+    'Cash prize : 1000 € pour le vainqueur.',
+    'Impro totale — aucune choré préparée, musiques jamais communiquées à l’avance.',
+  ],
+  rulesTitle: 'Règlement',
+  rulesBullets: [
+    'Chaque danseur passe individuellement en pré-sélection (45 s) ; 8 qualifiés rejoignent le tableau avec les guests.',
+    'Dès les 8èmes, chaque sélectionné affronte un guest.',
+    'Récompense : 1000 € pour le vainqueur.',
+    'Fusion autorisée, mais la bachata doit rester dominante — sinon le passage peut être pénalisé.',
+  ],
+  posterLabel: 'Affiche Street Bachata Battle — 18 septembre 2026',
+  registrationHint: 'Inscription battle (Weezevent) ou page festival go&dance.',
+  registrationPrimary: 'https://my.weezevent.com/sbb-all-star',
+  registrationSecondary:
+    'https://www.goandance.com/en/event/8924/paris-bachata-vibe-festival-2026',
+  registrationPrimaryLabel: 'S’inscrire à la battle',
+  registrationSecondaryLabel: 'Page festival go&dance',
+} as const;
+
 export const images = {
   hero: require('@/assets/images/festival/hero-stage.jpg'),
   pbvLogo: require('@/assets/images/pbv-logo.png'),
@@ -171,4 +203,5 @@ export const images = {
   jackNJillJudgesSaturday: require('@/assets/images/festival/jack-n-jill-judges-saturday.png'),
   jackNJillJudgesSundayRounds: require('@/assets/images/festival/jack-n-jill-judges-sunday-rounds.png'),
   jackNJillJudgesSundayFinal: require('@/assets/images/festival/jack-n-jill-judges-sunday-final.png'),
+  streetBachataBattle: require('@/assets/images/festival/street-bachata-battle-18-sept-26.jpg'),
 };
