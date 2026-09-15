@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
   center: { paddingVertical: 120, alignItems: 'center' },
   error: { paddingHorizontal: space.card, paddingTop: 100, ...type.body, color: theme.muted },
-  heroWrap: { height: 300, position: 'relative', overflow: 'hidden' },
+  heroWrap: { height: 380, position: 'relative', overflow: 'hidden' },
   heroImage: { width: '100%', height: '100%' },
   heroFade: {
     position: 'absolute',
