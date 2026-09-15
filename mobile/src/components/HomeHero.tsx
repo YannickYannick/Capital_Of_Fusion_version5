@@ -11,11 +11,13 @@ import { FESTIVAL, images } from '@/src/lib/festival-data';
 
 type HomeHeroProps = {
   topInset: number;
-  /** Ligne du haut (ex. « Bientôt · 17–20 sept. »). */
+  /** Ligne du haut (ex. « Coming soon · 17–20 Sep »). */
   eyebrow: string;
 };
 
-/** Hero accueil — même forme que l’APK (hauteur fixe 300, logo en bas). */
+/**
+ * Hero accueil — logo centré, dates lisibles au-dessus / en dessous.
+ */
 export function HomeHero({ topInset, eyebrow }: HomeHeroProps) {
   const { t } = useLocale();
 
@@ -25,13 +27,13 @@ export function HomeHero({ topInset, eyebrow }: HomeHeroProps) {
         <AftermovieHeroBackground height={HOME_HERO_HEIGHT} />
       </View>
       <LinearGradient
-        colors={['rgba(10,14,39,0.15)', 'rgba(10,14,39,0.6)', theme.background]}
-        locations={[0, 0.55, 1]}
+        colors={['rgba(10,14,39,0.2)', 'rgba(10,14,39,0.55)', theme.background]}
+        locations={[0, 0.5, 1]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
 
-      <View style={[styles.content, { paddingTop: topInset + 8 }]}>
+      <View style={[styles.content, { paddingTop: topInset + 12 }]}>
         <Text style={styles.today}>{eyebrow}</Text>
         <Image
           source={images.pbvLogo}
@@ -59,22 +61,30 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: space.screen,
     right: space.screen,
-    bottom: 16,
+    bottom: 20,
     zIndex: 2,
+    alignItems: 'center',
   },
   today: {
-    ...type.meta,
+    ...type.bodyMedium,
+    fontSize: 14,
+    letterSpacing: 0.4,
     color: theme.gold,
+    textAlign: 'center',
   },
   logo: {
     width: '100%',
-    maxWidth: 280,
-    height: 88,
-    marginTop: 8,
+    maxWidth: 260,
+    height: 96,
+    marginTop: 10,
+    alignSelf: 'center',
   },
   meta: {
-    marginTop: 6,
-    ...type.caption,
+    marginTop: 8,
+    ...type.meta,
+    fontSize: 13,
+    letterSpacing: 1.2,
     color: theme.textSoft,
+    textAlign: 'center',
   },
 });

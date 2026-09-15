@@ -80,20 +80,25 @@ export default function ArtistDetailScreen() {
                   source={{ uri: heroUri }}
                   style={styles.heroImage}
                   contentFit="cover"
-                  contentPosition="top"
+                  contentPosition="center"
                 />
               ) : (
                 <View style={styles.heroFallback}>
                   <Text style={styles.heroInitial}>{name.charAt(0).toUpperCase()}</Text>
                 </View>
               )}
-              <LinearGradient colors={['transparent', theme.background]} style={StyleSheet.absoluteFill} />
+              {/* Dégradé limité au bas — le haut de la photo reste lisible. */}
+              <LinearGradient
+                colors={['transparent', theme.background]}
+                style={styles.heroFade}
+                pointerEvents="none"
+              />
               {artist.profile_picture && artist.cover_image ? (
                 <Image
                   source={{ uri: artist.profile_picture }}
                   style={styles.avatarOverlay}
                   contentFit="cover"
-                  contentPosition="top"
+                  contentPosition="center"
                 />
               ) : null}
             </View>
@@ -150,8 +155,15 @@ const styles = StyleSheet.create({
   },
   center: { paddingVertical: 120, alignItems: 'center' },
   error: { paddingHorizontal: space.card, paddingTop: 100, ...type.body, color: theme.muted },
-  heroWrap: { height: 240, position: 'relative' },
+  heroWrap: { height: 300, position: 'relative', overflow: 'hidden' },
   heroImage: { width: '100%', height: '100%' },
+  heroFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '32%',
+  },
   heroFallback: {
     width: '100%',
     height: '100%',

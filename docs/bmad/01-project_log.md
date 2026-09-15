@@ -155,5 +155,6 @@
 | [2026-09-15 21:30] Completed Task | i18n app EN/FR/ES + gate PC | Outcome: LocaleProvider + catalogs ; sélecteur drapeaux Infos ; DesktopGate ≥900px web ; UI traduite. |
 | [2026-09-15 21:35] Starting Task | FAQ dans l’app PWA | Objectif : page Infos FAQ alignée contenu site, i18n EN/FR/ES. |
 | [2026-09-15 21:40] Completed Task | FAQ dans l’app PWA | Outcome: `/faq` accordéon 8 Q/R (seed load_faq_data) ; carte Infos ; i18n. |
+| [2026-09-15 23:05] Completed Task | Hero accueil + photo artiste | Outcome: logo centré et dates plus lisibles (`HomeHero`) ; hero fiche artiste 300px, dégradé limité au bas, cadrage centré. |
 | [2026-09-15 21:20] Starting Task | Wire i18n mobile screens | Objectif : brancher `useLocale` / `t` / `tList` / `dayLabel` sur tous les écrans & composants UI listés. |
 | [2026-09-15 21:25] Completed Task | Wire i18n mobile screens | Outcome: tous les écrans/composants listés utilisent `t`/`tList`/`dayLabel` ; LanguageFlags sur Infos ; filtres lineup ; clés map.* pour zones. |
