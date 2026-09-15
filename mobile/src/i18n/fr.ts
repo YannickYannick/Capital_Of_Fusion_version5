@@ -133,7 +133,14 @@ export const fr: Messages = {
     battleBody: 'Format, règlement, affiche et inscriptions — 18 sept.',
     codeTitle: 'Code de conduite',
     codeBody: 'Capital of Fusion · version 3.0 — swipe entre les sections.',
+    faqTitle: 'FAQ',
+    faqBody: 'Hôtel, passes, vestiaire, compétitions — questions fréquentes.',
     footer: '{name} · {location} · {edition}',
+  },
+  faq: {
+    eyebrow: 'Support',
+    title: 'FAQ',
+    subtitle: 'Les réponses aux questions les plus fréquentes sur le festival.',
   },
   jack: {
     eyebrow: 'Compétition',

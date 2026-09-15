@@ -140,7 +140,14 @@ export type Messages = {
     battleBody: string;
     codeTitle: string;
     codeBody: string;
+    faqTitle: string;
+    faqBody: string;
     footer: string;
+  };
+  faq: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
   };
   jack: {
     eyebrow: string;

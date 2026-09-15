@@ -1,14 +1,13 @@
 import { useRouter } from 'expo-router';
-import { Image } from 'expo-image';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { radius, space, theme } from '@/constants/theme';
+import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
 import { LanguageFlags } from '@/src/components/LanguageFlags';
 import { PageHeader } from '@/src/components/PageHeader';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { useLocale } from '@/src/i18n/LocaleContext';
-import { FESTIVAL, images } from '@/src/lib/festival-data';
+import { FESTIVAL } from '@/src/lib/festival-data';
 
 export default function MoreScreen() {
   const router = useRouter();
@@ -24,14 +23,9 @@ export default function MoreScreen() {
         </GlassCard>
 
         <Pressable onPress={() => router.push('/passes')} accessibilityRole="button">
-          <GlassCard style={styles.passCard}>
-            <View style={styles.passRow}>
-              <Image source={images.bracelet} style={styles.passImg} contentFit="cover" />
-              <View style={styles.passText}>
-                <Text style={styles.passTitle}>{t('more.passesTitle')}</Text>
-                <Text style={styles.passBody}>{t('more.passesBody')}</Text>
-              </View>
-            </View>
+          <GlassCard style={styles.card}>
+            <Text style={styles.title}>{t('more.passesTitle')}</Text>
+            <Text style={styles.body}>{t('more.passesBody')}</Text>
           </GlassCard>
         </Pressable>
 
@@ -62,6 +56,13 @@ export default function MoreScreen() {
             <Text style={styles.body}>{t('more.codeBody')}</Text>
           </GlassCard>
         </Pressable>
+
+        <Pressable onPress={() => router.push('/faq')} accessibilityRole="button">
+          <GlassCard style={styles.card}>
+            <Text style={styles.title}>{t('more.faqTitle')}</Text>
+            <Text style={styles.body}>{t('more.faqBody')}</Text>
+          </GlassCard>
+        </Pressable>
       </View>
 
       <Text style={styles.footer}>
@@ -79,12 +80,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.background },
   list: { paddingHorizontal: space.card, gap: space.gap },
   card: { padding: space.card },
-  passCard: { padding: space.card },
-  passRow: { flexDirection: 'row', gap: space.card, alignItems: 'center' },
-  passImg: { width: 72, height: 72, borderRadius: radius.card },
-  passText: { flex: 1 },
-  passTitle: { ...type.title, color: theme.foreground },
-  passBody: { marginTop: 4, ...type.body, fontSize: 14, color: theme.muted },
   title: { ...type.title, fontSize: 16, color: theme.foreground },
   body: { marginTop: 4, ...type.body, fontSize: 14, color: theme.muted },
   footer: {

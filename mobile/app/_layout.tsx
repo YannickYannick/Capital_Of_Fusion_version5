@@ -74,8 +74,9 @@ export default function RootLayout() {
                 <Stack.Screen name="all-star-street-battle" />
                 <Stack.Screen name="shuttles" />
                 <Stack.Screen name="passes" />
-                <Stack.Screen name="code-of-conduct" />
-              </Stack>
+            <Stack.Screen name="code-of-conduct" />
+            <Stack.Screen name="faq" />
+          </Stack>
             </View>
           </DesktopGate>
         </AnnouncementsProvider>
