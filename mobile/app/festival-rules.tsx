@@ -30,7 +30,7 @@ const SECTIONS: RuleSection[] = [
 
 export default function FestivalRulesScreen() {
   const { t } = useLocale();
-  const [openId, setOpenId] = useState<string | null>('main-venue');
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const toggle = (id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
