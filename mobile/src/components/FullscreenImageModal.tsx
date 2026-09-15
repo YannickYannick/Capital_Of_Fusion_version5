@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 
 type FullscreenImageModalProps = {
   visible: boolean;
@@ -34,6 +35,7 @@ export function FullscreenImageModal({
 }: FullscreenImageModalProps) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+  const { t } = useLocale();
 
   return (
     <Modal
@@ -48,7 +50,7 @@ export function FullscreenImageModal({
           style={[styles.closeBtn, { top: insets.top + 8 }]}
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel="Fermer"
+          accessibilityLabel={t('common.close')}
           hitSlop={12}
         >
           <X size={22} color={theme.foreground} strokeWidth={2.5} />
@@ -72,7 +74,7 @@ export function FullscreenImageModal({
               source={source}
               style={{ width: width - 24, height: height * 0.82 }}
               contentFit="contain"
-              accessibilityLabel={label ?? 'Image plein écran'}
+              accessibilityLabel={label ?? t('common.closeImage')}
             />
           ) : null}
         </ScrollView>
@@ -81,9 +83,9 @@ export function FullscreenImageModal({
           onPress={onClose}
           style={[styles.hintWrap, { bottom: insets.bottom + 16 }]}
           accessibilityRole="button"
-          accessibilityLabel="Fermer l’image"
+          accessibilityLabel={t('common.closeImage')}
         >
-          <Text style={styles.hint}>Appuyer pour fermer</Text>
+          <Text style={styles.hint}>{t('common.tapToClose')}</Text>
         </Pressable>
       </View>
     </Modal>

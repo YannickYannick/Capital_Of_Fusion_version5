@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { spring } from '@/src/lib/motion';
 
 export type TabBarProps = {
@@ -16,16 +17,24 @@ export type TabBarProps = {
   };
 };
 
+/** Route tab → clé i18n `tabs.*`. */
+const TAB_LABEL_KEYS: Record<string, string> = {
+  timetable: 'tabs.timetable',
+  map: 'tabs.map',
+  index: 'tabs.home',
+  lineup: 'tabs.lineup',
+  more: 'tabs.more',
+};
+
 const TABS: {
   name: string;
-  label: string;
   Icon: typeof CalendarDays;
 }[] = [
-  { name: 'timetable', label: 'Planning', Icon: CalendarDays },
-  { name: 'map', label: 'Carte', Icon: Map },
-  { name: 'index', label: 'Accueil', Icon: Home },
-  { name: 'lineup', label: 'Artistes', Icon: Music2 },
-  { name: 'more', label: 'Plus', Icon: MoreHorizontal },
+  { name: 'timetable', Icon: CalendarDays },
+  { name: 'map', Icon: Map },
+  { name: 'index', Icon: Home },
+  { name: 'lineup', Icon: Music2 },
+  { name: 'more', Icon: MoreHorizontal },
 ];
 
 function TabItem({
@@ -75,6 +84,7 @@ function TabItem({
 
 export function PbvfTabBar({ state, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useLocale();
 
   const go = (name: string) => {
     const route = state.routes.find((r: { name: string; key: string }) => r.name === name);
@@ -87,10 +97,10 @@ export function PbvfTabBar({ state, navigation }: TabBarProps) {
 
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 10) }]}>
-      {TABS.map(({ name, label, Icon }) => (
+      {TABS.map(({ name, Icon }) => (
         <TabItem
           key={name}
-          label={label}
+          label={t(TAB_LABEL_KEYS[name] ?? name)}
           Icon={Icon}
           focused={isFocused(name)}
           onPress={() => go(name)}

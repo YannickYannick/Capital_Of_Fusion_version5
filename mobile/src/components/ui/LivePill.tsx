@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { radius, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 
 type LivePillProps = {
   /** Instant cible du compteur (fin du live, ou ouverture festival). */
@@ -28,6 +29,7 @@ function formatRemaining(ms: number): string {
  * Pill compteur — temps restant jusqu’à `target` (tick 1s).
  */
 export function LivePill({ target }: LivePillProps) {
+  const { t } = useLocale();
   const targetMs = target.getTime();
   const [label, setLabel] = useState(() => formatRemaining(targetMs - Date.now()));
 
@@ -39,7 +41,7 @@ export function LivePill({ target }: LivePillProps) {
   }, [targetMs]);
 
   return (
-    <View style={styles.pill} accessibilityLabel={`Temps restant ${label}`}>
+    <View style={styles.pill} accessibilityLabel={t('home.remainingA11y', { label })}>
       <Text style={styles.text}>{label}</Text>
     </View>
   );

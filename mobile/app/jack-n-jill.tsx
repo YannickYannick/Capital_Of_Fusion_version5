@@ -21,6 +21,7 @@ import { PageHeader } from '@/src/components/PageHeader';
 import { Chip } from '@/src/components/ui/Chip';
 import { CtaRow } from '@/src/components/ui/CtaRow';
 import { SurfaceCard } from '@/src/components/ui/SurfaceCard';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { JACK_N_JILL, images } from '@/src/lib/festival-data';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -30,10 +31,18 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 type TabId = 'infos' | 'juges';
 type LightboxState = { source: ImageSource; label: string } | null;
 
+/** Panel id festival-data → clé titre i18n. */
+const PANEL_TITLE_KEYS: Record<string, string> = {
+  saturday: 'jack.panelSaturday',
+  'sunday-rounds': 'jack.panelSundayRounds',
+  'sunday-final': 'jack.panelSundayFinal',
+};
+
 /**
  * Page Jack N Jill — onglets Infos / Juges ; affiches repliées par défaut.
  */
 export default function JackNJillScreen() {
+  const { t } = useLocale();
   const [tab, setTab] = useState<TabId>('infos');
   const [lightbox, setLightbox] = useState<LightboxState>(null);
   const [openPosterId, setOpenPosterId] = useState<string | null>(null);
@@ -48,77 +57,92 @@ export default function JackNJillScreen() {
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
         <BackButton fallbackHref="/(tabs)/more" />
 
-        <PageHeader eyebrow="Compétition" title="Jack N Jill Vibe" subtitle={JACK_N_JILL.intro} />
+        <PageHeader
+          eyebrow={t('jack.eyebrow')}
+          title={t('jack.title')}
+          subtitle={t('jack.intro')}
+        />
 
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabs}
         >
-          <Chip label="Infos" active={tab === 'infos'} onPress={() => setTab('infos')} variant="day" />
-          <Chip label="Juges" active={tab === 'juges'} onPress={() => setTab('juges')} variant="day" />
+          <Chip
+            label={t('jack.tabInfos')}
+            active={tab === 'infos'}
+            onPress={() => setTab('infos')}
+            variant="day"
+          />
+          <Chip
+            label={t('jack.tabJudges')}
+            active={tab === 'juges'}
+            onPress={() => setTab('juges')}
+            variant="day"
+          />
         </ScrollView>
 
         {tab === 'infos' ? (
           <View style={styles.list}>
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{JACK_N_JILL.saturdayTitle}</Text>
-              <Text style={styles.body}>{JACK_N_JILL.saturdayBody}</Text>
+              <Text style={styles.sectionTitle}>{t('jack.saturdayTitle')}</Text>
+              <Text style={styles.body}>{t('jack.saturdayBody')}</Text>
               <CollapsiblePoster
                 id="saturday"
                 open={openPosterId === 'saturday'}
                 onToggle={() => togglePoster('saturday')}
                 source={images.jackNJillSaturday}
-                label={JACK_N_JILL.saturdayPosterLabel}
+                label={t('jack.saturdayPoster')}
                 onOpenFullscreen={() =>
                   setLightbox({
                     source: images.jackNJillSaturday,
-                    label: JACK_N_JILL.saturdayPosterLabel,
+                    label: t('jack.saturdayPoster'),
                   })
                 }
               />
             </SurfaceCard>
 
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{JACK_N_JILL.sundayTitle}</Text>
-              <Text style={styles.body}>{JACK_N_JILL.sundayBody}</Text>
+              <Text style={styles.sectionTitle}>{t('jack.sundayTitle')}</Text>
+              <Text style={styles.body}>{t('jack.sundayBody')}</Text>
               <CollapsiblePoster
                 id="sunday"
                 open={openPosterId === 'sunday'}
                 onToggle={() => togglePoster('sunday')}
                 source={images.jackNJillSunday}
-                label={JACK_N_JILL.sundayPosterLabel}
+                label={t('jack.sundayPoster')}
                 onOpenFullscreen={() =>
                   setLightbox({
                     source: images.jackNJillSunday,
-                    label: JACK_N_JILL.sundayPosterLabel,
+                    label: t('jack.sundayPoster'),
                   })
                 }
               />
             </SurfaceCard>
 
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>Inscriptions</Text>
-              <Text style={styles.body}>{JACK_N_JILL.registrationHint}</Text>
+              <Text style={styles.sectionTitle}>{t('jack.registrationTitle')}</Text>
+              <Text style={styles.body}>{t('jack.registrationHint')}</Text>
               <CtaRow
-                label="Catégorie amateur"
+                label={t('jack.ctaAmateur')}
                 onPress={() => Linking.openURL(JACK_N_JILL.registrationAmateur)}
               />
               <View style={styles.ctaSpacer} />
               <CtaRow
-                label="Catégorie professionnelle"
+                label={t('jack.ctaPro')}
                 onPress={() => Linking.openURL(JACK_N_JILL.registrationPro)}
               />
             </SurfaceCard>
           </View>
         ) : (
           <View style={styles.list}>
-            <Text style={styles.judgesIntro}>{JACK_N_JILL.judgesIntro}</Text>
+            <Text style={styles.judgesIntro}>{t('jack.judgesIntro')}</Text>
             {JACK_N_JILL.judgesPanels.map((panel) => {
               const source = images[panel.imageKey];
+              const panelTitle = t(PANEL_TITLE_KEYS[panel.id] ?? panel.title);
               return (
                 <SurfaceCard key={panel.id} style={styles.card}>
-                  <Text style={styles.sectionTitle}>{panel.title}</Text>
+                  <Text style={styles.sectionTitle}>{panelTitle}</Text>
                   <View style={styles.judgeList}>
                     {panel.judges.map((name) => (
                       <Text key={name} style={styles.judgeName}>
@@ -131,8 +155,8 @@ export default function JackNJillScreen() {
                     open={openPosterId === panel.id}
                     onToggle={() => togglePoster(panel.id)}
                     source={source}
-                    label={panel.title}
-                    onOpenFullscreen={() => setLightbox({ source, label: panel.title })}
+                    label={panelTitle}
+                    onOpenFullscreen={() => setLightbox({ source, label: panelTitle })}
                   />
                 </SurfaceCard>
               );
@@ -170,6 +194,9 @@ function CollapsiblePoster({
   label,
   onOpenFullscreen,
 }: CollapsiblePosterProps) {
+  const { t } = useLocale();
+  const toggleLabel = open ? t('common.hidePoster') : t('common.seePoster');
+
   return (
     <View style={styles.posterBlock}>
       <Pressable
@@ -177,9 +204,9 @@ function CollapsiblePoster({
         style={({ pressed }) => [styles.posterToggle, pressed && styles.pressed]}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={open ? 'Masquer l’affiche' : 'Voir l’affiche'}
+        accessibilityLabel={toggleLabel}
       >
-        <Text style={styles.posterToggleLabel}>{open ? 'Masquer l’affiche' : 'Voir l’affiche'}</Text>
+        <Text style={styles.posterToggleLabel}>{toggleLabel}</Text>
         <ChevronDown
           size={18}
           color={theme.gold}
@@ -192,10 +219,10 @@ function CollapsiblePoster({
         <Pressable
           onPress={onOpenFullscreen}
           accessibilityRole="imagebutton"
-          accessibilityLabel={`Agrandir — ${label}`}
+          accessibilityLabel={`${t('common.tapToEnlarge')} — ${label}`}
         >
           <Image source={source} style={styles.poster} contentFit="contain" accessibilityLabel={label} />
-          <Text style={styles.posterHint}>Appuyer pour agrandir</Text>
+          <Text style={styles.posterHint}>{t('common.tapToEnlarge')}</Text>
         </Pressable>
       ) : null}
     </View>

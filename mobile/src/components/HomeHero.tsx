@@ -6,6 +6,7 @@ import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
 import { AftermovieHeroBackground } from '@/src/components/AftermovieHeroBackground';
 import { HOME_HERO_HEIGHT } from '@/src/constants/media';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { FESTIVAL, images } from '@/src/lib/festival-data';
 
 type HomeHeroProps = {
@@ -16,6 +17,8 @@ type HomeHeroProps = {
 
 /** Hero accueil — même forme que l’APK (hauteur fixe 300, logo en bas). */
 export function HomeHero({ topInset, eyebrow }: HomeHeroProps) {
+  const { t } = useLocale();
+
   return (
     <View style={styles.wrap}>
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -34,7 +37,7 @@ export function HomeHero({ topInset, eyebrow }: HomeHeroProps) {
           source={images.pbvLogo}
           style={styles.logo}
           contentFit="contain"
-          accessibilityLabel="Paris Bachata Vibe Festival"
+          accessibilityLabel={t('home.logoA11y')}
         />
         <Text style={styles.meta}>
           {FESTIVAL.location} · {FESTIVAL.edition}

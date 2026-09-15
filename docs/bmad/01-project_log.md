@@ -151,3 +151,7 @@
 | [2026-09-15 02:05] Completed Task | Retrait bouton App festival | Outcome: liens UI retirés (landing, menu, /festival) ; PWA reste sur app.capitaloffusion.com. |
 | [2026-09-15 20:15] Starting Task | Page All Star Street Battle app | Objectif : écran Infos + lien sous J&J, contenu aligné fiche web. |
 | [2026-09-15 20:20] Completed Task | Page All Star Street Battle app | Outcome: `/all-star-street-battle` (Infos/Règlement, affiche, CTAs Weezevent) ; carte Infos sous J&J ; asset JPG. |
+| [2026-09-15 21:20] Starting Task | i18n app EN/FR/ES + gate PC | Objectif : défaut EN, drapeaux, AsyncStorage, message desktop. |
+| [2026-09-15 21:30] Completed Task | i18n app EN/FR/ES + gate PC | Outcome: LocaleProvider + catalogs ; sélecteur drapeaux Infos ; DesktopGate ≥900px web ; UI traduite. |
+| [2026-09-15 21:20] Starting Task | Wire i18n mobile screens | Objectif : brancher `useLocale` / `t` / `tList` / `dayLabel` sur tous les écrans & composants UI listés. |
+| [2026-09-15 21:25] Completed Task | Wire i18n mobile screens | Outcome: tous les écrans/composants listés utilisent `t`/`tList`/`dayLabel` ; LanguageFlags sur Infos ; filtres lineup ; clés map.* pour zones. |

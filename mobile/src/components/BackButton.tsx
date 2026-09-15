@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { radius, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 
 type BackButtonProps = {
   /** Fallback si l’historique est vide (ex. deep link PWA). */
@@ -20,10 +21,12 @@ type BackButtonProps = {
 export function BackButton({
   fallbackHref = '/(tabs)/lineup',
   floating = false,
-  label = 'Retour',
+  label,
 }: BackButtonProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useLocale();
+  const resolvedLabel = label ?? t('common.back');
 
   const goBack = () => {
     if (router.canGoBack()) {
@@ -39,11 +42,11 @@ export function BackButton({
         onPress={goBack}
         style={({ pressed }) => [styles.btn, floating && styles.btnFloating, pressed && styles.pressed]}
         accessibilityRole="button"
-        accessibilityLabel={label}
+        accessibilityLabel={resolvedLabel}
         hitSlop={8}
       >
         <ChevronLeft size={20} color={theme.gold} strokeWidth={2.5} />
-        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.label}>{resolvedLabel}</Text>
       </Pressable>
     </View>
   );

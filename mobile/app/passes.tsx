@@ -17,10 +17,9 @@ import { type } from '@/constants/typography';
 import { BackButton } from '@/src/components/BackButton';
 import { FullscreenImageModal } from '@/src/components/FullscreenImageModal';
 import { PageHeader } from '@/src/components/PageHeader';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import {
   FESTIVAL_PASSES,
-  PASS_INTRO,
-  PASS_WARNING,
   passImages,
 } from '@/src/lib/passes';
 
@@ -34,6 +33,7 @@ type PassSlide = {
  * Passes — même format que Code de conduite : carrousel horizontal + lightbox.
  */
 export default function PassesScreen() {
+  const { t } = useLocale();
   const { width } = useWindowDimensions();
   const pagerRef = useRef<ScrollView>(null);
   const [index, setIndex] = useState(0);
@@ -43,7 +43,7 @@ export default function PassesScreen() {
     () => [
       {
         id: 'intro',
-        title: 'Quel accès avec mon pass ?',
+        title: t('passes.introSlide'),
         image: passImages.intro,
       },
       ...FESTIVAL_PASSES.map((pass) => ({
@@ -52,7 +52,7 @@ export default function PassesScreen() {
         image: passImages[pass.imageKey],
       })),
     ],
-    [],
+    [t],
   );
 
   const slideWidth = width;
@@ -77,13 +77,17 @@ export default function PassesScreen() {
         contentContainerStyle={styles.screenContent}
       >
         <BackButton fallbackHref="/(tabs)/more" />
-        <PageHeader eyebrow="Billetterie" title="Passes" subtitle={PASS_INTRO} />
+        <PageHeader
+          eyebrow={t('passes.eyebrow')}
+          title={t('passes.title')}
+          subtitle={t('passes.intro')}
+        />
 
         <View style={styles.counterRow}>
           <Text style={styles.counter}>
             {index + 1} / {total}
           </Text>
-          <Text style={styles.version}>PBVF 2026</Text>
+          <Text style={styles.version}>{t('passes.version')}</Text>
         </View>
 
         <View style={styles.pagerWrap}>
@@ -102,7 +106,7 @@ export default function PassesScreen() {
                 onPress={() => setLightboxOpen(true)}
                 style={{ width: slideWidth }}
                 accessibilityRole="imagebutton"
-                accessibilityLabel={`${slide.title}. Agrandir`}
+                accessibilityLabel={`${slide.title}. ${t('common.tapToEnlarge')}`}
               >
                 <Image
                   source={slide.image}
@@ -123,7 +127,7 @@ export default function PassesScreen() {
                 pressed && styles.pressed,
               ]}
               accessibilityRole="button"
-              accessibilityLabel="Slide précédente"
+              accessibilityLabel={t('common.prevSlide')}
             >
               <ChevronLeft size={22} color={theme.foreground} strokeWidth={2} />
             </Pressable>
@@ -136,7 +140,7 @@ export default function PassesScreen() {
                 pressed && styles.pressed,
               ]}
               accessibilityRole="button"
-              accessibilityLabel="Slide suivante"
+              accessibilityLabel={t('common.nextSlide')}
             >
               <ChevronRight size={22} color={theme.foreground} strokeWidth={2} />
             </Pressable>
@@ -144,8 +148,8 @@ export default function PassesScreen() {
         </View>
 
         <Text style={styles.slideTitle}>{current?.title}</Text>
-        <Text style={styles.swipeHint}>Glisse à gauche ou à droite · tap pour agrandir</Text>
-        <Text style={styles.warning}>{PASS_WARNING}</Text>
+        <Text style={styles.swipeHint}>{t('common.swipeHint')}</Text>
+        <Text style={styles.warning}>{t('passes.warning')}</Text>
 
         <View style={styles.dotsWrap}>
           {slides.map((slide, i) => (
@@ -154,7 +158,7 @@ export default function PassesScreen() {
               onPress={() => goTo(i)}
               accessibilityRole="button"
               accessibilityState={{ selected: i === index }}
-              accessibilityLabel={`Aller à ${slide.title}`}
+              accessibilityLabel={slide.title}
               style={[styles.dot, i === index && styles.dotActive]}
             />
           ))}

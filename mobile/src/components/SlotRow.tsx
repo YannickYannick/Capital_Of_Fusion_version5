@@ -10,6 +10,7 @@ import Animated, {
 
 import { radius, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { colorForLevel } from '@/src/lib/levelColors';
 import { spring } from '@/src/lib/motion';
 import type { ProgramSlotApi } from '@/src/types/api';
@@ -25,6 +26,7 @@ type SlotRowProps = {
  * Ligne créneau planning — bandeau couleur selon niveau workshop.
  */
 export function SlotRow({ slot, favorite, onToggle, index = 0 }: SlotRowProps) {
+  const { t } = useLocale();
   const starScale = useSharedValue(1);
   const levelColor = colorForLevel(slot.level);
 
@@ -56,13 +58,17 @@ export function SlotRow({ slot, favorite, onToggle, index = 0 }: SlotRowProps) {
           </Text>
           <Text style={styles.meta} numberOfLines={2}>
             {slot.genre} · {slot.stage}
-            {slot.notInFullPass ? ' · Hors pass' : ''}
+            {slot.notInFullPass ? ` · ${t('timetable.notInFullPass')}` : ''}
           </Text>
           {levelColor ? (
             <View style={styles.levelRow}>
               <View style={[styles.levelDot, { backgroundColor: levelColor }]} />
               <Text style={[styles.levelText, { color: levelColor }]}>
-                {levelLabel(slot.level)}
+                {(['open', 'beginner', 'intermediate', 'advanced'] as const).includes(
+                  (slot.level ?? '').toLowerCase() as 'open',
+                )
+                  ? t(`levels.${(slot.level ?? '').toLowerCase()}`)
+                  : (slot.level ?? '')}
               </Text>
             </View>
           ) : null}
@@ -71,7 +77,9 @@ export function SlotRow({ slot, favorite, onToggle, index = 0 }: SlotRowProps) {
           onPress={handleToggle}
           accessibilityRole="button"
           accessibilityLabel={
-            favorite ? `Retirer ${slot.artist} des favoris` : `Ajouter ${slot.artist} aux favoris`
+            favorite
+              ? t('timetable.removeFavoriteA11y', { artist: slot.artist })
+              : t('timetable.addFavoriteA11y', { artist: slot.artist })
           }
           style={styles.starBtn}
           hitSlop={8}
@@ -87,21 +95,6 @@ export function SlotRow({ slot, favorite, onToggle, index = 0 }: SlotRowProps) {
       </View>
     </Animated.View>
   );
-}
-
-function levelLabel(level?: string): string {
-  switch ((level ?? '').toLowerCase()) {
-    case 'open':
-      return 'Open Level';
-    case 'beginner':
-      return 'Beginner';
-    case 'intermediate':
-      return 'Intermediate';
-    case 'advanced':
-      return 'Advanced';
-    default:
-      return level ?? '';
-  }
 }
 
 const styles = StyleSheet.create({

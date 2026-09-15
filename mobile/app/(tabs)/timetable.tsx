@@ -9,8 +9,10 @@ import { SlotRow } from '@/src/components/SlotRow';
 import { Chip } from '@/src/components/ui/Chip';
 import { useFavorites } from '@/src/hooks/useFavorites';
 import { useProgram } from '@/src/hooks/useProgram';
+import { useLocale } from '@/src/i18n/LocaleContext';
 
 export default function TimetableScreen() {
+  const { t, dayLabel } = useLocale();
   const { days, stages, slots, loading, error } = useProgram();
   const [day, setDay] = useState<string | null>(null);
   const [stage, setStage] = useState<string>('all');
@@ -40,7 +42,7 @@ export default function TimetableScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
-      <PageHeader eyebrow="Workshops & soirées" title="Planning" compact />
+      <PageHeader eyebrow={t('timetable.eyebrow')} title={t('timetable.title')} compact />
 
       {loading && (
         <View style={styles.center}>
@@ -54,29 +56,32 @@ export default function TimetableScreen() {
         <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
             <Chip
-              label="★ Favoris"
+              label={t('timetable.favorites')}
               active={onlyFavs}
               onPress={() => setOnlyFavs((v) => !v)}
               variant="favorite"
             />
-            {days.map((d) => (
-              <Chip
-                key={d.id}
-                label={`${d.label} ${d.date}`}
-                active={!onlyFavs && d.id === activeDay}
-                onPress={() => {
-                  setOnlyFavs(false);
-                  setDay(d.id);
-                }}
-                variant="day"
-              />
-            ))}
+            {days.map((d) => {
+              const localized = dayLabel(d);
+              return (
+                <Chip
+                  key={d.id}
+                  label={`${localized.label} ${localized.date}`}
+                  active={!onlyFavs && d.id === activeDay}
+                  onPress={() => {
+                    setOnlyFavs(false);
+                    setDay(d.id);
+                  }}
+                  variant="day"
+                />
+              );
+            })}
           </ScrollView>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsStage}>
             <Chip
               key="all"
-              label="Toutes salles"
+              label={t('timetable.allStages')}
               active={stage === 'all'}
               onPress={() => setStage('all')}
               variant="stage"
@@ -95,18 +100,21 @@ export default function TimetableScreen() {
           <View style={styles.list}>
             {visibleSlots.length === 0 ? (
               <Text style={styles.empty}>
-                {onlyFavs ? 'Aucun favori pour l’instant.' : 'Aucun créneau pour ces filtres.'}
+                {onlyFavs ? t('timetable.emptyFavorites') : t('timetable.emptyFilters')}
               </Text>
             ) : (
               visibleSlots.map((s, i) => {
                 const dayMeta = days.find((d) => d.id === s.day);
                 const showDayHeader =
                   onlyFavs && (i === 0 || visibleSlots[i - 1]?.day !== s.day);
+                const localizedDay = dayMeta ? dayLabel(dayMeta) : null;
                 return (
                   <View key={String(s.id)}>
                     {showDayHeader ? (
                       <Text style={styles.dayHeading}>
-                        {dayMeta ? `${dayMeta.label} ${dayMeta.date}` : s.day}
+                        {localizedDay
+                          ? `${localizedDay.label} ${localizedDay.date}`
+                          : s.day}
                       </Text>
                     ) : null}
                     <SlotRow

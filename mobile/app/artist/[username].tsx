@@ -11,6 +11,7 @@ import { BackButton } from '@/src/components/BackButton';
 import { CtaRow } from '@/src/components/ui/CtaRow';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { useArtist } from '@/src/hooks/useArtist';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { PRODUCTION_API_URL } from '@/src/lib/api';
 import { fixMojibake } from '@/src/lib/textEncoding';
 
@@ -32,6 +33,7 @@ export async function generateStaticParams(): Promise<{ username: string }[]> {
 }
 
 export default function ArtistDetailScreen() {
+  const { t, locale } = useLocale();
   const { username } = useLocalSearchParams<{ username: string }>();
   const resolvedUsername = typeof username === 'string' ? username : undefined;
   const { artist, loading, error } = useArtist(resolvedUsername);
@@ -40,6 +42,16 @@ export default function ArtistDetailScreen() {
   const subtitle = artist ? artistSubtitle(artist) : '';
   const links = artist ? artistLinkRows(artist.external_links) : [];
   const heroUri = artist?.cover_image || artist?.profile_picture || null;
+
+  /**
+   * Bio selon locale (fallback FR).
+   */
+  const localizedBio = (() => {
+    if (!artist) return '';
+    if (locale === 'en' && artist.bio_en?.trim()) return artist.bio_en;
+    if (locale === 'es' && artist.bio_es?.trim()) return artist.bio_es;
+    return artist.bio ?? '';
+  })();
 
   return (
     <View style={styles.screen}>
@@ -55,6 +67,10 @@ export default function ArtistDetailScreen() {
         )}
 
         {error && !loading && <Text style={styles.error}>{error}</Text>}
+
+        {!loading && !error && !artist && (
+          <Text style={styles.error}>{t('artist.notFound')}</Text>
+        )}
 
         {artist && !loading && (
           <>
@@ -85,19 +101,21 @@ export default function ArtistDetailScreen() {
             <View style={styles.header}>
               <Text style={styles.name}>{name}</Text>
               <Text style={styles.meta}>{subtitle}</Text>
-              {artist.is_staff_member ? <Text style={styles.badge}>Membre Team CoF</Text> : null}
+              {artist.is_staff_member ? (
+                <Text style={styles.badge}>{t('artist.staffBadge')}</Text>
+              ) : null}
             </View>
 
-            {artist.bio ? (
+            {localizedBio ? (
               <GlassCard style={styles.section}>
-                <Text style={styles.sectionTitle}>À propos</Text>
-                <Text style={styles.bio}>{fixMojibake(artist.bio).trim()}</Text>
+                <Text style={styles.sectionTitle}>{t('artist.about')}</Text>
+                <Text style={styles.bio}>{fixMojibake(localizedBio).trim()}</Text>
               </GlassCard>
             ) : null}
 
             {artist.linked_partner_structures && artist.linked_partner_structures.length > 0 ? (
               <GlassCard style={styles.section}>
-                <Text style={styles.sectionTitle}>Structures partenaires</Text>
+                <Text style={styles.sectionTitle}>{t('artist.partners')}</Text>
                 {artist.linked_partner_structures.map((s) => (
                   <Text key={s.slug} style={styles.partner}>
                     {s.name}
@@ -108,7 +126,7 @@ export default function ArtistDetailScreen() {
 
             {links.length > 0 ? (
               <GlassCard style={styles.linksCard}>
-                <Text style={styles.sectionTitle}>Liens</Text>
+                <Text style={styles.sectionTitle}>{t('artist.links')}</Text>
                 {links.map((link) => (
                   <CtaRow key={link.key} label={link.label} onPress={() => Linking.openURL(link.url)} />
                 ))}

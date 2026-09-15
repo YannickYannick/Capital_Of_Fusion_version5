@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
 
 /**
@@ -21,6 +22,7 @@ import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
 export function UrgentBanner() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const { t } = useLocale();
   const { urgentItems, dismissAllUrgent } = useAnnouncements();
   const offset = useSharedValue(0);
 
@@ -69,7 +71,7 @@ export function UrgentBanner() {
       accessibilityLabel={line}
     >
       <View style={styles.row}>
-        <Text style={styles.badge}>URGENT</Text>
+        <Text style={styles.badge}>{t('urgent.badge')}</Text>
         <View style={styles.track}>
           <Animated.View style={[styles.marqueeRow, animStyle]}>
             <Text style={styles.marqueeText} numberOfLines={1}>
@@ -80,7 +82,7 @@ export function UrgentBanner() {
         <Pressable
           onPress={dismissAllUrgent}
           accessibilityRole="button"
-          accessibilityLabel="Fermer les annonces urgentes"
+          accessibilityLabel={t('urgent.dismissA11y')}
           hitSlop={10}
           style={styles.close}
         >

@@ -21,6 +21,7 @@ import { PageHeader } from '@/src/components/PageHeader';
 import { Chip } from '@/src/components/ui/Chip';
 import { CtaRow } from '@/src/components/ui/CtaRow';
 import { SurfaceCard } from '@/src/components/ui/SurfaceCard';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { ALL_STAR_STREET_BATTLE, images } from '@/src/lib/festival-data';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -35,9 +36,13 @@ type LightboxState = { source: ImageSource; label: string } | null;
  * Alignée sur la fiche web /organisation/noeuds/all-star-street-bachata-battle.
  */
 export default function AllStarStreetBattleScreen() {
+  const { t, tList } = useLocale();
   const [tab, setTab] = useState<TabId>('infos');
   const [lightbox, setLightbox] = useState<LightboxState>(null);
   const [posterOpen, setPosterOpen] = useState(false);
+
+  const formatBullets = tList('battle.formatBullets');
+  const rulesBullets = tList('battle.rulesBullets');
 
   const togglePoster = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -50,9 +55,9 @@ export default function AllStarStreetBattleScreen() {
         <BackButton fallbackHref="/(tabs)/more" />
 
         <PageHeader
-          eyebrow="Compétition"
-          title="All Star Street Battle"
-          subtitle={ALL_STAR_STREET_BATTLE.intro}
+          eyebrow={t('battle.eyebrow')}
+          title={t('battle.title')}
+          subtitle={t('battle.intro')}
         />
 
         <ScrollView
@@ -60,9 +65,14 @@ export default function AllStarStreetBattleScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.tabs}
         >
-          <Chip label="Infos" active={tab === 'infos'} onPress={() => setTab('infos')} variant="day" />
           <Chip
-            label="Règlement"
+            label={t('battle.tabInfos')}
+            active={tab === 'infos'}
+            onPress={() => setTab('infos')}
+            variant="day"
+          />
+          <Chip
+            label={t('battle.tabRules')}
             active={tab === 'reglement'}
             onPress={() => setTab('reglement')}
             variant="day"
@@ -72,25 +82,25 @@ export default function AllStarStreetBattleScreen() {
         {tab === 'infos' ? (
           <View style={styles.list}>
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{ALL_STAR_STREET_BATTLE.overviewTitle}</Text>
-              <Text style={styles.body}>{ALL_STAR_STREET_BATTLE.overviewBody}</Text>
+              <Text style={styles.sectionTitle}>{t('battle.overviewTitle')}</Text>
+              <Text style={styles.body}>{t('battle.overviewBody')}</Text>
               <CollapsiblePoster
                 open={posterOpen}
                 onToggle={togglePoster}
                 source={images.streetBachataBattle}
-                label={ALL_STAR_STREET_BATTLE.posterLabel}
+                label={t('battle.posterLabel')}
                 onOpenFullscreen={() =>
                   setLightbox({
                     source: images.streetBachataBattle,
-                    label: ALL_STAR_STREET_BATTLE.posterLabel,
+                    label: t('battle.posterLabel'),
                   })
                 }
               />
             </SurfaceCard>
 
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{ALL_STAR_STREET_BATTLE.formatTitle}</Text>
-              {ALL_STAR_STREET_BATTLE.formatBullets.map((line) => (
+              <Text style={styles.sectionTitle}>{t('battle.formatTitle')}</Text>
+              {formatBullets.map((line) => (
                 <Text key={line} style={styles.bullet}>
                   • {line}
                 </Text>
@@ -98,15 +108,15 @@ export default function AllStarStreetBattleScreen() {
             </SurfaceCard>
 
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>Inscriptions</Text>
-              <Text style={styles.body}>{ALL_STAR_STREET_BATTLE.registrationHint}</Text>
+              <Text style={styles.sectionTitle}>{t('battle.registrationTitle')}</Text>
+              <Text style={styles.body}>{t('battle.registrationHint')}</Text>
               <CtaRow
-                label={ALL_STAR_STREET_BATTLE.registrationPrimaryLabel}
+                label={t('battle.ctaPrimary')}
                 onPress={() => Linking.openURL(ALL_STAR_STREET_BATTLE.registrationPrimary)}
               />
               <View style={styles.ctaSpacer} />
               <CtaRow
-                label={ALL_STAR_STREET_BATTLE.registrationSecondaryLabel}
+                label={t('battle.ctaSecondary')}
                 onPress={() => Linking.openURL(ALL_STAR_STREET_BATTLE.registrationSecondary)}
               />
             </SurfaceCard>
@@ -114,8 +124,8 @@ export default function AllStarStreetBattleScreen() {
         ) : (
           <View style={styles.list}>
             <SurfaceCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{ALL_STAR_STREET_BATTLE.rulesTitle}</Text>
-              {ALL_STAR_STREET_BATTLE.rulesBullets.map((line) => (
+              <Text style={styles.sectionTitle}>{t('battle.rulesTitle')}</Text>
+              {rulesBullets.map((line) => (
                 <Text key={line} style={styles.bullet}>
                   • {line}
                 </Text>
@@ -153,6 +163,9 @@ function CollapsiblePoster({
   label,
   onOpenFullscreen,
 }: CollapsiblePosterProps) {
+  const { t } = useLocale();
+  const toggleLabel = open ? t('common.hidePoster') : t('common.seePoster');
+
   return (
     <View style={styles.posterBlock}>
       <Pressable
@@ -160,9 +173,9 @@ function CollapsiblePoster({
         style={({ pressed }) => [styles.posterToggle, pressed && styles.pressed]}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={open ? 'Masquer l’affiche' : 'Voir l’affiche'}
+        accessibilityLabel={toggleLabel}
       >
-        <Text style={styles.posterToggleLabel}>{open ? 'Masquer l’affiche' : 'Voir l’affiche'}</Text>
+        <Text style={styles.posterToggleLabel}>{toggleLabel}</Text>
         <ChevronDown
           size={18}
           color={theme.gold}
@@ -175,10 +188,10 @@ function CollapsiblePoster({
         <Pressable
           onPress={onOpenFullscreen}
           accessibilityRole="imagebutton"
-          accessibilityLabel={`Agrandir — ${label}`}
+          accessibilityLabel={`${t('common.tapToEnlarge')} — ${label}`}
         >
           <Image source={source} style={styles.poster} contentFit="contain" accessibilityLabel={label} />
-          <Text style={styles.posterHint}>Appuyer pour agrandir</Text>
+          <Text style={styles.posterHint}>{t('common.tapToEnlarge')}</Text>
         </Pressable>
       ) : null}
     </View>

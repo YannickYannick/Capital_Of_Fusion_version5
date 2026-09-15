@@ -4,27 +4,32 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { radius, space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { LanguageFlags } from '@/src/components/LanguageFlags';
 import { PageHeader } from '@/src/components/PageHeader';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { FESTIVAL, images } from '@/src/lib/festival-data';
 
 export default function MoreScreen() {
   const router = useRouter();
+  const { t } = useLocale();
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
-      <PageHeader eyebrow="Avant & pendant" title="Infos" compact />
+      <PageHeader eyebrow={t('more.eyebrow')} title={t('more.title')} compact />
 
       <View style={styles.list}>
+        <GlassCard style={styles.card}>
+          <LanguageFlags />
+        </GlassCard>
+
         <Pressable onPress={() => router.push('/passes')} accessibilityRole="button">
           <GlassCard style={styles.passCard}>
             <View style={styles.passRow}>
               <Image source={images.bracelet} style={styles.passImg} contentFit="cover" />
               <View style={styles.passText}>
-                <Text style={styles.passTitle}>Passes</Text>
-                <Text style={styles.passBody}>
-                  Détail inclus / non inclus de chaque formule.
-                </Text>
+                <Text style={styles.passTitle}>{t('more.passesTitle')}</Text>
+                <Text style={styles.passBody}>{t('more.passesBody')}</Text>
               </View>
             </View>
           </GlassCard>
@@ -32,37 +37,39 @@ export default function MoreScreen() {
 
         <Pressable onPress={() => router.push('/shuttles')} accessibilityRole="button">
           <GlassCard style={styles.card}>
-            <Text style={styles.title}>Navettes</Text>
-            <Text style={styles.body}>Horaires Palmeraie ↔ hôtel — par jour et par sens.</Text>
+            <Text style={styles.title}>{t('more.shuttlesTitle')}</Text>
+            <Text style={styles.body}>{t('more.shuttlesBody')}</Text>
           </GlassCard>
         </Pressable>
 
         <Pressable onPress={() => router.push('/jack-n-jill')} accessibilityRole="button">
           <GlassCard style={styles.card}>
-            <Text style={styles.title}>Jack & Jill Vibe</Text>
-            <Text style={styles.body}>Affiches — pré-sélection et finale.</Text>
+            <Text style={styles.title}>{t('more.jackTitle')}</Text>
+            <Text style={styles.body}>{t('more.jackBody')}</Text>
           </GlassCard>
         </Pressable>
 
         <Pressable onPress={() => router.push('/all-star-street-battle')} accessibilityRole="button">
           <GlassCard style={styles.card}>
-            <Text style={styles.title}>All Star Street Battle</Text>
-            <Text style={styles.body}>Format, règlement, affiche et inscriptions — 18 sept.</Text>
+            <Text style={styles.title}>{t('more.battleTitle')}</Text>
+            <Text style={styles.body}>{t('more.battleBody')}</Text>
           </GlassCard>
         </Pressable>
 
         <Pressable onPress={() => router.push('/code-of-conduct')} accessibilityRole="button">
           <GlassCard style={styles.card}>
-            <Text style={styles.title}>Code de conduite</Text>
-            <Text style={styles.body}>
-              Capital of Fusion · version 3.0 — swipe entre les sections.
-            </Text>
+            <Text style={styles.title}>{t('more.codeTitle')}</Text>
+            <Text style={styles.body}>{t('more.codeBody')}</Text>
           </GlassCard>
         </Pressable>
       </View>
 
       <Text style={styles.footer}>
-        {FESTIVAL.name} · {FESTIVAL.location} · {FESTIVAL.edition}
+        {t('more.footer', {
+          name: FESTIVAL.name,
+          location: FESTIVAL.location,
+          edition: FESTIVAL.edition,
+        })}
       </Text>
     </ScrollView>
   );

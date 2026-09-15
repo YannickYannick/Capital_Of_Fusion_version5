@@ -13,7 +13,9 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { theme } from '@/constants/theme';
+import { DesktopGate } from '@/src/components/DesktopGate';
 import { UrgentBanner } from '@/src/components/UrgentBanner';
+import { LocaleProvider } from '@/src/i18n/LocaleContext';
 import { AnnouncementsProvider } from '@/src/providers/AnnouncementsProvider';
 
 export { ErrorBoundary } from 'expo-router';
@@ -55,25 +57,29 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <AnnouncementsProvider>
-        <View style={{ flex: 1, backgroundColor: theme.background }}>
-          <UrgentBanner />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: theme.background },
-            }}
-          >
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="artist/[username]" />
-            <Stack.Screen name="jack-n-jill" />
-            <Stack.Screen name="all-star-street-battle" />
-            <Stack.Screen name="shuttles" />
-            <Stack.Screen name="passes" />
-            <Stack.Screen name="code-of-conduct" />
-          </Stack>
-        </View>
-      </AnnouncementsProvider>
+      <LocaleProvider>
+        <AnnouncementsProvider>
+          <DesktopGate>
+            <View style={{ flex: 1, backgroundColor: theme.background }}>
+              <UrgentBanner />
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: theme.background },
+                }}
+              >
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="artist/[username]" />
+                <Stack.Screen name="jack-n-jill" />
+                <Stack.Screen name="all-star-street-battle" />
+                <Stack.Screen name="shuttles" />
+                <Stack.Screen name="passes" />
+                <Stack.Screen name="code-of-conduct" />
+              </Stack>
+            </View>
+          </DesktopGate>
+        </AnnouncementsProvider>
+      </LocaleProvider>
     </SafeAreaProvider>
   );
 }

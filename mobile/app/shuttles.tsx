@@ -9,13 +9,15 @@ import { Chip } from '@/src/components/ui/Chip';
 import { CtaRow } from '@/src/components/ui/CtaRow';
 import { SurfaceCard } from '@/src/components/ui/SurfaceCard';
 import { useShuttles } from '@/src/hooks/useShuttles';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { SHUTTLE_BOOKING } from '@/src/lib/festival-data';
-import { SHUTTLE_DIRECTION_LABEL, type ShuttleDirection } from '@/src/lib/shuttle-types';
+import type { ShuttleDirection } from '@/src/lib/shuttle-types';
 
 /**
  * Horaires navettes + lien réservation Weezevent.
  */
 export default function ShuttlesScreen() {
+  const { t, dayLabel } = useLocale();
   const { schedules, loading, error } = useShuttles();
   const [dayId, setDayId] = useState<string | null>(null);
   const [direction, setDirection] = useState<ShuttleDirection>('to_hotel');
@@ -24,18 +26,21 @@ export default function ShuttlesScreen() {
   const day = schedules.find((d) => d.id === activeDayId);
   const times = day ? (direction === 'to_hotel' ? day.toHotel : day.toPalmeraie) : [];
 
+  const directionLabel = (dir: ShuttleDirection) =>
+    dir === 'to_hotel' ? t('shuttles.dirToHotel') : t('shuttles.dirToPalmeraie');
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
       <BackButton fallbackHref="/(tabs)/more" />
 
-      <PageHeader eyebrow="Palmeraie ↔ hôtel" title="Navettes" compact />
+      <PageHeader eyebrow={t('shuttles.eyebrow')} title={t('shuttles.title')} compact />
 
       <View style={styles.bookingWrap}>
         <SurfaceCard style={styles.bookingCard}>
-          <Text style={styles.bookingTitle}>Réservation</Text>
-          <Text style={styles.bookingNote}>{SHUTTLE_BOOKING.fareNote}</Text>
+          <Text style={styles.bookingTitle}>{t('shuttles.bookingTitle')}</Text>
+          <Text style={styles.bookingNote}>{t('shuttles.fareNote')}</Text>
           <CtaRow
-            label={SHUTTLE_BOOKING.ctaLabel}
+            label={t('shuttles.cta')}
             onPress={() => Linking.openURL(SHUTTLE_BOOKING.url)}
           />
         </SurfaceCard>
@@ -50,29 +55,33 @@ export default function ShuttlesScreen() {
       {error && (
         <Text style={styles.error}>
           {error}
-          {'\n'}Vérifie que le backend Django tourne (port 8000).
+          {'\n'}
+          {t('shuttles.backendHint')}
         </Text>
       )}
 
       {!loading && !error && (
         <View style={styles.content}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-            {schedules.map((d) => (
-              <Chip
-                key={d.id}
-                label={`${d.label} ${d.date}`}
-                active={d.id === activeDayId}
-                onPress={() => setDayId(d.id)}
-                variant="day"
-              />
-            ))}
+            {schedules.map((d) => {
+              const localized = dayLabel(d);
+              return (
+                <Chip
+                  key={d.id}
+                  label={`${localized.label} ${localized.date}`}
+                  active={d.id === activeDayId}
+                  onPress={() => setDayId(d.id)}
+                  variant="day"
+                />
+              );
+            })}
           </ScrollView>
 
           <View style={styles.dirRow}>
             {(['to_hotel', 'to_palmeraie'] as const).map((dir) => (
               <Chip
                 key={dir}
-                label={SHUTTLE_DIRECTION_LABEL[dir]}
+                label={directionLabel(dir)}
                 active={direction === dir}
                 onPress={() => setDirection(dir)}
                 variant="stage"

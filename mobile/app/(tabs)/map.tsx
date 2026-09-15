@@ -10,7 +10,8 @@ import { FullscreenImageModal } from '@/src/components/FullscreenImageModal';
 import { PageHeader } from '@/src/components/PageHeader';
 import { AccesVenueVideo } from '@/src/components/SiteEntryVideo';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
-import { FESTIVAL, VENUE_AREAS, images, type VenueArea } from '@/src/lib/festival-data';
+import { useLocale } from '@/src/i18n/LocaleContext';
+import { VENUE_AREAS, images, type VenueArea } from '@/src/lib/festival-data';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -20,8 +21,26 @@ const AREAS12_TAB_ID = 'areas-1-2';
 const ENTRY_TAB_ID = 'site-entry';
 const TEASER_TAB_ID = 'acces-teaser';
 
-/** Adresse venue officielle — copie presse-papiers au clic. */
-const VENUE_ADDRESS = '18–19 rue du Colonel Pierre Avia, 75015 Paris';
+/** Clés i18n name/detail pour une zone venue (id festival-data). */
+const AREA_I18N: Record<string, { name: string; detail: string }> = {
+  palmeraie: { name: 'map.palmeraieName', detail: 'map.palmeraieDetail' },
+  aquaboulevard: { name: 'map.aquaboulevardName', detail: 'map.aquaboulevardDetail' },
+};
+
+/**
+ * Clés i18n sous-espaces — indexés par le nom stable de festival-data.
+ */
+const SUB_I18N: Record<string, { name: string; detail: string }> = {
+  'La Casa Room': { name: 'map.subCasa', detail: 'map.subCasaDetail' },
+  'La Escuela Room': { name: 'map.subEscuela', detail: 'map.subEscuelaDetail' },
+  'La Vibe Room': { name: 'map.subVibe', detail: 'map.subVibeDetail' },
+  'El Patio Room': { name: 'map.subPatio', detail: 'map.subPatioDetail' },
+  'Antille Beach': { name: 'map.subAntille', detail: 'map.subAntilleDetail' },
+  'Mangrove Area': { name: 'map.subMangrove', detail: 'map.subMangroveDetail' },
+  'Caribbean Beach': { name: 'map.subCaribbean', detail: 'map.subCaribbeanDetail' },
+  'Surf Pool': { name: 'map.subSurf', detail: 'map.subSurfDetail' },
+  Jonas: { name: 'map.subJonas', detail: 'map.subJonasDetail' },
+};
 
 type LightboxState = { source: ImageSource; label: string } | null;
 
@@ -29,14 +48,15 @@ type LightboxState = { source: ImageSource; label: string } | null;
  * Carte venue — overview, toggles zones, vidéos, lightbox plein écran au clic.
  */
 export default function MapScreen() {
+  const { t } = useLocale();
   const [openId, setOpenId] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<LightboxState>(null);
   const [addressCopied, setAddressCopied] = useState(false);
 
   useEffect(() => {
     if (!addressCopied) return;
-    const t = setTimeout(() => setAddressCopied(false), 1800);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setAddressCopied(false), 1800);
+    return () => clearTimeout(timer);
   }, [addressCopied]);
 
   const toggle = (id: string) => {
@@ -52,45 +72,43 @@ export default function MapScreen() {
    * Copie l’adresse venue dans le presse-papiers.
    */
   const copyAddress = async () => {
-    await Clipboard.setStringAsync(VENUE_ADDRESS);
+    await Clipboard.setStringAsync(t('map.address'));
     setAddressCopied(true);
   };
 
   return (
     <>
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
-        <PageHeader eyebrow="Sur site" title="Carte" compact />
+        <PageHeader eyebrow={t('map.eyebrow')} title={t('map.title')} compact />
         <View style={styles.pad}>
-          <Text style={styles.sectionLabel}>Vue d’ensemble</Text>
+          <Text style={styles.sectionLabel}>{t('map.overview')}</Text>
           <GlassCard>
             <Pressable
-              onPress={() =>
-                openImage(images.venueOverview, `Plan d'ensemble — ${FESTIVAL.displayName}`)
-              }
+              onPress={() => openImage(images.venueOverview, t('map.overviewPlan'))}
               accessibilityRole="imagebutton"
-              accessibilityLabel="Agrandir le plan d'ensemble"
+              accessibilityLabel={t('map.overviewExpandA11y')}
             >
               <Image
                 source={images.venueOverview}
                 style={styles.mapImg}
                 contentFit="contain"
-                accessibilityLabel={`Plan d'ensemble — ${FESTIVAL.displayName}`}
+                accessibilityLabel={t('map.overviewPlan')}
               />
             </Pressable>
           </GlassCard>
           <Pressable
             onPress={copyAddress}
             accessibilityRole="button"
-            accessibilityLabel="Copier l’adresse"
+            accessibilityLabel={t('map.copyAddressA11y')}
             hitSlop={8}
             style={({ pressed }) => [styles.addressBtn, pressed && styles.pressed]}
           >
             <Text style={[styles.hint, addressCopied && styles.hintCopied]}>
-              {addressCopied ? 'Adresse copiée' : VENUE_ADDRESS}
+              {addressCopied ? t('map.addressCopied') : t('map.address')}
             </Text>
           </Pressable>
 
-          <Text style={[styles.sectionLabel, styles.sectionSpaced]}>Zones & salles</Text>
+          <Text style={[styles.sectionLabel, styles.sectionSpaced]}>{t('map.zones')}</Text>
           <View style={styles.accordion}>
             <View style={[styles.areaBlock, styles.areaBorder]}>
               <Pressable
@@ -98,12 +116,14 @@ export default function MapScreen() {
                 style={({ pressed }) => [styles.areaHeader, pressed && styles.pressed]}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: openId === AREAS12_TAB_ID }}
-                accessibilityLabel={`Zones 1 et 2. ${openId === AREAS12_TAB_ID ? 'Réduire' : 'Voir le plan'}`}
+                accessibilityLabel={`${t('map.areas12Name')}. ${
+                  openId === AREAS12_TAB_ID ? t('common.collapse') : t('common.seePlan')
+                }`}
               >
                 <MapPin size={16} color={theme.gold} strokeWidth={2} />
                 <View style={styles.areaHeaderBody}>
-                  <Text style={styles.areaName}>Zones 1 & 2</Text>
-                  <Text style={styles.areaDetail}>La Palmeraie & Aquaboulevard — plan combiné</Text>
+                  <Text style={styles.areaName}>{t('map.areas12Name')}</Text>
+                  <Text style={styles.areaDetail}>{t('map.areas12Detail')}</Text>
                 </View>
                 <ChevronDown
                   size={18}
@@ -117,20 +137,15 @@ export default function MapScreen() {
               {openId === AREAS12_TAB_ID ? (
                 <View style={[styles.areaBody, styles.areaBorder]}>
                   <Pressable
-                    onPress={() =>
-                      openImage(
-                        images.venueAreas12,
-                        'Plan Zones 1 et 2 — La Palmeraie et Aquaboulevard',
-                      )
-                    }
+                    onPress={() => openImage(images.venueAreas12, t('map.areas12Plan'))}
                     accessibilityRole="imagebutton"
-                    accessibilityLabel="Agrandir le plan Zones 1 et 2"
+                    accessibilityLabel={t('map.areas12ExpandA11y')}
                   >
                     <Image
                       source={images.venueAreas12}
                       style={styles.mapImgAreas12}
                       contentFit="contain"
-                      accessibilityLabel="Plan Zones 1 et 2 — La Palmeraie et Aquaboulevard"
+                      accessibilityLabel={t('map.areas12Plan')}
                     />
                   </Pressable>
                 </View>
@@ -152,22 +167,20 @@ export default function MapScreen() {
               id={ENTRY_TAB_ID}
               open={openId === ENTRY_TAB_ID}
               onToggle={() => toggle(ENTRY_TAB_ID)}
-              title="Plan d’entrée"
-              detail="Vidéo — comment entrer sur le site"
+              title={t('map.entryTitle')}
+              detail={t('map.entryDetail')}
               showBorder
             >
               <AccesVenueVideo kind="site-entry" active={openId === ENTRY_TAB_ID} aspectRatio={1} />
-              <Text style={styles.videoHint}>
-                Les zones n’ouvrent pas toutes aux mêmes horaires — suis la signalétique sur place.
-              </Text>
+              <Text style={styles.videoHint}>{t('map.entryHint')}</Text>
             </VideoAccordionRow>
 
             <VideoAccordionRow
               id={TEASER_TAB_ID}
               open={openId === TEASER_TAB_ID}
               onToggle={() => toggle(TEASER_TAB_ID)}
-              title="Accès & Venue"
-              detail="Vidéo teaser — page Accès & Venue"
+              title={t('map.teaserTitle')}
+              detail={t('map.teaserDetail')}
               showBorder={false}
             >
               <AccesVenueVideo
@@ -211,6 +224,8 @@ function VideoAccordionRow({
   showBorder,
   children,
 }: VideoAccordionRowProps) {
+  const { t } = useLocale();
+
   return (
     <View style={[styles.areaBlock, showBorder && styles.areaBorder]}>
       <Pressable
@@ -218,7 +233,7 @@ function VideoAccordionRow({
         style={({ pressed }) => [styles.areaHeader, pressed && styles.pressed]}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={`${title}. ${open ? 'Réduire' : 'Voir la vidéo'}`}
+        accessibilityLabel={`${title}. ${open ? t('common.collapse') : t('common.seeVideo')}`}
       >
         <Play size={16} color={theme.gold} strokeWidth={2} />
         <View style={styles.areaHeaderBody}>
@@ -249,7 +264,11 @@ type VenueAreaRowProps = {
  * Ligne accordéon : en-tête zone + plan + liste des sous-areas si ouvert.
  */
 function VenueAreaRow({ area, open, onToggle, onOpenImage, showBorder }: VenueAreaRowProps) {
+  const { t } = useLocale();
   const mapSource = images[area.mapKey];
+  const areaKeys = AREA_I18N[area.id];
+  const areaName = areaKeys ? t(areaKeys.name) : area.name;
+  const areaDetail = areaKeys ? t(areaKeys.detail) : area.detail;
 
   return (
     <View style={[styles.areaBlock, showBorder && styles.areaBorder]}>
@@ -258,12 +277,14 @@ function VenueAreaRow({ area, open, onToggle, onOpenImage, showBorder }: VenueAr
         style={({ pressed }) => [styles.areaHeader, pressed && styles.pressed]}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={`${area.name}. ${open ? 'Réduire' : 'Voir les sous-espaces'}`}
+        accessibilityLabel={`${areaName}. ${
+          open ? t('common.collapse') : t('common.seeSubspaces')
+        }`}
       >
         <MapPin size={16} color={theme.gold} strokeWidth={2} />
         <View style={styles.areaHeaderBody}>
-          <Text style={styles.areaName}>{area.name}</Text>
-          <Text style={styles.areaDetail}>{area.detail}</Text>
+          <Text style={styles.areaName}>{areaName}</Text>
+          <Text style={styles.areaDetail}>{areaDetail}</Text>
         </View>
         <ChevronDown
           size={18}
@@ -276,30 +297,35 @@ function VenueAreaRow({ area, open, onToggle, onOpenImage, showBorder }: VenueAr
       {open ? (
         <View style={[styles.areaBody, showBorder && styles.areaBorder]}>
           <Pressable
-            onPress={() => onOpenImage(mapSource, `Plan — ${area.name}`)}
+            onPress={() => onOpenImage(mapSource, t('map.planLabel', { name: areaName }))}
             accessibilityRole="imagebutton"
-            accessibilityLabel={`Agrandir le plan ${area.name}`}
+            accessibilityLabel={t('map.expandPlanA11y', { name: areaName })}
           >
             <Image
               source={mapSource}
               style={styles.zoneMapImg}
               contentFit="contain"
-              accessibilityLabel={`Plan — ${area.name}`}
+              accessibilityLabel={t('map.planLabel', { name: areaName })}
             />
           </Pressable>
           <View style={styles.subList}>
-            {area.subAreas.map((sub, j) => (
-              <View
-                key={sub.name}
-                style={[styles.subRow, j < area.subAreas.length - 1 && styles.subBorder]}
-              >
-                <View style={styles.subDot} />
-                <View style={styles.pointBody}>
-                  <Text style={styles.pointName}>{sub.name}</Text>
-                  <Text style={styles.pointDetail}>{sub.detail}</Text>
+            {area.subAreas.map((sub, j) => {
+              const subKeys = SUB_I18N[sub.name];
+              const subName = subKeys ? t(subKeys.name) : sub.name;
+              const subDetail = subKeys ? t(subKeys.detail) : sub.detail;
+              return (
+                <View
+                  key={sub.name}
+                  style={[styles.subRow, j < area.subAreas.length - 1 && styles.subBorder]}
+                >
+                  <View style={styles.subDot} />
+                  <View style={styles.pointBody}>
+                    <Text style={styles.pointName}>{subName}</Text>
+                    <Text style={styles.pointDetail}>{subDetail}</Text>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         </View>
       ) : null}

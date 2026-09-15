@@ -10,6 +10,7 @@ import { HomeAnnouncements } from '@/src/components/HomeAnnouncements';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { LivePill } from '@/src/components/ui/LivePill';
 import programSeed from '@/src/data/program.seed.json';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import {
   festivalStartDate,
   findLiveSlot,
@@ -21,6 +22,7 @@ import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t, dayLabel } = useLocale();
   const { urgent } = useAnnouncements();
   const days = programSeed.days;
 
@@ -37,11 +39,16 @@ export default function HomeScreen() {
   /** Le bandeau urgent gère déjà le safe-area haut. */
   const heroTop = urgent ? 8 : insets.top;
 
-  const heroEyebrow = live
-    ? `Aujourd'hui · ${days.find((d) => d.id === live.day)?.label ?? ''} · ${days.find((d) => d.id === live.day)?.date ?? ''}`
+  const firstDay = days[0] ? dayLabel(days[0]) : null;
+  const lastDay = days[days.length - 1] ? dayLabel(days[days.length - 1]) : null;
+  const liveDayMeta = live ? days.find((d) => d.id === live.day) : null;
+  const liveDay = liveDayMeta ? dayLabel(liveDayMeta) : null;
+
+  const heroEyebrow = live && liveDay
+    ? t('home.eyebrowLive', { day: liveDay.label, date: liveDay.date })
     : beforeFestival
-      ? `Bientôt · ${days[0]?.date ?? ''} – ${days[days.length - 1]?.date ?? ''}`
-      : `Paris · ${days[0]?.date ?? ''} – ${days[days.length - 1]?.date ?? ''}`;
+      ? t('home.eyebrowSoon', { start: firstDay?.date ?? '', end: lastDay?.date ?? '' })
+      : t('home.eyebrowParis', { start: firstDay?.date ?? '', end: lastDay?.date ?? '' });
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -53,7 +60,7 @@ export default function HomeScreen() {
             <GlassCard featured style={styles.liveCard}>
               <View style={styles.liveHeader}>
                 <LivePill target={liveEnd} />
-                <Text style={styles.liveLabel}>En ce moment</Text>
+                <Text style={styles.liveLabel}>{t('home.liveNow')}</Text>
               </View>
               <Text style={styles.liveArtist}>{live.artist}</Text>
               <Text style={styles.liveMeta}>
@@ -66,11 +73,14 @@ export default function HomeScreen() {
             <GlassCard featured style={styles.liveCard}>
               <View style={styles.liveHeader}>
                 <LivePill target={festStart} />
-                <Text style={styles.liveLabel}>Avant le festival</Text>
+                <Text style={styles.liveLabel}>{t('home.beforeFestival')}</Text>
               </View>
-              <Text style={styles.liveArtist}>Paris Bachata Vibe</Text>
+              <Text style={styles.liveArtist}>{t('home.brandTitle')}</Text>
               <Text style={styles.liveMeta}>
-                Ouverture · {days[0]?.label} {days[0]?.date} · 18h00
+                {t('home.openingMeta', {
+                  day: firstDay?.label ?? '',
+                  date: firstDay?.date ?? '',
+                })}
               </Text>
             </GlassCard>
           </Pressable>

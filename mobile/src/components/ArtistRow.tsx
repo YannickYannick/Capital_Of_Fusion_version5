@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { radius, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { artistDisplayName, artistSubtitle } from '@/src/lib/api/artists';
 import type { ArtistApi } from '@/src/types/api';
 
@@ -16,6 +17,7 @@ type ArtistRowProps = {
 
 export function ArtistRow({ artist, rank }: ArtistRowProps) {
   const router = useRouter();
+  const { t } = useLocale();
   const name = artistDisplayName(artist);
   const subtitle = artistSubtitle(artist);
   const initial = name.charAt(0).toUpperCase();
@@ -25,7 +27,7 @@ export function ArtistRow({ artist, rank }: ArtistRowProps) {
       style={styles.card}
       onPress={() => router.push(`/artist/${artist.username}`)}
       accessibilityRole="button"
-      accessibilityLabel={`Voir le profil de ${name}`}
+      accessibilityLabel={t('lineup.viewProfileA11y', { name })}
     >
       {typeof rank === 'number' ? (
         <Text style={styles.rank}>{String(rank).padStart(2, '0')}</Text>
@@ -48,7 +50,7 @@ export function ArtistRow({ artist, rank }: ArtistRowProps) {
         </Text>
         <Text style={styles.meta} numberOfLines={1}>
           {subtitle}
-          {artist.is_staff_member ? ' · Team CoF' : ''}
+          {artist.is_staff_member ? t('lineup.teamCof') : ''}
         </Text>
       </View>
       <ChevronRight size={18} color={theme.muted} strokeWidth={2} />

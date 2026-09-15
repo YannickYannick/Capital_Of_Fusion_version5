@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
+import { useLocale } from '@/src/i18n/LocaleContext';
 import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
 
 /**
@@ -11,6 +12,7 @@ import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
  */
 export function HomeAnnouncements() {
   const router = useRouter();
+  const { t } = useLocale();
   const { normal } = useAnnouncements();
 
   if (normal.length === 0) return null;
@@ -27,7 +29,7 @@ export function HomeAnnouncements() {
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.heading}>Annonces</Text>
+      <Text style={styles.heading}>{t('home.announcements')}</Text>
       {normal.map((item) => (
         <Pressable
           key={String(item.id)}
