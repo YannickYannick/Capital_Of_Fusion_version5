@@ -90,6 +90,8 @@ export const en: Messages = {
     palmeraieDetail: 'Indoor · workshops, battles & parties',
     aquaboulevardName: 'Zone 2 — Aquaboulevard',
     aquaboulevardDetail: 'Pool party, social & water areas',
+    aquaboulevardAddress: '📍 4 Rue Louis Armand, 75015 Paris',
+    aquaboulevardAddressDay: 'Saturday',
     subCasa: 'La Casa Room',
     subCasaDetail: 'Workshops, battles & night parties',
     subEscuela: 'La Escuela Room',

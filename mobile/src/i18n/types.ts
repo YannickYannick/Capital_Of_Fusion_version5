@@ -97,6 +97,8 @@ export type Messages = {
     palmeraieDetail: string;
     aquaboulevardName: string;
     aquaboulevardDetail: string;
+    aquaboulevardAddress: string;
+    aquaboulevardAddressDay: string;
     subCasa: string;
     subCasaDetail: string;
     subEscuela: string;

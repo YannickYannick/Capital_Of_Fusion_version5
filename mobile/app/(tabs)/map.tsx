@@ -296,6 +296,13 @@ function VenueAreaRow({ area, open, onToggle, onOpenImage, showBorder }: VenueAr
 
       {open ? (
         <View style={[styles.areaBody, showBorder && styles.areaBorder]}>
+          {/* Adresse spéciale samedi pour Aquaboulevard */}
+          {area.id === 'aquaboulevard' && (
+            <View style={styles.addressHighlight}>
+              <Text style={styles.addressDay}>{t('map.aquaboulevardAddressDay')}</Text>
+              <Text style={styles.addressText}>{t('map.aquaboulevardAddress')}</Text>
+            </View>
+          )}
           <Pressable
             onPress={() => onOpenImage(mapSource, t('map.planLabel', { name: areaName }))}
             accessibilityRole="imagebutton"
@@ -422,4 +429,23 @@ const styles = StyleSheet.create({
   pointName: { ...type.bodyMedium, color: theme.foreground },
   pointDetail: { marginTop: 2, ...type.caption, color: theme.muted },
   videoHint: { ...type.caption, color: theme.muted },
+  addressHighlight: {
+    backgroundColor: theme.gold + '18',
+    borderRadius: radius.card,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: theme.gold + '40',
+  },
+  addressDay: {
+    ...type.labelSm,
+    color: theme.gold,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  addressText: {
+    ...type.bodyMedium,
+    color: theme.foreground,
+  },
 });
