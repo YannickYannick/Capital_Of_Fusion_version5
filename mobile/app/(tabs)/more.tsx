@@ -18,16 +18,16 @@ export default function MoreScreen() {
       <PageHeader eyebrow={t('more.eyebrow')} title={t('more.title')} compact />
 
       <View style={styles.list}>
+        <GlassCard style={styles.card}>
+          <LanguageFlags />
+        </GlassCard>
+
         <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
           <GlassCard style={[styles.card, styles.rulesCard]}>
             <Text style={styles.title}>{t('more.rulesTitle')}</Text>
             <Text style={styles.body}>{t('more.rulesBody')}</Text>
           </GlassCard>
         </Pressable>
-
-        <GlassCard style={styles.card}>
-          <LanguageFlags />
-        </GlassCard>
 
         <Pressable onPress={() => router.push('/passes')} accessibilityRole="button">
           <GlassCard style={styles.card}>
