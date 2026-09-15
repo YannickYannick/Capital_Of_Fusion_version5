@@ -12,3 +12,4 @@ django-modeltranslation>=0.19.0
 google-genai>=0.3.0
 cloudinary
 django-cloudinary-storage
+pywebpush>=2.0.0

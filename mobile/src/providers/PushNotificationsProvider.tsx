@@ -1,8 +1,14 @@
 /**
- * Provider push notifications — demande permission au démarrage et enregistre le token.
+ * Provider push notifications — demande permission au démarrage et enregistre le token/subscription.
+ * Supporte Web Push (PWA) et Expo Push (native).
  */
 import { ReactNode, useEffect } from 'react';
-import { usePushNotifications, sendPushTokenToBackend } from '@/src/hooks/usePushNotifications';
+import { Platform } from 'react-native';
+import {
+  usePushNotifications,
+  sendPushTokenToBackend,
+  sendWebPushSubscriptionToBackend,
+} from '@/src/hooks/usePushNotifications';
 import { API_BASE_URL } from '@/src/lib/api';
 
 type Props = { children: ReactNode };
@@ -10,28 +16,45 @@ type Props = { children: ReactNode };
 /**
  * Initialise les push notifications au montage.
  * - Demande la permission
- * - Récupère le token Expo Push
- * - Envoie le token au backend
+ * - Récupère le token (Expo) ou subscription (Web Push)
+ * - Envoie au backend
  */
 export function PushNotificationsProvider({ children }: Props) {
-  const { expoPushToken, permission } = usePushNotifications();
+  const { expoPushToken, webPushSubscription, permission } = usePushNotifications();
 
+  // Enregistre le token Expo (native)
   useEffect(() => {
-    if (!expoPushToken) return;
+    if (!expoPushToken || Platform.OS === 'web') return;
 
-    // Envoie le token au backend
     sendPushTokenToBackend(expoPushToken, API_BASE_URL)
       .then((success) => {
         if (success) {
-          console.log('Push token registered with backend');
+          console.log('Expo push token registered with backend');
         } else {
-          console.warn('Failed to register push token with backend');
+          console.warn('Failed to register Expo push token');
         }
       })
       .catch((err) => {
-        console.error('Error registering push token:', err);
+        console.error('Error registering Expo push token:', err);
       });
   }, [expoPushToken]);
+
+  // Enregistre la subscription Web Push (PWA)
+  useEffect(() => {
+    if (!webPushSubscription || Platform.OS !== 'web') return;
+
+    sendWebPushSubscriptionToBackend(webPushSubscription, API_BASE_URL)
+      .then((success) => {
+        if (success) {
+          console.log('Web push subscription registered with backend');
+        } else {
+          console.warn('Failed to register web push subscription');
+        }
+      })
+      .catch((err) => {
+        console.error('Error registering web push subscription:', err);
+      });
+  }, [webPushSubscription]);
 
   useEffect(() => {
     if (permission && permission !== 'granted') {

@@ -220,8 +220,8 @@ class FestivalAnnouncement(BaseModel):
 
 class PushToken(BaseModel):
     """
-    Token push Expo pour les notifications mobiles/PWA.
-    Un token par appareil, mis à jour à chaque ouverture de l'app.
+    Token/subscription push pour les notifications mobiles/PWA.
+    Supporte Expo Push (native) et Web Push (PWA).
     """
 
     class Platform(models.TextChoices):
@@ -229,7 +229,25 @@ class PushToken(BaseModel):
         ANDROID = "android", "Android"
         WEB = "web", "Web"
 
-    token = models.CharField(max_length=500, unique=True, db_index=True)
+    class TokenType(models.TextChoices):
+        EXPO = "expo", "Expo Push"
+        WEBPUSH = "webpush", "Web Push"
+
+    # Type de token
+    token_type = models.CharField(
+        max_length=10,
+        choices=TokenType.choices,
+        default=TokenType.EXPO,
+    )
+
+    # Token Expo (pour iOS/Android natif)
+    token = models.CharField(max_length=500, blank=True, db_index=True)
+
+    # Web Push subscription (pour PWA)
+    endpoint = models.URLField(max_length=500, blank=True)
+    p256dh_key = models.CharField(max_length=200, blank=True)
+    auth_key = models.CharField(max_length=50, blank=True)
+
     platform = models.CharField(
         max_length=10,
         choices=Platform.choices,
@@ -242,6 +260,21 @@ class PushToken(BaseModel):
         verbose_name = "Token push"
         verbose_name_plural = "Tokens push"
         ordering = ["-last_used_at"]
+        # Un seul enregistrement par token ou endpoint
+        constraints = [
+            models.UniqueConstraint(
+                fields=["token"],
+                condition=models.Q(token_type="expo"),
+                name="unique_expo_token",
+            ),
+            models.UniqueConstraint(
+                fields=["endpoint"],
+                condition=models.Q(token_type="webpush"),
+                name="unique_webpush_endpoint",
+            ),
+        ]
 
     def __str__(self):
+        if self.token_type == self.TokenType.WEBPUSH:
+            return f"{self.platform} (web) — {self.endpoint[:30]}..."
         return f"{self.platform} — {self.token[:20]}..."

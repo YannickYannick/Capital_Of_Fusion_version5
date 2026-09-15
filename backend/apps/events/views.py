@@ -297,8 +297,14 @@ class EventAdminDetailAPIView(APIView):
 class PushTokenRegisterAPIView(APIView):
     """
     POST /api/push/register/
-    Enregistre ou met à jour un token push Expo.
+    Enregistre ou met à jour un token push (Expo ou Web Push).
     Pas d'authentification requise (anonyme).
+
+    Pour Expo Push (native):
+        { "token": "ExponentPushToken[xxx]", "platform": "ios|android", "type": "expo" }
+
+    Pour Web Push (PWA):
+        { "subscription": { "endpoint": "...", "keys": { "p256dh": "...", "auth": "..." } }, "platform": "web", "type": "webpush" }
     """
     permission_classes = []
     authentication_classes = []
@@ -306,29 +312,61 @@ class PushTokenRegisterAPIView(APIView):
     def post(self, request):
         from .models import PushToken
 
-        token = request.data.get("token")
+        token_type = request.data.get("type", "expo")
         platform = request.data.get("platform", "android")
 
-        if not token:
-            return Response(
-                {"error": "Token requis"},
-                status=status.HTTP_400_BAD_REQUEST,
+        if token_type == "webpush":
+            # Web Push subscription
+            subscription = request.data.get("subscription", {})
+            endpoint = subscription.get("endpoint")
+            keys = subscription.get("keys", {})
+            p256dh = keys.get("p256dh", "")
+            auth = keys.get("auth", "")
+
+            if not endpoint:
+                return Response(
+                    {"error": "Subscription endpoint requis"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Créer ou mettre à jour
+            push_token, created = PushToken.objects.update_or_create(
+                endpoint=endpoint,
+                token_type=PushToken.TokenType.WEBPUSH,
+                defaults={
+                    "platform": platform,
+                    "p256dh_key": p256dh,
+                    "auth_key": auth,
+                    "is_active": True,
+                },
             )
 
-        # Créer ou mettre à jour le token
-        push_token, created = PushToken.objects.update_or_create(
-            token=token,
-            defaults={
-                "platform": platform,
-                "is_active": True,
-            },
-        )
+        else:
+            # Expo Push token
+            token = request.data.get("token")
+
+            if not token:
+                return Response(
+                    {"error": "Token requis"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Créer ou mettre à jour
+            push_token, created = PushToken.objects.update_or_create(
+                token=token,
+                token_type=PushToken.TokenType.EXPO,
+                defaults={
+                    "platform": platform,
+                    "is_active": True,
+                },
+            )
 
         return Response(
             {
                 "success": True,
                 "created": created,
                 "token_id": str(push_token.id),
+                "type": token_type,
             },
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
