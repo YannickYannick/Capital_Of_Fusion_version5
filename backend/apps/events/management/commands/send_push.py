@@ -71,18 +71,18 @@ class Command(BaseCommand):
             tokens_qs = tokens_qs.filter(platform=options["platform"])
         token_count = tokens_qs.count()
 
-        self.stdout.write(f"📱 {token_count} appareil(s) enregistré(s)")
+        self.stdout.write(f"[PUSH] {token_count} appareil(s) enregistre(s)")
 
         if token_count == 0:
             self.stdout.write(
-                self.style.WARNING("Aucun token push enregistré. L'app doit être ouverte au moins une fois.")
+                self.style.WARNING("Aucun token push enregistre. L'app doit etre ouverte au moins une fois.")
             )
             return
 
         # Mode dry-run
         if options["dry_run"]:
             self.stdout.write(
-                self.style.SUCCESS(f"[DRY RUN] {token_count} notification(s) seraient envoyées")
+                self.style.SUCCESS(f"[DRY RUN] {token_count} notification(s) seraient envoyees")
             )
             return
 
@@ -94,7 +94,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f"Annonce {options['announcement']} introuvable"))
                 return
 
-            self.stdout.write(f"📣 Envoi de l'annonce: {announcement.title}")
+            self.stdout.write(f"[SEND] Envoi de l'annonce: {announcement.title}")
             stats = send_announcement_notification(announcement)
 
         else:
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR("JSON invalide pour --data"))
                     return
 
-            self.stdout.write(f"📣 Envoi: {options['title']}")
+            self.stdout.write(f"[SEND] Envoi: {options['title']}")
             stats = send_push_to_all(
                 title=options["title"],
                 body=options["body"],
@@ -124,6 +124,6 @@ class Command(BaseCommand):
         # Résultat
         self.stdout.write(
             self.style.SUCCESS(
-                f"✅ Envoyées: {stats['sent']} | ❌ Échouées: {stats['failed']}"
+                f"OK Envoyees: {stats['sent']} | FAILED: {stats['failed']}"
             )
         )
