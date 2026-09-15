@@ -50,6 +50,14 @@ export default function MoreScreen() {
           </GlassCard>
         </Pressable>
 
+        <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
+          <GlassCard style={[styles.card, styles.rulesCard]}>
+            <Text style={styles.rulesIcon}>⚠️</Text>
+            <Text style={styles.title}>{t('more.rulesTitle')}</Text>
+            <Text style={styles.body}>{t('more.rulesBody')}</Text>
+          </GlassCard>
+        </Pressable>
+
         <Pressable onPress={() => router.push('/code-of-conduct')} accessibilityRole="button">
           <GlassCard style={styles.card}>
             <Text style={styles.title}>{t('more.codeTitle')}</Text>
@@ -80,6 +88,15 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.background },
   list: { paddingHorizontal: space.card, gap: space.gap },
   card: { padding: space.card },
+  rulesCard: {
+    borderWidth: 1,
+    borderColor: theme.gold + '50',
+    backgroundColor: theme.gold + '08',
+  },
+  rulesIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
   title: { ...type.title, fontSize: 16, color: theme.foreground },
   body: { marginTop: 4, ...type.body, fontSize: 14, color: theme.muted },
   footer: {

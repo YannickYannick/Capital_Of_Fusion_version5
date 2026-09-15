@@ -76,6 +76,7 @@ export default function RootLayout() {
                 <Stack.Screen name="passes" />
             <Stack.Screen name="code-of-conduct" />
             <Stack.Screen name="faq" />
+            <Stack.Screen name="festival-rules" />
           </Stack>
             </View>
           </DesktopGate>

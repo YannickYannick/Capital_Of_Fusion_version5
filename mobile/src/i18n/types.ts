@@ -140,6 +140,8 @@ export type Messages = {
     jackBody: string;
     battleTitle: string;
     battleBody: string;
+    rulesTitle: string;
+    rulesBody: string;
     codeTitle: string;
     codeBody: string;
     faqTitle: string;
@@ -231,5 +233,21 @@ export type Messages = {
     body: string;
     ctaSite: string;
     hintPhone: string;
+  };
+  rules: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    mainVenueTitle: string;
+    mainVenueContent: string;
+    saturdayTitle: string;
+    saturdayContent: string;
+    hotelTitle: string;
+    hotelContent: string;
+    partyEndTitle: string;
+    partyEndContent: string;
+    staffTitle: string;
+    staffContent: string;
+    footer: string;
   };
 };
