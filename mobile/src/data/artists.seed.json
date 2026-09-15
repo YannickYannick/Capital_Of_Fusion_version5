@@ -1008,5 +1008,114 @@
       }
     },
     "linked_partner_structures": []
+  },
+  {
+    "id": 63,
+    "username": "lina",
+    "first_name": "Lina",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_mit3lz",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 64,
+    "username": "dj-loves-me",
+    "first_name": "DJ Loves Me",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_mit3lz",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "DJ",
+        "slug": "dj"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": ["http://djloves.me/"],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
+  },
+  {
+    "id": 65,
+    "username": "diger-marie",
+    "first_name": "Diger & Marie",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "bio": "",
+    "bio_en": "",
+    "bio_es": "",
+    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/Avatars_artistes_sans_photo_mit3lz",
+    "cover_image": null,
+    "professions": [
+      {
+        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
+        "name": "Danseur",
+        "slug": "danseur"
+      },
+      {
+        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
+        "name": "Professeur",
+        "slug": "professeur"
+      }
+    ],
+    "is_staff_member": false,
+    "artist_display_order": 1,
+    "external_links": {
+      "instagram": [],
+      "websites": [],
+      "facebook": "",
+      "contact": {
+        "email": "",
+        "phone": "",
+        "whatsapp": ""
+      }
+    },
+    "linked_partner_structures": []
   }
 ]
