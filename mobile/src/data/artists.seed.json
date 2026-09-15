@@ -346,44 +346,6 @@
     "linked_partner_structures": []
   },
   {
-    "id": 36,
-    "username": "alexis-sania",
-    "first_name": "Alexis & Sania",
-    "last_name": "",
-    "email": "",
-    "phone": "",
-    "bio": "",
-    "bio_en": "",
-    "bio_es": "",
-    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/alexis-sania_Flyer_insta_VF_41_1_kwnlz2",
-    "cover_image": null,
-    "professions": [
-      {
-        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
-        "name": "Danseur",
-        "slug": "danseur"
-      },
-      {
-        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
-        "name": "Professeur",
-        "slug": "professeur"
-      }
-    ],
-    "is_staff_member": false,
-    "artist_display_order": 1,
-    "external_links": {
-      "instagram": [],
-      "websites": [],
-      "facebook": "",
-      "contact": {
-        "email": "",
-        "phone": "",
-        "whatsapp": ""
-      }
-    },
-    "linked_partner_structures": []
-  },
-  {
     "id": 42,
     "username": "bastien-amelie",
     "first_name": "Bastien & Amélie",
@@ -797,44 +759,6 @@
     "bio_en": "",
     "bio_es": "",
     "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/meline_Meline_fw8fsj",
-    "cover_image": null,
-    "professions": [
-      {
-        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
-        "name": "Danseur",
-        "slug": "danseur"
-      },
-      {
-        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
-        "name": "Professeur",
-        "slug": "professeur"
-      }
-    ],
-    "is_staff_member": false,
-    "artist_display_order": 1,
-    "external_links": {
-      "instagram": [],
-      "websites": [],
-      "facebook": "",
-      "contact": {
-        "email": "",
-        "phone": "",
-        "whatsapp": ""
-      }
-    },
-    "linked_partner_structures": []
-  },
-  {
-    "id": 40,
-    "username": "michael-dori",
-    "first_name": "Michael & dori",
-    "last_name": "",
-    "email": "",
-    "phone": "",
-    "bio": "",
-    "bio_en": "",
-    "bio_es": "",
-    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/michael-dori_D_M_070_WEB_xyfe8b",
     "cover_image": null,
     "professions": [
       {
