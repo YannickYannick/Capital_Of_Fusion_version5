@@ -17,6 +17,7 @@ import { DesktopGate } from '@/src/components/DesktopGate';
 import { UrgentBanner } from '@/src/components/UrgentBanner';
 import { LocaleProvider } from '@/src/i18n/LocaleContext';
 import { AnnouncementsProvider } from '@/src/providers/AnnouncementsProvider';
+import { PushNotificationsProvider } from '@/src/providers/PushNotificationsProvider';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -58,8 +59,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <StatusBar style="light" />
       <LocaleProvider>
-        <AnnouncementsProvider>
-          <DesktopGate>
+        <PushNotificationsProvider>
+          <AnnouncementsProvider>
+            <DesktopGate>
             <View style={{ flex: 1, backgroundColor: theme.background }}>
               <UrgentBanner />
               <Stack
@@ -79,8 +81,9 @@ export default function RootLayout() {
             <Stack.Screen name="festival-rules" />
           </Stack>
             </View>
-          </DesktopGate>
-        </AnnouncementsProvider>
+            </DesktopGate>
+          </AnnouncementsProvider>
+        </PushNotificationsProvider>
       </LocaleProvider>
     </SafeAreaProvider>
   );

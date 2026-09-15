@@ -216,3 +216,32 @@ class FestivalAnnouncement(BaseModel):
         if self.ends_at and now > self.ends_at:
             return False
         return True
+
+
+class PushToken(BaseModel):
+    """
+    Token push Expo pour les notifications mobiles/PWA.
+    Un token par appareil, mis à jour à chaque ouverture de l'app.
+    """
+
+    class Platform(models.TextChoices):
+        IOS = "ios", "iOS"
+        ANDROID = "android", "Android"
+        WEB = "web", "Web"
+
+    token = models.CharField(max_length=500, unique=True, db_index=True)
+    platform = models.CharField(
+        max_length=10,
+        choices=Platform.choices,
+        default=Platform.ANDROID,
+    )
+    is_active = models.BooleanField(default=True)
+    last_used_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Token push"
+        verbose_name_plural = "Tokens push"
+        ordering = ["-last_used_at"]
+
+    def __str__(self):
+        return f"{self.platform} — {self.token[:20]}..."

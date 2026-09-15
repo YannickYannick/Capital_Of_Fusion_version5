@@ -36,6 +36,7 @@ from apps.events.views import (
     FestivalProgramAPIView,
     FestivalCacheManifestAPIView,
     FestivalAnnouncementListAPIView,
+    PushTokenRegisterAPIView,
 )
 from apps.organization.views import (
     OrganizationNodeListAPIView,
@@ -183,6 +184,9 @@ urlpatterns = [
     path("admin/partners/events/", PartnerEventAdminCreateAPIView.as_view()),
     path("admin/partners/courses/<slug:slug>/", PartnerCourseAdminDetailAPIView.as_view()),
     path("admin/partners/courses/", PartnerCourseAdminCreateAPIView.as_view()),
+
+    # ── Push notifications ───────────────────────────────────────────────────
+    path("push/register/", PushTokenRegisterAPIView.as_view()),
 ]
 
 urlpatterns += router.urls

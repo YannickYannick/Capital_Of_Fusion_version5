@@ -5,6 +5,7 @@ from .models import (
     FestivalAnnouncement,
     FestivalShuttleDeparture,
     FestivalProgramSlot,
+    PushToken,
     Registration,
 )
 
@@ -56,3 +57,16 @@ class FestivalAnnouncementAdmin(admin.ModelAdmin):
     list_filter = ("priority", "edition", "is_published")
     search_fields = ("title", "body")
     ordering = ("-priority", "sort_order", "-created_at")
+
+
+@admin.register(PushToken)
+class PushTokenAdmin(admin.ModelAdmin):
+    list_display = ("token_short", "platform", "is_active", "last_used_at", "created_at")
+    list_filter = ("platform", "is_active")
+    search_fields = ("token",)
+    readonly_fields = ("token", "created_at", "updated_at", "last_used_at")
+    ordering = ("-last_used_at",)
+
+    @admin.display(description="Token")
+    def token_short(self, obj):
+        return f"{obj.token[:30]}..." if obj.token else "-"

@@ -159,3 +159,5 @@
 | [2026-09-15 21:20] Starting Task | Wire i18n mobile screens | Objectif : brancher `useLocale` / `t` / `tList` / `dayLabel` sur tous les écrans & composants UI listés. |
 | [2026-09-15 21:25] Completed Task | Wire i18n mobile screens | Outcome: tous les écrans/composants listés utilisent `t`/`tList`/`dayLabel` ; LanguageFlags sur Infos ; filtres lineup ; clés map.* pour zones. |
 | [2026-09-15 23:25] Completed Task | Ajout artiste Lina | Outcome: entrée `lina` (id 63) dans `artists.seed.json` ; photo placeholder — uploader sur Cloudinary via admin Django pour personnaliser. |
+| [2026-09-16 01:40] Starting Task | Push notifications natives | Objectif : notifications push via Expo Push API (mobile + PWA). |
+| [2026-09-16 01:50] Completed Task | Push notifications natives | Outcome: `expo-notifications` + `expo-device` ; hook `usePushNotifications` ; modèle `PushToken` Django ; API `/api/push/register/` ; service `push_service.py` ; commande `manage.py send_push`. |

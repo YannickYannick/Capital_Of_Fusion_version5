@@ -293,3 +293,43 @@ class EventAdminDetailAPIView(APIView):
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class PushTokenRegisterAPIView(APIView):
+    """
+    POST /api/push/register/
+    Enregistre ou met à jour un token push Expo.
+    Pas d'authentification requise (anonyme).
+    """
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
+        from .models import PushToken
+
+        token = request.data.get("token")
+        platform = request.data.get("platform", "android")
+
+        if not token:
+            return Response(
+                {"error": "Token requis"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Créer ou mettre à jour le token
+        push_token, created = PushToken.objects.update_or_create(
+            token=token,
+            defaults={
+                "platform": platform,
+                "is_active": True,
+            },
+        )
+
+        return Response(
+            {
+                "success": True,
+                "created": created,
+                "token_id": str(push_token.id),
+            },
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
