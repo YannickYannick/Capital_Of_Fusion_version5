@@ -14,9 +14,10 @@ const VAPID_PUBLIC_KEY = 'BKQipokym9Ph68CMgvzCAZqJUAYTh9FflToDSkGuwqm4HdbXbajFzW
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowAlert: true,
       shouldPlaySound: true,
       shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
     }),
   });
 }
@@ -37,8 +38,8 @@ export function usePushNotifications(): PushNotificationState {
   const [permission, setPermission] = useState<NotificationPermission | Notifications.PermissionStatus | null>(null);
   const [notification, setNotification] = useState<Notifications.Notification | null>(null);
 
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.EventSubscription | null>(null);
+  const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -66,12 +67,8 @@ export function usePushNotifications(): PushNotificationState {
     }
 
     return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
+      notificationListener.current?.remove();
+      responseListener.current?.remove();
     };
   }, []);
 
@@ -154,11 +151,11 @@ function describeWebDevice(): string {
 /**
  * Convertit la clé VAPID base64 en Uint8Array.
  */
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
+  const outputArray = new Uint8Array(new ArrayBuffer(rawData.length));
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
@@ -245,6 +242,53 @@ export async function sendPushTokenToBackend(
     console.error('Error sending push token to backend:', error);
     return false;
   }
+}
+
+/**
+ * État courant de la permission notifications, sans rien demander.
+ * `null` si la plateforme ne l'expose pas.
+ */
+export function getCurrentPushPermission(): NotificationPermission | null {
+  if (Platform.OS !== 'web') return null;
+  if (typeof Notification === 'undefined') return null;
+  return Notification.permission;
+}
+
+/** True si le navigateur courant sait gérer les Web Push. */
+export function isWebPushSupported(): boolean {
+  if (Platform.OS !== 'web') return true;
+  return (
+    typeof window !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    typeof Notification !== 'undefined'
+  );
+}
+
+export type EnablePushResult = {
+  ok: boolean;
+  /** 'denied' => l'utilisateur doit repasser par les réglages système/navigateur. */
+  status: NotificationPermission | Notifications.PermissionStatus | null;
+};
+
+/**
+ * Active les notifications à la demande (bouton UI) : permission,
+ * souscription, puis enregistrement backend.
+ */
+export async function enablePushNotifications(apiBaseUrl: string): Promise<EnablePushResult> {
+  if (Platform.OS === 'web') {
+    const { subscription, status } = await registerForWebPushAsync();
+    if (!subscription) return { ok: false, status };
+
+    const sent = await sendWebPushSubscriptionToBackend(subscription, apiBaseUrl);
+    return { ok: sent, status };
+  }
+
+  const { token, status } = await registerForExpoPushAsync();
+  if (!token) return { ok: false, status };
+
+  const sent = await sendPushTokenToBackend(token, apiBaseUrl);
+  return { ok: sent, status };
 }
 
 /**

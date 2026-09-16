@@ -132,6 +132,13 @@ export type Messages = {
     eyebrow: string;
     title: string;
     language: string;
+    notifsLabel: string;
+    notifsOn: string;
+    notifsOffBody: string;
+    notifsEnable: string;
+    notifsRetry: string;
+    notifsBlocked: string;
+    notifsBlockedHelp: string;
     passesTitle: string;
     passesBody: string;
     shuttlesTitle: string;

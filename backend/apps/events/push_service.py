@@ -80,6 +80,16 @@ def send_expo_push(
 # WEB PUSH (PWA)
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _is_expired_subscription(exc) -> bool:
+    """True si FCM/Mozilla a répondu 404/410 (souscription morte)."""
+    response = getattr(exc, "response", None)
+    status = getattr(response, "status_code", None)
+    if status in (404, 410):
+        return True
+    message = str(exc).lower()
+    return "410" in message or "unsubscribed" in message or "expired" in message
+
+
 def send_web_push(
     endpoint: str,
     p256dh: str,
@@ -120,10 +130,9 @@ def send_web_push(
         return {"status": "ok"}
     except WebPushException as e:
         logger.error(f"Web push failed: {e}")
-        # Désactiver les subscriptions invalides (410 Gone, 404 Not Found)
-        if e.response and e.response.status_code in (404, 410):
+        if _is_expired_subscription(e):
             PushToken.objects.filter(endpoint=endpoint).update(is_active=False)
-            logger.warning(f"Disabled invalid Web Push endpoint: {endpoint[:50]}...")
+            logger.warning(f"Disabled expired Web Push endpoint: {endpoint[:50]}...")
         return {"status": "error", "message": str(e)}
     except Exception as e:
         logger.error(f"Web push error: {e}")

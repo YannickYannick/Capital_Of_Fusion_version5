@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
 import { LanguageFlags } from '@/src/components/LanguageFlags';
+import { NotificationsToggle } from '@/src/components/NotificationsToggle';
 import { PageHeader } from '@/src/components/PageHeader';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { useLocale } from '@/src/i18n/LocaleContext';
@@ -20,6 +21,10 @@ export default function MoreScreen() {
       <View style={styles.list}>
         <GlassCard style={styles.card}>
           <LanguageFlags />
+        </GlassCard>
+
+        <GlassCard style={styles.card}>
+          <NotificationsToggle />
         </GlassCard>
 
         <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
