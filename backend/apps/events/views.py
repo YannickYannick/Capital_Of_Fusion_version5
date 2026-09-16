@@ -222,14 +222,20 @@ class FestivalProgramAPIView(APIView):
 
 class FestivalAnnouncementListAPIView(APIView):
     """
-    GET /api/festival/announcements/?edition=2026
+    GET /api/festival/announcements/?edition=2026&lang=en|fr|es
     Annonces publiées actives (urgent + normal) pour l’app / PWA.
     """
 
     permission_classes = [AllowAny]
 
     def get(self, request):
+        from django.utils import translation as django_translation
+
         edition = request.query_params.get("edition", "2026")
+        lang = (request.query_params.get("lang") or "en").strip().lower()
+        if lang not in {"en", "fr", "es"}:
+            lang = "en"
+
         now = timezone.now()
         qs = FestivalAnnouncement.objects.filter(
             edition=edition,
@@ -237,7 +243,11 @@ class FestivalAnnouncementListAPIView(APIView):
         ).order_by("-priority", "sort_order", "-created_at")
 
         active = [a for a in qs if a.is_active_at(now)]
-        return Response(FestivalAnnouncementSerializer(active, many=True).data)
+        django_translation.activate(lang)
+        try:
+            return Response(FestivalAnnouncementSerializer(active, many=True).data)
+        finally:
+            django_translation.deactivate()
 
 
 # ─── Admin views ──────────────────────────────────────────────────────────────

@@ -169,3 +169,5 @@
 | [2026-09-16 02:45] Completed Task | Bouton activer notifs menu Infos | Outcome: carte Infos (`NotificationsToggle`) — Activer si jamais demandé, Réactiver si bloqué ; sync permission au retour des réglages ; tokens Web Push expirés (410) désactivés. |
 | [2026-09-16 15:15] Starting Task | 404 Vercel intermittent PWA | Objectif : comprendre/fixer NOT_FOUND blanc sur app.capitaloffusion.com. |
 | [2026-09-16 15:20] Completed Task | 404 Vercel intermittent PWA | Outcome: rewrite SPA `/:path* → /index.html` ; SW v4 ne traite plus sa propre origine comme API distante et sert le shell `/` si navigation 404. |
+| [2026-09-16 15:20] Starting Task | Annonces festival i18n | Objectif : title/body/link_label EN/FR/ES, API `?lang=`, refetch PWA au changement de langue. |
+| [2026-09-16 15:35] Completed Task | Annonces festival i18n | Outcome: modeltranslation `title`/`body`/`link_label` ; API `?lang=` ; PWA refetch au changement de langue ; seed localisé ; data migration des 4 annonces existantes. |

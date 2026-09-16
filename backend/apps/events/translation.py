@@ -1,6 +1,6 @@
 from modeltranslation.translator import register, TranslationOptions
 
-from .models import Event, EventPass
+from .models import Event, EventPass, FestivalAnnouncement
 
 
 @register(Event)
@@ -12,3 +12,7 @@ class EventTranslationOptions(TranslationOptions):
 class EventPassTranslationOptions(TranslationOptions):
     fields = ("name",)
 
+
+@register(FestivalAnnouncement)
+class FestivalAnnouncementTranslationOptions(TranslationOptions):
+    fields = ("title", "body", "link_label")

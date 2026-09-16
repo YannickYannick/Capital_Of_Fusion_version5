@@ -2,37 +2,79 @@
   {
     "id": "seed-urgent-welcome",
     "edition": "2026",
-    "title": "Bienvenue sur l’app PBVF",
-    "body": "Les annonces urgentes s’affichent ici, sur tous les écrans. Tu peux fermer ce bandeau.",
     "priority": "urgent",
     "starts_at": null,
     "ends_at": null,
     "link_url": "",
-    "link_label": "",
-    "sort_order": 0
+    "sort_order": 0,
+    "i18n": {
+      "en": {
+        "title": "Welcome to the PBVF app",
+        "body": "Urgent announcements appear here, on every screen. You can dismiss this banner.",
+        "link_label": ""
+      },
+      "fr": {
+        "title": "Bienvenue sur l’app PBVF",
+        "body": "Les annonces urgentes s’affichent ici, sur tous les écrans. Tu peux fermer ce bandeau.",
+        "link_label": ""
+      },
+      "es": {
+        "title": "Bienvenido a la app PBVF",
+        "body": "Los anuncios urgentes aparecen aquí, en todas las pantallas. Puedes cerrar este aviso.",
+        "link_label": ""
+      }
+    }
   },
   {
     "id": "seed-normal-passes",
     "edition": "2026",
-    "title": "Vérifie ton pass",
-    "body": "Consulte le détail inclus / non inclus de chaque formule avant d’acheter des options.",
     "priority": "normal",
     "starts_at": null,
     "ends_at": null,
     "link_url": "/passes",
-    "link_label": "Voir les passes",
-    "sort_order": 1
+    "sort_order": 1,
+    "i18n": {
+      "en": {
+        "title": "Check your pass",
+        "body": "See what’s included / not included in each formula before buying extras.",
+        "link_label": "See the passes"
+      },
+      "fr": {
+        "title": "Vérifie ton pass",
+        "body": "Consulte le détail inclus / non inclus de chaque formule avant d’acheter des options.",
+        "link_label": "Voir les passes"
+      },
+      "es": {
+        "title": "Revisa tu pass",
+        "body": "Consulta lo incluido / no incluido en cada fórmula antes de comprar extras.",
+        "link_label": "Ver los pases"
+      }
+    }
   },
   {
     "id": "seed-normal-coc",
     "edition": "2026",
-    "title": "Code de conduite",
-    "body": "Prends connaissance des règles Capital of Fusion avant le festival.",
     "priority": "normal",
     "starts_at": null,
     "ends_at": null,
     "link_url": "/code-of-conduct",
-    "link_label": "Lire",
-    "sort_order": 2
+    "sort_order": 2,
+    "i18n": {
+      "en": {
+        "title": "Code of Conduct",
+        "body": "Please read our Code of Conduct before the festival. Respect everyone, enjoy the vibe!",
+        "link_label": "Read now"
+      },
+      "fr": {
+        "title": "Code de conduite",
+        "body": "Prends connaissance des règles Capital of Fusion avant le festival.",
+        "link_label": "Lire"
+      },
+      "es": {
+        "title": "Código de conducta",
+        "body": "Lee las reglas de Capital of Fusion antes del festival.",
+        "link_label": "Leer"
+      }
+    }
   }
 ]

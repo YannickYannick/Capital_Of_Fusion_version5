@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { useLocale } from '@/src/i18n/LocaleContext';
 import {
   fetchFestivalAnnouncements,
   filterNormal,
@@ -36,7 +37,10 @@ const AnnouncementsContext = createContext<AnnouncementsContextValue | null>(nul
  * Charge les annonces + gère le dismiss du bandeau urgent (AsyncStorage).
  */
 export function AnnouncementsProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<FestivalAnnouncement[]>(localAnnouncementsFallback);
+  const { locale } = useLocale();
+  const [items, setItems] = useState<FestivalAnnouncement[]>(() =>
+    localAnnouncementsFallback(locale),
+  );
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -50,12 +54,15 @@ export function AnnouncementsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refresh = useCallback(() => {
-    fetchFestivalAnnouncements().then(setItems).catch(() => undefined);
-  }, []);
+    fetchFestivalAnnouncements(locale).then(setItems).catch(() => {
+      setItems(localAnnouncementsFallback(locale));
+    });
+  }, [locale]);
 
   useEffect(() => {
+    setItems(localAnnouncementsFallback(locale));
     refresh();
-  }, [refresh]);
+  }, [locale, refresh]);
 
   const persistDismissed = useCallback((next: Set<string>) => {
     AsyncStorage.setItem(DISMISS_KEY, JSON.stringify([...next])).catch(() => undefined);

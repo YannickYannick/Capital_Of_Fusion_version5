@@ -53,6 +53,7 @@ TRANSLATION_TARGETS: tuple[TranslationTarget, ...] = (
     # events
     TranslationTarget("events", "Event", ("name", "description", "location_name")),
     TranslationTarget("events", "EventPass", ("name",)),
+    TranslationTarget("events", "FestivalAnnouncement", ("title", "body", "link_label")),
     # organization
     TranslationTarget(
         "organization",
