@@ -314,6 +314,7 @@ class PushTokenRegisterAPIView(APIView):
 
         token_type = request.data.get("type", "expo")
         platform = request.data.get("platform", "android")
+        device_label = (request.data.get("device_label") or "")[:200]
 
         if token_type == "webpush":
             # Web Push subscription
@@ -337,6 +338,7 @@ class PushTokenRegisterAPIView(APIView):
                     "platform": platform,
                     "p256dh_key": p256dh,
                     "auth_key": auth,
+                    "device_label": device_label,
                     "is_active": True,
                 },
             )
@@ -357,6 +359,7 @@ class PushTokenRegisterAPIView(APIView):
                 token_type=PushToken.TokenType.EXPO,
                 defaults={
                     "platform": platform,
+                    "device_label": device_label,
                     "is_active": True,
                 },
             )

@@ -97,11 +97,22 @@ async function registerForWebPushAsync(): Promise<{
 
   try {
     // Enregistre le service worker
-    const registration = await navigator.serviceWorker.register('/sw.js');
-    console.log('Service Worker registered:', registration);
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      updateViaCache: 'none',
+    });
+
+    // Force la vérification d'une nouvelle version : sans ça, un SW déjà
+    // installé sans handler `push` reste actif et les notifications
+    // arrivent sans jamais être affichées.
+    try {
+      await registration.update();
+    } catch {
+      // Pas bloquant
+    }
 
     // Attend que le SW soit prêt
-    await navigator.serviceWorker.ready;
+    const ready = await navigator.serviceWorker.ready;
+    console.log('Service Worker ready, scope:', ready.scope);
 
     // Demande la permission
     const permission = await Notification.requestPermission();
@@ -111,19 +122,33 @@ async function registerForWebPushAsync(): Promise<{
       return { subscription: null, status: permission };
     }
 
-    // S'abonne aux push
-    const subscription = await registration.pushManager.subscribe({
+    // S'abonne aux push via le SW actif
+    const subscription = await ready.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
 
-    console.log('Web Push subscription:', subscription);
+    console.log('Web Push subscription:', subscription.endpoint);
     return { subscription, status: permission };
 
   } catch (error) {
     console.error('Error registering for web push:', error);
     return { subscription: null, status: null };
   }
+}
+
+/**
+ * Décrit l'appareil web courant (mode d'affichage + user agent tronqué).
+ * Permet de distinguer « PWA installée » de « onglet navigateur ».
+ */
+function describeWebDevice(): string {
+  const standalone =
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    // iOS Safari expose navigator.standalone hors standard
+    (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+  const mode = standalone ? 'PWA installee' : 'Navigateur';
+  return `${mode} — ${navigator.userAgent.slice(0, 140)}`;
 }
 
 /**
@@ -237,6 +262,7 @@ export async function sendWebPushSubscriptionToBackend(
         subscription: subscription.toJSON(),
         platform: 'web',
         type: 'webpush',
+        device_label: describeWebDevice(),
       }),
     });
     return response.ok;

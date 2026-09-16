@@ -72,6 +72,9 @@ class Command(BaseCommand):
         token_count = tokens_qs.count()
 
         self.stdout.write(f"[PUSH] {token_count} appareil(s) enregistre(s)")
+        for t in tokens_qs:
+            label = t.device_label or "(appareil non identifie)"
+            self.stdout.write(f"  - [{t.token_type}/{t.platform}] {label}")
 
         if token_count == 0:
             self.stdout.write(

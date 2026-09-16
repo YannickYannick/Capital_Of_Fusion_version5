@@ -163,3 +163,5 @@
 | [2026-09-16 01:50] Completed Task | Push notifications Expo | Outcome: `expo-notifications` + `expo-device` ; hook `usePushNotifications` ; modèle `PushToken` Django ; API `/api/push/register/` ; service `push_service.py` ; commande `manage.py send_push`. |
 | [2026-09-16 02:00] Starting Task | Web Push PWA | Objectif : notifications push pour PWA web via Web Push API + VAPID. |
 | [2026-09-16 02:10] Completed Task | Web Push PWA | Outcome: clés VAPID ; `pywebpush` backend ; Service Worker push handler ; hook web subscription ; modèle `PushToken` étendu (expo + webpush) ; `push_service.py` unifié. |
+| [2026-09-16 02:25] Starting Task | Push KO sur PWA installée | Objectif : notifs reçues dans Chrome mais pas dans la PWA installée. |
+| [2026-09-16 02:35] Completed Task | Push KO sur PWA installée | Outcome: cause = SW cache-first sur le document HTML → PWA installée figée sur l'ancien bundle (SW sans handler `push`). Fix : navigation network-first, cache `v3`, `registration.update()` + `updateViaCache: 'none'`, `device_label` pour identifier les appareils (modèle + API + `send_push` + admin). |

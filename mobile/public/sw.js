@@ -2,7 +2,7 @@
  * Service worker PWA — cache shell + assets, network-first pour l'API, push notifications.
  * Généré / maintenu manuellement (alternative Workbox si besoin).
  */
-const CACHE_NAME = 'pbvf-pwa-v2';
+const CACHE_NAME = 'pbvf-pwa-v3';
 const PRECACHE = ['/', '/manifest.json', '/pwa-icon-192.png', '/pwa-icon-512.png', '/favicon.png'];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -93,6 +93,24 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((res) => res)
         .catch(() => caches.match(request)),
+    );
+    return;
+  }
+
+  // Navigation (document HTML) : réseau d'abord.
+  // Sans ça, la PWA installée démarre indéfiniment sur le HTML précaché
+  // et ne récupère jamais un nouveau bundle JS.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res && res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return res;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/'))),
     );
     return;
   }

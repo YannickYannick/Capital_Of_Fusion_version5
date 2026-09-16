@@ -253,6 +253,11 @@ class PushToken(BaseModel):
         choices=Platform.choices,
         default=Platform.ANDROID,
     )
+    device_label = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Identification lisible de l'appareil (PWA installée / navigateur, user agent)",
+    )
     is_active = models.BooleanField(default=True)
     last_used_at = models.DateTimeField(auto_now=True)
 

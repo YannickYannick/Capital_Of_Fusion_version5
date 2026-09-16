@@ -61,12 +61,13 @@ class FestivalAnnouncementAdmin(admin.ModelAdmin):
 
 @admin.register(PushToken)
 class PushTokenAdmin(admin.ModelAdmin):
-    list_display = ("token_short", "platform", "is_active", "last_used_at", "created_at")
-    list_filter = ("platform", "is_active")
-    search_fields = ("token",)
-    readonly_fields = ("token", "created_at", "updated_at", "last_used_at")
+    list_display = ("token_short", "token_type", "platform", "device_label", "is_active", "last_used_at")
+    list_filter = ("token_type", "platform", "is_active")
+    search_fields = ("token", "endpoint", "device_label")
+    readonly_fields = ("token", "endpoint", "created_at", "updated_at", "last_used_at")
     ordering = ("-last_used_at",)
 
-    @admin.display(description="Token")
+    @admin.display(description="Token / Endpoint")
     def token_short(self, obj):
-        return f"{obj.token[:30]}..." if obj.token else "-"
+        value = obj.endpoint or obj.token
+        return f"{value[:40]}..." if value else "-"
