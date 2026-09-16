@@ -123,6 +123,11 @@ export const fr: Messages = {
   more: {
     eyebrow: 'Avant & pendant',
     title: 'Infos',
+    sectionApp: 'App',
+    sectionOnSite: 'Sur place',
+    sectionCompetitions: 'Compétitions',
+    sectionRules: 'Règles',
+    sectionHelp: 'Aide',
     language: 'Langue',
     notifsLabel: 'Notifications',
     notifsOn: 'Notifications activées',

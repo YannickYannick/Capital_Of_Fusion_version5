@@ -128,6 +128,11 @@ export type Messages = {
   more: {
     eyebrow: string;
     title: string;
+    sectionApp: string;
+    sectionOnSite: string;
+    sectionCompetitions: string;
+    sectionRules: string;
+    sectionHelp: string;
     language: string;
     notifsLabel: string;
     notifsOn: string;

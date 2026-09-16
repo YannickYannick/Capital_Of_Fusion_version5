@@ -195,3 +195,6 @@
 | [2026-09-16 20:54] Completed Task | Langues visibles accueil | Outcome: Festival Rules + drapeaux juste sous le compteur, avant les annonces. |
 | [2026-09-16 20:56] Completed Task | 4 annonces accueil | Outcome: Check your pass, CoC, navettes, Festival Rules ; drapeaux sous le fil. |
 | [2026-09-16 20:56] Completed Task | Ordre 4 annonces | Outcome: pass → rules → CoC → Book your navette. Pas de limite à 3. |
+| [2026-09-16 21:03] Completed Task | Annonce règlement | Outcome: carte `Festival Rules` → `/festival-rules` republiee (2e du fil). |
+| [2026-09-16 21:06] Starting Task | Sections écran Infos | Objectif : titres App / Sur place / Compétitions / Règles / Aide. |
+| [2026-09-16 21:08] Completed Task | Sections écran Infos | Outcome: `more.tsx` groupé en 5 sections ; Festival Rules reste en carte or. |
