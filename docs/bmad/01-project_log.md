@@ -188,3 +188,5 @@
 | [2026-09-16 20:38] Starting Task | Vue d’ensemble carte | Objectif : remplacer l’overview par l’affiche PLAN (adresses jeu–dim / samedi). |
 | [2026-09-16 20:42] Completed Task | Vue d’ensemble carte | Outcome: `venue-overview.png` (affiche PLAN + 2 adresses) ; ratio 3/4 ; texte copiable aligné. |
 | [2026-09-16 20:43] Completed Task | Retrait adresse 18–19 | Outcome: ligne sous la vue d’ensemble retirée (adresses restent sur l’affiche PLAN). |
+| [2026-09-16 20:45] Starting Task | Accueil rules + langues ; battles ven | Objectif : Festival Rules + drapeaux en bas d’accueil ; retirer Intermediate des battles vendredi. |
+| [2026-09-16 20:50] Completed Task | Accueil rules + langues ; battles ven | Outcome: carte Festival Rules + `LanguageFlags` en bas d’accueil ; battles ven sans niveau ; migration `0016`. |

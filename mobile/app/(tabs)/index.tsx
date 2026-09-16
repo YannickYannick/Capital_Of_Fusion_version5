@@ -7,6 +7,7 @@ import { space, theme } from '@/constants/theme';
 import { fonts, type } from '@/constants/typography';
 import { HomeHero } from '@/src/components/HomeHero';
 import { HomeAnnouncements } from '@/src/components/HomeAnnouncements';
+import { LanguageFlags } from '@/src/components/LanguageFlags';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { LivePill } from '@/src/components/ui/LivePill';
 import programSeed from '@/src/data/program.seed.json';
@@ -19,7 +20,7 @@ import {
 } from '@/src/lib/liveNow';
 import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
 
-/** Accueil — hero + live / compteur + annonces normales. */
+/** Accueil — hero + live / compteur + annonces + rules + langues. */
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -87,6 +88,17 @@ export default function HomeScreen() {
 
         <HomeAnnouncements />
 
+        <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
+          <GlassCard style={[styles.card, styles.rulesCard]}>
+            <Text style={styles.linkTitle}>{t('more.rulesTitle')}</Text>
+            <Text style={styles.linkBody}>{t('more.rulesBody')}</Text>
+          </GlassCard>
+        </Pressable>
+
+        <GlassCard style={styles.card}>
+          <LanguageFlags />
+        </GlassCard>
+
         <Text style={styles.footer}>
           {t('more.footer', {
             name: FESTIVAL.name,
@@ -113,6 +125,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display,
   },
   liveMeta: { marginTop: 4, ...type.body, fontSize: 14, color: theme.textMuted },
+  card: { padding: space.card },
+  rulesCard: {
+    borderWidth: 1,
+    borderColor: theme.gold + '50',
+    backgroundColor: theme.gold + '08',
+  },
+  linkTitle: { ...type.title, fontSize: 16, color: theme.foreground },
+  linkBody: { marginTop: 4, ...type.body, fontSize: 14, color: theme.muted },
   footer: {
     marginTop: 28,
     textAlign: 'center',
