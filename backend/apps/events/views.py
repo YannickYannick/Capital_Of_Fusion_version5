@@ -245,9 +245,23 @@ class FestivalAnnouncementListAPIView(APIView):
         ).order_by("-priority", "sort_order", "-created_at")
 
         active = [a for a in qs if a.is_active_at(now)]
+        latest_urgent = next(
+            (
+                a
+                for a in active
+                if a.kind == FestivalAnnouncement.Kind.URGENT or a.priority == "urgent"
+            ),
+            None,
+        )
+        feed = [
+            a
+            for a in active
+            if a.kind != FestivalAnnouncement.Kind.URGENT and a.priority != "urgent"
+        ]
+        payload = ([latest_urgent] if latest_urgent else []) + feed
         django_translation.activate(lang)
         try:
-            return Response(FestivalAnnouncementSerializer(active, many=True).data)
+            return Response(FestivalAnnouncementSerializer(payload, many=True).data)
         finally:
             django_translation.deactivate()
 

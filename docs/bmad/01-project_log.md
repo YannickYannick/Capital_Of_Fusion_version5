@@ -173,3 +173,5 @@
 | [2026-09-16 15:35] Completed Task | Annonces festival i18n | Outcome: modeltranslation `title`/`body`/`link_label` ; API `?lang=` ; PWA refetch au changement de langue ; seed localisé ; data migration des 4 annonces existantes. |
 | [2026-09-16 15:25] Starting Task | 4 types de notifications | Objectif : push spontané, annonce avec redirection, annonce sans redirection, urgence bandeau. |
 | [2026-09-16 15:40] Completed Task | 4 types de notifications | Outcome: champ `kind` (push/link/info/urgent) ; admin Django + action « Envoyer en push » ; API exclut les push seuls ; clic notif ouvre le lien seulement pour `link` (et urgence si URL). |
+| [2026-09-16 15:50] Starting Task | Bandeau urgent unique | Objectif : une seule urgence à la fois, la nouvelle remplace le texte. |
+| [2026-09-16 15:55] Completed Task | Bandeau urgent unique | Outcome: save() dépublie les urgences précédentes ; API ne renvoie que la dernière ; ticker n’affiche plus qu’un texte. |

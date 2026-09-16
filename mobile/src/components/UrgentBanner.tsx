@@ -23,18 +23,12 @@ export function UrgentBanner() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { t } = useLocale();
-  const { urgentItems, dismissAllUrgent } = useAnnouncements();
+  const { urgent, dismissAllUrgent } = useAnnouncements();
   const offset = useSharedValue(0);
 
-  const line =
-    urgentItems.length === 0
-      ? ''
-      : urgentItems
-          .map((a) => {
-            const label = a.link_label ? ` → ${a.link_label}` : '';
-            return `${a.title} — ${a.body}${label}`;
-          })
-          .join('     ·     ');
+  const line = urgent
+    ? `${urgent.title} — ${urgent.body}${urgent.link_label ? ` → ${urgent.link_label}` : ''}`
+    : '';
 
   /** Deux copies pour une boucle sans trou. */
   const marquee = line ? `${line}     ·     ${line}     ·     ` : '';
@@ -62,7 +56,7 @@ export function UrgentBanner() {
     transform: [{ translateX: offset.value }],
   }));
 
-  if (urgentItems.length === 0) return null;
+  if (!urgent) return null;
 
   return (
     <View

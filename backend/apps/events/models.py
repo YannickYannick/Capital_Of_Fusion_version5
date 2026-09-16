@@ -260,6 +260,13 @@ class FestivalAnnouncement(BaseModel):
     def save(self, *args, **kwargs):
         self.sync_priority()
         super().save(*args, **kwargs)
+        # Une seule urgence à la fois : la nouvelle remplace le bandeau.
+        if self.kind == self.Kind.URGENT and self.is_published:
+            FestivalAnnouncement.objects.filter(
+                edition=self.edition,
+                kind=self.Kind.URGENT,
+                is_published=True,
+            ).exclude(pk=self.pk).update(is_published=False)
 
     def is_active_at(self, moment=None) -> bool:
         """True si publiée et dans la fenêtre starts_at / ends_at."""

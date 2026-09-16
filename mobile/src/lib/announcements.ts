@@ -80,9 +80,10 @@ export async function fetchFestivalAnnouncements(
 }
 
 export function filterUrgent(items: FestivalAnnouncement[]): FestivalAnnouncement[] {
-  return items
-    .filter((a) => a.kind === 'urgent' || (!a.kind && a.priority === 'urgent'))
-    .sort((a, b) => a.sort_order - b.sort_order);
+  const latest = items.find(
+    (a) => a.kind === 'urgent' || (!a.kind && a.priority === 'urgent'),
+  );
+  return latest ? [latest] : [];
 }
 
 export function filterNormal(items: FestivalAnnouncement[]): FestivalAnnouncement[] {
