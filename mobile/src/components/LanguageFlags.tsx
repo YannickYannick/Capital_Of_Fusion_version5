@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 12,
     borderRadius: radius.card,
-    backgroundColor: theme.surface,
+    backgroundColor: theme.surface2,
     borderWidth: 1,
     borderColor: theme.border,
   },

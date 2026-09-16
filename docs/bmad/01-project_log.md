@@ -190,3 +190,6 @@
 | [2026-09-16 20:43] Completed Task | Retrait adresse 18–19 | Outcome: ligne sous la vue d’ensemble retirée (adresses restent sur l’affiche PLAN). |
 | [2026-09-16 20:45] Starting Task | Accueil rules + langues ; battles ven | Objectif : Festival Rules + drapeaux en bas d’accueil ; retirer Intermediate des battles vendredi. |
 | [2026-09-16 20:50] Completed Task | Accueil rules + langues ; battles ven | Outcome: carte Festival Rules + `LanguageFlags` en bas d’accueil ; battles ven sans niveau ; migration `0016`. |
+| [2026-09-16 20:48] Completed Task | Notif test Clément | Outcome: push spontané « test clément » ; Web Push 2/2. |
+| [2026-09-16 20:52] Starting Task | Langues visibles accueil | Objectif : remonter le sélecteur sous le live, avant les annonces. |
+| [2026-09-16 20:54] Completed Task | Langues visibles accueil | Outcome: Festival Rules + drapeaux juste sous le compteur, avant les annonces. |

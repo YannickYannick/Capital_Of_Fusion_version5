@@ -51,7 +51,10 @@ export default function HomeScreen() {
     : '';
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={{ paddingBottom: 140 + insets.bottom }}
+    >
       <HomeHero topInset={heroTop} eyebrow={heroEyebrow} />
 
       <View style={styles.content}>
@@ -86,8 +89,6 @@ export default function HomeScreen() {
           </Pressable>
         ) : null}
 
-        <HomeAnnouncements />
-
         <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
           <GlassCard style={[styles.card, styles.rulesCard]}>
             <Text style={styles.linkTitle}>{t('more.rulesTitle')}</Text>
@@ -98,6 +99,8 @@ export default function HomeScreen() {
         <GlassCard style={styles.card}>
           <LanguageFlags />
         </GlassCard>
+
+        <HomeAnnouncements />
 
         <Text style={styles.footer}>
           {t('more.footer', {
