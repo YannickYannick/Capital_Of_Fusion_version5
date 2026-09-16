@@ -177,3 +177,5 @@
 | [2026-09-16 15:55] Completed Task | Bandeau urgent unique | Outcome: save() dépublie les urgences précédentes ; API ne renvoie que la dernière ; ticker n’affiche plus qu’un texte. |
 | [2026-09-16 16:00] Starting Task | Bandeau live + détail au clic | Objectif : refresh sans relancer l’app ; clic = texte complet. |
 | [2026-09-16 16:10] Completed Task | Bandeau live + détail au clic | Outcome: poll 20s + reprise au premier plan ; clic ticker → modal titre/corps/lien. |
+| [2026-09-16 16:05] Starting Task | Carrousel Passes / Code de conduite | Objectif : compteur et dots qui suivent le swipe (PWA). |
+| [2026-09-16 16:15] Completed Task | Carrousel Passes / Code de conduite | Outcome: `PosterPager` commun — `onScroll` + snap + pan-x ; plus de dépendance à `onMomentumScrollEnd` (souvent muet sur web). |

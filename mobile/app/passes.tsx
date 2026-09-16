@@ -1,45 +1,25 @@
 import { useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react-native';
-import { Image, type ImageSource } from 'expo-image';
-import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { radius, space, theme } from '@/constants/theme';
+import { space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
 import { BackButton } from '@/src/components/BackButton';
 import { FullscreenImageModal } from '@/src/components/FullscreenImageModal';
 import { PageHeader } from '@/src/components/PageHeader';
+import { PosterPager, type PosterPagerHandle } from '@/src/components/PosterPager';
 import { useLocale } from '@/src/i18n/LocaleContext';
-import {
-  FESTIVAL_PASSES,
-  passImages,
-} from '@/src/lib/passes';
-
-type PassSlide = {
-  id: string;
-  title: string;
-  image: ImageSource;
-};
+import { FESTIVAL_PASSES, passImages } from '@/src/lib/passes';
 
 /**
  * Passes — même format que Code de conduite : carrousel horizontal + lightbox.
  */
 export default function PassesScreen() {
   const { t } = useLocale();
-  const { width } = useWindowDimensions();
-  const pagerRef = useRef<ScrollView>(null);
+  const pagerRef = useRef<PosterPagerHandle>(null);
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const slides = useMemo<PassSlide[]>(
+  const slides = useMemo(
     () => [
       {
         id: 'intro',
@@ -55,27 +35,12 @@ export default function PassesScreen() {
     [t],
   );
 
-  const slideWidth = width;
   const current = slides[index];
   const total = slides.length;
 
-  const onPagerScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const next = Math.round(e.nativeEvent.contentOffset.x / slideWidth);
-    if (next >= 0 && next < total) setIndex(next);
-  };
-
-  const goTo = (next: number) => {
-    const clamped = Math.max(0, Math.min(total - 1, next));
-    setIndex(clamped);
-    pagerRef.current?.scrollTo({ x: clamped * slideWidth, animated: true });
-  };
-
   return (
     <>
-      <ScrollView
-        style={styles.screen}
-        contentContainerStyle={styles.screenContent}
-      >
+      <ScrollView style={styles.screen} contentContainerStyle={styles.screenContent} nestedScrollEnabled>
         <BackButton fallbackHref="/(tabs)/more" />
         <PageHeader
           eyebrow={t('passes.eyebrow')}
@@ -90,62 +55,16 @@ export default function PassesScreen() {
           <Text style={styles.version}>{t('passes.version')}</Text>
         </View>
 
-        <View style={styles.pagerWrap}>
-          <ScrollView
-            ref={pagerRef}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={onPagerScrollEnd}
-            decelerationRate="fast"
-            style={{ width: slideWidth }}
-          >
-            {slides.map((slide) => (
-              <Pressable
-                key={slide.id}
-                onPress={() => setLightboxOpen(true)}
-                style={{ width: slideWidth }}
-                accessibilityRole="imagebutton"
-                accessibilityLabel={`${slide.title}. ${t('common.tapToEnlarge')}`}
-              >
-                <Image
-                  source={slide.image}
-                  style={[styles.poster, { width: slideWidth - space.card * 2 }]}
-                  contentFit="contain"
-                />
-              </Pressable>
-            ))}
-          </ScrollView>
-
-          <View style={styles.navRow}>
-            <Pressable
-              onPress={() => goTo(index - 1)}
-              disabled={index === 0}
-              style={({ pressed }) => [
-                styles.navBtn,
-                index === 0 && styles.navBtnDisabled,
-                pressed && styles.pressed,
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.prevSlide')}
-            >
-              <ChevronLeft size={22} color={theme.foreground} strokeWidth={2} />
-            </Pressable>
-            <Pressable
-              onPress={() => goTo(index + 1)}
-              disabled={index === total - 1}
-              style={({ pressed }) => [
-                styles.navBtn,
-                index === total - 1 && styles.navBtnDisabled,
-                pressed && styles.pressed,
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.nextSlide')}
-            >
-              <ChevronRight size={22} color={theme.foreground} strokeWidth={2} />
-            </Pressable>
-          </View>
-        </View>
+        <PosterPager
+          ref={pagerRef}
+          slides={slides}
+          index={index}
+          onIndexChange={setIndex}
+          onPressSlide={() => setLightboxOpen(true)}
+          enlargeLabel={t('common.tapToEnlarge')}
+          prevLabel={t('common.prevSlide')}
+          nextLabel={t('common.nextSlide')}
+        />
 
         <Text style={styles.slideTitle}>{current?.title}</Text>
         <Text style={styles.swipeHint}>{t('common.swipeHint')}</Text>
@@ -155,7 +74,7 @@ export default function PassesScreen() {
           {slides.map((slide, i) => (
             <Pressable
               key={slide.id}
-              onPress={() => goTo(i)}
+              onPress={() => pagerRef.current?.goTo(i)}
               accessibilityRole="button"
               accessibilityState={{ selected: i === index }}
               accessibilityLabel={slide.title}
@@ -192,31 +111,6 @@ const styles = StyleSheet.create({
   },
   counter: { ...type.meta, color: theme.gold, fontSize: 12 },
   version: { ...type.meta, color: theme.muted, fontSize: 10 },
-  pagerWrap: { position: 'relative', width: '100%' },
-  poster: {
-    alignSelf: 'center',
-    height: 480,
-    borderRadius: radius.card,
-  },
-  navRow: {
-    position: 'absolute',
-    top: '42%',
-    left: 4,
-    right: 4,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    pointerEvents: 'box-none',
-  },
-  navBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(10, 14, 39, 0.72)',
-  },
-  navBtnDisabled: { opacity: 0.25 },
-  pressed: { opacity: 0.7 },
   slideTitle: {
     marginTop: space.card,
     paddingHorizontal: space.card,
