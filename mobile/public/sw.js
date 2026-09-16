@@ -2,7 +2,7 @@
  * Service worker PWA — cache shell + assets, network-first pour l'API, push notifications.
  * Généré / maintenu manuellement (alternative Workbox si besoin).
  */
-const CACHE_NAME = 'pbvf-pwa-v3';
+const CACHE_NAME = 'pbvf-pwa-v4';
 const PRECACHE = ['/', '/manifest.json', '/pwa-icon-192.png', '/pwa-icon-512.png', '/favicon.png'];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,24 +82,14 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  // API Django / médias distants : réseau d'abord
-  if (
-    url.pathname.startsWith('/api/') ||
-    url.hostname.includes('railway.app') ||
-    url.hostname.includes('cloudinary.com') ||
-    url.hostname.includes('capitaloffusion.com')
-  ) {
-    event.respondWith(
-      fetch(request)
-        .then((res) => res)
-        .catch(() => caches.match(request)),
-    );
+  // Le SW ne contrôle que son origine. Ne pas traiter app.capitaloffusion.com
+  // comme une API distante (l'ancien test `hostname.includes('capitaloffusion.com')`
+  // matchait la PWA elle-même et renvoyait les 404 Vercel telles quelles).
+  if (url.origin !== self.location.origin) {
     return;
   }
 
-  // Navigation (document HTML) : réseau d'abord.
-  // Sans ça, la PWA installée démarre indéfiniment sur le HTML précaché
-  // et ne récupère jamais un nouveau bundle JS.
+  // Navigation (document HTML) : réseau d'abord, shell SPA si 404.
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -107,8 +97,9 @@ self.addEventListener('fetch', (event) => {
           if (res && res.ok) {
             const clone = res.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            return res;
           }
-          return res;
+          return caches.match('/').then((cached) => cached || res);
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match('/'))),
     );

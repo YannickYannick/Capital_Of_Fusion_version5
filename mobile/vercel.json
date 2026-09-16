@@ -11,5 +11,11 @@
       "source": "/manifest.json",
       "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
   ]
 }

@@ -167,3 +167,5 @@
 | [2026-09-16 02:35] Completed Task | Push KO sur PWA installée | Outcome: cause = SW cache-first sur le document HTML → PWA installée figée sur l'ancien bundle (SW sans handler `push`). Fix : navigation network-first, cache `v3`, `registration.update()` + `updateViaCache: 'none'`, `device_label` pour identifier les appareils (modèle + API + `send_push` + admin). |
 | [2026-09-16 02:40] Starting Task | Bouton activer notifs menu Infos | Objectif : réactiver les push depuis Infos si elles ont été coupées. |
 | [2026-09-16 02:45] Completed Task | Bouton activer notifs menu Infos | Outcome: carte Infos (`NotificationsToggle`) — Activer si jamais demandé, Réactiver si bloqué ; sync permission au retour des réglages ; tokens Web Push expirés (410) désactivés. |
+| [2026-09-16 15:15] Starting Task | 404 Vercel intermittent PWA | Objectif : comprendre/fixer NOT_FOUND blanc sur app.capitaloffusion.com. |
+| [2026-09-16 15:20] Completed Task | 404 Vercel intermittent PWA | Outcome: rewrite SPA `/:path* → /index.html` ; SW v4 ne traite plus sa propre origine comme API distante et sert le shell `/` si navigation 404. |
