@@ -175,3 +175,5 @@
 | [2026-09-16 15:40] Completed Task | 4 types de notifications | Outcome: champ `kind` (push/link/info/urgent) ; admin Django + action « Envoyer en push » ; API exclut les push seuls ; clic notif ouvre le lien seulement pour `link` (et urgence si URL). |
 | [2026-09-16 15:50] Starting Task | Bandeau urgent unique | Objectif : une seule urgence à la fois, la nouvelle remplace le texte. |
 | [2026-09-16 15:55] Completed Task | Bandeau urgent unique | Outcome: save() dépublie les urgences précédentes ; API ne renvoie que la dernière ; ticker n’affiche plus qu’un texte. |
+| [2026-09-16 16:00] Starting Task | Bandeau live + détail au clic | Objectif : refresh sans relancer l’app ; clic = texte complet. |
+| [2026-09-16 16:10] Completed Task | Bandeau live + détail au clic | Outcome: poll 20s + reprise au premier plan ; clic ticker → modal titre/corps/lien. |

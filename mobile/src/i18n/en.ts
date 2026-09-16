@@ -46,6 +46,8 @@ export const en: Messages = {
   urgent: {
     badge: 'URGENT',
     dismissA11y: 'Dismiss urgent announcements',
+    readA11y: 'Read the full urgent announcement',
+    closeDetail: 'Close',
   },
   timetable: {
     eyebrow: 'Workshops & parties',

@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { AppState, Platform } from 'react-native';
 
 import { useLocale } from '@/src/i18n/LocaleContext';
 import {
@@ -19,11 +20,11 @@ import {
 } from '@/src/lib/announcements';
 
 const DISMISS_KEY = 'pbvf-dismissed-announcements';
+/** Rafraîchit le bandeau sans relancer l’app. */
+const POLL_MS = 20_000;
 
 type AnnouncementsContextValue = {
-  /** Première urgente (compat). */
   urgent: FestivalAnnouncement | null;
-  /** Toutes les urgentes non fermées — pour le ticker. */
   urgentItems: FestivalAnnouncement[];
   normal: FestivalAnnouncement[];
   dismissUrgent: (id: string) => void;
@@ -34,7 +35,7 @@ type AnnouncementsContextValue = {
 const AnnouncementsContext = createContext<AnnouncementsContextValue | null>(null);
 
 /**
- * Charge les annonces + gère le dismiss du bandeau urgent (AsyncStorage).
+ * Charge les annonces, rafraîchit en arrière-plan, gère le dismiss du bandeau.
  */
 export function AnnouncementsProvider({ children }: { children: ReactNode }) {
   const { locale } = useLocale();
@@ -54,15 +55,37 @@ export function AnnouncementsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refresh = useCallback(() => {
-    fetchFestivalAnnouncements(locale).then(setItems).catch(() => {
-      setItems(localAnnouncementsFallback(locale));
-    });
+    fetchFestivalAnnouncements(locale)
+      .then(setItems)
+      .catch(() => undefined);
   }, [locale]);
 
   useEffect(() => {
     setItems(localAnnouncementsFallback(locale));
     refresh();
   }, [locale, refresh]);
+
+  useEffect(() => {
+    const timer = setInterval(refresh, POLL_MS);
+    const appSub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refresh();
+    });
+    const onVisible = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        refresh();
+      }
+    };
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisible);
+    }
+    return () => {
+      clearInterval(timer);
+      appSub.remove();
+      if (Platform.OS === 'web' && typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisible);
+      }
+    };
+  }, [refresh]);
 
   const persistDismissed = useCallback((next: Set<string>) => {
     AsyncStorage.setItem(DISMISS_KEY, JSON.stringify([...next])).catch(() => undefined);
