@@ -194,3 +194,4 @@
 | [2026-09-16 20:52] Starting Task | Langues visibles accueil | Objectif : remonter le sélecteur sous le live, avant les annonces. |
 | [2026-09-16 20:54] Completed Task | Langues visibles accueil | Outcome: Festival Rules + drapeaux juste sous le compteur, avant les annonces. |
 | [2026-09-16 20:56] Completed Task | 4 annonces accueil | Outcome: Check your pass, CoC, navettes, Festival Rules ; drapeaux sous le fil. |
+| [2026-09-16 20:56] Completed Task | Ordre 4 annonces | Outcome: pass → rules → CoC → Book your navette. Pas de limite à 3. |

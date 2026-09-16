@@ -61,7 +61,7 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/code-of-conduct",
-    "sort_order": 2,
+    "sort_order": 3,
     "i18n": {
       "en": {
         "title": "Code of Conduct",
@@ -88,22 +88,22 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/shuttles",
-    "sort_order": 3,
+    "sort_order": 4,
     "i18n": {
       "en": {
-        "title": "Shuttle times",
+        "title": "Book your navette",
         "body": "Check the Palmeraie <-> hotel schedule and book your shuttle.",
-        "link_label": "See shuttles"
+        "link_label": "Book a shuttle"
       },
       "fr": {
-        "title": "Horaires navettes",
+        "title": "Réserve ta navette",
         "body": "Consulte les horaires Palmeraie <-> hôtel et réserve ta navette.",
-        "link_label": "Voir les navettes"
+        "link_label": "Réserver une navette"
       },
       "es": {
-        "title": "Horarios de lanzaderas",
+        "title": "Reserva tu lanzadera",
         "body": "Consulta los horarios Palmeraie <-> hotel y reserva tu lanzadera.",
-        "link_label": "Ver lanzaderas"
+        "link_label": "Reservar lanzadera"
       }
     }
   },
@@ -115,7 +115,7 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/festival-rules",
-    "sort_order": 4,
+    "sort_order": 2,
     "i18n": {
       "en": {
         "title": "Festival Rules",
