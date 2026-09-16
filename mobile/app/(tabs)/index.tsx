@@ -20,7 +20,7 @@ import {
 } from '@/src/lib/liveNow';
 import { useAnnouncements } from '@/src/providers/AnnouncementsProvider';
 
-/** Accueil — hero + live / compteur + annonces + rules + langues. */
+/** Accueil — hero + live / compteur + 4 annonces + langues. */
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -89,18 +89,11 @@ export default function HomeScreen() {
           </Pressable>
         ) : null}
 
-        <Pressable onPress={() => router.push('/festival-rules')} accessibilityRole="button">
-          <GlassCard style={[styles.card, styles.rulesCard]}>
-            <Text style={styles.linkTitle}>{t('more.rulesTitle')}</Text>
-            <Text style={styles.linkBody}>{t('more.rulesBody')}</Text>
-          </GlassCard>
-        </Pressable>
+        <HomeAnnouncements />
 
         <GlassCard style={styles.card}>
           <LanguageFlags />
         </GlassCard>
-
-        <HomeAnnouncements />
 
         <Text style={styles.footer}>
           {t('more.footer', {
@@ -129,13 +122,6 @@ const styles = StyleSheet.create({
   },
   liveMeta: { marginTop: 4, ...type.body, fontSize: 14, color: theme.textMuted },
   card: { padding: space.card },
-  rulesCard: {
-    borderWidth: 1,
-    borderColor: theme.gold + '50',
-    backgroundColor: theme.gold + '08',
-  },
-  linkTitle: { ...type.title, fontSize: 16, color: theme.foreground },
-  linkBody: { marginTop: 4, ...type.body, fontSize: 14, color: theme.muted },
   footer: {
     marginTop: 28,
     textAlign: 'center',

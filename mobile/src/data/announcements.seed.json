@@ -79,5 +79,59 @@
         "link_label": "Leer"
       }
     }
+  },
+  {
+    "id": "seed-normal-shuttles",
+    "edition": "2026",
+    "kind": "link",
+    "priority": "normal",
+    "starts_at": null,
+    "ends_at": null,
+    "link_url": "/shuttles",
+    "sort_order": 3,
+    "i18n": {
+      "en": {
+        "title": "Shuttle times",
+        "body": "Check the Palmeraie <-> hotel schedule and book your shuttle.",
+        "link_label": "See shuttles"
+      },
+      "fr": {
+        "title": "Horaires navettes",
+        "body": "Consulte les horaires Palmeraie <-> hôtel et réserve ta navette.",
+        "link_label": "Voir les navettes"
+      },
+      "es": {
+        "title": "Horarios de lanzaderas",
+        "body": "Consulta los horarios Palmeraie <-> hotel y reserva tu lanzadera.",
+        "link_label": "Ver lanzaderas"
+      }
+    }
+  },
+  {
+    "id": "seed-normal-rules",
+    "edition": "2026",
+    "kind": "link",
+    "priority": "normal",
+    "starts_at": null,
+    "ends_at": null,
+    "link_url": "/festival-rules",
+    "sort_order": 4,
+    "i18n": {
+      "en": {
+        "title": "Festival Rules",
+        "body": "Important rules for all venues — cloakroom, food, Saturday pool party, hotel.",
+        "link_label": "Read the rules"
+      },
+      "fr": {
+        "title": "Règles du festival",
+        "body": "Règles importantes pour tous les lieux — vestiaire, nourriture, pool party samedi, hôtel.",
+        "link_label": "Lire le règlement"
+      },
+      "es": {
+        "title": "Reglas del festival",
+        "body": "Reglas importantes para todos los lugares — guardarropa, comida, pool party sábado, hotel.",
+        "link_label": "Leer el reglamento"
+      }
+    }
   }
 ]
