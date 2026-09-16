@@ -77,9 +77,6 @@ export type Messages = {
     title: string;
     overview: string;
     zones: string;
-    address: string;
-    addressCopied: string;
-    copyAddressA11y: string;
     overviewPlan: string;
     overviewExpandA11y: string;
     areas12Name: string;

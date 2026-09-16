@@ -179,3 +179,12 @@
 | [2026-09-16 16:10] Completed Task | Bandeau live + détail au clic | Outcome: poll 20s + reprise au premier plan ; clic ticker → modal titre/corps/lien. |
 | [2026-09-16 16:05] Starting Task | Carrousel Passes / Code de conduite | Objectif : compteur et dots qui suivent le swipe (PWA). |
 | [2026-09-16 16:15] Completed Task | Carrousel Passes / Code de conduite | Outcome: `PosterPager` commun — `onScroll` + snap + pan-x ; plus de dépendance à `onMomentumScrollEnd` (souvent muet sur web). |
+| [2026-09-16 16:02] Completed Task | Test urgence live | Outcome: annonce `urgent` publiée + push Web Push 2/2 (bandeau « Urgent test » / « Test urgence »). |
+| [2026-09-16 20:00] Completed Task | Test urgence 2 | Outcome: nouvelle urgence « Urgent test 2 » ; push Web Push 2/2. |
+| [2026-09-16 20:03] Completed Task | Test urgence Guillaume | Outcome: urgence « test guillauame » ; push Web Push 2/2. |
+| [2026-09-16 20:11] Completed Task | Annonce navettes (lien) | Outcome: kind `link` → `/shuttles` ; push Web Push 2/2. |
+| [2026-09-16 20:16] Completed Task | Retrait doublon CoC | Outcome: une des deux cartes « Code of Conduct » dépubliée ; 1 restante. |
+| [2026-09-16 20:33] Completed Task | Urgence navettes | Outcome: bandeau urgent + lien `/shuttles` ; push Web Push 2/2. |
+| [2026-09-16 20:38] Starting Task | Vue d’ensemble carte | Objectif : remplacer l’overview par l’affiche PLAN (adresses jeu–dim / samedi). |
+| [2026-09-16 20:42] Completed Task | Vue d’ensemble carte | Outcome: `venue-overview.png` (affiche PLAN + 2 adresses) ; ratio 3/4 ; texte copiable aligné. |
+| [2026-09-16 20:43] Completed Task | Retrait adresse 18–19 | Outcome: ligne sous la vue d’ensemble retirée (adresses restent sur l’affiche PLAN). |

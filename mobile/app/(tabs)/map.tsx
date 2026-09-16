@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown, MapPin, Play } from 'lucide-react-native';
-import * as Clipboard from 'expo-clipboard';
 import { Image, type ImageSource } from 'expo-image';
 import { LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, Text, UIManager, View } from 'react-native';
 
@@ -51,13 +50,6 @@ export default function MapScreen() {
   const { t } = useLocale();
   const [openId, setOpenId] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<LightboxState>(null);
-  const [addressCopied, setAddressCopied] = useState(false);
-
-  useEffect(() => {
-    if (!addressCopied) return;
-    const timer = setTimeout(() => setAddressCopied(false), 1800);
-    return () => clearTimeout(timer);
-  }, [addressCopied]);
 
   const toggle = (id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -66,14 +58,6 @@ export default function MapScreen() {
 
   const openImage = (source: ImageSource, label: string) => {
     setLightbox({ source, label });
-  };
-
-  /**
-   * Copie l’adresse venue dans le presse-papiers.
-   */
-  const copyAddress = async () => {
-    await Clipboard.setStringAsync(t('map.address'));
-    setAddressCopied(true);
   };
 
   return (
@@ -96,17 +80,6 @@ export default function MapScreen() {
               />
             </Pressable>
           </GlassCard>
-          <Pressable
-            onPress={copyAddress}
-            accessibilityRole="button"
-            accessibilityLabel={t('map.copyAddressA11y')}
-            hitSlop={8}
-            style={({ pressed }) => [styles.addressBtn, pressed && styles.pressed]}
-          >
-            <Text style={[styles.hint, addressCopied && styles.hintCopied]}>
-              {addressCopied ? t('map.addressCopied') : t('map.address')}
-            </Text>
-          </Pressable>
 
           <Text style={[styles.sectionLabel, styles.sectionSpaced]}>{t('map.zones')}</Text>
           <View style={styles.accordion}>
@@ -349,21 +322,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionSpaced: { marginTop: space.gapLg },
-  hint: {
-    marginTop: 8,
-    ...type.caption,
-    color: theme.muted,
-  },
-  hintCopied: {
-    color: theme.gold,
-  },
-  addressBtn: {
-    alignSelf: 'flex-start',
-  },
   mapImg: {
     width: '100%',
-    aspectRatio: 1.2,
+    aspectRatio: 3 / 4,
     backgroundColor: theme.surface2,
+    borderRadius: radius.card,
   },
   mapImgAreas12: {
     width: '100%',

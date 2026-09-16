@@ -193,7 +193,7 @@ export const images = {
   bracelet: require('@/assets/images/festival/bracelet.jpg'),
   /** @deprecated Placeholder — préférer venueOverview / venueArea1 / venueArea2 */
   siteMap: require('@/assets/images/festival/site-map.jpg'),
-  venueOverview: require('@/assets/images/festival/venue-overview.jpg'),
+  venueOverview: require('@/assets/images/festival/venue-overview.png'),
   /** Plan Zones 1 & 2 (La Palmeraie + Aquaboulevard) — page Accès & Venue. */
   venueAreas12: require('@/assets/images/festival/area1-2.png'),
   venueArea1: require('@/assets/images/festival/area1.png'),
