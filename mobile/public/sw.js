@@ -2,7 +2,7 @@
  * Service worker PWA — cache shell + assets, network-first pour l'API, push notifications.
  * Généré / maintenu manuellement (alternative Workbox si besoin).
  */
-const CACHE_NAME = 'pbvf-pwa-v4';
+const CACHE_NAME = 'pbvf-pwa-v5';
 const PRECACHE = ['/', '/manifest.json', '/pwa-icon-192.png', '/pwa-icon-512.png', '/favicon.png'];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -28,8 +28,8 @@ self.addEventListener('push', (event) => {
     badge: '/pwa-icon-192.png',
     vibrate: [100, 50, 100],
     data: {
-      url: data.url || '/',
       ...data,
+      url: data.url || '/',
     },
     actions: data.actions || [],
   };
@@ -43,7 +43,8 @@ self.addEventListener('notificationclick', (event) => {
   console.log('[SW] Notification click:', event);
   event.notification.close();
 
-  const url = event.notification.data?.url || '/';
+  const rawUrl = event.notification.data?.url || '/';
+  const url = rawUrl.startsWith('/') ? self.location.origin + rawUrl : rawUrl;
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {

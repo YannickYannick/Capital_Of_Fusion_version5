@@ -1,6 +1,7 @@
 """
 Modèles Events — Event, EventPass, Registration. Alignés MCD Phase 1 section 1.5.
 """
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from apps.core.models import BaseModel
@@ -162,15 +163,38 @@ class FestivalProgramSlot(BaseModel):
 
 class FestivalAnnouncement(BaseModel):
     """
-    Annonce festival mobile/PWA.
-    urgent = bandeau toutes pages ; normal = fil accueil.
+    Notification / annonce festival (PWA).
+
+    Quatre types :
+    - push : notif spontanée (téléphone uniquement, pas dans l'app)
+    - link : annonce accueil, le clic ouvre une page
+    - info : annonce accueil, sans redirection
+    - urgent : bandeau rouge sur toutes les pages
     """
+
+    class Kind(models.TextChoices):
+        PUSH = "push", "Notif spontanée (push seul)"
+        LINK = "link", "Annonce avec redirection"
+        INFO = "info", "Annonce sans redirection"
+        URGENT = "urgent", "Urgence (bandeau)"
 
     class Priority(models.TextChoices):
         URGENT = "urgent", "Urgent (bandeau)"
         NORMAL = "normal", "Normal (accueil)"
 
     edition = models.CharField(max_length=16, default="2026", db_index=True)
+    kind = models.CharField(
+        max_length=16,
+        choices=Kind.choices,
+        default=Kind.INFO,
+        db_index=True,
+        help_text=(
+            "push = notification téléphone uniquement. "
+            "link = carte accueil + ouverture d'une page. "
+            "info = carte accueil sans lien. "
+            "urgent = bandeau en haut de toutes les pages."
+        ),
+    )
     title = models.CharField(max_length=200)
     body = models.TextField()
     priority = models.CharField(
@@ -178,6 +202,7 @@ class FestivalAnnouncement(BaseModel):
         choices=Priority.choices,
         default=Priority.NORMAL,
         db_index=True,
+        help_text="Dérivé automatiquement du type (urgent vs le reste).",
     )
     is_published = models.BooleanField(default=True)
     starts_at = models.DateTimeField(
@@ -193,18 +218,48 @@ class FestivalAnnouncement(BaseModel):
     link_url = models.CharField(
         max_length=500,
         blank=True,
-        help_text="URL absolue ou chemin app (/passes, /code-of-conduct…)",
+        help_text="Obligatoire pour une annonce avec redirection (/passes, /code-of-conduct…)",
     )
     link_label = models.CharField(max_length=80, blank=True)
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        verbose_name = "Annonce festival"
-        verbose_name_plural = "Annonces festival"
+        verbose_name = "Notification / annonce"
+        verbose_name_plural = "Notifications / annonces"
         ordering = ["-priority", "sort_order", "-created_at"]
 
     def __str__(self):
-        return f"[{self.priority}] {self.title}"
+        return f"[{self.kind}] {self.title}"
+
+    def sync_priority(self) -> None:
+        """priority reste aligné sur kind pour le bandeau vs le fil accueil."""
+        if self.kind == self.Kind.URGENT:
+            self.priority = self.Priority.URGENT
+        else:
+            self.priority = self.Priority.NORMAL
+
+    def appears_in_app(self) -> bool:
+        """False pour les notifs spontanées (push seul)."""
+        return self.kind != self.Kind.PUSH
+
+    def push_open_url(self) -> str:
+        """URL ouverte au tap sur la notification système."""
+        if self.kind == self.Kind.LINK and self.link_url.strip():
+            return self.link_url.strip()
+        if self.kind == self.Kind.URGENT and self.link_url.strip():
+            return self.link_url.strip()
+        return "/"
+
+    def clean(self):
+        super().clean()
+        if self.kind == self.Kind.LINK and not (self.link_url or "").strip():
+            raise ValidationError(
+                {"link_url": "Une annonce avec redirection doit avoir une URL (ex. /passes)."}
+            )
+
+    def save(self, *args, **kwargs):
+        self.sync_priority()
+        super().save(*args, **kwargs)
 
     def is_active_at(self, moment=None) -> bool:
         """True si publiée et dans la fenêtre starts_at / ends_at."""

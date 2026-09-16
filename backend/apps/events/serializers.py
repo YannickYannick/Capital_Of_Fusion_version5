@@ -116,6 +116,7 @@ class FestivalAnnouncementSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "edition",
+            "kind",
             "title",
             "body",
             "priority",

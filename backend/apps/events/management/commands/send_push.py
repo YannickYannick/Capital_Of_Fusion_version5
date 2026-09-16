@@ -120,7 +120,7 @@ class Command(BaseCommand):
             stats = send_push_to_all(
                 title=options["title"],
                 body=options["body"],
-                data=data,
+                data=data or {"kind": "push", "url": "/"},
                 platform=options["platform"],
             )
 

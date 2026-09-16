@@ -241,13 +241,16 @@ def send_push_to_all(
 
 
 def send_announcement_notification(announcement) -> dict:
-    """Envoie une notification pour une annonce festival."""
-    data = {"type": "announcement", "id": str(announcement.id)}
-    if announcement.link_url:
-        data["url"] = announcement.link_url
-
+    """Envoie une notification pour une annonce festival, selon son type."""
+    data = {
+        "type": announcement.kind,
+        "kind": announcement.kind,
+        "id": str(announcement.id),
+        "url": announcement.push_open_url(),
+    }
+    body = announcement.body or ""
     return send_push_to_all(
         title=announcement.title,
-        body=announcement.body[:150] + ("..." if len(announcement.body) > 150 else ""),
+        body=body[:150] + ("..." if len(body) > 150 else ""),
         data=data,
     )

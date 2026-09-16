@@ -2,6 +2,7 @@
   {
     "id": "seed-urgent-welcome",
     "edition": "2026",
+    "kind": "urgent",
     "priority": "urgent",
     "starts_at": null,
     "ends_at": null,
@@ -28,6 +29,7 @@
   {
     "id": "seed-normal-passes",
     "edition": "2026",
+    "kind": "link",
     "priority": "normal",
     "starts_at": null,
     "ends_at": null,
@@ -54,6 +56,7 @@
   {
     "id": "seed-normal-coc",
     "edition": "2026",
+    "kind": "link",
     "priority": "normal",
     "starts_at": null,
     "ends_at": null,

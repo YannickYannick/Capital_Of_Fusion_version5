@@ -240,6 +240,8 @@ class FestivalAnnouncementListAPIView(APIView):
         qs = FestivalAnnouncement.objects.filter(
             edition=edition,
             is_published=True,
+        ).exclude(
+            kind=FestivalAnnouncement.Kind.PUSH,
         ).order_by("-priority", "sort_order", "-created_at")
 
         active = [a for a in qs if a.is_active_at(now)]

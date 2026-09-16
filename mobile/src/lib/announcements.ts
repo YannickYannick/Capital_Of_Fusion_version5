@@ -3,11 +3,13 @@ import { FESTIVAL } from '@/src/lib/festival-data';
 import announcementsSeed from '@/src/data/announcements.seed.json';
 import type { AppLocale } from '@/src/i18n/types';
 
+export type AnnouncementKind = 'push' | 'link' | 'info' | 'urgent';
 export type AnnouncementPriority = 'urgent' | 'normal';
 
 export type FestivalAnnouncement = {
   id: string;
   edition: string;
+  kind: AnnouncementKind;
   title: string;
   body: string;
   priority: AnnouncementPriority;
@@ -27,6 +29,7 @@ type SeedCopy = {
 type SeedAnnouncement = {
   id: string;
   edition: string;
+  kind: AnnouncementKind;
   priority: AnnouncementPriority;
   starts_at: string | null;
   ends_at: string | null;
@@ -46,6 +49,7 @@ export function localAnnouncementsFallback(
     return {
       id: item.id,
       edition: item.edition,
+      kind: item.kind,
       title: copy.title,
       body: copy.body,
       priority: item.priority,
@@ -77,12 +81,16 @@ export async function fetchFestivalAnnouncements(
 
 export function filterUrgent(items: FestivalAnnouncement[]): FestivalAnnouncement[] {
   return items
-    .filter((a) => a.priority === 'urgent')
+    .filter((a) => a.kind === 'urgent' || (!a.kind && a.priority === 'urgent'))
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export function filterNormal(items: FestivalAnnouncement[]): FestivalAnnouncement[] {
   return items
-    .filter((a) => a.priority === 'normal')
+    .filter((a) => {
+      if (a.kind === 'push' || a.kind === 'urgent') return false;
+      if (a.kind === 'link' || a.kind === 'info') return true;
+      return a.priority === 'normal';
+    })
     .sort((a, b) => a.sort_order - b.sort_order);
 }
