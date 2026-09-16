@@ -9,7 +9,7 @@ import {
   sendPushTokenToBackend,
   sendWebPushSubscriptionToBackend,
 } from '@/src/hooks/usePushNotifications';
-import { API_BASE_URL } from '@/src/lib/api';
+import { getApiBaseUrl } from '@/src/lib/api';
 
 type Props = { children: ReactNode };
 
@@ -26,7 +26,7 @@ export function PushNotificationsProvider({ children }: Props) {
   useEffect(() => {
     if (!expoPushToken || Platform.OS === 'web') return;
 
-    sendPushTokenToBackend(expoPushToken, API_BASE_URL)
+    sendPushTokenToBackend(expoPushToken, getApiBaseUrl())
       .then((success) => {
         if (success) {
           console.log('Expo push token registered with backend');
@@ -43,7 +43,7 @@ export function PushNotificationsProvider({ children }: Props) {
   useEffect(() => {
     if (!webPushSubscription || Platform.OS !== 'web') return;
 
-    sendWebPushSubscriptionToBackend(webPushSubscription, API_BASE_URL)
+    sendWebPushSubscriptionToBackend(webPushSubscription, getApiBaseUrl())
       .then((success) => {
         if (success) {
           console.log('Web push subscription registered with backend');
