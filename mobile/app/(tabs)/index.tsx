@@ -10,6 +10,7 @@ import { HomeAnnouncements } from '@/src/components/HomeAnnouncements';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { LivePill } from '@/src/components/ui/LivePill';
 import programSeed from '@/src/data/program.seed.json';
+import { FESTIVAL } from '@/src/lib/festival-data';
 import { useLocale } from '@/src/i18n/LocaleContext';
 import {
   festivalStartDate,
@@ -85,6 +86,14 @@ export default function HomeScreen() {
         ) : null}
 
         <HomeAnnouncements />
+
+        <Text style={styles.footer}>
+          {t('more.footer', {
+            name: FESTIVAL.name,
+            location: FESTIVAL.location,
+            edition: FESTIVAL.edition,
+          })}
+        </Text>
       </View>
     </ScrollView>
   );
@@ -104,4 +113,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display,
   },
   liveMeta: { marginTop: 4, ...type.body, fontSize: 14, color: theme.textMuted },
+  footer: {
+    marginTop: 28,
+    textAlign: 'center',
+    ...type.meta,
+    fontSize: 10,
+    color: theme.muted,
+  },
 });
