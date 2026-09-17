@@ -207,4 +207,5 @@
 | [2026-09-17 14:16] Starting Task | Remplacement Luis & Andrea | Objectif : 3 créneaux → David & Ines / Mika & Liza / Claudio & Manue. |
 | [2026-09-17 14:20] Completed Task | Remplacement Luis & Andrea | Outcome: seed + PWA + passes mis à jour ; migration `0017` appliquée Railway ; Luis & Andrea retiré du seed artistes / staff_role. Thème Claudio & Manue = `Theme TBA`. |
 | [2026-09-17 14:24] Starting Task | Thème Claudio & Manue | Objectif : Theme TBA → Bachata Fusion. |
+| [2026-09-17 14:25] Completed Task | Thème Claudio & Manue | Outcome: style `Bachata Fusion` en seed + BDD prod (1 créneau sam 15h). |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |
