@@ -212,4 +212,6 @@
 | [2026-09-17 14:38] Completed Task | Badge bandeau configurable | Outcome: `badge_label` (admin + API) ; tap ouvre `link_url` ; urgence test « test » → capitaloffusion.com ; migration `0018`. |
 | [2026-09-17 14:39] Starting Task | Adresses onglet Carte | Objectif : 3 adresses cliquables (Maps + copier) Main / Pool-samedi / Hôtel. |
 | [2026-09-17 14:42] Completed Task | Adresses onglet Carte | Outcome: section Adresses sous overview — tap = Google Maps, icône = copier ; EN/FR/ES. |
+| [2026-09-17 14:55] Starting Task | Nouveau logo PBVF app | Objectif : remplacer logo accueil + icônes PWA par le wordmark Paris Bachata Vibe. |
+| [2026-09-17 14:57] Completed Task | Nouveau logo PBVF app | Outcome: `pbv-logo.png` + favicon/PWA 192/512/icon/splash ; hero hauteur 360, logo contain 200. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |
