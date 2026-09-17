@@ -148,6 +148,8 @@ export const en: Messages = {
     passesBody: 'What’s included / not included in each pass.',
     shuttlesTitle: 'Shuttles',
     shuttlesBody: 'Palmeraie ↔ hotel schedule — by day and direction.',
+    hotelSocialsTitle: 'Hotel Day Socials',
+    hotelSocialsBody: 'Daytime socials at the partner hotel — Thu to Sun.',
     jackTitle: 'Jack & Jill Vibe',
     jackBody: 'Posters — pre-selection and final.',
     battleTitle: 'All Star Street Battle',
@@ -245,6 +247,13 @@ export const en: Messages = {
     dirToHotel: 'Palmeraie → Hotel',
     dirToPalmeraie: 'Hotel → Palmeraie',
     backendHint: 'Make sure the Django backend is running (port 8000).',
+  },
+  hotelSocials: {
+    eyebrow: 'Partner hotel',
+    title: 'Hotel Day Socials',
+    intro: 'Daytime socials at the festival hotel — open dancing between workshops and parties.',
+    address: '40 Av. du Maréchal de Lattre de Tassigny, 92360 Meudon',
+    posterA11y: 'Hotel Day Socials schedule poster',
   },
   artist: {
     staffBadge: 'Team CoF member',

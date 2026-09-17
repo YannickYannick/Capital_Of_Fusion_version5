@@ -18,6 +18,7 @@ STAGES = [
     "El Patio Room",
     "Vibe Room",
     "Aquaboulevard",
+    "Hotel",
 ]
 
 # Tuple: day_id, room, start, end, title, style, level, category, is_live, not_in_full_pass
@@ -25,11 +26,13 @@ STAGES = [
 # category: workshop | party | break | competition | social | info | concert
 SLOT_ROWS: list[tuple] = [
     # —— Jeudi ——
+    ("jeu", "Hotel", "14:00", "17:00", "Hotel Day Socials", "Partner hotel · Meudon", "", "social", False, False),
     ("jeu", "La Casa Room", "18:00", "18:00", "Open Doors", "", "", "info", False, False),
     ("jeu", "La Casa Room", "18:00", "19:30", "Social Day", "La Casa Room", "", "social", False, False),
     ("jeu", "La Casa Room", "19:30", "22:30", "Carlos y Paz", "Bootcamp Bachazouk", "open", "workshop", False, False),
     ("jeu", "La Casa Room", "22:30", "04:00", "Urban Vibe Party", "Today's music & remix authorized", "", "party", True, False),
     # —— Vendredi ——
+    ("ven", "Hotel", "13:00", "18:30", "Hotel Day Socials", "Partner hotel · Meudon", "", "social", False, False),
     ("ven", "La Casa Room", "13:00", "13:00", "Open Doors", "Toutes salles", "", "info", False, False),
     ("ven", "La Casa Room", "14:00", "15:55", "Mika", "Masterclass Musicality", "open", "workshop", False, False),
     ("ven", "La Casa Room", "16:00", "16:55", "Jerem & Jade", "Bachazouk", "advanced", "workshop", False, False),
@@ -42,6 +45,7 @@ SLOT_ROWS: list[tuple] = [
     ("ven", "El Patio Room", "17:00", "22:00", "Open Air Social Day", "", "", "social", False, False),
     ("ven", "Vibe Room", "00:00", "03:00", "Boiler Room DJ Set", "Live Instagram 01h–02h Mix World Wide", "", "party", True, False),
     # —— Samedi ——
+    ("sam", "Hotel", "13:30", "18:00", "Hotel Day Socials", "Partner hotel · Meudon", "", "social", False, False),
     ("sam", "La Casa Room", "09:45", "09:45", "Open Doors", "Toutes salles", "", "info", False, False),
     ("sam", "La Casa Room", "10:00", "10:55", "Brice & Manue", "Bachata Fusion", "open", "workshop", False, False),
     ("sam", "La Escuela", "10:00", "10:55", "Pablo & Andrea", "Sensual Bachata", "beginner", "workshop", False, False),
@@ -71,6 +75,7 @@ SLOT_ROWS: list[tuple] = [
     ("sam", "Aquaboulevard", "23:45", "00:15", "Artist Presentation", "XXL Vibe Pool Party", "", "info", False, False),
     ("sam", "Aquaboulevard", "00:15", "05:00", "Capital of Fusion Party", "Multi-Vibes 100% Bachata", "", "party", True, False),
     # —— Dimanche ——
+    ("dim", "Hotel", "15:00", "20:00", "Hotel Day Socials", "Partner hotel · Meudon", "", "social", False, False),
     ("dim", "La Casa Room", "10:45", "10:45", "Open Doors", "Toutes salles", "", "info", False, False),
     ("dim", "La Casa Room", "11:00", "11:55", "Christina & Rebeca", "Sensual Bachata", "open", "workshop", False, False),
     ("dim", "La Escuela", "11:00", "11:55", "Oliver Chiro", "Body Care for Dance", "beginner", "workshop", False, False),

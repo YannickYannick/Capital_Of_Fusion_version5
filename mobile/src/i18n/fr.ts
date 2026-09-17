@@ -148,6 +148,8 @@ export const fr: Messages = {
     passesBody: 'Détail inclus / non inclus de chaque formule.',
     shuttlesTitle: 'Navettes',
     shuttlesBody: 'Horaires Palmeraie ↔ hôtel — par jour et par sens.',
+    hotelSocialsTitle: 'Hotel Day Socials',
+    hotelSocialsBody: 'Socials de jour à l’hôtel partenaire — jeu au dim.',
     jackTitle: 'Jack & Jill Vibe',
     jackBody: 'Affiches — pré-sélection et finale.',
     battleTitle: 'All Star Street Battle',
@@ -245,6 +247,13 @@ export const fr: Messages = {
     dirToHotel: 'Palmeraie → Hôtel',
     dirToPalmeraie: 'Hôtel → Palmeraie',
     backendHint: 'Vérifie que le backend Django tourne (port 8000).',
+  },
+  hotelSocials: {
+    eyebrow: 'Hôtel partenaire',
+    title: 'Hotel Day Socials',
+    intro: 'Socials de jour à l’hôtel du festival — danse libre entre workshops et soirées.',
+    address: '40 Av. du Maréchal de Lattre de Tassigny, 92360 Meudon',
+    posterA11y: 'Affiche horaires Hotel Day Socials',
   },
   artist: {
     staffBadge: 'Membre Team CoF',

@@ -20,6 +20,14 @@ export const DAYS: Day[] = [
   { id: 'dim', label: 'Dim', date: '20 sept.' },
 ];
 
+/** Socials de jour à l’hôtel partenaire (affiche officielle). */
+export const HOTEL_DAY_SOCIALS = [
+  { dayId: 'jeu', start: '14:00', end: '17:00' },
+  { dayId: 'ven', start: '13:00', end: '18:30' },
+  { dayId: 'sam', start: '13:30', end: '18:00' },
+  { dayId: 'dim', start: '15:00', end: '20:00' },
+] as const;
+
 export const STAGES = ['La Casa Room', 'El Patio', 'Vibe Room', 'Aquaboulevard'] as const;
 
 export type Slot = {
@@ -204,4 +212,5 @@ export const images = {
   jackNJillJudgesSundayRounds: require('@/assets/images/festival/jack-n-jill-judges-sunday-rounds.png'),
   jackNJillJudgesSundayFinal: require('@/assets/images/festival/jack-n-jill-judges-sunday-final.png'),
   streetBachataBattle: require('@/assets/images/festival/street-bachata-battle-18-sept-26.jpg'),
+  hotelDaySocials: require('@/assets/images/festival/hotel-day-socials.png'),
 };

@@ -224,5 +224,7 @@
 | [2026-09-17 16:10] Completed Task | Réactiver bandeau + push | Outcome: urgence test republiee + send_push. |
 | [2026-09-17 16:15] Starting Task | Soft redirect mobile → app | Objectif : recommandation PWA sur téléphone (EN/FR/ES), dismissible. |
 | [2026-09-17 16:16] Completed Task | Soft redirect mobile → app | Outcome: `MobileAppRecommendBanner` bas écran ≤768px → app.capitaloffusion.com ; Later = localStorage ; EN/FR/ES. |
+| [2026-09-17 17:14] Starting Task | Hotel Day Socials | Objectif : horaires socials hôtel dans l’app + page book-your-hotel. |
+| [2026-09-17 17:20] Completed Task | Hotel Day Socials | Outcome: page app `/hotel-socials` + More ; section + affiche + markdown EN/FR/ES sur book-your-hotel ; 4 créneaux `Hotel` (seed + migration 0019). |
 | [2026-09-17 16:14] Starting Task | Redirect mobile → PWA | Objectif : www.capitaloffusion.com/ (téléphone) → app.capitaloffusion.com, FR/EN/ES. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |

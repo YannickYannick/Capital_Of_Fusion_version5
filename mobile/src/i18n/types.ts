@@ -152,6 +152,8 @@ export type Messages = {
     passesBody: string;
     shuttlesTitle: string;
     shuttlesBody: string;
+    hotelSocialsTitle: string;
+    hotelSocialsBody: string;
     jackTitle: string;
     jackBody: string;
     battleTitle: string;
@@ -231,6 +233,13 @@ export type Messages = {
     dirToHotel: string;
     dirToPalmeraie: string;
     backendHint: string;
+  };
+  hotelSocials: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    address: string;
+    posterA11y: string;
   };
   artist: {
     staffBadge: string;

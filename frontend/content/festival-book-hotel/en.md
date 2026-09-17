@@ -8,6 +8,15 @@ A shuttle service will also be available between the hotel and the festival venu
 
 ![Partner festival hotel](/festival-hotel-cof.jpg)
 
+### Hotel Day Socials
+
+| Day | Hours |
+| --- | --- |
+| Thursday | 14:00 – 17:00 |
+| Friday | 13:00 – 18:30 |
+| Saturday | 13:30 – 18:00 |
+| Sunday | 15:00 – 20:00 |
+
 We offer 2 options:
 
 - Premium room for 3 people

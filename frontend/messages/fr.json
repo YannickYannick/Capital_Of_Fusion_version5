@@ -237,7 +237,17 @@
       "title": "Book your hôtel",
       "subtitle": "Hôtel 4★ avec piscine et petit-déjeuner, navette festival, socials quotidiens.",
       "ctaGoAndDance": "Réserver sur go&dance",
-      "empty": "Contenu à venir."
+      "empty": "Contenu à venir.",
+      "socialsTitle": "Hotel Day Socials",
+      "socialsIntro": "Socials de jour à l’hôtel partenaire — danse libre entre workshops et soirées.",
+      "socialsPosterAlt": "Affiche horaires Hotel Day Socials — jeudi à dimanche",
+      "socialsNote": "À l’hôtel du festival · 40 Av. du Maréchal de Lattre de Tassigny, 92360 Meudon",
+      "socialsDays": {
+        "thu": "Jeudi",
+        "fri": "Vendredi",
+        "sat": "Samedi",
+        "sun": "Dimanche"
+      }
     },
     "festivalGiveaway": {
       "metaTitle": "Giveaway & Capital of Culture | Festival",

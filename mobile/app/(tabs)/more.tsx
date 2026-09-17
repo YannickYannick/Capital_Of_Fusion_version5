@@ -57,6 +57,12 @@ export default function MoreScreen() {
               <Text style={styles.body}>{t('more.shuttlesBody')}</Text>
             </GlassCard>
           </Pressable>
+          <Pressable onPress={() => router.push('/hotel-socials')} accessibilityRole="button">
+            <GlassCard style={styles.card}>
+              <Text style={styles.title}>{t('more.hotelSocialsTitle')}</Text>
+              <Text style={styles.body}>{t('more.hotelSocialsBody')}</Text>
+            </GlassCard>
+          </Pressable>
         </InfoSection>
 
         <InfoSection title={t('more.sectionCompetitions')}>

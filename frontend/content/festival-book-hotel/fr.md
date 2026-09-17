@@ -8,6 +8,15 @@ Un service de navette sera également disponible entre l’hôtel et le lieu du 
 
 ![Hôtel partenaire festival](/festival-hotel-cof.jpg)
 
+### Hotel Day Socials
+
+| Jour | Horaires |
+| --- | --- |
+| Jeudi | 14:00 – 17:00 |
+| Vendredi | 13:00 – 18:30 |
+| Samedi | 13:30 – 18:00 |
+| Dimanche | 15:00 – 20:00 |
+
 Nous proposons 2 options :
 
 - Chambre premium pour 3 personnes
