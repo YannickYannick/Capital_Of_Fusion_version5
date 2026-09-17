@@ -198,3 +198,12 @@
 | [2026-09-16 21:03] Completed Task | Annonce règlement | Outcome: carte `Festival Rules` → `/festival-rules` republiee (2e du fil). |
 | [2026-09-16 21:06] Starting Task | Sections écran Infos | Objectif : titres App / Sur place / Compétitions / Règles / Aide. |
 | [2026-09-16 21:08] Completed Task | Sections écran Infos | Outcome: `more.tsx` groupé en 5 sections ; Festival Rules reste en carte or. |
+| [2026-09-16 21:07] Completed Task | Notif test Clément 2 | Outcome: push spontané « test clément 2 » ; Web Push 2 OK, 1 échec (token JWT). |
+| [2026-09-16 21:24] Completed Task | Urgence J-1 | Outcome: bandeau « Le festival commence demain » ; push 2 OK, 1 échec. |
+| [2026-09-16 21:48] Starting Task | Notif test | Objectif : envoyer un push spontané « test » à tous les appareils. |
+| [2026-09-16 21:49] Completed Task | Notif test | Outcome: push « test » / « test » ; Web Push 2 OK, 1 échec (token JWT Safari). |
+| [2026-09-16 22:01] Starting Task | Urgence test bandeau | Objectif : publier une urgence « test » + push. |
+| [2026-09-16 22:02] Completed Task | Urgence test bandeau | Outcome: urgence « test » publiée (remplace la précédente) ; push 2 OK, 2 échecs (token expiré + JWT Safari). |
+| [2026-09-17 14:16] Starting Task | Remplacement Luis & Andrea | Objectif : 3 créneaux → David & Ines / Mika & Liza / Claudio & Manue. |
+| [2026-09-17 14:20] Completed Task | Remplacement Luis & Andrea | Outcome: seed + PWA + passes mis à jour ; migration `0017` appliquée Railway ; Luis & Andrea retiré du seed artistes / staff_role. Thème Claudio & Manue = `Theme TBA`. |
+| [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |

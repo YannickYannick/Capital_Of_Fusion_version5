@@ -118,44 +118,6 @@
     "linked_partner_structures": []
   },
   {
-    "id": 57,
-    "username": "luis-andrea",
-    "first_name": "Luis & Andrea",
-    "last_name": "",
-    "email": "",
-    "phone": "",
-    "bio": "",
-    "bio_en": "",
-    "bio_es": "",
-    "profile_picture": "https://res.cloudinary.com/capital-of-fusion/image/upload/v1/media/Artistes/luis-andrea_image00002-2_bf0jet",
-    "cover_image": null,
-    "professions": [
-      {
-        "id": "81120152-de18-49ce-8b5d-1ce51a20d020",
-        "name": "Danseur",
-        "slug": "danseur"
-      },
-      {
-        "id": "deaf51df-ef5a-4478-9b4d-f712c6b02486",
-        "name": "Professeur",
-        "slug": "professeur"
-      }
-    ],
-    "is_staff_member": false,
-    "artist_display_order": 0,
-    "external_links": {
-      "instagram": [],
-      "websites": [],
-      "facebook": "",
-      "contact": {
-        "email": "",
-        "phone": "",
-        "whatsapp": ""
-      }
-    },
-    "linked_partner_structures": []
-  },
-  {
     "id": 58,
     "username": "melonito",
     "first_name": "Melonito",

@@ -214,7 +214,7 @@ export const FESTIVAL_PASSES: FestivalPass[] = [
     imageKey: 'masterclass',
     included: [
       'Accès à la Masterclass correspondant à ton billet :',
-      'Méline · Claudio · Luis y Andrea',
+      'Méline · Claudio · Mika & Liza',
     ],
     notIncluded: [
       'Tout le reste du programme, activités & services',
