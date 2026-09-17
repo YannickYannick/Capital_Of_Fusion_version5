@@ -197,6 +197,15 @@ class FestivalAnnouncement(BaseModel):
     )
     title = models.CharField(max_length=200)
     body = models.TextField()
+    badge_label = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        help_text=(
+            "Mot affiché à gauche du bandeau (urgence). "
+            "Ex. URGENT, TEST, INFO. Vide = URGENT par défaut dans l’app."
+        ),
+    )
     priority = models.CharField(
         max_length=16,
         choices=Priority.choices,

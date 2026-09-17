@@ -119,6 +119,7 @@ class FestivalAnnouncementSerializer(serializers.ModelSerializer):
             "kind",
             "title",
             "body",
+            "badge_label",
             "priority",
             "starts_at",
             "ends_at",

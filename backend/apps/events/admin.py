@@ -111,12 +111,15 @@ class FestivalAnnouncementAdmin(admin.ModelAdmin):
                 ),
             },
         ),
-        ("Contenu", {"fields": ("title", "body", "edition")}),
+        ("Contenu", {"fields": ("badge_label", "title", "body", "edition")}),
         (
             "Redirection",
             {
                 "fields": ("link_url", "link_label"),
-                "description": "Obligatoire uniquement pour « Annonce avec redirection ».",
+                "description": (
+                    "Annonce avec redirection : obligatoire. "
+                    "Urgence : optionnel — si rempli, le tap sur le bandeau ouvre le lien."
+                ),
             },
         ),
         (

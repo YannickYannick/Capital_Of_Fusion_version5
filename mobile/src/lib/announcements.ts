@@ -12,6 +12,8 @@ export type FestivalAnnouncement = {
   kind: AnnouncementKind;
   title: string;
   body: string;
+  /** Mot à gauche du bandeau (ex. TEST). Vide = URGENT i18n. */
+  badge_label?: string;
   priority: AnnouncementPriority;
   starts_at: string | null;
   ends_at: string | null;
@@ -35,6 +37,7 @@ type SeedAnnouncement = {
   ends_at: string | null;
   link_url: string;
   sort_order: number;
+  badge_label?: string;
   i18n: Record<AppLocale, SeedCopy>;
 };
 
@@ -52,6 +55,7 @@ export function localAnnouncementsFallback(
       kind: item.kind,
       title: copy.title,
       body: copy.body,
+      badge_label: item.badge_label || '',
       priority: item.priority,
       starts_at: item.starts_at,
       ends_at: item.ends_at,

@@ -33,6 +33,9 @@ export function UrgentBanner() {
     ? `${urgent.title} — ${urgent.body}${urgent.link_label ? ` → ${urgent.link_label}` : ''}`
     : '';
 
+  const badge =
+    (urgent?.badge_label || '').trim() || t('urgent.badge');
+
   const marquee = line ? `${line}     ·     ${line}     ·     ` : '';
 
   useEffect(() => {
@@ -72,6 +75,17 @@ export function UrgentBanner() {
     Linking.openURL(trimmed).catch(() => undefined);
   };
 
+  /** Tap bandeau : lien externe/interne si présent, sinon détail. */
+  const onBannerPress = () => {
+    if (!urgent) return;
+    const url = (urgent.link_url || '').trim();
+    if (url) {
+      openLink(url);
+      return;
+    }
+    setDetailOpen(true);
+  };
+
   if (!urgent) return null;
 
   return (
@@ -82,9 +96,9 @@ export function UrgentBanner() {
         accessibilityLabel={line}
       >
         <View style={styles.row}>
-          <Text style={styles.badge}>{t('urgent.badge')}</Text>
+          <Text style={styles.badge}>{badge}</Text>
           <Pressable
-            onPress={() => setDetailOpen(true)}
+            onPress={onBannerPress}
             accessibilityRole="button"
             accessibilityLabel={t('urgent.readA11y')}
             style={styles.track}
@@ -115,7 +129,7 @@ export function UrgentBanner() {
       >
         <Pressable style={styles.modalBackdrop} onPress={() => setDetailOpen(false)}>
           <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
-            <Text style={styles.modalBadge}>{t('urgent.badge')}</Text>
+            <Text style={styles.modalBadge}>{badge}</Text>
             <Text style={styles.modalTitle}>{urgent.title}</Text>
             <Text style={styles.modalBody}>{urgent.body}</Text>
             {urgent.link_url ? (
