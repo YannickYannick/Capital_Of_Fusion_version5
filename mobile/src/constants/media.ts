@@ -36,4 +36,4 @@ export function youtubeEmbedUrl(videoId: string): string {
 }
 
 /** Hauteur hero accueil (plus immersive que l’ancien 200px). */
-export const HOME_HERO_HEIGHT = 300;
+export const HOME_HERO_HEIGHT = 360;
