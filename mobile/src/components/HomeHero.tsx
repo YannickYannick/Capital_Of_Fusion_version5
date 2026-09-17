@@ -74,9 +74,9 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    maxWidth: 200,
-    height: 200,
-    marginTop: 8,
+    maxWidth: 220,
+    height: 180,
+    marginTop: 6,
     alignSelf: 'center',
   },
   meta: {
