@@ -217,4 +217,5 @@
 | [2026-09-17 15:15] Completed Task | Logo hero fond transparent | Outcome: fond noir retiré du wordmark hero (local, sans push) ; taille logo 220×180. |
 | [2026-09-17 15:20] Starting Task | Icône app (launcher) | Objectif : remplacer icônes PWA/écran d’accueil avec logo marges+, sans toucher au hero. |
 | [2026-09-17 15:21] Completed Task | Icône app (launcher) | Outcome: pwa 192/512, favicon, icon, splash, android-foreground mis à jour ; hero inchangé. |
+| [2026-09-17 15:38] Starting Task | Tri planning après minuit | Objectif : créneaux 00h–09h en fin de journée festival, pas en tête. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |

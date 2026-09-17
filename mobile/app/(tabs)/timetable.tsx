@@ -10,6 +10,7 @@ import { Chip } from '@/src/components/ui/Chip';
 import { useFavorites } from '@/src/hooks/useFavorites';
 import { useProgram } from '@/src/hooks/useProgram';
 import { useLocale } from '@/src/i18n/LocaleContext';
+import { compareFestivalSlots } from '@/src/lib/festivalSort';
 
 export default function TimetableScreen() {
   const { t, dayLabel } = useLocale();
@@ -23,6 +24,7 @@ export default function TimetableScreen() {
 
   /**
    * Favoris = les 4 jours (ignore le filtre jour). Sinon = jour actif.
+   * Après minuit (< 09h) = fin de soirée, pas en tête de liste.
    */
   const visibleSlots = slots
     .filter(
@@ -31,14 +33,9 @@ export default function TimetableScreen() {
         (stage === 'all' || s.stage === stage) &&
         (!onlyFavs || has(String(s.id))),
     )
-    .sort((a, b) => {
-      if (onlyFavs && a.day !== b.day) {
-        const ai = days.findIndex((d) => d.id === a.day);
-        const bi = days.findIndex((d) => d.id === b.day);
-        return ai - bi;
-      }
-      return a.start.localeCompare(b.start);
-    });
+    .sort((a, b) =>
+      compareFestivalSlots(a, b, (id) => days.findIndex((d) => d.id === id)),
+    );
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 120 }}>
