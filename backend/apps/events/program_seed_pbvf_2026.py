@@ -53,7 +53,7 @@ SLOT_ROWS: list[tuple] = [
     ("sam", "La Casa Room", "14:00", "14:55", "Owen & Eva", "Dynamic Bachata", "intermediate", "workshop", False, False),
     ("sam", "La Escuela", "14:00", "14:55", "Evan & Eugenia", "Role Rotation", "open", "workshop", False, False),
     ("sam", "El Patio Room", "14:00", "14:55", "Mika & Liza", "Brazilian Zouk · Tilt & Twist – Upper Body Movements", "advanced", "workshop", False, True),
-    ("sam", "La Casa Room", "15:00", "15:55", "Claudio & Manue", "Theme TBA", "intermediate", "workshop", False, False),
+    ("sam", "La Casa Room", "15:00", "15:55", "Claudio & Manue", "Bachata Fusion", "intermediate", "workshop", False, False),
     ("sam", "La Escuela", "15:00", "15:55", "Melonito & Laure", "Brazilian Zouk for Bachata", "beginner", "workshop", False, False),
     ("sam", "El Patio Room", "15:00", "15:55", "Didi Backstage", "Hip Work", "open", "workshop", False, False),
     ("sam", "La Casa Room", "16:00", "16:55", "Dario & Sara", "Bachata Fusion", "open", "workshop", False, False),

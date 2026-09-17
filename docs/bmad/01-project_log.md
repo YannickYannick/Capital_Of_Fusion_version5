@@ -206,4 +206,5 @@
 | [2026-09-16 22:02] Completed Task | Urgence test bandeau | Outcome: urgence « test » publiée (remplace la précédente) ; push 2 OK, 2 échecs (token expiré + JWT Safari). |
 | [2026-09-17 14:16] Starting Task | Remplacement Luis & Andrea | Objectif : 3 créneaux → David & Ines / Mika & Liza / Claudio & Manue. |
 | [2026-09-17 14:20] Completed Task | Remplacement Luis & Andrea | Outcome: seed + PWA + passes mis à jour ; migration `0017` appliquée Railway ; Luis & Andrea retiré du seed artistes / staff_role. Thème Claudio & Manue = `Theme TBA`. |
+| [2026-09-17 14:24] Starting Task | Thème Claudio & Manue | Objectif : Theme TBA → Bachata Fusion. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |
