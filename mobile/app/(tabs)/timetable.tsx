@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { space, theme } from '@/constants/theme';
@@ -10,7 +10,7 @@ import { Chip } from '@/src/components/ui/Chip';
 import { useFavorites } from '@/src/hooks/useFavorites';
 import { useProgram } from '@/src/hooks/useProgram';
 import { useLocale } from '@/src/i18n/LocaleContext';
-import { compareFestivalSlots } from '@/src/lib/festivalSort';
+import { buildOpenDoorMinutesByDay, compareFestivalSlots } from '@/src/lib/festivalSort';
 
 export default function TimetableScreen() {
   const { t, dayLabel } = useLocale();
@@ -22,9 +22,11 @@ export default function TimetableScreen() {
 
   const activeDay = day ?? days[0]?.id ?? 'jeu';
 
+  const openDoorByDay = useMemo(() => buildOpenDoorMinutesByDay(slots), [slots]);
+
   /**
    * Favoris = les 4 jours (ignore le filtre jour). Sinon = jour actif.
-   * Après minuit (< 09h) = fin de soirée, pas en tête de liste.
+   * Rien avant Open Doors en tête : créneaux plus tôt = fin de soirée.
    */
   const visibleSlots = slots
     .filter(
@@ -34,7 +36,12 @@ export default function TimetableScreen() {
         (!onlyFavs || has(String(s.id))),
     )
     .sort((a, b) =>
-      compareFestivalSlots(a, b, (id) => days.findIndex((d) => d.id === id)),
+      compareFestivalSlots(
+        a,
+        b,
+        (id) => days.findIndex((d) => d.id === id),
+        openDoorByDay,
+      ),
     );
 
   return (

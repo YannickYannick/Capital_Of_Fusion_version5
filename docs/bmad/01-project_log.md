@@ -219,4 +219,5 @@
 | [2026-09-17 15:21] Completed Task | Icône app (launcher) | Outcome: pwa 192/512, favicon, icon, splash, android-foreground mis à jour ; hero inchangé. |
 | [2026-09-17 15:38] Starting Task | Tri planning après minuit | Objectif : créneaux 00h–09h en fin de journée festival, pas en tête. |
 | [2026-09-17 15:40] Completed Task | Tri planning après minuit | Outcome: `festivalSortMinutes` (<09h = +24h) ; Boiler Room / after-parties en bas de liste. |
+| [2026-09-17 15:41] Completed Task | Tri via Open Doors | Outcome: cutoff = heure Open Doors du jour (plus simple / robuste). |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |
