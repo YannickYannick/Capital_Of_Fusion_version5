@@ -213,4 +213,5 @@ export const images = {
   jackNJillJudgesSundayFinal: require('@/assets/images/festival/jack-n-jill-judges-sunday-final.png'),
   streetBachataBattle: require('@/assets/images/festival/street-bachata-battle-18-sept-26.jpg'),
   hotelDaySocials: require('@/assets/images/festival/hotel-day-socials.png'),
+  appShareQr: require('@/assets/images/festival/app-share-qr.png'),
 };

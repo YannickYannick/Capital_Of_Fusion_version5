@@ -52,6 +52,11 @@ export type Messages = {
     logoA11y: string;
     announcements: string;
     remainingA11y: string;
+    shareCopy: string;
+    shareCopied: string;
+    shareNative: string;
+    shareOpen: string;
+    shareQrA11y: string;
   };
   urgent: { badge: string; dismissA11y: string; readA11y: string; closeDetail: string };
   timetable: {

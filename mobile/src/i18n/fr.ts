@@ -42,6 +42,11 @@ export const fr: Messages = {
     logoA11y: 'Paris Bachata Vibe Festival',
     announcements: 'Annonces',
     remainingA11y: 'Temps restant {label}',
+    shareCopy: 'Copier le lien',
+    shareCopied: 'Copié',
+    shareNative: 'Partager…',
+    shareOpen: 'Ouvrir',
+    shareQrA11y: 'QR code vers l’app festival',
   },
   urgent: {
     badge: 'URGENT',

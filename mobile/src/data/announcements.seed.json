@@ -1,5 +1,33 @@
 [
   {
+    "id": "seed-share-app",
+    "edition": "2026",
+    "kind": "info",
+    "priority": "normal",
+    "starts_at": null,
+    "ends_at": null,
+    "link_url": "https://app.capitaloffusion.com",
+    "image_url": "local:app-share-qr",
+    "sort_order": 0,
+    "i18n": {
+      "en": {
+        "title": "Share the festival app",
+        "body": "Scan the QR or copy the link so friends can open the PWA on their phone.",
+        "link_label": "Copy link"
+      },
+      "fr": {
+        "title": "Partage l’app du festival",
+        "body": "Scanne le QR ou copie le lien pour que tes amis ouvrent la PWA sur leur téléphone.",
+        "link_label": "Copier le lien"
+      },
+      "es": {
+        "title": "Comparte la app del festival",
+        "body": "Escanea el QR o copia el enlace para que tus amigos abran la PWA en su teléfono.",
+        "link_label": "Copiar enlace"
+      }
+    }
+  },
+  {
     "id": "seed-urgent-welcome",
     "edition": "2026",
     "kind": "urgent",
@@ -35,7 +63,7 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/passes",
-    "sort_order": 1,
+    "sort_order": 11,
     "i18n": {
       "en": {
         "title": "Check your pass",
@@ -62,7 +90,7 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/code-of-conduct",
-    "sort_order": 3,
+    "sort_order": 13,
     "i18n": {
       "en": {
         "title": "Code of Conduct",
@@ -89,7 +117,7 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/shuttles",
-    "sort_order": 4,
+    "sort_order": 14,
     "i18n": {
       "en": {
         "title": "Book your navette",
@@ -116,7 +144,7 @@
     "starts_at": null,
     "ends_at": null,
     "link_url": "/festival-rules",
-    "sort_order": 2,
+    "sort_order": 12,
     "i18n": {
       "en": {
         "title": "Festival Rules",

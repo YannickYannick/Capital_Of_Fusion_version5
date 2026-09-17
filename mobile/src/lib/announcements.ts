@@ -19,6 +19,8 @@ export type FestivalAnnouncement = {
   ends_at: string | null;
   link_url: string;
   link_label: string;
+  /** URL abs. d’image (QR…) ou `local:app-share-qr` pour l’asset embarqué. */
+  image_url?: string;
   sort_order: number;
 };
 
@@ -36,6 +38,7 @@ type SeedAnnouncement = {
   starts_at: string | null;
   ends_at: string | null;
   link_url: string;
+  image_url?: string;
   sort_order: number;
   badge_label?: string;
   i18n: Record<AppLocale, SeedCopy>;
@@ -61,6 +64,7 @@ export function localAnnouncementsFallback(
       ends_at: item.ends_at,
       link_url: item.link_url,
       link_label: copy.link_label,
+      image_url: item.image_url || '',
       sort_order: item.sort_order,
     };
   });

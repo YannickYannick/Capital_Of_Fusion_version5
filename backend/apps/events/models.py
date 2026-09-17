@@ -230,6 +230,15 @@ class FestivalAnnouncement(BaseModel):
         help_text="Obligatoire pour une annonce avec redirection (/passes, /code-of-conduct…)",
     )
     link_label = models.CharField(max_length=80, blank=True)
+    image_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text=(
+            "URL absolue d’une image (QR code, affiche…). "
+            "Ex. https://www.capitaloffusion.com/images/festival/app-share-qr.png"
+        ),
+    )
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:

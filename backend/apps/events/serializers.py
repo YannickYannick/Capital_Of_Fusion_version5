@@ -125,6 +125,7 @@ class FestivalAnnouncementSerializer(serializers.ModelSerializer):
             "ends_at",
             "link_url",
             "link_label",
+            "image_url",
             "sort_order",
         )
         read_only_fields = fields

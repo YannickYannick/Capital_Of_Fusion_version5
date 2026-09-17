@@ -111,14 +111,15 @@ class FestivalAnnouncementAdmin(admin.ModelAdmin):
                 ),
             },
         ),
-        ("Contenu", {"fields": ("badge_label", "title", "body", "edition")}),
+        ("Contenu", {"fields": ("badge_label", "title", "body", "edition", "image_url")}),
         (
             "Redirection",
             {
                 "fields": ("link_url", "link_label"),
                 "description": (
                     "Annonce avec redirection : obligatoire. "
-                    "Urgence : optionnel — si rempli, le tap sur le bandeau ouvre le lien."
+                    "Urgence : optionnel — si rempli, le tap sur le bandeau ouvre le lien. "
+                    "Partage app : mets l’URL PWA dans link_url + image_url = QR."
                 ),
             },
         ),
