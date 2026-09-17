@@ -96,6 +96,13 @@ export type Messages = {
     aquaboulevardDetail: string;
     aquaboulevardAddress: string;
     aquaboulevardAddressDay: string;
+    addresses: string;
+    addrMain: string;
+    addrPool: string;
+    addrHotel: string;
+    openInMaps: string;
+    copyAddress: string;
+    addressCopied: string;
     subCasa: string;
     subCasaDetail: string;
     subEscuela: string;

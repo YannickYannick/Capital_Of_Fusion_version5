@@ -1,7 +1,18 @@
-import { useState } from 'react';
-import { ChevronDown, MapPin, Play } from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import * as Clipboard from 'expo-clipboard';
+import { ChevronDown, Copy, ExternalLink, MapPin, Play } from 'lucide-react-native';
 import { Image, type ImageSource } from 'expo-image';
-import { LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, Text, UIManager, View } from 'react-native';
+import {
+  LayoutAnimation,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  UIManager,
+  View,
+} from 'react-native';
 
 import { radius, space, theme } from '@/constants/theme';
 import { type } from '@/constants/typography';
@@ -10,6 +21,7 @@ import { PageHeader } from '@/src/components/PageHeader';
 import { AccesVenueVideo } from '@/src/components/SiteEntryVideo';
 import { GlassCard } from '@/src/components/ui/SurfaceCard';
 import { useLocale } from '@/src/i18n/LocaleContext';
+import type { Messages } from '@/src/i18n/types';
 import { VENUE_AREAS, images, type VenueArea } from '@/src/lib/festival-data';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -19,6 +31,29 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const AREAS12_TAB_ID = 'areas-1-2';
 const ENTRY_TAB_ID = 'site-entry';
 const TEASER_TAB_ID = 'acces-teaser';
+
+/** Adresses venue — ouverture Maps / copie. */
+const MAP_ADDRESSES: {
+  id: string;
+  labelKey: keyof Messages['map'];
+  address: string;
+}[] = [
+  {
+    id: 'main',
+    labelKey: 'addrMain',
+    address: '20 Rue du Colonel Pierre Avia, 75015 Paris',
+  },
+  {
+    id: 'pool',
+    labelKey: 'addrPool',
+    address: '4 Rue Louis Armand, 75015 Paris',
+  },
+  {
+    id: 'hotel',
+    labelKey: 'addrHotel',
+    address: '40 Av. du Maréchal de Lattre de Tassigny, 92360 Meudon',
+  },
+];
 
 /** Clés i18n name/detail pour une zone venue (id festival-data). */
 const AREA_I18N: Record<string, { name: string; detail: string }> = {
@@ -44,7 +79,17 @@ const SUB_I18N: Record<string, { name: string; detail: string }> = {
 type LightboxState = { source: ImageSource; label: string } | null;
 
 /**
- * Carte venue — overview, toggles zones, vidéos, lightbox plein écran au clic.
+ * Ouvre Google Maps sur l’adresse (web + natif).
+ * Inputs: adresse postale.
+ * Outputs: void (side-effect Linking).
+ */
+function openGoogleMaps(address: string) {
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  Linking.openURL(url).catch(() => undefined);
+}
+
+/**
+ * Carte venue — overview, adresses, toggles zones, vidéos, lightbox.
  */
 export default function MapScreen() {
   const { t } = useLocale();
@@ -80,6 +125,18 @@ export default function MapScreen() {
               />
             </Pressable>
           </GlassCard>
+
+          <Text style={[styles.sectionLabel, styles.sectionSpaced]}>{t('map.addresses')}</Text>
+          <View style={styles.addressList}>
+            {MAP_ADDRESSES.map((item, index) => (
+              <AddressRow
+                key={item.id}
+                label={t(`map.${item.labelKey}`)}
+                address={item.address}
+                showBorder={index < MAP_ADDRESSES.length - 1}
+              />
+            ))}
+          </View>
 
           <Text style={[styles.sectionLabel, styles.sectionSpaced]}>{t('map.zones')}</Text>
           <View style={styles.accordion}>
@@ -173,6 +230,68 @@ export default function MapScreen() {
         onClose={() => setLightbox(null)}
       />
     </>
+  );
+}
+
+type AddressRowProps = {
+  label: string;
+  address: string;
+  showBorder: boolean;
+};
+
+/**
+ * Ligne adresse : tap = Google Maps, bouton = copier.
+ * Inputs: label, address, showBorder.
+ * Outputs: UI interactive.
+ */
+function AddressRow({ label, address, showBorder }: AddressRowProps) {
+  const { t } = useLocale();
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 1600);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const onCopy = async () => {
+    try {
+      await Clipboard.setStringAsync(address);
+      setCopied(true);
+    } catch {
+      // ignore
+    }
+  };
+
+  return (
+    <View style={[styles.addrRow, showBorder && styles.addrBorder]}>
+      <Pressable
+        onPress={() => openGoogleMaps(address)}
+        style={({ pressed }) => [styles.addrMain, pressed && styles.pressed]}
+        accessibilityRole="link"
+        accessibilityLabel={`${label}. ${address}. ${t('map.openInMaps')}`}
+      >
+        <MapPin size={16} color={theme.gold} strokeWidth={2} />
+        <View style={styles.addrBody}>
+          <Text style={styles.addrLabel}>{label}</Text>
+          <Text style={styles.addrText}>{address}</Text>
+        </View>
+        <ExternalLink size={16} color={theme.muted} strokeWidth={2} />
+      </Pressable>
+      <Pressable
+        onPress={onCopy}
+        hitSlop={8}
+        style={({ pressed }) => [styles.addrCopy, pressed && styles.pressed]}
+        accessibilityRole="button"
+        accessibilityLabel={copied ? t('map.addressCopied') : t('map.copyAddress')}
+      >
+        {copied ? (
+          <Text style={styles.addrCopied}>{t('map.addressCopied')}</Text>
+        ) : (
+          <Copy size={16} color={theme.gold} strokeWidth={2} />
+        )}
+      </Pressable>
+    </View>
   );
 }
 
@@ -410,5 +529,52 @@ const styles = StyleSheet.create({
   addressText: {
     ...type.bodyMedium,
     color: theme.foreground,
+  },
+  addressList: {
+    borderRadius: radius.card,
+    backgroundColor: theme.surface,
+    overflow: 'hidden',
+  },
+  addrRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  addrBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  addrMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  addrBody: { flex: 1 },
+  addrLabel: {
+    ...type.meta,
+    color: theme.gold,
+    letterSpacing: 0.4,
+    marginBottom: 2,
+  },
+  addrText: {
+    ...type.body,
+    fontSize: 13,
+    color: theme.foreground,
+    lineHeight: 18,
+  },
+  addrCopy: {
+    width: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderLeftWidth: 1,
+    borderLeftColor: theme.border,
+  },
+  addrCopied: {
+    ...type.meta,
+    fontSize: 10,
+    color: theme.gold,
+    fontWeight: '700',
   },
 });

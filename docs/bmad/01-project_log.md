@@ -210,4 +210,6 @@
 | [2026-09-17 14:25] Completed Task | Thème Claudio & Manue | Outcome: style `Bachata Fusion` en seed + BDD prod (1 créneau sam 15h). |
 | [2026-09-17 14:35] Starting Task | Badge bandeau configurable | Objectif : champ badge_label + urgence test lien capitaloffusion.com. |
 | [2026-09-17 14:38] Completed Task | Badge bandeau configurable | Outcome: `badge_label` (admin + API) ; tap ouvre `link_url` ; urgence test « test » → capitaloffusion.com ; migration `0018`. |
+| [2026-09-17 14:39] Starting Task | Adresses onglet Carte | Objectif : 3 adresses cliquables (Maps + copier) Main / Pool-samedi / Hôtel. |
+| [2026-09-17 14:42] Completed Task | Adresses onglet Carte | Outcome: section Adresses sous overview — tap = Google Maps, icône = copier ; EN/FR/ES. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |
