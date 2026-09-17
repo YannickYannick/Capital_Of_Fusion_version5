@@ -814,5 +814,13 @@
     "lineDoubleClick": "Double-clic : réinitialiser",
     "dismissButton": "Compris",
     "nonBlockingHint": "Vous pouvez utiliser le menu du haut pour aller ailleurs."
+  },
+  "mobileAppPrompt": {
+    "aria": "Recommandation application festival",
+    "title": "Meilleure expérience avec l’app festival",
+    "body": "Planning, carte, alertes et infos live — on te recommande l’app PBVF. Ce n’est pas obligatoire : tu peux rester sur ce site.",
+    "cta": "Ouvrir l’app",
+    "dismiss": "Plus tard",
+    "dismissA11y": "Fermer la recommandation d’app"
   }
 }

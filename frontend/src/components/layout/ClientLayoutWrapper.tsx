@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/shared/Navbar";
 import { MainContent } from "@/components/shared/MainContent";
+import { MobileAppRecommendBanner } from "@/components/shared/MobileAppRecommendBanner";
 import {
   PlanetsOptionsProvider,
   usePlanetsOptions,
@@ -60,6 +61,7 @@ function MainChrome({
       <Navbar />
       {showVideo && <VideoBackgroundClient config={config} />}
       <MainContent>{children}</MainContent>
+      <MobileAppRecommendBanner />
     </>
   );
 }

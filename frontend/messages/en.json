@@ -814,5 +814,13 @@
     "lineDoubleClick": "Double-click: reset",
     "dismissButton": "Got it",
     "nonBlockingHint": "You can use the top menu to go elsewhere."
+  },
+  "mobileAppPrompt": {
+    "aria": "Festival app recommendation",
+    "title": "Better on your phone with the festival app",
+    "body": "Schedules, map, alerts and live info — we recommend opening the PBVF app for the best experience. Optional, you can stay on this site.",
+    "cta": "Open the app",
+    "dismiss": "Later",
+    "dismissA11y": "Dismiss app recommendation"
   }
 }

@@ -220,4 +220,9 @@
 | [2026-09-17 15:38] Starting Task | Tri planning après minuit | Objectif : créneaux 00h–09h en fin de journée festival, pas en tête. |
 | [2026-09-17 15:40] Completed Task | Tri planning après minuit | Outcome: `festivalSortMinutes` (<09h = +24h) ; Boiler Room / after-parties en bas de liste. |
 | [2026-09-17 15:41] Completed Task | Tri via Open Doors | Outcome: cutoff = heure Open Doors du jour (plus simple / robuste). |
+| [2026-09-17 16:09] Completed Task | Désactiver bandeau | Outcome: urgence « Test redirection » dépubliée (prod). |
+| [2026-09-17 16:10] Completed Task | Réactiver bandeau + push | Outcome: urgence test republiee + send_push. |
+| [2026-09-17 16:15] Starting Task | Soft redirect mobile → app | Objectif : recommandation PWA sur téléphone (EN/FR/ES), dismissible. |
+| [2026-09-17 16:16] Completed Task | Soft redirect mobile → app | Outcome: `MobileAppRecommendBanner` bas écran ≤768px → app.capitaloffusion.com ; Later = localStorage ; EN/FR/ES. |
+| [2026-09-17 16:14] Starting Task | Redirect mobile → PWA | Objectif : www.capitaloffusion.com/ (téléphone) → app.capitaloffusion.com, FR/EN/ES. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |
