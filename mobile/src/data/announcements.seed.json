@@ -12,17 +12,17 @@
     "i18n": {
       "en": {
         "title": "Share the festival app",
-        "body": "Scan the QR or copy the link so friends can open the PWA on their phone.",
+        "body": "Scan the QR or copy the link so friends can open the app on their phone.",
         "link_label": "Copy link"
       },
       "fr": {
         "title": "Partage l’app du festival",
-        "body": "Scanne le QR ou copie le lien pour que tes amis ouvrent la PWA sur leur téléphone.",
+        "body": "Scanne le QR ou copie le lien pour que tes amis ouvrent l’appli sur leur téléphone.",
         "link_label": "Copier le lien"
       },
       "es": {
         "title": "Comparte la app del festival",
-        "body": "Escanea el QR o copia el enlace para que tus amigos abran la PWA en su teléfono.",
+        "body": "Escanea el QR o copia el enlace para que tus amigos abran la app en su teléfono.",
         "link_label": "Copiar enlace"
       }
     }

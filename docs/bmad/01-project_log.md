@@ -228,5 +228,6 @@
 | [2026-09-17 17:20] Completed Task | Hotel Day Socials | Outcome: page app `/hotel-socials` + More ; section + affiche + markdown EN/FR/ES sur book-your-hotel ; 4 créneaux `Hotel` (seed + migration 0019). |
 | [2026-09-17 17:22] Starting Task | Annonce QR partage app | Objectif : 1ère annonce accueil = QR + URL PWA pour diffusion. |
 | [2026-09-17 17:25] Completed Task | Annonce QR partage app | Outcome: `image_url` sur FestivalAnnouncement ; seed Share app (sort 0) ; UI QR + URL + Copier/Partager/Ouvrir ; asset `app-share-qr.png`. |
+| [2026-09-17 17:39] Completed Task | Share app UX tweak | Outcome: bouton Ouvrir retiré ; « PWA » → « appli »/app (seed + migration 0021). |
 | [2026-09-17 16:14] Starting Task | Redirect mobile → PWA | Objectif : www.capitaloffusion.com/ (téléphone) → app.capitaloffusion.com, FR/EN/ES. |
 | [2026-09-17 14:12] Starting Task | Bandeau urgent 2 champs + anim | Objectif : texte ticker dédié, texte complet au clic, toggle masquer texte, pause 3s puis défilement intégral. |

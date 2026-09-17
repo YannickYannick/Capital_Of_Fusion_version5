@@ -129,13 +129,6 @@ export function HomeAnnouncements() {
                 >
                   <Text style={styles.actionText}>{t('home.shareNative')}</Text>
                 </Pressable>
-                <Pressable
-                  onPress={() => openLink(url)}
-                  style={styles.actionBtn}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.actionText}>{t('home.shareOpen')}</Text>
-                </Pressable>
               </View>
             </GlassCard>
           );

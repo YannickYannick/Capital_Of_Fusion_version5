@@ -45,7 +45,6 @@ export const en: Messages = {
     shareCopy: 'Copy link',
     shareCopied: 'Copied',
     shareNative: 'Share…',
-    shareOpen: 'Open',
     shareQrA11y: 'QR code linking to the festival app',
   },
   urgent: {
